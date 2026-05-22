@@ -1,0 +1,59 @@
+# ── Dart / Flutter ───────────────────────────────────────────────────────────
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+/build/
+coverage/
+**/doc/api/
+app.*.symbols
+app.*.map.json
+*.dart.js
+*.info.json
+
+# ── Generated plugin registrants / ephemeral build files ─────────────────────
+**/ios/Flutter/.last_build_id
+**/ios/Flutter/flutter_export_environment.sh
+**/macos/Flutter/ephemeral/
+ios/.symlinks/
+
+# ── CocoaPods ────────────────────────────────────────────────────────────────
+ios/Pods/
+macos/Pods/
+
+# ── Xcode (iOS / macOS) ──────────────────────────────────────────────────────
+**/xcuserdata/
+**/DerivedData/
+*.moved-aside
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+
+# ── IDE / editor ─────────────────────────────────────────────────────────────
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.history
+.atom/
+.svn/
+migrate_working_dir/
+
+# ── OS / misc ────────────────────────────────────────────────────────────────
+.DS_Store
+*.log
+*.swp
+*.class
+*.pyc
+
+# ── Local environment ────────────────────────────────────────────────────────
+*.env
+.env.local
+
+# ── just local state ─────────────────────────────────────────────────────────
+.just/
