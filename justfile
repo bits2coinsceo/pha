@@ -5,7 +5,7 @@ set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
 
 flutter := "flutter"
 bundle_id := "com.pha.phaFlutter"
-ios_device := env_var_or_default("IOS_DEVICE_ID", "iPhone 15 Pro")
+ios_device := env_var_or_default("IOS_DEVICE_ID", "iPhone 17")
 simulator_app := "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app"
 
 default:
