@@ -19,8 +19,30 @@ class Db {
     final path = p.join(dir.path, 'pha.db');
     _db = await databaseFactory.openDatabase(
       path,
-      options: OpenDatabaseOptions(version: 1, onCreate: _create),
+      options: OpenDatabaseOptions(version: 2, onCreate: _create, onUpgrade: _upgrade),
     );
+  }
+
+  Future<void> _upgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await _createOnboardingDrafts(db);
+    }
+  }
+
+  Future<void> _createOnboardingDrafts(Database db) async {
+    await db.execute('''
+      CREATE TABLE onboarding_drafts (
+        id TEXT PRIMARY KEY,
+        unit_system TEXT NOT NULL DEFAULT 'metric',
+        age INTEGER,
+        height INTEGER,
+        weight REAL,
+        metrics_json TEXT,
+        step INTEGER NOT NULL DEFAULT 1,
+        completed INTEGER NOT NULL DEFAULT 0,
+        updated_at TEXT NOT NULL
+      )
+    ''');
   }
 
   Future<void> _create(Database db, int version) async {
@@ -127,5 +149,6 @@ class Db {
         analyzed_at TEXT NOT NULL
       )
     ''');
+    await _createOnboardingDrafts(db);
   }
 }

@@ -107,6 +107,85 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     _weight.addListener(() {
       if (step == 2 && !_xpWeight && _weight.text.trim().isNotEmpty) _setXpWeight();
     });
+
+    if (beforeSignUp) _restoreDraft();
+  }
+
+  /// Restores an interrupted pre-signup onboarding from the persisted draft so
+  /// the user resumes where they left off instead of starting over.
+  Future<void> _restoreDraft() async {
+    final d = await OnboardingPrefs.load();
+    if (d == null || !mounted) return;
+    setState(() {
+      unitSystem = d.unitSystem;
+
+      // Mark micro-XP flags before assigning text so listeners don't re-award.
+      _xpAge = d.age != null;
+      _xpHeight = d.heightCm != null;
+      _xpWeight = d.weightKg != null;
+
+      if (d.age != null) _age.text = '${d.age}';
+      if (d.heightCm != null) {
+        if (isImperial) {
+          final r = cmToFtIn(d.heightCm!.toDouble());
+          _heightFt.text = '${r.ft}';
+          _heightIn.text = '${r.inch}';
+        } else {
+          _heightCm.text = '${d.heightCm}';
+        }
+      }
+      if (d.weightKg != null) {
+        _weight.text = isImperial
+            ? (kgToLbs(d.weightKg!) * 10).round().toString()
+            : d.weightKg!.toStringAsFixed(d.weightKg! % 1 == 0 ? 0 : 1);
+      }
+
+      _pendingAge = d.age;
+      _pendingHeightCm = d.heightCm;
+      _pendingWeightKg = d.weightKg;
+
+      final sys = d.extraMetrics['blood_pressure_systolic'];
+      final dia = d.extraMetrics['blood_pressure_diastolic'];
+      final glucose = d.extraMetrics['glucose'];
+      if (sys != null) _systolic.text = sys.round().toString();
+      if (dia != null) _diastolic.text = dia.round().toString();
+      if (glucose != null) {
+        _glucose.text = isImperial
+            ? glucose.round().toString()
+            : mgdlToMmol(glucose).toStringAsFixed(1);
+      }
+
+      step = d.completed ? 4 : d.step.clamp(1, 3);
+      quest1Done = d.step > 1;
+      quest2Done = d.step > 2;
+      quest3Done = d.completed;
+      vitalsBonus = d.extraMetrics.isNotEmpty;
+
+      _badges['units'] = quest1Done;
+      _badges['foundation'] = quest2Done;
+      _badges['champion'] = quest3Done;
+      if (sys != null && dia != null) _badges['heart'] = true;
+      if (glucose != null) _badges['glucose'] = true;
+
+      xp = _restoredXp(d).clamp(0, _maxXp);
+    });
+  }
+
+  int _restoredXp(OnboardingDraftData d) {
+    var total = 0;
+    if (d.step > 1) total += 50; // Quest 1
+    if (d.step > 2) {
+      total += 120; // Quest 2
+      if (d.age != null) total += 15;
+      if (d.heightCm != null) total += 15;
+      if (d.weightKg != null) total += 15;
+    }
+    if (d.completed) {
+      total += 40; // Quest 3 base
+      if (d.extraMetrics.containsKey('blood_pressure_systolic')) total += 80;
+      if (d.extraMetrics.containsKey('glucose')) total += 80;
+    }
+    return total;
   }
 
   @override
@@ -210,6 +289,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   }
 
   void _completeQuest1() {
+    if (beforeSignUp) OnboardingPrefs.saveUnit(unitSystem);
     if (quest1Done) {
       setState(() => step = 2);
       return;
@@ -250,6 +330,12 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       _pendingAge = ageVal;
       _pendingHeightCm = heightCm;
       _pendingWeightKg = weightKg;
+      await OnboardingPrefs.saveGeneral(
+        unitSystem: unitSystem,
+        age: ageVal,
+        heightCm: heightCm,
+        weightKg: weightKg,
+      );
     } else {
       final auth = context.read<AuthProvider>();
       await Db.instance.raw.update(
@@ -336,11 +422,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         setState(() { error = 'Complete Quest 2 first.'; saving = false; });
         return;
       }
-      await OnboardingPrefs.save(
+      await OnboardingPrefs.complete(
         unitSystem: unitSystem,
-        age: _pendingAge!,
-        heightCm: _pendingHeightCm!,
-        weightKg: _pendingWeightKg!,
         extraMetrics: extraMetrics,
       );
     } else {

@@ -1,52 +1,135 @@
 import 'dart:convert';
 
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import 'db.dart';
 
-const _kComplete = 'pre_onboarding_complete';
-const _kUnit = 'pending_unit_system';
-const _kAge = 'pending_age';
-const _kHeight = 'pending_height';
-const _kMetrics = 'pending_metrics_json';
-
 const _uuid = Uuid();
 
-/// Onboarding data collected before sign-up; applied to profile on registration.
+/// Snapshot of an in-progress onboarding draft, used to restore the UI when a
+/// user reopens the app after interrupting onboarding.
+class OnboardingDraftData {
+  final String unitSystem;
+  final int? age;
+  final int? heightCm;
+  final double? weightKg;
+  final Map<String, double> extraMetrics;
+  final int step;
+  final bool completed;
+
+  const OnboardingDraftData({
+    required this.unitSystem,
+    required this.age,
+    required this.heightCm,
+    required this.weightKg,
+    required this.extraMetrics,
+    required this.step,
+    required this.completed,
+  });
+}
+
+/// Onboarding data collected before sign-up. Persisted to SQLite incrementally
+/// (on every quest/page change) so an interrupted onboarding is never repeated,
+/// then applied to the profile + health metrics once the user registers.
 class OnboardingPrefs {
-  static Future<bool> isComplete() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_kComplete) ?? false;
+  // There is only one pre-signup user on a device, so the draft is a singleton.
+  static const _id = 'pending';
+
+  static Future<Map<String, Object?>?> _row() async {
+    final rows = await Db.instance.raw
+        .query('onboarding_drafts', where: 'id = ?', whereArgs: [_id]);
+    return rows.isEmpty ? null : rows.first;
   }
 
-  static Future<void> save({
+  /// Upsert the subset of columns in [values] into the singleton draft row.
+  static Future<void> _upsert(Map<String, Object?> values) async {
+    final now = DateTime.now().toUtc().toIso8601String();
+    final existing = await _row();
+    if (existing == null) {
+      await Db.instance.raw.insert('onboarding_drafts', {
+        'id': _id,
+        'unit_system': 'metric',
+        'step': 1,
+        'completed': 0,
+        ...values,
+        'updated_at': now,
+      });
+    } else {
+      await Db.instance.raw.update(
+        'onboarding_drafts',
+        {...values, 'updated_at': now},
+        where: 'id = ?',
+        whereArgs: [_id],
+      );
+    }
+  }
+
+  static Future<bool> isComplete() async {
+    final r = await _row();
+    return r != null && (r['completed'] as int) == 1;
+  }
+
+  /// Loads the current draft (completed or in-progress) for restoring the UI.
+  static Future<OnboardingDraftData?> load() async {
+    final r = await _row();
+    if (r == null) return null;
+    final metricsJson = r['metrics_json'] as String?;
+    final extra = <String, double>{};
+    if (metricsJson != null && metricsJson.isNotEmpty) {
+      final decoded = jsonDecode(metricsJson) as Map<String, dynamic>;
+      decoded.forEach((k, v) => extra[k] = (v as num).toDouble());
+    }
+    return OnboardingDraftData(
+      unitSystem: r['unit_system'] as String? ?? 'metric',
+      age: r['age'] as int?,
+      heightCm: r['height'] as int?,
+      weightKg: (r['weight'] as num?)?.toDouble(),
+      extraMetrics: extra,
+      step: (r['step'] as int?) ?? 1,
+      completed: ((r['completed'] as int?) ?? 0) == 1,
+    );
+  }
+
+  /// Quest 1 done — units chosen. Advances the saved step to 2.
+  static Future<void> saveUnit(String unitSystem) =>
+      _upsert({'unit_system': unitSystem, 'step': 2});
+
+  /// Quest 2 done — core vitals captured. Advances the saved step to 3.
+  static Future<void> saveGeneral({
     required String unitSystem,
     required int age,
     required int heightCm,
     required double weightKg,
+  }) =>
+      _upsert({
+        'unit_system': unitSystem,
+        'age': age,
+        'height': heightCm,
+        'weight': weightKg,
+        'step': 3,
+      });
+
+  /// Quest 3 done — optional vitals captured and onboarding finished.
+  static Future<void> complete({
+    required String unitSystem,
     Map<String, double> extraMetrics = const {},
-  }) async {
-    final prefs = await SharedPreferences.getInstance();
-    final metrics = <Map<String, dynamic>>[
-      {'metric_type': 'weight', 'value': weightKg},
-      for (final e in extraMetrics.entries) {'metric_type': e.key, 'value': e.value},
-    ];
-    await prefs.setBool(_kComplete, true);
-    await prefs.setString(_kUnit, unitSystem);
-    await prefs.setInt(_kAge, age);
-    await prefs.setInt(_kHeight, heightCm);
-    await prefs.setString(_kMetrics, jsonEncode(metrics));
-  }
+  }) =>
+      _upsert({
+        'unit_system': unitSystem,
+        'metrics_json': jsonEncode(extraMetrics),
+        'step': 4,
+        'completed': 1,
+      });
 
+  /// Copies the completed draft onto a freshly registered user, then clears it.
   static Future<void> applyToUser(String userId) async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!(prefs.getBool(_kComplete) ?? false)) return;
+    final r = await _row();
+    if (r == null || (r['completed'] as int) != 1) return;
 
-    final unit = prefs.getString(_kUnit) ?? 'metric';
-    final age = prefs.getInt(_kAge);
-    final height = prefs.getInt(_kHeight);
-    final metricsJson = prefs.getString(_kMetrics);
+    final unit = r['unit_system'] as String? ?? 'metric';
+    final age = r['age'] as int?;
+    final height = r['height'] as int?;
+    final weight = (r['weight'] as num?)?.toDouble();
 
     await Db.instance.raw.update(
       'profiles',
@@ -60,35 +143,32 @@ class OnboardingPrefs {
       whereArgs: [userId],
     );
 
-    if (metricsJson != null) {
-      final list = jsonDecode(metricsJson) as List<dynamic>;
-      final now = DateTime.now().toUtc().toIso8601String();
-      for (final raw in list) {
-        final m = raw as Map<String, dynamic>;
-        await Db.instance.raw.insert('health_metrics', {
-          'id': _uuid.v4(),
-          'user_id': userId,
-          'metric_type': m['metric_type'] as String,
-          'value': (m['value'] as num).toDouble(),
-          'recorded_at': now,
-          'created_at': now,
-        });
-      }
+    final now = DateTime.now().toUtc().toIso8601String();
+    final metrics = <MapEntry<String, double>>[
+      if (weight != null) MapEntry('weight', weight),
+    ];
+    final metricsJson = r['metrics_json'] as String?;
+    if (metricsJson != null && metricsJson.isNotEmpty) {
+      final decoded = jsonDecode(metricsJson) as Map<String, dynamic>;
+      decoded.forEach((k, v) => metrics.add(MapEntry(k, (v as num).toDouble())));
+    }
+    for (final m in metrics) {
+      await Db.instance.raw.insert('health_metrics', {
+        'id': _uuid.v4(),
+        'user_id': userId,
+        'metric_type': m.key,
+        'value': m.value,
+        'recorded_at': now,
+        'created_at': now,
+      });
     }
 
-    await prefs.remove(_kUnit);
-    await prefs.remove(_kAge);
-    await prefs.remove(_kHeight);
-    await prefs.remove(_kMetrics);
+    await clear();
   }
 
   /// For tests / full reset.
   static Future<void> clear() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_kComplete);
-    await prefs.remove(_kUnit);
-    await prefs.remove(_kAge);
-    await prefs.remove(_kHeight);
-    await prefs.remove(_kMetrics);
+    await Db.instance.raw
+        .delete('onboarding_drafts', where: 'id = ?', whereArgs: [_id]);
   }
 }
