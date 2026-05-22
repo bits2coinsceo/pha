@@ -381,7 +381,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                     children: [
                       if (_xpToastMsg != null) ...[
                         OnboardingXpToast(message: _xpToastMsg!, xp: _xpToastAmount),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 6),
                       ],
                       OnboardingGameHud(
                         xp: xp,
@@ -389,7 +389,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                         levelTitle: _levelTitle,
                         power: _power,
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
                       AnimatedSwitcher(
                         duration: const Duration(milliseconds: 350),
                         switchInCurve: Curves.easeOutCubic,
@@ -492,31 +492,12 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     );
   }
 
-  Widget _logo() => Center(
-        child: Container(
-          padding: const EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: kBlueTealGradient,
-            boxShadow: [
-              BoxShadow(color: C.blue400.withValues(alpha: 0.4), blurRadius: 16),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(40),
-            child: Image.asset('assets/logo.jpg', width: 72, height: 72, fit: BoxFit.cover),
-          ),
-        ),
-      );
-
   Widget _stepUnits() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _questHeader(),
-        const SizedBox(height: 20),
-        _logo(),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         Text(
           beforeSignUp ? 'Quest 1: Choose your world' : 'Pick your units',
           textAlign: TextAlign.center,

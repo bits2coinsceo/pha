@@ -22,58 +22,52 @@ class OnboardingGameHud extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         gradient: kBlueTealGradient,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: const [
-          BoxShadow(color: Color(0x33000000), blurRadius: 12, offset: Offset(0, 4)),
+          BoxShadow(color: Color(0x22000000), blurRadius: 8, offset: Offset(0, 2)),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             children: [
               _levelOrb(level),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('Level $level',
+                    Text('Lv $level · $levelTitle',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                            color: C.white, fontWeight: FontWeight.w800, fontSize: 16)),
-                    Text(levelTitle,
-                        style: TextStyle(color: C.white.withValues(alpha: 0.85), fontSize: 12)),
+                            color: C.white, fontWeight: FontWeight.w700, fontSize: 12)),
+                    Text('$streak-day streak · Health Power',
+                        style: TextStyle(
+                            color: C.white.withValues(alpha: 0.8), fontSize: 10)),
                   ],
                 ),
               ),
+              const SizedBox(width: 6),
               _xpPill(xp),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              const Icon(Icons.local_fire_department, color: C.amber300, size: 18),
-              const SizedBox(width: 4),
-              Text('$streak-day streak',
-                  style: TextStyle(color: C.white.withValues(alpha: 0.9), fontSize: 11)),
-              const Spacer(),
-              Text('Health Power',
-                  style: TextStyle(color: C.white.withValues(alpha: 0.85), fontSize: 11)),
             ],
           ),
           const SizedBox(height: 6),
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(4),
             child: TweenAnimationBuilder<double>(
               duration: const Duration(milliseconds: 600),
               curve: Curves.easeOutCubic,
               tween: Tween(begin: 0, end: power),
               builder: (_, v, __) => LinearProgressIndicator(
                 value: v,
-                minHeight: 10,
+                minHeight: 5,
                 backgroundColor: C.white.withValues(alpha: 0.25),
                 color: C.amber400,
               ),
@@ -86,35 +80,35 @@ class OnboardingGameHud extends StatelessWidget {
 
   Widget _levelOrb(int level) {
     return Container(
-      width: 48,
-      height: 48,
+      width: 32,
+      height: 32,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: C.white.withValues(alpha: 0.2),
-        border: Border.all(color: C.white.withValues(alpha: 0.5), width: 2),
+        border: Border.all(color: C.white.withValues(alpha: 0.45), width: 1.5),
       ),
       alignment: Alignment.center,
       child: Text('$level',
           style: const TextStyle(
-              color: C.white, fontWeight: FontWeight.w900, fontSize: 20)),
+              color: C.white, fontWeight: FontWeight.w900, fontSize: 14)),
     );
   }
 
   Widget _xpPill(int xp) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: C.amber400,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.bolt, size: 14, color: C.gray900),
-          const SizedBox(width: 4),
-          Text('$xp XP',
+          const Icon(Icons.bolt, size: 12, color: C.gray900),
+          const SizedBox(width: 3),
+          Text('$xp',
               style: const TextStyle(
-                  fontWeight: FontWeight.w800, fontSize: 13, color: C.gray900)),
+                  fontWeight: FontWeight.w800, fontSize: 11, color: C.gray900)),
         ],
       ),
     );
