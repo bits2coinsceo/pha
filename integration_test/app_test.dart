@@ -42,7 +42,7 @@ void main() {
     await tester.pumpAndSettle(const Duration(seconds: 1));
 
     expect(find.textContaining('All quests complete'), findsOneWidget);
-    await tester.tap(find.text('Create account & play →'));
+    await tester.tap(find.text('Create account and become healthy →'));
     await tester.pumpAndSettle(const Duration(seconds: 1));
 
     // ── Login / sign up ──

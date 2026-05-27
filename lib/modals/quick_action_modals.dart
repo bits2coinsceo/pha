@@ -209,7 +209,7 @@ class AIChatModal extends StatefulWidget {
 class _AIChatModalState extends State<AIChatModal> {
   final _messages = <_Msg>[
     _Msg(false,
-        "Hello! I'm your AI health advisor. I can help you with questions about sleep, exercise, nutrition, stress management, and general wellness. What would you like to know?"),
+        "Hello! I'm your AI health assistant. Would you like us to use the data you provided during onboarding? After that, you can describe your problem in detail."),
   ];
   final _input = TextEditingController();
   final _scroll = ScrollController();
@@ -272,7 +272,7 @@ class _AIChatModalState extends State<AIChatModal> {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     return AppModal(
-      title: 'AI Health Advisor',
+      title: 'AI Health Assistant',
       onClose: () => Navigator.pop(context),
       child: SizedBox(
         height: 400,
@@ -794,13 +794,44 @@ class _UpgradeModalState extends State<UpgradeModal> {
             ),
           ),
           const SizedBox(height: 24),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(child: _planCard('Monthly', '\$9.99', '/mo', 'Billed monthly. Cancel anytime.', false)),
-              const SizedBox(width: 12),
-              Expanded(child: _planCard('Annual', '\$69.99', '/yr', 'Save ~42% vs monthly.', true)),
-            ],
+          IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: _planCard(
+                    plan: 'monthly',
+                    name: 'Monthly',
+                    price: '\$9.99',
+                    per: '/mo',
+                    note: 'Billed monthly.',
+                    best: false,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _planCard(
+                    plan: 'semiannual',
+                    name: '6 Months',
+                    price: '\$49.99',
+                    per: '/6mo',
+                    note: 'Save ~17%.',
+                    best: false,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _planCard(
+                    plan: 'annual',
+                    name: 'Annual',
+                    price: '\$69.99',
+                    per: '/yr',
+                    note: 'Save ~42%.',
+                    best: true,
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 16),
           Container(
@@ -845,51 +876,71 @@ class _UpgradeModalState extends State<UpgradeModal> {
   static const _thStyle =
       TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: C.gray500);
 
-  Widget _planCard(String name, String price, String per, String note, bool best) {
-    final plan = name.toLowerCase();
+  Widget _planCard({
+    required String plan,
+    required String name,
+    required String price,
+    required String per,
+    required String note,
+    required bool best,
+  }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: best ? C.amber50 : C.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: best ? C.amber400 : C.gray200, width: 2),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (best)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration:
-                  BoxDecoration(color: C.amber400, borderRadius: BorderRadius.circular(99)),
-              child: const Text('BEST VALUE',
-                  style: TextStyle(
-                      fontSize: 10, fontWeight: FontWeight.bold, color: C.white)),
-            ),
-          if (best) const SizedBox(height: 6),
+          SizedBox(
+            height: 18,
+            child: best
+                ? Container(
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                        color: C.amber400, borderRadius: BorderRadius.circular(99)),
+                    child: const Text('BEST',
+                        style: TextStyle(
+                            fontSize: 9, fontWeight: FontWeight.bold, color: C.white)),
+                  )
+                : null,
+          ),
           Text(name.toUpperCase(),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 10,
                   fontWeight: FontWeight.w600,
                   color: best ? C.amber600 : C.gray500)),
           const SizedBox(height: 4),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(price,
-                  style: const TextStyle(
-                      fontSize: 24, fontWeight: FontWeight.w800, color: C.gray900)),
-              Text(per, style: const TextStyle(fontSize: 12, color: C.gray400)),
-            ],
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(price,
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w800, color: C.gray900)),
+                Text(per, style: const TextStyle(fontSize: 10, color: C.gray400)),
+              ],
+            ),
           ),
           const SizedBox(height: 4),
-          Text(note, style: const TextStyle(fontSize: 12, color: C.gray400)),
-          const SizedBox(height: 12),
+          Text(note,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 10, color: C.gray400, height: 1.2)),
+          const Spacer(),
+          const SizedBox(height: 8),
           GestureDetector(
             onTap: loadingPlan != null ? null : () => _upgrade(plan),
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              padding: const EdgeInsets.symmetric(vertical: 7),
               decoration:
                   BoxDecoration(gradient: kAmberGradient, borderRadius: BorderRadius.circular(8)),
               child: Center(
@@ -899,18 +950,7 @@ class _UpgradeModalState extends State<UpgradeModal> {
                         height: 14,
                         child: CircularProgressIndicator(strokeWidth: 2, color: C.white),
                       )
-                    : Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: const [
-                          Icon(Icons.auto_awesome, size: 14, color: C.white),
-                          SizedBox(width: 6),
-                          Text('Subscribe',
-                              style: TextStyle(
-                                  color: C.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12)),
-                        ],
-                      ),
+                    : const Icon(Icons.auto_awesome, size: 14, color: C.white),
               ),
             ),
           ),

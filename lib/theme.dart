@@ -106,6 +106,9 @@ const kAmberGradient = LinearGradient(
   colors: [C.amber400, C.orange400],
 );
 
+/// Logical pixels for a physical length in millimeters (160 dpi baseline).
+double logicalMm(double millimeters) => millimeters * 160.0 / 25.4;
+
 /// rounded-2xl ≈ 16, rounded-xl ≈ 12, rounded-lg ≈ 8
 BoxDecoration cardDecoration({double radius = 16, Color? border}) => BoxDecoration(
       color: C.white,

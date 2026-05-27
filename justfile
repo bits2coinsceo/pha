@@ -24,8 +24,19 @@ sim:
     @echo "✓ Simulator ready (check the Simulator window)"
 
 run: sim
-    @echo "→ flutter run on iPhone…"
-    {{flutter}} run -d "{{ios_device}}"
+    @bash scripts/flutter-run-ios.sh
+
+# Hot reload — needs `just run` active in another terminal
+reload:
+    @bash scripts/flutter-hot.sh r
+
+# Hot restart (full widget tree)
+restart:
+    @bash scripts/flutter-hot.sh R
+
+# Wipe app data + run from onboarding (same as purge + fresh install)
+onboarding: sim purge
+    @bash scripts/flutter-run-ios.sh
 
 run-ios: run
 

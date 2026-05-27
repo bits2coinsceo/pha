@@ -22,7 +22,7 @@ class OnboardingGameHud extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         gradient: kBlueTealGradient,
         borderRadius: BorderRadius.circular(12),
@@ -39,26 +39,37 @@ class OnboardingGameHud extends StatelessWidget {
               _levelOrb(level),
               const SizedBox(width: 8),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('Lv $level · $levelTitle',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                child: Text.rich(
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  TextSpan(
+                    style: const TextStyle(fontSize: 11, height: 1.2),
+                    children: [
+                      TextSpan(
+                        text: 'Lv $level · $levelTitle',
                         style: const TextStyle(
-                            color: C.white, fontWeight: FontWeight.w700, fontSize: 12)),
-                    Text('$streak-day streak · Health Power',
+                          color: C.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12,
+                        ),
+                      ),
+                      TextSpan(
+                        text: ' · $streak-day streak · Health Power',
                         style: TextStyle(
-                            color: C.white.withValues(alpha: 0.8), fontSize: 10)),
-                  ],
+                          color: C.white.withValues(alpha: 0.75),
+                          fontWeight: FontWeight.w500,
+                          fontSize: 10,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(width: 6),
               _xpPill(xp),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 4),
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: TweenAnimationBuilder<double>(
@@ -67,7 +78,7 @@ class OnboardingGameHud extends StatelessWidget {
               tween: Tween(begin: 0, end: power),
               builder: (_, v, __) => LinearProgressIndicator(
                 value: v,
-                minHeight: 5,
+                minHeight: 4,
                 backgroundColor: C.white.withValues(alpha: 0.25),
                 color: C.amber400,
               ),
@@ -198,36 +209,44 @@ class OnboardingBadgeStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      alignment: WrapAlignment.center,
-      children: badges
-          .map((b) => Opacity(
-                opacity: b.unlocked ? 1 : 0.35,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: b.unlocked ? C.amber50 : C.gray100,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                        color: b.unlocked ? C.amber300 : C.gray200),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(b.emoji, style: const TextStyle(fontSize: 14)),
-                      const SizedBox(width: 4),
-                      Text(b.label,
-                          style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: b.unlocked ? C.amber700 : C.gray400)),
-                    ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          for (var i = 0; i < badges.length; i++) ...[
+            if (i > 0) const SizedBox(width: 6),
+            Opacity(
+              opacity: badges[i].unlocked ? 1 : 0.35,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: badges[i].unlocked ? C.amber50 : C.gray100,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: badges[i].unlocked ? C.amber300 : C.gray200,
                   ),
                 ),
-              ))
-          .toList(),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(badges[i].emoji, style: const TextStyle(fontSize: 12)),
+                    const SizedBox(width: 3),
+                    Text(
+                      badges[i].label,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                        color: badges[i].unlocked ? C.amber700 : C.gray400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

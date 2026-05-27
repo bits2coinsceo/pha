@@ -935,7 +935,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         ),
         const SizedBox(height: 24),
         PrimaryButton(
-          label: beforeSignUp ? 'Create account & play →' : 'Enter dashboard →',
+          label: beforeSignUp ? 'Create account and become healthy →' : 'Enter dashboard →',
           color: C.teal600,
           icon: const Icon(Icons.rocket_launch, size: 20, color: C.white),
           onPressed: _finishJourney,

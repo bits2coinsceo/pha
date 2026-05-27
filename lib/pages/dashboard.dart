@@ -176,7 +176,7 @@ class _DashboardState extends State<Dashboard> {
       ),
       QuickAction(
         title: 'AI Consultation',
-        description: 'Chat with AI physician',
+        description: 'Chat with AI assistant',
         icon: Icons.chat_bubble_outline,
         color: C.teal600,
         bgColor: C.teal100,
@@ -293,7 +293,7 @@ class _DashboardState extends State<Dashboard> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1152),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              padding: EdgeInsets.fromLTRB(24, 16, logicalMm(5), 16),
               child: Row(
                 children: [
                   Container(
@@ -319,10 +319,9 @@ class _DashboardState extends State<Dashboard> {
                       ],
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  if (auth.user != null)
+                  const Spacer(),
+                  if (auth.user != null) ...[
                     Flexible(
-                      flex: 2,
                       child: Text(auth.user!.email,
                           textAlign: TextAlign.right,
                           maxLines: 1,
@@ -330,8 +329,10 @@ class _DashboardState extends State<Dashboard> {
                           style: const TextStyle(
                               fontSize: 12, color: C.gray500, fontWeight: FontWeight.w500)),
                     ),
-                  const SizedBox(width: 8),
+                    const SizedBox(width: 8),
+                  ],
                   Stack(
+                    clipBehavior: Clip.none,
                     children: [
                       const Padding(
                         padding: EdgeInsets.all(8),

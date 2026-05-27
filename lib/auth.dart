@@ -97,9 +97,12 @@ class AuthProvider extends ChangeNotifier {
   Future<void> upgradeToPlus(String plan) async {
     if (user == null) return;
     final now = DateTime.now();
-    final expires = plan == 'monthly'
-        ? DateTime(now.year, now.month + 1, now.day)
-        : DateTime(now.year + 1, now.month, now.day);
+    final expires = switch (plan) {
+      'monthly' => DateTime(now.year, now.month + 1, now.day),
+      'semiannual' => DateTime(now.year, now.month + 6, now.day),
+      'annual' => DateTime(now.year + 1, now.month, now.day),
+      _ => DateTime(now.year, now.month + 1, now.day),
+    };
     await Db.instance.raw.update(
       'profiles',
       {
