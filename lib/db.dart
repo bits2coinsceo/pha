@@ -19,13 +19,21 @@ class Db {
     final path = p.join(dir.path, 'pha.db');
     _db = await databaseFactory.openDatabase(
       path,
-      options: OpenDatabaseOptions(version: 2, onCreate: _create, onUpgrade: _upgrade),
+      options: OpenDatabaseOptions(version: 3, onCreate: _create, onUpgrade: _upgrade),
     );
   }
 
   Future<void> _upgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await _createOnboardingDrafts(db);
+    }
+    if (oldVersion < 3) {
+      await db.execute(
+          'ALTER TABLE profiles ADD COLUMN health_points INTEGER NOT NULL DEFAULT 0');
+      await db.execute(
+          'ALTER TABLE profiles ADD COLUMN hp_discount_used INTEGER NOT NULL DEFAULT 0');
+      await db.execute(
+          'ALTER TABLE onboarding_drafts ADD COLUMN health_points INTEGER NOT NULL DEFAULT 0');
     }
   }
 
@@ -40,6 +48,7 @@ class Db {
         metrics_json TEXT,
         step INTEGER NOT NULL DEFAULT 1,
         completed INTEGER NOT NULL DEFAULT 0,
+        health_points INTEGER NOT NULL DEFAULT 0,
         updated_at TEXT NOT NULL
       )
     ''');
@@ -59,6 +68,8 @@ class Db {
         unit_system TEXT NOT NULL DEFAULT 'metric',
         subscription_plan TEXT,
         subscription_expires_at TEXT,
+        health_points INTEGER NOT NULL DEFAULT 0,
+        hp_discount_used INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL
       )

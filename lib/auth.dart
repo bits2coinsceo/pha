@@ -6,7 +6,9 @@ import 'package:uuid/uuid.dart';
 
 import 'db.dart';
 import 'models.dart';
+import 'onboarding_hp.dart';
 import 'onboarding_prefs.dart';
+import 'telemetry_sync.dart';
 
 const _uuid = Uuid();
 String _hash(String password) => sha256.convert(utf8.encode('pha-salt::$password')).toString();
@@ -17,6 +19,11 @@ class AuthProvider extends ChangeNotifier {
   bool loading = true;
   bool isPlus = false;
   String unitSystem = 'metric'; // 'metric' | 'imperial'
+  int healthPoints = 0;
+  bool hpDiscountUsed = false;
+
+  bool get hpDiscountEligible =>
+      healthPoints >= maxOnboardingHp && !hpDiscountUsed;
 
   Future<void> bootstrap() async {
     final prefs = await SharedPreferences.getInstance();
@@ -38,6 +45,8 @@ class AuthProvider extends ChangeNotifier {
     if (rows.isNotEmpty) {
       isPlus = (rows.first['is_plus'] as int) == 1;
       unitSystem = (rows.first['unit_system'] as String?) ?? 'metric';
+      healthPoints = (rows.first['health_points'] as int?) ?? 0;
+      hpDiscountUsed = ((rows.first['hp_discount_used'] as int?) ?? 0) == 1;
     }
   }
 
@@ -69,6 +78,7 @@ class AuthProvider extends ChangeNotifier {
     });
     await _setSession(id, email);
     await OnboardingPrefs.applyToUser(id);
+    await TelemetrySyncService.markNeedsPromptAfterSignUp(id);
     await _loadPlanStatus(id);
     notifyListeners();
   }
@@ -91,6 +101,8 @@ class AuthProvider extends ChangeNotifier {
     user = null;
     isPlus = false;
     unitSystem = 'metric';
+    healthPoints = 0;
+    hpDiscountUsed = false;
     notifyListeners();
   }
 
@@ -103,6 +115,8 @@ class AuthProvider extends ChangeNotifier {
       'annual' => DateTime(now.year + 1, now.month, now.day),
       _ => DateTime(now.year, now.month + 1, now.day),
     };
+    final applyDiscount =
+        hpDiscountEligible && planEligibleForHpDiscount(plan);
     await Db.instance.raw.update(
       'profiles',
       {
@@ -110,11 +124,17 @@ class AuthProvider extends ChangeNotifier {
         'subscription_plan': plan,
         'subscription_expires_at': expires.toUtc().toIso8601String(),
         'updated_at': now.toUtc().toIso8601String(),
+        if (applyDiscount) 'hp_discount_used': 1,
+        if (applyDiscount) 'health_points': 0,
       },
       where: 'id = ?',
       whereArgs: [user!.id],
     );
     isPlus = true;
+    if (applyDiscount) {
+      hpDiscountUsed = true;
+      healthPoints = 0;
+    }
     notifyListeners();
   }
 

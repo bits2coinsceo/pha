@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import '../theme.dart';
 
-/// Gamified HUD: level, XP, health power meter.
+/// Gamified HUD: level, HP, health power meter.
 class OnboardingGameHud extends StatelessWidget {
-  final int xp;
+  final int hp;
   final int level;
   final String levelTitle;
   final double power; // 0..1
@@ -12,7 +12,7 @@ class OnboardingGameHud extends StatelessWidget {
 
   const OnboardingGameHud({
     super.key,
-    required this.xp,
+    required this.hp,
     required this.level,
     required this.levelTitle,
     required this.power,
@@ -66,7 +66,7 @@ class OnboardingGameHud extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 6),
-              _xpPill(xp),
+              _hpPill(hp),
             ],
           ),
           const SizedBox(height: 4),
@@ -105,7 +105,7 @@ class OnboardingGameHud extends StatelessWidget {
     );
   }
 
-  Widget _xpPill(int xp) {
+  Widget _hpPill(int hp) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -115,9 +115,9 @@ class OnboardingGameHud extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.bolt, size: 12, color: C.gray900),
+          const Icon(Icons.favorite, size: 12, color: C.gray900),
           const SizedBox(width: 3),
-          Text('$xp',
+          Text('$hp HP',
               style: const TextStyle(
                   fontWeight: FontWeight.w800, fontSize: 11, color: C.gray900)),
         ],
@@ -251,11 +251,11 @@ class OnboardingBadgeStrip extends StatelessWidget {
   }
 }
 
-class OnboardingXpToast extends StatelessWidget {
+class OnboardingHpToast extends StatelessWidget {
   final String message;
-  final int xp;
+  final int hp;
 
-  const OnboardingXpToast({super.key, required this.message, required this.xp});
+  const OnboardingHpToast({super.key, required this.message, required this.hp});
 
   @override
   Widget build(BuildContext context) {
@@ -282,7 +282,7 @@ class OnboardingXpToast extends StatelessWidget {
                   style: const TextStyle(
                       fontWeight: FontWeight.w700, fontSize: 13, color: C.gray900)),
             ),
-            Text('+$xp XP',
+            Text('+$hp HP',
                 style: const TextStyle(
                     fontWeight: FontWeight.w900, fontSize: 14, color: C.gray900)),
           ],

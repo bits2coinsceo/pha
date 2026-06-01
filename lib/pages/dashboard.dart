@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../auth.dart';
 import '../db.dart';
+import '../health_telemetry.dart';
 import '../models.dart';
 import '../services.dart';
 import '../theme.dart';
@@ -44,13 +45,23 @@ class _DashboardState extends State<Dashboard> {
   LastSync? lastSync;
   bool syncing = false;
   String syncError = '';
+  bool telemetrySupported = false;
+  bool telemetryGranted = false;
   int uploadCount = 0;
   int aiConsultCount = 0;
 
   @override
   void initState() {
     super.initState();
+    telemetrySupported = HealthTelemetryService.isSupported;
     _loadAll();
+    _refreshTelemetryPermission();
+  }
+
+  Future<void> _refreshTelemetryPermission() async {
+    if (!telemetrySupported) return;
+    final granted = await HealthTelemetryService.hasPermission();
+    if (mounted) setState(() => telemetryGranted = granted);
   }
 
   String get _userId => context.read<AuthProvider>().user!.id;
@@ -126,18 +137,72 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
-  Future<void> _testSync() async {
+  Future<void> _requestTelemetryPermission() async {
+    final allow = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Allow activity access'),
+        content: const Text(
+          'PHA reads your steps and walking distance from Apple Health '
+          'to update your dashboard. You can change this anytime in Settings.',
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Not now')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Allow')),
+        ],
+      ),
+    );
+    if (allow != true || !mounted) return;
+
     setState(() {
       syncing = true;
       syncError = '';
     });
     try {
-      await HealthConnectService.sync(_userId, steps: 8500, distanceMeters: 6500);
-      await _loadAll();
+      final granted = await HealthTelemetryService.requestPermission();
+      if (!mounted) return;
+      setState(() => telemetryGranted = granted);
+      if (granted) {
+        await HealthConnectService.syncFromDevice(_userId);
+        await _loadAll();
+      } else {
+        setState(() => syncError = 'Activity permission was denied.');
+      }
     } catch (e) {
-      setState(() => syncError = e.toString().replaceFirst('Exception: ', ''));
+      if (mounted) {
+        setState(() => syncError = e.toString().replaceFirst('Exception: ', ''));
+      }
     } finally {
       if (mounted) setState(() => syncing = false);
+    }
+  }
+
+  Future<void> _syncFromDevice() async {
+    setState(() {
+      syncing = true;
+      syncError = '';
+    });
+    try {
+      await HealthConnectService.syncFromDevice(_userId);
+      await _loadAll();
+    } catch (e) {
+      final msg = e.toString().replaceFirst('Exception: ', '');
+      setState(() {
+        syncError = msg;
+        if (msg.toLowerCase().contains('permission')) {
+          telemetryGranted = false;
+        }
+      });
+    } finally {
+      if (mounted) setState(() => syncing = false);
+    }
+  }
+
+  void _onTelemetryAction() {
+    if (!telemetryGranted) {
+      _requestTelemetryPermission();
+    } else {
+      _syncFromDevice();
     }
   }
 
@@ -367,6 +432,7 @@ class _DashboardState extends State<Dashboard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 width: 40,
@@ -376,37 +442,53 @@ class _DashboardState extends State<Dashboard> {
                 child: const Icon(Icons.smartphone, color: C.green600, size: 20),
               ),
               const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text('Health Connect',
-                      style: TextStyle(fontWeight: FontWeight.w600, color: C.gray900)),
-                  Text('Android activity sync',
-                      style: TextStyle(fontSize: 12, color: C.gray400)),
-                ],
-              ),
-              const Spacer(),
-              ElevatedButton(
-                onPressed: syncing ? null : _testSync,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: C.green500,
-                  foregroundColor: C.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.refresh, size: 14),
-                    const SizedBox(width: 6),
-                    Text(syncing ? 'Syncing…' : 'Test Sync',
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                    const Text('Device Activity',
+                        style: TextStyle(fontWeight: FontWeight.w600, color: C.gray900)),
+                    Text(
+                        telemetrySupported
+                            ? 'Steps & distance from Apple Health'
+                            : 'Available on iPhone and Android',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 12, color: C.gray400)),
                   ],
                 ),
               ),
             ],
           ),
+          if (telemetrySupported) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: syncing ? null : _onTelemetryAction,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: telemetryGranted ? C.green500 : C.blue500,
+                  foregroundColor: C.white,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(telemetryGranted ? Icons.refresh : Icons.lock_open, size: 14),
+                    const SizedBox(width: 6),
+                    Text(
+                        syncing
+                            ? 'Syncing…'
+                            : (telemetryGranted ? 'Sync now' : 'Allow access'),
+                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                  ],
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 16),
           if (syncError.isNotEmpty) ...[
             AppBanner(
@@ -429,11 +511,15 @@ class _DashboardState extends State<Dashboard> {
               ],
             )
           else
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
               child: Center(
-                child: Text('No sync data yet. Press Test Sync.',
-                    style: TextStyle(fontSize: 14, color: C.gray400)),
+                child: Text(
+                    telemetryGranted
+                        ? 'No sync data yet. Press Sync now.'
+                        : 'Allow access to import today\'s steps and distance.',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 14, color: C.gray400)),
               ),
             ),
           if (lastSync != null) ...[

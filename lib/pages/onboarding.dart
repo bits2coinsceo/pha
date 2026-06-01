@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 
 import '../auth.dart';
 import '../db.dart';
+import '../onboarding_hp.dart';
 import '../onboarding_prefs.dart';
 import '../theme.dart';
 import '../units.dart';
@@ -11,7 +12,6 @@ import '../widgets.dart';
 import 'onboarding_widgets.dart';
 
 const _uuid = Uuid();
-const _maxXp = 330;
 
 class OnboardingPage extends StatefulWidget {
   final bool beforeSignUp;
@@ -33,7 +33,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   bool saving = false;
   String error = '';
 
-  int xp = 0;
+  int hp = 0;
   bool quest1Done = false;
   bool quest2Done = false;
   bool quest3Done = false;
@@ -47,12 +47,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     'champion': false,
   };
 
-  String? _xpToastMsg;
-  int _xpToastAmount = 0;
-
-  bool _xpAge = false;
-  bool _xpHeight = false;
-  bool _xpWeight = false;
+  String? _hpToastMsg;
+  int _hpToastAmount = 0;
 
   late final AnimationController _bgFloat;
   late final AnimationController _toastCtrl;
@@ -73,7 +69,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   bool get isImperial => unitSystem == 'imperial';
   bool get beforeSignUp => widget.beforeSignUp;
 
-  int get _level => xp < 50 ? 1 : (xp < 170 ? 2 : 3);
+  int get _level => hp < hpUnitsReward ? 1 : (hp < hpUnitsReward + hpBasicReward ? 2 : 3);
 
   String get _levelTitle {
     switch (_level) {
@@ -86,7 +82,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     }
   }
 
-  double get _power => (xp / _maxXp).clamp(0.0, 1.0);
+  double get _power => (hp / maxOnboardingHp).clamp(0.0, 1.0);
 
   @override
   void initState() {
@@ -94,19 +90,6 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     _bgFloat = AnimationController(vsync: this, duration: const Duration(seconds: 4))
       ..repeat(reverse: true);
     _toastCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 2200));
-
-    _age.addListener(() {
-      if (step == 2 && !_xpAge && _age.text.trim().isNotEmpty) _setXpAge();
-    });
-    _heightCm.addListener(() {
-      if (step == 2 && !_xpHeight && _heightCm.text.trim().isNotEmpty) _setXpHeight();
-    });
-    _heightFt.addListener(() {
-      if (step == 2 && !_xpHeight && _heightFt.text.trim().isNotEmpty) _setXpHeight();
-    });
-    _weight.addListener(() {
-      if (step == 2 && !_xpWeight && _weight.text.trim().isNotEmpty) _setXpWeight();
-    });
 
     if (beforeSignUp) _restoreDraft();
   }
@@ -118,11 +101,6 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     if (d == null || !mounted) return;
     setState(() {
       unitSystem = d.unitSystem;
-
-      // Mark micro-XP flags before assigning text so listeners don't re-award.
-      _xpAge = d.age != null;
-      _xpHeight = d.heightCm != null;
-      _xpWeight = d.weightKg != null;
 
       if (d.age != null) _age.text = '${d.age}';
       if (d.heightCm != null) {
@@ -167,25 +145,21 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       if (sys != null && dia != null) _badges['heart'] = true;
       if (glucose != null) _badges['glucose'] = true;
 
-      xp = _restoredXp(d).clamp(0, _maxXp);
+      hp = d.healthPoints > 0
+          ? d.healthPoints.clamp(0, maxOnboardingHp)
+          : _restoredHp(d).clamp(0, maxOnboardingHp);
     });
   }
 
-  int _restoredXp(OnboardingDraftData d) {
-    var total = 0;
-    if (d.step > 1) total += 50; // Quest 1
-    if (d.step > 2) {
-      total += 120; // Quest 2
-      if (d.age != null) total += 15;
-      if (d.heightCm != null) total += 15;
-      if (d.weightKg != null) total += 15;
-    }
-    if (d.completed) {
-      total += 40; // Quest 3 base
-      if (d.extraMetrics.containsKey('blood_pressure_systolic')) total += 80;
-      if (d.extraMetrics.containsKey('glucose')) total += 80;
-    }
-    return total;
+  int _restoredHp(OnboardingDraftData d) {
+    final sys = d.extraMetrics['blood_pressure_systolic'];
+    final dia = d.extraMetrics['blood_pressure_diastolic'];
+    return computeOnboardingHp(
+      unitsDone: d.step > 1,
+      basicDone: d.step > 2,
+      hasBp: sys != null && dia != null,
+      hasGlucose: d.extraMetrics.containsKey('glucose'),
+    );
   }
 
   @override
@@ -198,41 +172,21 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     super.dispose();
   }
 
-  void _grantXp(int amount, {String? toast, String? badgeKey}) {
+  void _grantHp(int amount, {String? toast, String? badgeKey}) {
     setState(() {
-      xp = (xp + amount).clamp(0, _maxXp);
+      hp = (hp + amount).clamp(0, maxOnboardingHp);
       if (toast != null) {
-        _xpToastMsg = toast;
-        _xpToastAmount = amount;
+        _hpToastMsg = toast;
+        _hpToastAmount = amount;
       }
       if (badgeKey != null) _badges[badgeKey] = true;
     });
     if (toast != null) {
       _toastCtrl.forward(from: 0);
       Future.delayed(const Duration(milliseconds: 2200), () {
-        if (mounted) setState(() => _xpToastMsg = null);
+        if (mounted) setState(() => _hpToastMsg = null);
       });
     }
-  }
-
-  void _microFieldXp(bool Function() flag, VoidCallback setFlag, String toast) {
-    if (flag()) return;
-    setFlag();
-    _grantXp(15, toast: toast);
-  }
-
-  void _setXpAge() => _microFieldXp(() => _xpAge, () => _xpAge = true, 'Age logged!');
-  void _setXpHeight() => _microFieldXp(() => _xpHeight, () => _xpHeight = true, 'Height logged!');
-  void _setXpWeight() => _microFieldXp(() => _xpWeight, () => _xpWeight = true, 'Weight logged!');
-
-  Future<void> _markDone(AuthProvider auth) async {
-    await Db.instance.raw.update(
-      'profiles',
-      {'onboarding_completed': 1, 'unit_system': unitSystem},
-      where: 'id = ?',
-      whereArgs: [auth.user!.id],
-    );
-    await auth.refreshPlanStatus();
   }
 
   Future<void> _insertMetrics(AuthProvider auth, List<Map<String, dynamic>> inserts) async {
@@ -298,7 +252,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       quest1Done = true;
       step = 2;
     });
-    _grantXp(50, toast: 'Quest 1 complete!', badgeKey: 'units');
+    _grantHp(hpUnitsReward, toast: 'Quest 1 complete!', badgeKey: 'units');
   }
 
   Future<void> _submitGeneral() async {
@@ -354,14 +308,14 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         step = 3;
         error = '';
       });
-      _grantXp(120, toast: 'Quest 2 crushed!', badgeKey: 'foundation');
+      _grantHp(hpBasicReward, toast: 'Quest 2 crushed!', badgeKey: 'foundation');
     }
   }
 
   Future<void> _finish({required bool includeAdvanced}) async {
     setState(() => saving = true);
     final extraMetrics = <String, double>{};
-    var bonusXp = 0;
+    var bonusHp = 0;
 
     if (includeAdvanced) {
       setState(() => error = '');
@@ -384,7 +338,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         }
         extraMetrics['blood_pressure_systolic'] = sys;
         extraMetrics['blood_pressure_diastolic'] = dia;
-        bonusXp += 80;
+        bonusHp += hpBpReward;
         _badges['heart'] = true;
       }
 
@@ -411,7 +365,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           glucoseMgdl = (mmolToMgdl(g) * 10).round() / 10;
         }
         extraMetrics['glucose'] = glucoseMgdl;
-        bonusXp += 80;
+        bonusHp += hpGlucoseReward;
         _badges['glucose'] = true;
       }
       vitalsBonus = extraMetrics.isNotEmpty;
@@ -425,13 +379,25 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       await OnboardingPrefs.complete(
         unitSystem: unitSystem,
         extraMetrics: extraMetrics,
+        healthPoints: hp + bonusHp,
       );
     } else {
       final auth = context.read<AuthProvider>();
       if (extraMetrics.isNotEmpty) {
         await _insertMetrics(auth, _metricRows(auth.user!.id, extraMetrics));
       }
-      await _markDone(auth);
+      final finalHp = (hp + bonusHp).clamp(0, maxOnboardingHp);
+      await Db.instance.raw.update(
+        'profiles',
+        {
+          'onboarding_completed': 1,
+          'unit_system': unitSystem,
+          'health_points': finalHp,
+        },
+        where: 'id = ?',
+        whereArgs: [auth.user!.id],
+      );
+      await auth.refreshPlanStatus();
     }
 
     if (mounted) {
@@ -440,8 +406,9 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         quest3Done = true;
         step = 4;
       });
-      final quest3Xp = includeAdvanced ? 40 + bonusXp : 40;
-      _grantXp(quest3Xp, toast: includeAdvanced ? 'Bonus quest done!' : 'Quest 3 skipped');
+      if (bonusHp > 0) {
+        _grantHp(bonusHp, toast: 'Bonus quest done!');
+      }
       setState(() => _badges['champion'] = true);
     }
   }
@@ -462,12 +429,12 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                   constraints: const BoxConstraints(maxWidth: 460),
                   child: Column(
                     children: [
-                      if (_xpToastMsg != null) ...[
-                        OnboardingXpToast(message: _xpToastMsg!, xp: _xpToastAmount),
+                      if (_hpToastMsg != null) ...[
+                        OnboardingHpToast(message: _hpToastMsg!, hp: _hpToastAmount),
                         const SizedBox(height: 6),
                       ],
                       OnboardingGameHud(
-                        xp: xp,
+                        hp: hp,
                         level: _level,
                         levelTitle: _levelTitle,
                         power: _power,
@@ -595,10 +562,10 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           style: const TextStyle(color: C.gray500, fontSize: 14, height: 1.4),
         ),
         const SizedBox(height: 16),
-        const OnboardingQuestCard(
+        OnboardingQuestCard(
           title: 'Quest 1 · Measurement realm',
           subtitle: 'Unlock charts in your language',
-          reward: '+50 XP',
+          reward: '+$hpUnitsReward HP',
           icon: Icons.public,
           accent: C.blue500,
         ),
@@ -670,10 +637,10 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: C.gray900),
         ),
         const SizedBox(height: 6),
-        const Text(
-          'Fill all 3 fields — earn +15 XP per field, +120 XP on complete.',
+        Text(
+          'Fill all 3 fields — earn +$hpBasicReward HP on complete.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: C.gray500, fontSize: 13),
+          style: const TextStyle(color: C.gray500, fontSize: 13),
         ),
         const SizedBox(height: 16),
         if (error.isNotEmpty) ...[
@@ -685,7 +652,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
               controller: _age,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
-              onChanged: (_) => _setXpAge(),
+              onChanged: (_) {},
               decoration: appInput('e.g. 32'),
             )),
         const SizedBox(height: 14),
@@ -703,7 +670,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                       controller: _heightFt,
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
-                      onChanged: (_) => _setXpHeight(),
+                      onChanged: (_) {},
                       decoration: appInput('ft'),
                     ),
                   ),
@@ -713,7 +680,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                       controller: _heightIn,
                       keyboardType: TextInputType.number,
                       textAlign: TextAlign.center,
-                      onChanged: (_) => _setXpHeight(),
+                      onChanged: (_) {},
                       decoration: appInput('in'),
                     ),
                   ),
@@ -722,7 +689,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
                   controller: _heightCm,
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,
-                  onChanged: (_) => _setXpHeight(),
+                  onChanged: (_) {},
                   decoration: appInput('e.g. 175'),
                 ),
         ),
@@ -738,13 +705,13 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
             controller: _weight,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             textAlign: TextAlign.center,
-            onChanged: (_) => _setXpWeight(),
+            onChanged: (_) {},
             decoration: appInput(isImperial ? 'e.g. 165' : 'e.g. 70'),
           ),
         ),
         const SizedBox(height: 20),
         PrimaryButton(
-          label: saving ? 'Saving…' : 'Complete Quest 2 (+120 XP)',
+          label: saving ? 'Saving…' : 'Complete Quest 2 (+$hpBasicReward HP)',
           color: C.teal600,
           icon: const Icon(Icons.military_tech, size: 18, color: C.white),
           onPressed: saving ? null : _submitGeneral,
@@ -778,20 +745,20 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: C.gray900),
         ),
         const SizedBox(height: 6),
-        const Text(
-          'Optional vitals = up to +160 XP. Skip still earns +40 XP.',
+        Text(
+          'Optional vitals — +$hpBpReward HP for BP, +$hpGlucoseReward HP for glucose.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: C.gray500, fontSize: 13),
+          style: const TextStyle(color: C.gray500, fontSize: 13),
         ),
         const SizedBox(height: 12),
         Row(
           children: [
             Expanded(
-              child: _bonusTile('❤️ BP', '+80 XP', hasBp && _diastolic.text.isNotEmpty && _systolic.text.isNotEmpty),
+              child: _bonusTile('❤️ BP', '+$hpBpReward HP', hasBp && _diastolic.text.isNotEmpty && _systolic.text.isNotEmpty),
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: _bonusTile('💧 Glucose', '+80 XP', hasGlucose),
+              child: _bonusTile('💧 Glucose', '+$hpGlucoseReward HP', hasGlucose),
             ),
           ],
         ),
@@ -843,7 +810,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         TextButton(
           onPressed: saving ? null : () => _finish(includeAdvanced: false),
           child: Text(
-            'Skip bonus quest (+40 XP)',
+            'Skip bonus quest',
             style: TextStyle(color: C.gray600, fontWeight: FontWeight.w700, fontSize: 13),
           ),
         ),
@@ -851,7 +818,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     );
   }
 
-  Widget _bonusTile(String label, String xp, bool active) {
+  Widget _bonusTile(String label, String hpLabel, bool active) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
       padding: const EdgeInsets.all(12),
@@ -863,7 +830,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       child: Column(
         children: [
           Text(label, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
-          Text(xp,
+          Text(hpLabel,
               style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
@@ -886,10 +853,18 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         ),
         const SizedBox(height: 8),
         Text(
-          'You earned $xp XP · Level $_level $_levelTitle',
+          'You earned $hp HP · Level $_level $_levelTitle',
           textAlign: TextAlign.center,
           style: const TextStyle(color: C.teal600, fontWeight: FontWeight.w700, fontSize: 15),
         ),
+        if (hp >= maxOnboardingHp) ...[
+          const SizedBox(height: 8),
+          Text(
+            'Redeem your $maxOnboardingHp HP for $hpFirstPurchaseDiscountPercent% off your first 6-month or annual PHA Plus+ subscription.',
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: C.amber700, fontWeight: FontWeight.w600, fontSize: 13),
+          ),
+        ],
         if (vitalsBonus) ...[
           const SizedBox(height: 6),
           const Text('Bonus vitals unlocked extra insights!',

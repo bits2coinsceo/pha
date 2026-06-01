@@ -12,6 +12,7 @@ import 'pages/insights.dart';
 import 'pages/login.dart';
 import 'pages/onboarding.dart';
 import 'pages/profile.dart';
+import 'telemetry_sync.dart';
 import 'theme.dart';
 import 'widgets.dart';
 
@@ -46,12 +47,44 @@ class AppContent extends StatefulWidget {
   State<AppContent> createState() => _AppContentState();
 }
 
-class _AppContentState extends State<AppContent> {
+class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
   String currentPage = 'home';
   bool? preOnboardingDone;
   bool? onboardingDone;
   String? checkedForUserId;
   int dashboardKey = 0;
+  Future<void>? _telemetrySyncTask;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _scheduleTelemetrySync();
+    }
+  }
+
+  void _scheduleTelemetrySync() {
+    final auth = context.read<AuthProvider>();
+    if (auth.user == null || onboardingDone != true) return;
+    if (_telemetrySyncTask != null) return;
+
+    final userId = auth.user!.id;
+    _telemetrySyncTask = TelemetrySyncService.onAppOpen(userId).then((synced) {
+      _telemetrySyncTask = null;
+      if (synced && mounted) setState(() => dashboardKey++);
+    });
+  }
 
   Future<void> _checkPreOnboarding() async {
     final done = await OnboardingPrefs.isComplete();
@@ -71,6 +104,11 @@ class _AppContentState extends State<AppContent> {
       onboardingDone = completed && hasBasics;
       checkedForUserId = userId;
     });
+    if (completed && hasBasics) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _scheduleTelemetrySync();
+      });
+    }
   }
 
   void _openModal(Widget modal) {
@@ -116,7 +154,12 @@ class _AppContentState extends State<AppContent> {
     if (onboardingDone == false) {
       return OnboardingPage(
         beforeSignUp: false,
-        onComplete: () => setState(() => onboardingDone = true),
+        onComplete: () {
+          setState(() => onboardingDone = true);
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _scheduleTelemetrySync();
+          });
+        },
       );
     }
 

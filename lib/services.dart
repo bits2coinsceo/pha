@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'package:uuid/uuid.dart';
 
 import 'db.dart';
+import 'health_telemetry.dart';
 import 'models.dart';
 
 const _uuid = Uuid();
@@ -307,5 +309,27 @@ class HealthConnectService {
       'calories_calculated': calories,
       'raw_payload': jsonEncode({'steps': steps, 'distance_meters': distanceMeters}),
     });
+  }
+
+  /// Reads today's steps and distance from the device, then stores them locally.
+  static Future<void> syncFromDevice(String userId) async {
+    if (!HealthTelemetryService.isSupported) {
+      throw Exception('Device activity sync is only available on iOS and Android.');
+    }
+    if (Platform.isAndroid && !await HealthTelemetryService.hasPermission()) {
+      throw Exception('Activity permission not granted.');
+    }
+    final snapshot = await HealthTelemetryService.fetchToday();
+    if (snapshot == null) {
+      throw Exception(
+        'Could not read activity data. Tap Allow access and enable Steps '
+        'and Walking + Running Distance in the Health permission sheet.',
+      );
+    }
+    await sync(
+      userId,
+      steps: snapshot.steps,
+      distanceMeters: snapshot.distanceMeters,
+    );
   }
 }

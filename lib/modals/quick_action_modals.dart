@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 
 import '../auth.dart';
 import '../db.dart';
+import '../onboarding_hp.dart';
 import '../services.dart';
 import '../theme.dart';
 import '../units.dart';
@@ -680,7 +681,9 @@ class _UpgradeModalState extends State<UpgradeModal> {
 
   @override
   Widget build(BuildContext context) {
-    final isPlus = context.watch<AuthProvider>().isPlus;
+    final auth = context.watch<AuthProvider>();
+    final isPlus = auth.isPlus;
+    final hpDiscount = auth.hpDiscountEligible;
     if (isPlus || done) {
       return AppModal(
         title: '',
@@ -738,6 +741,16 @@ class _UpgradeModalState extends State<UpgradeModal> {
           const SizedBox(height: 8),
           const Text('Get the full power of your Personal Health Assistant',
               style: TextStyle(fontSize: 14, color: C.gray500)),
+          if (hpDiscount) ...[
+            const SizedBox(height: 12),
+            AppBanner(
+              text:
+                  'You have $maxOnboardingHp HP! Redeem for $hpFirstPurchaseDiscountPercent% off 6-month or annual plans.',
+              bg: C.amber50,
+              border: C.amber200,
+              fg: C.amber700,
+            ),
+          ],
           const SizedBox(height: 24),
           Container(
             decoration: BoxDecoration(
@@ -802,10 +815,11 @@ class _UpgradeModalState extends State<UpgradeModal> {
                   child: _planCard(
                     plan: 'monthly',
                     name: 'Monthly',
-                    price: '\$9.99',
+                    price: planListPrice('monthly'),
                     per: '/mo',
                     note: 'Billed monthly.',
                     best: false,
+                    discounted: false,
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -813,10 +827,12 @@ class _UpgradeModalState extends State<UpgradeModal> {
                   child: _planCard(
                     plan: 'semiannual',
                     name: '6 Months',
-                    price: '\$49.99',
+                    price: hpDiscount ? planDiscountedPrice('semiannual') : planListPrice('semiannual'),
                     per: '/6mo',
-                    note: 'Save ~17%.',
+                    note: hpDiscount ? '20% HP discount applied.' : 'Save ~17%.',
                     best: false,
+                    discounted: hpDiscount,
+                    listPrice: planListPrice('semiannual'),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -824,10 +840,12 @@ class _UpgradeModalState extends State<UpgradeModal> {
                   child: _planCard(
                     plan: 'annual',
                     name: 'Annual',
-                    price: '\$69.99',
+                    price: hpDiscount ? planDiscountedPrice('annual') : planListPrice('annual'),
                     per: '/yr',
-                    note: 'Save ~42%.',
+                    note: hpDiscount ? '20% HP discount applied.' : 'Save ~42%.',
                     best: true,
+                    discounted: hpDiscount,
+                    listPrice: planListPrice('annual'),
                   ),
                 ),
               ],
@@ -883,6 +901,8 @@ class _UpgradeModalState extends State<UpgradeModal> {
     required String per,
     required String note,
     required bool best,
+    required bool discounted,
+    String? listPrice,
   }) {
     return Container(
       padding: const EdgeInsets.all(10),
@@ -923,6 +943,14 @@ class _UpgradeModalState extends State<UpgradeModal> {
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
+                if (discounted && listPrice != null) ...[
+                  Text(listPrice,
+                      style: const TextStyle(
+                          fontSize: 12,
+                          decoration: TextDecoration.lineThrough,
+                          color: C.gray400)),
+                  const SizedBox(width: 4),
+                ],
                 Text(price,
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.w800, color: C.gray900)),

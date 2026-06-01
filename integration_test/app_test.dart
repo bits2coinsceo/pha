@@ -33,12 +33,12 @@ void main() {
     await tester.enterText(find.widgetWithText(TextField, 'e.g. 32'), '30');
     await tester.enterText(find.widgetWithText(TextField, 'e.g. 175'), '180');
     await tester.enterText(find.widgetWithText(TextField, 'e.g. 70'), '72');
-    await tester.tap(find.text('Complete Quest 2 (+120 XP)'));
+    await tester.tap(find.text('Complete Quest 2 (+5 HP)'));
     await tester.pumpAndSettle(const Duration(seconds: 1));
 
     expect(find.textContaining('Quest 3'), findsOneWidget);
     await shot('03_onboarding_advanced');
-    await tester.tap(find.text('Skip bonus quest (+40 XP)'));
+    await tester.tap(find.text('Skip bonus quest'));
     await tester.pumpAndSettle(const Duration(seconds: 1));
 
     expect(find.textContaining('All quests complete'), findsOneWidget);

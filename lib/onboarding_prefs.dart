@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:uuid/uuid.dart';
 
 import 'db.dart';
+import 'onboarding_hp.dart';
 
 const _uuid = Uuid();
 
@@ -16,6 +17,7 @@ class OnboardingDraftData {
   final Map<String, double> extraMetrics;
   final int step;
   final bool completed;
+  final int healthPoints;
 
   const OnboardingDraftData({
     required this.unitSystem,
@@ -25,6 +27,7 @@ class OnboardingDraftData {
     required this.extraMetrics,
     required this.step,
     required this.completed,
+    required this.healthPoints,
   });
 }
 
@@ -87,6 +90,7 @@ class OnboardingPrefs {
       extraMetrics: extra,
       step: (r['step'] as int?) ?? 1,
       completed: ((r['completed'] as int?) ?? 0) == 1,
+      healthPoints: (r['health_points'] as int?) ?? 0,
     );
   }
 
@@ -113,12 +117,14 @@ class OnboardingPrefs {
   static Future<void> complete({
     required String unitSystem,
     Map<String, double> extraMetrics = const {},
+    required int healthPoints,
   }) =>
       _upsert({
         'unit_system': unitSystem,
         'metrics_json': jsonEncode(extraMetrics),
         'step': 4,
         'completed': 1,
+        'health_points': healthPoints.clamp(0, maxOnboardingHp),
       });
 
   /// Copies the completed draft onto a freshly registered user, then clears it.
@@ -138,6 +144,7 @@ class OnboardingPrefs {
         if (age != null) 'age': age,
         if (height != null) 'height': height,
         'onboarding_completed': 1,
+        'health_points': ((r['health_points'] as int?) ?? 0).clamp(0, maxOnboardingHp),
       },
       where: 'id = ?',
       whereArgs: [userId],
