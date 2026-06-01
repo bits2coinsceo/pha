@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../auth.dart';
+import '../daily_vitals.dart';
 import '../db.dart';
 import '../onboarding_hp.dart';
 import '../services.dart';
@@ -538,6 +539,206 @@ class _StressTestModalState extends State<StressTestModal> {
   }
 }
 
+// ── Daily BP / glucose (once per calendar day) ───────────────────────────────
+class DailyVitalsDialog extends StatefulWidget {
+  final bool needBp;
+  final bool needGlucose;
+  final String unitSystem;
+
+  const DailyVitalsDialog({
+    super.key,
+    required this.needBp,
+    required this.needGlucose,
+    required this.unitSystem,
+  });
+
+  @override
+  State<DailyVitalsDialog> createState() => _DailyVitalsDialogState();
+}
+
+class _DailyVitalsDialogState extends State<DailyVitalsDialog> {
+  final _systolic = TextEditingController();
+  final _diastolic = TextEditingController();
+  final _glucose = TextEditingController();
+  bool saving = false;
+  String error = '';
+
+  bool get isImperial => widget.unitSystem == 'imperial';
+
+  @override
+  void dispose() {
+    _systolic.dispose();
+    _diastolic.dispose();
+    _glucose.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    setState(() => error = '');
+    final userId = context.read<AuthProvider>().user!.id;
+    final now = DateTime.now().toUtc().toIso8601String();
+    final inserts = <Map<String, dynamic>>[];
+
+    if (widget.needBp) {
+      if (_systolic.text.trim().isEmpty && _diastolic.text.trim().isEmpty) {
+        // BP optional if glucose still needed
+      } else {
+        if (_systolic.text.trim().isEmpty || _diastolic.text.trim().isEmpty) {
+          setState(() => error = 'Enter both blood pressure values, or leave both empty.');
+          return;
+        }
+        final sys = double.tryParse(_systolic.text.trim());
+        final dia = double.tryParse(_diastolic.text.trim());
+        if (sys == null || sys < 60 || sys > 250 || dia == null || dia < 40 || dia > 150) {
+          setState(() => error = 'Check blood pressure values.');
+          return;
+        }
+        inserts.addAll([
+          {
+            'id': _uuid.v4(),
+            'user_id': userId,
+            'metric_type': 'blood_pressure_systolic',
+            'value': sys,
+            'recorded_at': now,
+            'created_at': now,
+          },
+          {
+            'id': _uuid.v4(),
+            'user_id': userId,
+            'metric_type': 'blood_pressure_diastolic',
+            'value': dia,
+            'recorded_at': now,
+            'created_at': now,
+          },
+        ]);
+      }
+    }
+
+    if (widget.needGlucose && _glucose.text.trim().isNotEmpty) {
+      final g = double.tryParse(_glucose.text.trim());
+      double? glucoseMgdl;
+      if (isImperial) {
+        if (g == null || g < 20 || g > 600) {
+          setState(() => error = 'Glucose 20–600 mg/dL.');
+          return;
+        }
+        glucoseMgdl = g;
+      } else {
+        if (g == null || g < 1 || g > 33) {
+          setState(() => error = 'Glucose 1–33 mmol/L.');
+          return;
+        }
+        glucoseMgdl = (mmolToMgdl(g) * 10).round() / 10;
+      }
+      inserts.add({
+        'id': _uuid.v4(),
+        'user_id': userId,
+        'metric_type': 'glucose',
+        'value': glucoseMgdl,
+        'recorded_at': now,
+        'created_at': now,
+      });
+    }
+
+    if (inserts.isEmpty) {
+      Navigator.pop(context, false);
+      return;
+    }
+
+    setState(() => saving = true);
+    for (final row in inserts) {
+      await Db.instance.raw.insert('health_metrics', row);
+    }
+    if (inserts.any((r) => r['metric_type'] == 'blood_pressure_systolic')) {
+      await DailyVitalsService.markBpLogged(userId);
+    }
+    if (inserts.any((r) => r['metric_type'] == 'glucose')) {
+      await DailyVitalsService.markGlucoseLogged(userId);
+    }
+    if (mounted) Navigator.pop(context, true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Today\'s vitals'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Log blood pressure and glucose once per day. You can skip and log later.',
+              style: TextStyle(fontSize: 13, color: C.gray600),
+            ),
+            if (error.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              AppBanner(text: error, bg: C.red50, border: C.red200, fg: C.red700),
+            ],
+            if (widget.needBp) ...[
+              const SizedBox(height: 16),
+              const Text('Blood pressure (mmHg)',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _systolic,
+                      keyboardType: TextInputType.number,
+                      decoration: appInput('Systolic'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: _diastolic,
+                      keyboardType: TextInputType.number,
+                      decoration: appInput('Diastolic'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+            if (widget.needGlucose) ...[
+              const SizedBox(height: 16),
+              Text(
+                'Blood glucose (${isImperial ? 'mg/dL' : 'mmol/L'})',
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _glucose,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: appInput(isImperial ? 'e.g. 95' : 'e.g. 5.3'),
+              ),
+            ],
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: saving
+              ? null
+              : () async {
+                  final userId = context.read<AuthProvider>().user!.id;
+                  if (widget.needBp) await DailyVitalsService.markBpPromptDismissed(userId);
+                  if (widget.needGlucose) {
+                    await DailyVitalsService.markGlucosePromptDismissed(userId);
+                  }
+                  if (context.mounted) Navigator.pop(context, false);
+                },
+          child: const Text('Not now'),
+        ),
+        TextButton(
+          onPressed: saving ? null : _save,
+          child: Text(saving ? 'Saving…' : 'Save'),
+        ),
+      ],
+    );
+  }
+}
+
 // ── Log Metric ───────────────────────────────────────────────────────────────
 class LogMetricModal extends StatefulWidget {
   final VoidCallback onSaved;
@@ -584,15 +785,19 @@ class _LogMetricModalState extends State<LogMetricModal> {
       error = '';
     });
     final now = DateTime.now().toUtc().toIso8601String();
+    final userId = auth.user!.id;
     await Db.instance.raw.insert('health_metrics', {
       'id': _uuid.v4(),
-      'user_id': auth.user!.id,
+      'user_id': userId,
       'metric_type': metricType,
       'value': toStorageValue(metricType, num, auth.unitSystem),
       'recorded_at': now,
       'notes': _notes.text.trim().isEmpty ? null : _notes.text.trim(),
       'created_at': now,
     });
+    if (metricType == 'glucose') {
+      await DailyVitalsService.markGlucoseLogged(userId);
+    }
     setState(() {
       success = true;
       saving = false;

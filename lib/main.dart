@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'auth.dart';
 import 'db.dart';
 import 'onboarding_prefs.dart';
+import 'profile_basics.dart';
 import 'modals/psycho_test_modal.dart';
 import 'modals/quick_action_modals.dart';
 import 'pages/dashboard.dart';
@@ -92,14 +93,16 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
   }
 
   Future<void> _checkOnboarding(String userId) async {
+    await ProfileBasicsService.backfillWeightFromMetrics(userId);
     final rows = await Db.instance.raw.query('profiles',
-        columns: ['onboarding_completed', 'age', 'height'],
+        columns: ['onboarding_completed', 'age', 'height', 'weight'],
         where: 'id = ?',
         whereArgs: [userId]);
     final completed = rows.isNotEmpty && (rows.first['onboarding_completed'] as int) == 1;
     final hasBasics = rows.isNotEmpty &&
         rows.first['age'] != null &&
-        rows.first['height'] != null;
+        rows.first['height'] != null &&
+        rows.first['weight'] != null;
     setState(() {
       onboardingDone = completed && hasBasics;
       checkedForUserId = userId;

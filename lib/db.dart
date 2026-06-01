@@ -19,7 +19,7 @@ class Db {
     final path = p.join(dir.path, 'pha.db');
     _db = await databaseFactory.openDatabase(
       path,
-      options: OpenDatabaseOptions(version: 3, onCreate: _create, onUpgrade: _upgrade),
+      options: OpenDatabaseOptions(version: 4, onCreate: _create, onUpgrade: _upgrade),
     );
   }
 
@@ -34,6 +34,9 @@ class Db {
           'ALTER TABLE profiles ADD COLUMN hp_discount_used INTEGER NOT NULL DEFAULT 0');
       await db.execute(
           'ALTER TABLE onboarding_drafts ADD COLUMN health_points INTEGER NOT NULL DEFAULT 0');
+    }
+    if (oldVersion < 4) {
+      await db.execute('ALTER TABLE profiles ADD COLUMN weight REAL');
     }
   }
 
@@ -63,6 +66,7 @@ class Db {
         display_name TEXT,
         age INTEGER,
         height REAL,
+        weight REAL,
         onboarding_completed INTEGER NOT NULL DEFAULT 0,
         is_plus INTEGER NOT NULL DEFAULT 0,
         unit_system TEXT NOT NULL DEFAULT 'metric',

@@ -98,6 +98,34 @@ class OnboardingPrefs {
   static Future<void> saveUnit(String unitSystem) =>
       _upsert({'unit_system': unitSystem, 'step': 2});
 
+  /// Ensures the singleton draft row exists (avoids lost saves before quest 1 finishes).
+  static Future<void> ensureDraft({String unitSystem = 'metric'}) async {
+    if (await _row() != null) return;
+    await _upsert({'unit_system': unitSystem, 'step': 1});
+  }
+
+  /// Saves age / height / weight as the user types (quest 2), without advancing step.
+  static Future<void> saveBasicsProgress({
+    required String unitSystem,
+    int? age,
+    int? heightCm,
+    double? weightKg,
+  }) async {
+    await ensureDraft(unitSystem: unitSystem);
+    final existing = await _row();
+    final currentStep = (existing?['step'] as int?) ?? 1;
+    final values = <String, Object?>{
+      'unit_system': unitSystem,
+      if (age != null) 'age': age,
+      if (heightCm != null) 'height': heightCm,
+      if (weightKg != null) 'weight': weightKg,
+    };
+    if ((age != null || heightCm != null || weightKg != null) && currentStep < 3) {
+      values['step'] = 2;
+    }
+    await _upsert(values);
+  }
+
   /// Quest 2 done — core vitals captured. Advances the saved step to 3.
   static Future<void> saveGeneral({
     required String unitSystem,
@@ -127,15 +155,17 @@ class OnboardingPrefs {
         'health_points': healthPoints.clamp(0, maxOnboardingHp),
       });
 
-  /// Copies the completed draft onto a freshly registered user, then clears it.
+  /// Copies onboarding draft basics onto a freshly registered user, then clears the draft.
   static Future<void> applyToUser(String userId) async {
     final r = await _row();
-    if (r == null || (r['completed'] as int) != 1) return;
-
-    final unit = r['unit_system'] as String? ?? 'metric';
+    if (r == null) return;
+    final completed = (r['completed'] as int) == 1;
     final age = r['age'] as int?;
     final height = r['height'] as int?;
     final weight = (r['weight'] as num?)?.toDouble();
+    if (!completed && age == null && height == null && weight == null) return;
+
+    final unit = r['unit_system'] as String? ?? 'metric';
 
     await Db.instance.raw.update(
       'profiles',
@@ -143,7 +173,8 @@ class OnboardingPrefs {
         'unit_system': unit,
         if (age != null) 'age': age,
         if (height != null) 'height': height,
-        'onboarding_completed': 1,
+        if (weight != null) 'weight': weight,
+        if (completed) 'onboarding_completed': 1,
         'health_points': ((r['health_points'] as int?) ?? 0).clamp(0, maxOnboardingHp),
       },
       where: 'id = ?',
@@ -170,7 +201,7 @@ class OnboardingPrefs {
       });
     }
 
-    await clear();
+    if (completed) await clear();
   }
 
   /// For tests / full reset.

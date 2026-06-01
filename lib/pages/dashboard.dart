@@ -3,8 +3,10 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../auth.dart';
+import '../daily_vitals.dart';
 import '../db.dart';
 import '../health_telemetry.dart';
+import '../modals/quick_action_modals.dart';
 import '../models.dart';
 import '../services.dart';
 import '../theme.dart';
@@ -71,6 +73,26 @@ class _DashboardState extends State<Dashboard> {
     await _loadLastSync();
     await _loadCreditCounts();
     if (mounted) setState(() {});
+    await _maybePromptDailyVitals();
+  }
+
+  Future<void> _maybePromptDailyVitals() async {
+    final needBp = await DailyVitalsService.shouldPromptBp(_userId);
+    final needGlucose = await DailyVitalsService.shouldPromptGlucose(_userId);
+    if (!needBp && !needGlucose) return;
+    if (!mounted) return;
+
+    final unit = context.read<AuthProvider>().unitSystem;
+    final saved = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => DailyVitalsDialog(
+        needBp: needBp,
+        needGlucose: needGlucose,
+        unitSystem: unit,
+      ),
+    );
+    if (saved == true && mounted) await _loadHealthData();
+    if (mounted) setState(() {});
   }
 
   Future<void> _loadCreditCounts() async {
@@ -134,6 +156,7 @@ class _DashboardState extends State<Dashboard> {
       displayName = (p['display_name'] as String?) ?? '';
       age = (p['age'] as num?)?.toInt();
       height = (p['height'] as num?)?.toDouble();
+      weight ??= (p['weight'] as num?)?.toDouble();
     }
   }
 

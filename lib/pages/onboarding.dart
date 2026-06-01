@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../auth.dart';
+import '../daily_vitals.dart';
 import '../db.dart';
+import '../profile_basics.dart';
 import '../onboarding_hp.dart';
 import '../onboarding_prefs.dart';
 import '../theme.dart';
@@ -27,7 +31,8 @@ class OnboardingPage extends StatefulWidget {
   State<OnboardingPage> createState() => _OnboardingPageState();
 }
 
-class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStateMixin {
+class _OnboardingPageState extends State<OnboardingPage>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   int step = 1;
   String unitSystem = 'metric';
   bool saving = false;
@@ -66,7 +71,14 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   int? _pendingHeightCm;
   double? _pendingWeightKg;
 
+  String? _userId;
+  Timer? _basicsSaveTimer;
+  bool _needBpToday = true;
+  bool _needGlucoseToday = true;
+
   bool get isImperial => unitSystem == 'imperial';
+  String get _vitalsScope =>
+      beforeSignUp ? DailyVitalsService.preSignUpScope : (_userId ?? DailyVitalsService.preSignUpScope);
   bool get beforeSignUp => widget.beforeSignUp;
 
   int get _level => hp < hpUnitsReward ? 1 : (hp < hpUnitsReward + hpBasicReward ? 2 : 3);
@@ -87,11 +99,138 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _bgFloat = AnimationController(vsync: this, duration: const Duration(seconds: 4))
       ..repeat(reverse: true);
     _toastCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 2200));
 
-    if (beforeSignUp) _restoreDraft();
+    if (beforeSignUp) {
+      _restoreDraft();
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _userId = context.read<AuthProvider>().user?.id;
+        _restoreUserProfile();
+      });
+    }
+    _attachBasicsAutosave();
+  }
+
+  void _attachBasicsAutosave() {
+    void schedule() => _scheduleBasicsSave();
+    for (final c in [_age, _heightCm, _heightFt, _heightIn, _weight]) {
+      c.addListener(schedule);
+    }
+  }
+
+  void _scheduleBasicsSave() {
+    _basicsSaveTimer?.cancel();
+    _basicsSaveTimer = Timer(const Duration(milliseconds: 250), _persistBasicsDraft);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.detached) {
+      _basicsSaveTimer?.cancel();
+      unawaited(_persistBasicsDraft());
+    }
+  }
+
+  Future<void> _persistBasicsDraft() async {
+    final ageVal = _parseAge();
+    final heightCm = _parseHeightCm();
+    final weightKg = _parseWeightKg();
+    if (ageVal == null && heightCm == null && weightKg == null) return;
+
+    if (beforeSignUp) {
+      await OnboardingPrefs.saveBasicsProgress(
+        unitSystem: unitSystem,
+        age: ageVal,
+        heightCm: heightCm,
+        weightKg: weightKg,
+      );
+      if (ageVal != null) _pendingAge = ageVal;
+      if (heightCm != null) _pendingHeightCm = heightCm;
+      if (weightKg != null) _pendingWeightKg = weightKg;
+      return;
+    }
+
+    final userId = _userId;
+    if (userId == null) return;
+    await ProfileBasicsService.save(
+      userId: userId,
+      unitSystem: unitSystem,
+      age: ageVal,
+      heightCm: heightCm,
+      weightKg: weightKg,
+    );
+  }
+
+  void _fillBasicsFields({int? ageVal, int? heightCm, double? weightKg}) {
+    if (ageVal != null) _age.text = '$ageVal';
+    if (heightCm != null) {
+      if (isImperial) {
+        final r = cmToFtIn(heightCm.toDouble());
+        _heightFt.text = '${r.ft}';
+        _heightIn.text = '${r.inch}';
+      } else {
+        _heightCm.text = '$heightCm';
+      }
+    }
+    if (weightKg != null) {
+      _weight.text = isImperial
+          ? (kgToLbs(weightKg) * 10).round().toString()
+          : weightKg.toStringAsFixed(weightKg % 1 == 0 ? 0 : 1);
+    }
+    if (ageVal != null) _pendingAge = ageVal;
+    if (heightCm != null) _pendingHeightCm = heightCm;
+    if (weightKg != null) _pendingWeightKg = weightKg;
+  }
+
+  /// Restores saved profile fields for post-sign-up onboarding.
+  Future<void> _restoreUserProfile() async {
+    final userId = _userId;
+    if (userId == null) return;
+
+    final rows = await Db.instance.raw.query('profiles', where: 'id = ?', whereArgs: [userId]);
+    if (rows.isEmpty || !mounted) return;
+    final r = rows.first;
+
+    var ageVal = (r['age'] as num?)?.toInt();
+    var heightCm = (r['height'] as num?)?.toInt();
+    var weightKg = (r['weight'] as num?)?.toDouble();
+
+    if (weightKg == null) {
+      final wRows = await Db.instance.raw.query(
+        'health_metrics',
+        columns: ['value'],
+        where: 'user_id = ? AND metric_type = ?',
+        whereArgs: [userId, 'weight'],
+        orderBy: 'recorded_at DESC',
+        limit: 1,
+      );
+      if (wRows.isNotEmpty) weightKg = (wRows.first['value'] as num).toDouble();
+    }
+
+    final needBp = await DailyVitalsService.shouldPromptBp(_vitalsScope);
+    final needGlucose = await DailyVitalsService.shouldPromptGlucose(_vitalsScope);
+
+    final hasBasics = ageVal != null && heightCm != null && weightKg != null;
+    final hpStored = (r['health_points'] as int?) ?? 0;
+
+    setState(() {
+      unitSystem = (r['unit_system'] as String?) ?? 'metric';
+      _fillBasicsFields(ageVal: ageVal, heightCm: heightCm, weightKg: weightKg);
+      quest1Done = true;
+      quest2Done = hasBasics;
+      step = hasBasics ? 3 : 2;
+      _badges['units'] = true;
+      if (hasBasics) _badges['foundation'] = true;
+      hp = hpStored.clamp(0, maxOnboardingHp);
+      _needBpToday = needBp;
+      _needGlucoseToday = needGlucose;
+    });
   }
 
   /// Restores an interrupted pre-signup onboarding from the persisted draft so
@@ -99,28 +238,16 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Future<void> _restoreDraft() async {
     final d = await OnboardingPrefs.load();
     if (d == null || !mounted) return;
+
+    final needBp = await DailyVitalsService.shouldPromptBp(_vitalsScope);
+    final needGlucose = await DailyVitalsService.shouldPromptGlucose(_vitalsScope);
+
+    if (!mounted) return;
     setState(() {
       unitSystem = d.unitSystem;
-
-      if (d.age != null) _age.text = '${d.age}';
-      if (d.heightCm != null) {
-        if (isImperial) {
-          final r = cmToFtIn(d.heightCm!.toDouble());
-          _heightFt.text = '${r.ft}';
-          _heightIn.text = '${r.inch}';
-        } else {
-          _heightCm.text = '${d.heightCm}';
-        }
-      }
-      if (d.weightKg != null) {
-        _weight.text = isImperial
-            ? (kgToLbs(d.weightKg!) * 10).round().toString()
-            : d.weightKg!.toStringAsFixed(d.weightKg! % 1 == 0 ? 0 : 1);
-      }
-
-      _pendingAge = d.age;
-      _pendingHeightCm = d.heightCm;
-      _pendingWeightKg = d.weightKg;
+      _fillBasicsFields(ageVal: d.age, heightCm: d.heightCm, weightKg: d.weightKg);
+      _needBpToday = needBp;
+      _needGlucoseToday = needGlucose;
 
       final sys = d.extraMetrics['blood_pressure_systolic'];
       final dia = d.extraMetrics['blood_pressure_diastolic'];
@@ -133,8 +260,14 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
             : mgdlToMmol(glucose).toStringAsFixed(1);
       }
 
-      step = d.completed ? 4 : d.step.clamp(1, 3);
-      quest1Done = d.step > 1;
+      final hasPartialBasics =
+          d.age != null || d.heightCm != null || d.weightKg != null;
+      var restoredStep = d.completed ? 4 : d.step.clamp(1, 3);
+      if (!d.completed && hasPartialBasics && restoredStep < 2) {
+        restoredStep = 2;
+      }
+      step = restoredStep;
+      quest1Done = d.step > 1 || hasPartialBasics;
       quest2Done = d.step > 2;
       quest3Done = d.completed;
       vitalsBonus = d.extraMetrics.isNotEmpty;
@@ -164,6 +297,9 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _basicsSaveTimer?.cancel();
+    unawaited(_persistBasicsDraft());
     _bgFloat.dispose();
     _toastCtrl.dispose();
     for (final c in [_age, _heightCm, _heightFt, _heightIn, _weight, _systolic, _diastolic, _glucose]) {
@@ -242,8 +378,10 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
     return w;
   }
 
-  void _completeQuest1() {
-    if (beforeSignUp) OnboardingPrefs.saveUnit(unitSystem);
+  Future<void> _completeQuest1() async {
+    if (beforeSignUp) {
+      await OnboardingPrefs.saveUnit(unitSystem);
+    }
     if (quest1Done) {
       setState(() => step = 2);
       return;
@@ -292,11 +430,12 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
       );
     } else {
       final auth = context.read<AuthProvider>();
-      await Db.instance.raw.update(
-        'profiles',
-        {'age': ageVal, 'height': heightCm, 'unit_system': unitSystem},
-        where: 'id = ?',
-        whereArgs: [auth.user!.id],
+      await ProfileBasicsService.save(
+        userId: auth.user!.id,
+        unitSystem: unitSystem,
+        age: ageVal,
+        heightCm: heightCm,
+        weightKg: weightKg,
       );
       await _insertMetrics(auth, _metricRows(auth.user!.id, {'weight': weightKg}));
     }
@@ -319,7 +458,8 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
 
     if (includeAdvanced) {
       setState(() => error = '');
-      if (_systolic.text.trim().isNotEmpty || _diastolic.text.trim().isNotEmpty) {
+      if (_needBpToday &&
+          (_systolic.text.trim().isNotEmpty || _diastolic.text.trim().isNotEmpty)) {
         if (_systolic.text.trim().isEmpty || _diastolic.text.trim().isEmpty) {
           setState(() {
             error = 'Enter both BP values, or leave both empty.';
@@ -340,9 +480,10 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         extraMetrics['blood_pressure_diastolic'] = dia;
         bonusHp += hpBpReward;
         _badges['heart'] = true;
+        await DailyVitalsService.markBpLogged(_vitalsScope);
       }
 
-      if (_glucose.text.trim().isNotEmpty) {
+      if (_needGlucoseToday && _glucose.text.trim().isNotEmpty) {
         final g = double.tryParse(_glucose.text.trim());
         double? glucoseMgdl;
         if (isImperial) {
@@ -367,6 +508,7 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         extraMetrics['glucose'] = glucoseMgdl;
         bonusHp += hpGlucoseReward;
         _badges['glucose'] = true;
+        await DailyVitalsService.markGlucoseLogged(_vitalsScope);
       }
       vitalsBonus = extraMetrics.isNotEmpty;
     }
@@ -723,6 +865,10 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
   Widget _stepAdvanced() {
     final hasBp = _systolic.text.trim().isNotEmpty || _diastolic.text.trim().isNotEmpty;
     final hasGlucose = _glucose.text.trim().isNotEmpty;
+    final showBp = _needBpToday;
+    final showGlucose = _needGlucoseToday;
+    final allLoggedToday = !showBp && !showGlucose;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -746,66 +892,79 @@ class _OnboardingPageState extends State<OnboardingPage> with TickerProviderStat
         ),
         const SizedBox(height: 6),
         Text(
-          'Optional vitals — +$hpBpReward HP for BP, +$hpGlucoseReward HP for glucose.',
+          allLoggedToday
+              ? 'You already logged BP and glucose today. Come back tomorrow for your next reading.'
+              : 'Optional vitals — +$hpBpReward HP for BP, +$hpGlucoseReward HP for glucose. Once per day.',
           textAlign: TextAlign.center,
           style: const TextStyle(color: C.gray500, fontSize: 13),
         ),
         const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _bonusTile('❤️ BP', '+$hpBpReward HP', hasBp && _diastolic.text.isNotEmpty && _systolic.text.isNotEmpty),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: _bonusTile('💧 Glucose', '+$hpGlucoseReward HP', hasGlucose),
-            ),
-          ],
-        ),
+        if (!allLoggedToday)
+          Row(
+            children: [
+              if (showBp)
+                Expanded(
+                  child: _bonusTile(
+                    '❤️ BP',
+                    '+$hpBpReward HP',
+                    hasBp && _diastolic.text.isNotEmpty && _systolic.text.isNotEmpty,
+                  ),
+                ),
+              if (showBp && showGlucose) const SizedBox(width: 8),
+              if (showGlucose)
+                Expanded(
+                  child: _bonusTile('💧 Glucose', '+$hpGlucoseReward HP', hasGlucose),
+                ),
+            ],
+          ),
         const SizedBox(height: 16),
         if (error.isNotEmpty) ...[
           AppBanner(text: error, bg: C.red50, border: C.red200, fg: C.red700),
           const SizedBox(height: 12),
         ],
-        _gameField(Icons.monitor_heart_outlined, C.red50, C.red500, 'Blood pressure', 'mmHg', false,
-            Row(children: [
-              Expanded(
-                child: TextField(
-                  controller: _systolic,
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.center,
-                  onChanged: (_) => setState(() {}),
-                  decoration: appInput('Sys'),
+        if (showBp) ...[
+          _gameField(Icons.monitor_heart_outlined, C.red50, C.red500, 'Blood pressure', 'mmHg', false,
+              Row(children: [
+                Expanded(
+                  child: TextField(
+                    controller: _systolic,
+                    keyboardType: TextInputType.number,
+                    textAlign: TextAlign.center,
+                    onChanged: (_) => setState(() {}),
+                    decoration: appInput('Sys'),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: TextField(
-                  controller: _diastolic,
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.center,
-                  onChanged: (_) => setState(() {}),
-                  decoration: appInput('Dia'),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    controller: _diastolic,
+                    keyboardType: TextInputType.number,
+                    textAlign: TextAlign.center,
+                    onChanged: (_) => setState(() {}),
+                    decoration: appInput('Dia'),
+                  ),
                 ),
-              ),
-            ])),
-        const SizedBox(height: 14),
-        _gameField(Icons.water_drop_outlined, C.teal50, C.teal500, 'Blood glucose',
-            isImperial ? 'mg/dL' : 'mmol/L', false,
-            TextField(
-              controller: _glucose,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              textAlign: TextAlign.center,
-              onChanged: (_) => setState(() {}),
-              decoration: appInput(isImperial ? 'e.g. 95' : 'e.g. 5.3'),
-            )),
+              ])),
+          const SizedBox(height: 14),
+        ],
+        if (showGlucose)
+          _gameField(Icons.water_drop_outlined, C.teal50, C.teal500, 'Blood glucose',
+              isImperial ? 'mg/dL' : 'mmol/L', false,
+              TextField(
+                controller: _glucose,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                textAlign: TextAlign.center,
+                onChanged: (_) => setState(() {}),
+                decoration: appInput(isImperial ? 'e.g. 95' : 'e.g. 5.3'),
+              )),
         const SizedBox(height: 20),
-        PrimaryButton(
-          label: saving ? 'Calculating rewards…' : 'Claim bonus & finish 🏆',
-          color: C.amber600,
-          icon: const Icon(Icons.emoji_events, size: 18, color: C.white),
-          onPressed: saving ? null : () => _finish(includeAdvanced: true),
-        ),
+        if (!allLoggedToday)
+          PrimaryButton(
+            label: saving ? 'Calculating rewards…' : 'Claim bonus & finish 🏆',
+            color: C.amber600,
+            icon: const Icon(Icons.emoji_events, size: 18, color: C.white),
+            onPressed: saving ? null : () => _finish(includeAdvanced: true),
+          ),
         const SizedBox(height: 8),
         TextButton(
           onPressed: saving ? null : () => _finish(includeAdvanced: false),

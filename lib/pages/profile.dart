@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../auth.dart';
 import '../db.dart';
+import '../profile_basics.dart';
 import '../theme.dart';
 import '../widgets.dart';
 import 'history.dart' show pageHeader;
@@ -22,6 +23,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final _name = TextEditingController();
   final _age = TextEditingController();
   final _height = TextEditingController();
+  final _weight = TextEditingController();
 
   @override
   void initState() {
@@ -34,6 +36,7 @@ class _ProfilePageState extends State<ProfilePage> {
     _name.dispose();
     _age.dispose();
     _height.dispose();
+    _weight.dispose();
     super.dispose();
   }
 
@@ -45,6 +48,9 @@ class _ProfilePageState extends State<ProfilePage> {
       _name.text = (r['display_name'] as String?) ?? '';
       _age.text = r['age'] != null ? '${r['age']}' : '';
       _height.text = r['height'] != null ? '${(r['height'] as num).toInt()}' : '';
+      _weight.text = r['weight'] != null
+          ? (r['weight'] as num).toStringAsFixed((r['weight'] as num) % 1 == 0 ? 0 : 1)
+          : '';
     }
     setState(() => loading = false);
   }
@@ -78,11 +84,28 @@ class _ProfilePageState extends State<ProfilePage> {
         return;
       }
     }
+    double? weight;
+    if (_weight.text.isNotEmpty) {
+      weight = double.tryParse(_weight.text.trim());
+      if (weight == null || weight < 20 || weight > 300) {
+        setState(() {
+          error = 'Weight must be between 20 and 300 kg.';
+          saving = false;
+        });
+        return;
+      }
+    }
     await Db.instance.raw.update(
       'profiles',
-      {'display_name': _name.text, 'age': age, 'height': height},
+      {'display_name': _name.text},
       where: 'id = ?',
       whereArgs: [userId],
+    );
+    await ProfileBasicsService.save(
+      userId: userId,
+      age: age,
+      heightCm: height,
+      weightKg: weight,
     );
     setState(() {
       saving = false;
@@ -177,6 +200,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                     TextField(
                                         controller: _height,
                                         decoration: appInput('e.g. 175')),
+                                    const SizedBox(height: 16),
+                                    _label('Weight (kg)', Icons.monitor_weight, C.blue500),
+                                    TextField(
+                                        controller: _weight,
+                                        decoration: appInput('e.g. 70')),
                                     const SizedBox(height: 24),
                                     PrimaryButton(
                                       label: saving ? 'Saving...' : 'Save Changes',
