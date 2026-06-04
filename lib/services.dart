@@ -312,7 +312,8 @@ class HealthConnectService {
   }
 
   /// Reads today's steps and distance from the device, then stores them locally.
-  static Future<void> syncFromDevice(String userId) async {
+  /// Returns true when new data was written.
+  static Future<bool> syncFromDevice(String userId) async {
     if (!HealthTelemetryService.isSupported) {
       throw Exception('Device activity sync is only available on iOS and Android.');
     }
@@ -322,14 +323,28 @@ class HealthConnectService {
     final snapshot = await HealthTelemetryService.fetchToday();
     if (snapshot == null) {
       throw Exception(
-        'Could not read activity data. Tap Allow access and enable Steps '
-        'and Walking + Running Distance in the Health permission sheet.',
+        'Could not read activity data. Enable Steps and Walking + Running Distance '
+        'in the Health permission sheet.',
       );
+    }
+    final previous = await last(userId);
+    if (previous != null) {
+      final prevDay = previous.syncedAt.toLocal();
+      final today = DateTime.now();
+      final sameDay = prevDay.year == today.year &&
+          prevDay.month == today.month &&
+          prevDay.day == today.day;
+      if (sameDay &&
+          previous.steps == snapshot.steps &&
+          (previous.distanceMeters - snapshot.distanceMeters).abs() < 0.5) {
+        return false;
+      }
     }
     await sync(
       userId,
       steps: snapshot.steps,
       distanceMeters: snapshot.distanceMeters,
     );
+    return true;
   }
 }

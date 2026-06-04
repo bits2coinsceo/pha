@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../auth.dart';
+import '../cosmic_ui.dart';
 import '../theme.dart';
 import '../widgets.dart';
 
@@ -63,34 +64,36 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: C.gray50,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final wide = constraints.maxWidth >= 1024;
-          return Row(
-            children: [
-              if (wide) Expanded(child: _brandingPanel()),
-              Expanded(child: _formPanel(wide)),
-            ],
-          );
-        },
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          const CosmicBackground(),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final wide = constraints.maxWidth >= 1024;
+              return Row(
+                children: [
+                  if (wide) Expanded(child: _brandingPanel()),
+                  Expanded(child: _formPanel(wide)),
+                ],
+              );
+            },
+          ),
+        ],
       ),
     );
   }
 
   Widget _brandingPanel() {
-    const features = [
+    final features = [
       (Icons.favorite, 'Track vitals & glucose', C.rose500, C.rose50),
       (Icons.monitor_heart, 'AI health insights', C.blue500, C.blue50),
       (Icons.shield, 'Private & secure', C.teal500, C.teal50),
       (Icons.auto_awesome, 'Smart analysis', C.amber500, C.amber50),
     ];
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [C.blue600, C.blue500, C.teal500],
-        ),
+      decoration: BoxDecoration(
+        gradient: kNebulaGradient,
       ),
       padding: const EdgeInsets.all(48),
       child: Column(
@@ -106,14 +109,14 @@ class _LoginPageState extends State<LoginPage> {
                   decoration: BoxDecoration(
                       color: C.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(16)),
-                  child: const Icon(Icons.favorite, color: C.white, size: 32),
+                  child: Icon(Icons.favorite, color: C.white, size: 32),
                 ),
-                const SizedBox(height: 12),
-                const Text('PHA',
+                SizedBox(height: 12),
+                Text('PHA',
                     style: TextStyle(
                         color: C.white, fontWeight: FontWeight.bold, fontSize: 30, letterSpacing: -1)),
                 Text('Personal Health Assistant',
-                    style: TextStyle(color: C.blue100, fontSize: 14)),
+                    style: TextStyle(color: C.onGradientMuted, fontSize: 14)),
               ],
             ),
           ),
@@ -122,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               RichText(
                 text: TextSpan(
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 36, fontWeight: FontWeight.bold, height: 1.2, color: C.white),
                   children: [
                     const TextSpan(text: 'Your health,\n'),
@@ -131,12 +134,12 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               Text(
                 'Monitor your metrics, get AI-powered insights, and take control of your wellness journey.',
-                style: TextStyle(color: C.blue100, fontSize: 18, height: 1.5),
+                style: TextStyle(color: C.onGradientMuted, fontSize: 18, height: 1.5),
               ),
-              const SizedBox(height: 32),
+              SizedBox(height: 32),
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
@@ -161,10 +164,10 @@ class _LoginPageState extends State<LoginPage> {
                               color: f.$4, borderRadius: BorderRadius.circular(8)),
                           child: Icon(f.$1, size: 16, color: f.$3),
                         ),
-                        const SizedBox(width: 10),
+                        SizedBox(width: 10),
                         Expanded(
                           child: Text(f.$2,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: C.white, fontSize: 13, fontWeight: FontWeight.w500)),
                         ),
                       ],
@@ -183,7 +186,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _formPanel(bool wide) {
     return Container(
-      color: C.gray50,
+      color: Colors.transparent,
       alignment: Alignment.center,
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -196,16 +199,19 @@ class _LoginPageState extends State<LoginPage> {
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
-                      color: C.blue500, borderRadius: BorderRadius.circular(16)),
-                  child: const Icon(Icons.favorite, color: C.white, size: 28),
+                    gradient: kBlueTealGradient,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: const [BoxShadow(color: Color(0x5500D4FF), blurRadius: 10)],
+                  ),
+                  child: Icon(Icons.favorite, color: C.white, size: 28),
                 ),
-                const SizedBox(height: 12),
-                const Text('PHA',
+                SizedBox(height: 12),
+                Text('PHA',
                     style: TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 24, color: C.gray900)),
-                const Text('Personal Health Assistant',
-                    style: TextStyle(color: C.gray400, fontSize: 14)),
-                const SizedBox(height: 32),
+                Text('Personal Health Assistant',
+                    style: TextStyle(color: C.gray500, fontSize: 14)),
+                SizedBox(height: 32),
               ],
               Container(
                 decoration: cardDecoration(),
@@ -214,16 +220,16 @@ class _LoginPageState extends State<LoginPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(isSignUp ? 'Create your account' : 'Welcome back',
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 22, fontWeight: FontWeight.bold, color: C.gray900)),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       isSignUp
                           ? 'Start tracking your health today — free forever.'
                           : 'Sign in to access your health dashboard.',
-                      style: const TextStyle(color: C.gray500, fontSize: 14),
+                      style: TextStyle(color: C.gray500, fontSize: 14),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
                     if (error.isNotEmpty) ...[
                       AppBanner(
                         text: error,
@@ -232,12 +238,12 @@ class _LoginPageState extends State<LoginPage> {
                         fg: C.red700,
                         icon: Icons.error_outline,
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16),
                     ],
                     if (isSignUp) ...[
                       _label('Full name'),
                       TextField(controller: _name, decoration: appInput('Jane Smith')),
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16),
                     ],
                     _label('Email address'),
                     TextField(
@@ -245,7 +251,7 @@ class _LoginPageState extends State<LoginPage> {
                       keyboardType: TextInputType.emailAddress,
                       decoration: appInput('you@example.com'),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                     _label('Password'),
                     TextField(
                       controller: _password,
@@ -258,16 +264,16 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
                     PrimaryButton(
                       label: loading
                           ? (isSignUp ? 'Creating account…' : 'Signing in…')
                           : (isSignUp ? 'Create account' : 'Sign in'),
                       onPressed: loading ? null : _submit,
                     ),
-                    const SizedBox(height: 24),
-                    const Divider(color: C.gray100, height: 1),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
+                    Divider(color: C.gray100, height: 1),
+                    SizedBox(height: 24),
                     Center(
                       child: Wrap(
                         alignment: WrapAlignment.center,
@@ -276,13 +282,13 @@ class _LoginPageState extends State<LoginPage> {
                             isSignUp
                                 ? 'Already have an account? '
                                 : "Don't have an account? ",
-                            style: const TextStyle(fontSize: 14, color: C.gray500),
+                            style: TextStyle(fontSize: 14, color: C.gray500),
                           ),
                           GestureDetector(
                             onTap: _switchMode,
                             child: Text(
                               isSignUp ? 'Sign in' : 'Sign up for free',
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 14, color: C.blue500, fontWeight: FontWeight.w600),
                             ),
                           ),
@@ -293,7 +299,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               if (isSignUp) ...[
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 Text(
                   'By creating an account you agree to our Terms of Service and Privacy Policy.',
                   textAlign: TextAlign.center,
@@ -310,7 +316,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _label(String t) => Padding(
         padding: const EdgeInsets.only(bottom: 6),
         child: Text(t,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 14, fontWeight: FontWeight.w500, color: C.gray700)),
       );
 }

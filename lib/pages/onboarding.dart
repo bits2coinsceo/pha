@@ -9,6 +9,7 @@ import '../daily_vitals.dart';
 import '../db.dart';
 import '../profile_basics.dart';
 import '../onboarding_hp.dart';
+import '../cosmic_ui.dart';
 import '../onboarding_prefs.dart';
 import '../theme.dart';
 import '../units.dart';
@@ -560,9 +561,10 @@ class _OnboardingPageState extends State<OnboardingPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: C.gray50,
       body: Stack(
         children: [
-          _animatedBackground(),
+          CosmicBackground(drift: _bgFloat),
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -573,7 +575,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                     children: [
                       if (_hpToastMsg != null) ...[
                         OnboardingHpToast(message: _hpToastMsg!, hp: _hpToastAmount),
-                        const SizedBox(height: 6),
+                        SizedBox(height: 6),
                       ],
                       OnboardingGameHud(
                         hp: hp,
@@ -581,21 +583,14 @@ class _OnboardingPageState extends State<OnboardingPage>
                         levelTitle: _levelTitle,
                         power: _power,
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
                       AnimatedSwitcher(
                         duration: const Duration(milliseconds: 350),
                         switchInCurve: Curves.easeOutCubic,
                         child: Container(
                           key: ValueKey(step),
                           margin: const EdgeInsets.only(top: 4),
-                          decoration: BoxDecoration(
-                            color: C.white,
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: const [
-                              BoxShadow(
-                                  color: Color(0x28000000), blurRadius: 28, offset: Offset(0, 12)),
-                            ],
-                          ),
+                          decoration: cosmicPanelDecoration(radius: 24),
                           padding: const EdgeInsets.all(24),
                           child: switch (step) {
                             1 => _stepUnits(),
@@ -616,51 +611,6 @@ class _OnboardingPageState extends State<OnboardingPage>
     );
   }
 
-  Widget _animatedBackground() {
-    return AnimatedBuilder(
-      animation: _bgFloat,
-      builder: (_, __) {
-        final t = _bgFloat.value;
-        return Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFFDBEAFE), Color(0xFFCCFBF1), Color(0xFFD1FAE5)],
-            ),
-          ),
-          child: Stack(
-            children: [
-              Positioned(
-                top: -40 + t * 20,
-                right: -30,
-                child: _blob(140, C.blue200.withValues(alpha: 0.5)),
-              ),
-              Positioned(
-                bottom: 80 - t * 15,
-                left: -50,
-                child: _blob(180, C.teal200.withValues(alpha: 0.45)),
-              ),
-              Positioned(
-                top: 200 + t * 10,
-                left: 40,
-                child: _blob(90, C.amber200.withValues(alpha: 0.4)),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _blob(double size, Color color) {
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-    );
-  }
-
   Widget _questHeader() {
     return Column(
       children: [
@@ -670,7 +620,7 @@ class _OnboardingPageState extends State<OnboardingPage>
           quest2Done: quest2Done,
           quest3Done: quest3Done,
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         OnboardingBadgeStrip(
           badges: [
             (emoji: '🎯', label: 'Unit Pro', unlocked: _badges['units']!),
@@ -689,21 +639,21 @@ class _OnboardingPageState extends State<OnboardingPage>
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _questHeader(),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Text(
           beforeSignUp ? 'Quest 1: Choose your world' : 'Pick your units',
           textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: C.gray900),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: C.gray900),
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: 6),
         Text(
           beforeSignUp
               ? 'Start your health journey — 3 quick quests, then sign up.'
               : 'Tailor charts and tips to your region.',
           textAlign: TextAlign.center,
-          style: const TextStyle(color: C.gray500, fontSize: 14, height: 1.4),
+          style: TextStyle(color: C.gray500, fontSize: 14, height: 1.4),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         OnboardingQuestCard(
           title: 'Quest 1 · Measurement realm',
           subtitle: 'Unlock charts in your language',
@@ -711,22 +661,22 @@ class _OnboardingPageState extends State<OnboardingPage>
           icon: Icons.public,
           accent: C.blue500,
         ),
-        const SizedBox(height: 16),
-        _unitOption('imperial', '🇺🇸', 'Imperial', 'ft · lbs · mg/dL', C.blue500, C.blue50),
-        const SizedBox(height: 10),
-        _unitOption('metric', '🌍', 'Metric', 'cm · kg · mmol/L', C.teal500, C.teal50),
-        const SizedBox(height: 20),
+        SizedBox(height: 16),
+        _unitOption('imperial', '🇺🇸', 'Imperial', 'ft · lbs · mg/dL', C.neonCyan),
+        SizedBox(height: 10),
+        _unitOption('metric', '🌍', 'Metric', 'cm · kg · mmol/L', C.neonMint),
+        SizedBox(height: 20),
         PrimaryButton(
           label: 'Start Quest 1 →',
-          color: C.blue600,
-          icon: const Icon(Icons.play_arrow, size: 20, color: C.white),
+          cosmicGradient: true,
+          icon: Icon(Icons.play_arrow_rounded, size: 20, color: C.white),
           onPressed: _completeQuest1,
         ),
       ],
     );
   }
 
-  Widget _unitOption(String value, String emoji, String title, String desc, Color accent, Color accentBg) {
+  Widget _unitOption(String value, String emoji, String title, String desc, Color accent) {
     final selected = unitSystem == value;
     return GestureDetector(
       onTap: () => setState(() => unitSystem = value),
@@ -735,19 +685,27 @@ class _OnboardingPageState extends State<OnboardingPage>
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
-          color: selected ? accentBg : C.gray50,
+          color: selected ? accent.withValues(alpha: 0.18) : C.gray100,
           border: Border.all(color: selected ? accent : C.gray200, width: selected ? 2 : 1),
         ),
         child: Row(
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 28)),
-            const SizedBox(width: 12),
+            Text(emoji, style: TextStyle(fontSize: 28)),
+            SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontWeight: FontWeight.w700, color: C.gray900)),
-                  Text(desc, style: const TextStyle(fontSize: 12, color: C.gray500)),
+                  Text(title,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w700, fontSize: 16, color: C.gray900)),
+                  SizedBox(height: 2),
+                  Text(desc,
+                      style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: selected ? C.gray600 : C.gray500,
+                          height: 1.3)),
                 ],
               ),
             ),
@@ -755,7 +713,7 @@ class _OnboardingPageState extends State<OnboardingPage>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(color: accent, borderRadius: BorderRadius.circular(8)),
-                child: const Text('PICKED',
+                child: Text('PICKED',
                     style: TextStyle(
                         color: C.white, fontSize: 10, fontWeight: FontWeight.w800)),
               ),
@@ -770,24 +728,24 @@ class _OnboardingPageState extends State<OnboardingPage>
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _questHeader(),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         _backChip(),
-        const SizedBox(height: 8),
-        const Text(
+        SizedBox(height: 8),
+        Text(
           'Quest 2: Build your avatar',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: C.gray900),
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: 6),
         Text(
           'Fill all 3 fields — earn +$hpBasicReward HP on complete.',
           textAlign: TextAlign.center,
-          style: const TextStyle(color: C.gray500, fontSize: 13),
+          style: TextStyle(color: C.gray500, fontSize: 13),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         if (error.isNotEmpty) ...[
           AppBanner(text: error, bg: C.red50, border: C.red200, fg: C.red700),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
         ],
         _gameField(Icons.cake_outlined, C.orange50, C.orange500, 'Age', 'years', true,
             TextField(
@@ -797,7 +755,7 @@ class _OnboardingPageState extends State<OnboardingPage>
               onChanged: (_) {},
               decoration: appInput('e.g. 32'),
             )),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         _gameField(
           Icons.straighten,
           C.sky50,
@@ -816,7 +774,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                       decoration: appInput('ft'),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10),
                   Expanded(
                     child: TextField(
                       controller: _heightIn,
@@ -835,7 +793,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                   decoration: appInput('e.g. 175'),
                 ),
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         _gameField(
           Icons.monitor_weight_outlined,
           C.blue50,
@@ -851,11 +809,11 @@ class _OnboardingPageState extends State<OnboardingPage>
             decoration: appInput(isImperial ? 'e.g. 165' : 'e.g. 70'),
           ),
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
         PrimaryButton(
           label: saving ? 'Saving…' : 'Complete Quest 2 (+$hpBasicReward HP)',
           color: C.teal600,
-          icon: const Icon(Icons.military_tech, size: 18, color: C.white),
+          icon: Icon(Icons.military_tech, size: 18, color: C.white),
           onPressed: saving ? null : _submitGeneral,
         ),
       ],
@@ -873,10 +831,10 @@ class _OnboardingPageState extends State<OnboardingPage>
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _questHeader(),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         GestureDetector(
           onTap: saving ? null : () => setState(() { step = 2; error = ''; }),
-          child: const Row(
+          child: Row(
             children: [
               Icon(Icons.arrow_back, size: 16, color: C.gray400),
               SizedBox(width: 4),
@@ -884,21 +842,21 @@ class _OnboardingPageState extends State<OnboardingPage>
             ],
           ),
         ),
-        const SizedBox(height: 8),
-        const Text(
+        SizedBox(height: 8),
+        Text(
           'Quest 3: Power-up (bonus)',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: C.gray900),
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: 6),
         Text(
           allLoggedToday
               ? 'You already logged BP and glucose today. Come back tomorrow for your next reading.'
               : 'Optional vitals — +$hpBpReward HP for BP, +$hpGlucoseReward HP for glucose. Once per day.',
           textAlign: TextAlign.center,
-          style: const TextStyle(color: C.gray500, fontSize: 13),
+          style: TextStyle(color: C.gray500, fontSize: 13),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         if (!allLoggedToday)
           Row(
             children: [
@@ -910,17 +868,17 @@ class _OnboardingPageState extends State<OnboardingPage>
                     hasBp && _diastolic.text.isNotEmpty && _systolic.text.isNotEmpty,
                   ),
                 ),
-              if (showBp && showGlucose) const SizedBox(width: 8),
+              if (showBp && showGlucose) SizedBox(width: 8),
               if (showGlucose)
                 Expanded(
                   child: _bonusTile('💧 Glucose', '+$hpGlucoseReward HP', hasGlucose),
                 ),
             ],
           ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         if (error.isNotEmpty) ...[
           AppBanner(text: error, bg: C.red50, border: C.red200, fg: C.red700),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
         ],
         if (showBp) ...[
           _gameField(Icons.monitor_heart_outlined, C.red50, C.red500, 'Blood pressure', 'mmHg', false,
@@ -934,7 +892,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                     decoration: appInput('Sys'),
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(
                   child: TextField(
                     controller: _diastolic,
@@ -945,7 +903,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                   ),
                 ),
               ])),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
         ],
         if (showGlucose)
           _gameField(Icons.water_drop_outlined, C.teal50, C.teal500, 'Blood glucose',
@@ -957,15 +915,15 @@ class _OnboardingPageState extends State<OnboardingPage>
                 onChanged: (_) => setState(() {}),
                 decoration: appInput(isImperial ? 'e.g. 95' : 'e.g. 5.3'),
               )),
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
         if (!allLoggedToday)
           PrimaryButton(
             label: saving ? 'Calculating rewards…' : 'Claim bonus & finish 🏆',
             color: C.amber600,
-            icon: const Icon(Icons.emoji_events, size: 18, color: C.white),
+            icon: Icon(Icons.emoji_events, size: 18, color: C.white),
             onPressed: saving ? null : () => _finish(includeAdvanced: true),
           ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         TextButton(
           onPressed: saving ? null : () => _finish(includeAdvanced: false),
           child: Text(
@@ -988,7 +946,7 @@ class _OnboardingPageState extends State<OnboardingPage>
       ),
       child: Column(
         children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+          Text(label, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
           Text(hpLabel,
               style: TextStyle(
                   fontSize: 11,
@@ -1003,34 +961,34 @@ class _OnboardingPageState extends State<OnboardingPage>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text('🎊', textAlign: TextAlign.center, style: TextStyle(fontSize: 56)),
-        const SizedBox(height: 8),
-        const Text(
+        Text('🎊', textAlign: TextAlign.center, style: TextStyle(fontSize: 56)),
+        SizedBox(height: 8),
+        Text(
           'All quests complete!',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: C.gray900),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Text(
           'You earned $hp HP · Level $_level $_levelTitle',
           textAlign: TextAlign.center,
-          style: const TextStyle(color: C.teal600, fontWeight: FontWeight.w700, fontSize: 15),
+          style: TextStyle(color: C.teal400, fontWeight: FontWeight.w700, fontSize: 15),
         ),
         if (hp >= maxOnboardingHp) ...[
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             'Redeem your $maxOnboardingHp HP for $hpFirstPurchaseDiscountPercent% off your first 6-month or annual PHA Plus+ subscription.',
             textAlign: TextAlign.center,
-            style: const TextStyle(color: C.amber700, fontWeight: FontWeight.w600, fontSize: 13),
+            style: TextStyle(color: C.amber700, fontWeight: FontWeight.w600, fontSize: 13),
           ),
         ],
         if (vitalsBonus) ...[
-          const SizedBox(height: 6),
-          const Text('Bonus vitals unlocked extra insights!',
+          SizedBox(height: 6),
+          Text('Bonus vitals unlocked extra insights!',
               textAlign: TextAlign.center,
               style: TextStyle(color: C.gray500, fontSize: 13)),
         ],
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         OnboardingBadgeStrip(
           badges: [
             (emoji: '🎯', label: 'Unit Pro', unlocked: _badges['units']!),
@@ -1040,7 +998,7 @@ class _OnboardingPageState extends State<OnboardingPage>
             (emoji: '🏆', label: 'Champion', unlocked: _badges['champion']!),
           ],
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -1049,9 +1007,9 @@ class _OnboardingPageState extends State<OnboardingPage>
           ),
           child: Column(
             children: [
-              const Text('Health Power',
+              Text('Health Power',
                   style: TextStyle(color: C.white, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: LinearProgressIndicator(
@@ -1061,17 +1019,17 @@ class _OnboardingPageState extends State<OnboardingPage>
                   color: C.amber300,
                 ),
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: 6),
               Text('${(_power * 100).round()}% — ready for PHA',
                   style: TextStyle(color: C.white.withValues(alpha: 0.9), fontSize: 12)),
             ],
           ),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: 24),
         PrimaryButton(
           label: beforeSignUp ? 'Create account and become healthy →' : 'Enter dashboard →',
           color: C.teal600,
-          icon: const Icon(Icons.rocket_launch, size: 20, color: C.white),
+          icon: Icon(Icons.rocket_launch, size: 20, color: C.white),
           onPressed: _finishJourney,
         ),
       ],
@@ -1084,9 +1042,9 @@ class _OnboardingPageState extends State<OnboardingPage>
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.chevron_left, size: 18, color: C.gray400),
+          Icon(Icons.chevron_left, size: 18, color: C.gray400),
           Text(isImperial ? 'Imperial' : 'Metric',
-              style: const TextStyle(fontSize: 12, color: C.gray400, fontWeight: FontWeight.w600)),
+              style: TextStyle(fontSize: 12, color: C.gray400, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -1097,7 +1055,7 @@ class _OnboardingPageState extends State<OnboardingPage>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: C.gray50,
+        color: const Color(0xFF1E1A42),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: C.gray100),
       ),
@@ -1112,15 +1070,15 @@ class _OnboardingPageState extends State<OnboardingPage>
                 decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(10)),
                 child: Icon(icon, size: 18, color: fg),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Text(label,
-                  style: const TextStyle(fontWeight: FontWeight.w700, color: C.gray800)),
-              if (required) const Text(' *', style: TextStyle(color: C.red500, fontWeight: FontWeight.bold)),
-              const Spacer(),
-              Text(unit, style: const TextStyle(fontSize: 11, color: C.gray400)),
+                  style: TextStyle(fontWeight: FontWeight.w700, color: C.gray900)),
+              if (required) Text(' *', style: TextStyle(color: C.red500, fontWeight: FontWeight.bold)),
+              Spacer(),
+              Text(unit, style: TextStyle(fontSize: 11, color: C.gray400)),
             ],
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           input,
         ],
       ),

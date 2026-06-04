@@ -4,7 +4,9 @@ import 'package:provider/provider.dart';
 import '../auth.dart';
 import '../db.dart';
 import '../profile_basics.dart';
+import '../cosmic_ui.dart';
 import '../theme.dart';
+import '../theme_mode.dart';
 import '../widgets.dart';
 import 'history.dart' show pageHeader;
 
@@ -116,14 +118,14 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    return Scaffold(
-      backgroundColor: C.gray50,
+    final themeMode = context.watch<ThemeModeController>();
+    return CosmicScaffold(
       body: Column(
         children: [
           pageHeader('Profile', 'Manage your account settings'),
           Expanded(
             child: loading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(child: CircularProgressIndicator())
                 : SingleChildScrollView(
                     child: Center(
                       child: ConstrainedBox(
@@ -139,7 +141,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     border: C.red200,
                                     fg: C.red700,
                                     icon: Icons.error_outline),
-                                const SizedBox(height: 24),
+                                SizedBox(height: 24),
                               ],
                               if (success.isNotEmpty) ...[
                                 AppBanner(
@@ -148,7 +150,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     border: C.green200,
                                     fg: C.teal700,
                                     icon: Icons.check_circle),
-                                const SizedBox(height: 24),
+                                SizedBox(height: 24),
                               ],
                               Container(
                                 decoration: cardDecoration(border: C.gray200),
@@ -160,25 +162,25 @@ class _ProfilePageState extends State<ProfilePage> {
                                       children: [
                                         Container(
                                           padding: const EdgeInsets.all(16),
-                                          decoration: const BoxDecoration(
+                                          decoration: BoxDecoration(
                                             gradient: kBlueTealGradient,
                                             shape: BoxShape.circle,
                                           ),
-                                          child: const Icon(Icons.person,
+                                          child: Icon(Icons.person,
                                               color: C.white, size: 32),
                                         ),
-                                        const SizedBox(width: 16),
+                                        SizedBox(width: 16),
                                         Expanded(
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              const Text('Email',
+                                              Text('Email',
                                                   style: TextStyle(
                                                       fontSize: 14, color: C.gray600)),
                                               Text(auth.user?.email ?? '',
                                                   maxLines: 1,
                                                   overflow: TextOverflow.ellipsis,
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                       fontWeight: FontWeight.w600,
                                                       color: C.gray900)),
                                             ],
@@ -186,26 +188,26 @@ class _ProfilePageState extends State<ProfilePage> {
                                         ),
                                       ],
                                     ),
-                                    const SizedBox(height: 32),
+                                    SizedBox(height: 32),
                                     _label('Display Name', null, null),
                                     TextField(
                                         controller: _name,
                                         decoration: appInput('Your name')),
-                                    const SizedBox(height: 16),
+                                    SizedBox(height: 16),
                                     _label('Age', Icons.account_circle, C.orange500),
                                     TextField(
                                         controller: _age, decoration: appInput('e.g. 32')),
-                                    const SizedBox(height: 16),
+                                    SizedBox(height: 16),
                                     _label('Height (cm)', Icons.straighten, C.sky500),
                                     TextField(
                                         controller: _height,
                                         decoration: appInput('e.g. 175')),
-                                    const SizedBox(height: 16),
+                                    SizedBox(height: 16),
                                     _label('Weight (kg)', Icons.monitor_weight, C.blue500),
                                     TextField(
                                         controller: _weight,
                                         decoration: appInput('e.g. 70')),
-                                    const SizedBox(height: 24),
+                                    SizedBox(height: 24),
                                     PrimaryButton(
                                       label: saving ? 'Saving...' : 'Save Changes',
                                       onPressed: saving ? null : _save,
@@ -213,7 +215,55 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 24),
+                              SizedBox(height: 24),
+                              Container(
+                                width: double.infinity,
+                                decoration: cardDecoration(border: C.gray200),
+                                padding: const EdgeInsets.all(24),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: C.blue50,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Icon(
+                                        themeMode.isDark ? Icons.dark_mode : Icons.light_mode,
+                                        color: C.neonCyan,
+                                        size: 22,
+                                      ),
+                                    ),
+                                    SizedBox(width: 16),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text('Appearance',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: C.gray900)),
+                                          Text(
+                                            themeMode.isDark ? 'Dark theme' : 'Light theme',
+                                            style: TextStyle(
+                                                fontSize: 13, color: C.gray500),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Switch(
+                                      value: themeMode.isDark,
+                                      activeThumbColor: C.white,
+                                      activeTrackColor: C.nebulaPurple,
+                                      inactiveThumbColor: C.white,
+                                      inactiveTrackColor: C.gray300,
+                                      onChanged: (v) => themeMode.setDark(v),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 24),
                               Container(
                                 width: double.infinity,
                                 decoration: cardDecoration(border: C.gray200),
@@ -221,12 +271,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text('Account',
+                                    Text('Account',
                                         style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
                                             color: C.gray900)),
-                                    const SizedBox(height: 16),
+                                    SizedBox(height: 16),
                                     OutlinedButton(
                                       onPressed: () => auth.signOut(),
                                       style: OutlinedButton.styleFrom(
@@ -240,7 +290,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ),
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.center,
-                                        children: const [
+                                        children: [
                                           Icon(Icons.logout, size: 20),
                                           SizedBox(width: 8),
                                           Text('Sign Out',
@@ -270,10 +320,10 @@ class _ProfilePageState extends State<ProfilePage> {
           children: [
             if (icon != null) ...[
               Icon(icon, size: 16, color: iconColor),
-              const SizedBox(width: 6),
+              SizedBox(width: 6),
             ],
             Text(text,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 14, fontWeight: FontWeight.w500, color: C.gray900)),
           ],
         ),

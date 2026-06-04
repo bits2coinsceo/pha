@@ -24,7 +24,7 @@ class _Block {
   const _Block(this.title, this.subtitle, this.color, this.questions);
 }
 
-const _blue = (
+({Color bg, Color border, Color text, Color pillBg, Color pillText, Color dot}) get _blue => (
   bg: C.blue50,
   border: C.blue200,
   text: C.blue700,
@@ -32,7 +32,7 @@ const _blue = (
   pillText: C.blue700,
   dot: C.blue500
 );
-const _orange = (
+({Color bg, Color border, Color text, Color pillBg, Color pillText, Color dot}) get _orange => (
   bg: C.orange50,
   border: Color(0xFFFED7AA),
   text: Color(0xFFC2410C),
@@ -40,7 +40,7 @@ const _orange = (
   pillText: Color(0xFFC2410C),
   dot: C.orange500
 );
-const _teal = (
+({Color bg, Color border, Color text, Color pillBg, Color pillText, Color dot}) get _teal => (
   bg: C.teal50,
   border: C.teal200,
   text: C.teal700,
@@ -49,7 +49,7 @@ const _teal = (
   dot: C.teal500
 );
 
-const _blocks = [
+List<_Block> get _blocks => [
   _Block('Block 1', 'Stress Awareness', _blue, [
     _Question('How often have you felt overwhelmed or unable to control important things in your life?'),
     _Question('How often do you experience physical symptoms like headaches, muscle tension, or fatigue due to stress?'),
@@ -207,12 +207,12 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
               height: 48,
               decoration:
                   BoxDecoration(color: C.teal100, borderRadius: BorderRadius.circular(12)),
-              child: const Icon(Icons.psychology, color: C.teal600, size: 24),
+              child: Icon(Icons.psychology, color: C.teal600, size: 24),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 Text('PsychoTest',
                     style: TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold, color: C.gray900)),
@@ -222,12 +222,12 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
             ),
           ],
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
         Text(
           'This assessment contains 3 blocks with a total of $_totalQuestions questions. Answer honestly — there are no right or wrong answers. Results are saved to your profile.',
-          style: const TextStyle(fontSize: 14, color: C.gray600, height: 1.5),
+          style: TextStyle(fontSize: 14, color: C.gray600, height: 1.5),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         ..._blocks.map((b) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Container(
@@ -244,7 +244,7 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
                         height: 8,
                         decoration:
                             BoxDecoration(color: b.color.dot, shape: BoxShape.circle)),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -254,20 +254,20 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
                                 fontWeight: FontWeight.w600,
                                 color: b.color.text)),
                         Text(b.subtitle,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                                 color: C.gray800)),
                       ],
                     ),
-                    const Spacer(),
+                    Spacer(),
                     Text('${b.questions.length} questions',
-                        style: const TextStyle(fontSize: 12, color: C.gray400)),
+                        style: TextStyle(fontSize: 12, color: C.gray400)),
                   ],
                 ),
               ),
             )),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -275,15 +275,15 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: C.gray100),
           ),
-          child: const Text('Each question has 3 answer options: Never · Sometimes · Often',
+          child: Text('Each question has 3 answer options: Never · Sometimes · Often',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 12, color: C.gray500)),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         PrimaryButton(
           label: 'Start Assessment',
           color: C.teal500,
-          icon: const Icon(Icons.chevron_right, size: 16, color: C.white),
+          icon: Icon(Icons.chevron_right, size: 16, color: C.white),
           onPressed: () => setState(() => phase = 'block'),
         ),
       ],
@@ -306,10 +306,10 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
                 style: TextStyle(
                     fontSize: 12, fontWeight: FontWeight.w600, color: block.color.text)),
             Text('${answeredSoFar + 1}/$_totalQuestions',
-                style: const TextStyle(fontSize: 12, color: C.gray400)),
+                style: TextStyle(fontSize: 12, color: C.gray400)),
           ],
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: 6),
         ClipRRect(
           borderRadius: BorderRadius.circular(99),
           child: LinearProgressIndicator(
@@ -319,7 +319,7 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
             valueColor: AlwaysStoppedAnimation(block.color.dot),
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         Row(
           children: [
             Container(
@@ -332,12 +332,12 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
                       fontWeight: FontWeight.w500,
                       color: block.color.pillText)),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Text('Q${questionIndex + 1} of ${block.questions.length}',
-                style: const TextStyle(fontSize: 12, color: C.gray400)),
+                style: TextStyle(fontSize: 12, color: C.gray400)),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -349,10 +349,10 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(question.text,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 14, fontWeight: FontWeight.w600, color: C.gray900)),
               if (question.subItems != null) ...[
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 ...question.subItems!.map((item) => Padding(
                       padding: const EdgeInsets.only(bottom: 4),
                       child: Row(
@@ -362,9 +362,9 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
                               height: 6,
                               decoration: BoxDecoration(
                                   color: block.color.dot, shape: BoxShape.circle)),
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8),
                           Text(item,
-                              style: const TextStyle(fontSize: 12, color: C.gray600)),
+                              style: TextStyle(fontSize: 12, color: C.gray600)),
                         ],
                       ),
                     )),
@@ -372,7 +372,7 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         ..._answerOptions.map((opt) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: InkWell(
@@ -388,11 +388,11 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(opt.$1,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                               color: C.gray800)),
-                      const Icon(Icons.chevron_right, size: 16, color: C.gray300),
+                      Icon(Icons.chevron_right, size: 16, color: C.gray300),
                     ],
                   ),
                 ),
@@ -413,12 +413,12 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Center(
+        Center(
           child: Text('YOUR RESULT',
               style: TextStyle(
                   fontSize: 11, color: C.gray400, letterSpacing: 2)),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Center(
           child: Container(
             width: 112,
@@ -434,22 +434,22 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
                 Text('${r.total}',
                     style: TextStyle(
                         fontSize: 36, fontWeight: FontWeight.bold, color: lvl.color)),
-                const Text('/100', style: TextStyle(fontSize: 12, color: C.gray400)),
+                Text('/100', style: TextStyle(fontSize: 12, color: C.gray400)),
               ],
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Center(
           child: Text('${lvl.label} Stress Level',
               style: TextStyle(
                   fontSize: 20, fontWeight: FontWeight.bold, color: lvl.color)),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4),
         Text(lvl.desc,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14, color: C.gray500, height: 1.4)),
-        const SizedBox(height: 20),
+            style: TextStyle(fontSize: 14, color: C.gray500, height: 1.4)),
+        SizedBox(height: 20),
         ...blockScores.map((b) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(
@@ -457,7 +457,7 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
                   SizedBox(
                       width: 130,
                       child: Text(b.$1,
-                          style: const TextStyle(fontSize: 12, color: C.gray500))),
+                          style: TextStyle(fontSize: 12, color: C.gray500))),
                   Expanded(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(99),
@@ -469,19 +469,19 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   SizedBox(
                       width: 32,
                       child: Text('${b.$2}%',
                           textAlign: TextAlign.right,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                               color: C.gray700))),
                 ],
               ),
             )),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         Row(
           children: [
             Expanded(
@@ -489,14 +489,14 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
                 onPressed: _restart,
                 style: OutlinedButton.styleFrom(
                   foregroundColor: C.gray600,
-                  side: const BorderSide(color: C.gray200),
+                  side: BorderSide(color: C.gray200),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Icon(Icons.refresh, size: 14),
                     SizedBox(width: 6),
                     Text('Retake', style: TextStyle(fontWeight: FontWeight.w500)),
@@ -504,7 +504,7 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Expanded(
               child: PrimaryButton(
                 label: 'Done',

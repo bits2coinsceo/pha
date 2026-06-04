@@ -5,10 +5,8 @@ import 'package:provider/provider.dart';
 import '../auth.dart';
 import '../daily_vitals.dart';
 import '../db.dart';
-import '../health_telemetry.dart';
 import '../modals/quick_action_modals.dart';
 import '../models.dart';
-import '../services.dart';
 import '../theme.dart';
 import '../units.dart';
 import '../widgets.dart';
@@ -44,33 +42,19 @@ class _DashboardState extends State<Dashboard> {
   double? systolic, diastolic, glucose, weight, height;
   int? age;
   String displayName = '';
-  LastSync? lastSync;
-  bool syncing = false;
-  String syncError = '';
-  bool telemetrySupported = false;
-  bool telemetryGranted = false;
   int uploadCount = 0;
   int aiConsultCount = 0;
 
   @override
   void initState() {
     super.initState();
-    telemetrySupported = HealthTelemetryService.isSupported;
     _loadAll();
-    _refreshTelemetryPermission();
-  }
-
-  Future<void> _refreshTelemetryPermission() async {
-    if (!telemetrySupported) return;
-    final granted = await HealthTelemetryService.hasPermission();
-    if (mounted) setState(() => telemetryGranted = granted);
   }
 
   String get _userId => context.read<AuthProvider>().user!.id;
 
   Future<void> _loadAll() async {
     await _loadHealthData();
-    await _loadLastSync();
     await _loadCreditCounts();
     if (mounted) setState(() {});
     await _maybePromptDailyVitals();
@@ -103,10 +87,6 @@ class _DashboardState extends State<Dashboard> {
         'SELECT COUNT(*) c FROM ai_consultations WHERE user_id = ?', [_userId]);
     uploadCount = (u.first['c'] as num).toInt();
     aiConsultCount = (a.first['c'] as num).toInt();
-  }
-
-  Future<void> _loadLastSync() async {
-    lastSync = await HealthConnectService.last(_userId);
   }
 
   Future<void> _loadHealthData() async {
@@ -160,75 +140,6 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
-  Future<void> _requestTelemetryPermission() async {
-    final allow = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Allow activity access'),
-        content: const Text(
-          'PHA reads your steps and walking distance from Apple Health '
-          'to update your dashboard. You can change this anytime in Settings.',
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Not now')),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Allow')),
-        ],
-      ),
-    );
-    if (allow != true || !mounted) return;
-
-    setState(() {
-      syncing = true;
-      syncError = '';
-    });
-    try {
-      final granted = await HealthTelemetryService.requestPermission();
-      if (!mounted) return;
-      setState(() => telemetryGranted = granted);
-      if (granted) {
-        await HealthConnectService.syncFromDevice(_userId);
-        await _loadAll();
-      } else {
-        setState(() => syncError = 'Activity permission was denied.');
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => syncError = e.toString().replaceFirst('Exception: ', ''));
-      }
-    } finally {
-      if (mounted) setState(() => syncing = false);
-    }
-  }
-
-  Future<void> _syncFromDevice() async {
-    setState(() {
-      syncing = true;
-      syncError = '';
-    });
-    try {
-      await HealthConnectService.syncFromDevice(_userId);
-      await _loadAll();
-    } catch (e) {
-      final msg = e.toString().replaceFirst('Exception: ', '');
-      setState(() {
-        syncError = msg;
-        if (msg.toLowerCase().contains('permission')) {
-          telemetryGranted = false;
-        }
-      });
-    } finally {
-      if (mounted) setState(() => syncing = false);
-    }
-  }
-
-  void _onTelemetryAction() {
-    if (!telemetryGranted) {
-      _requestTelemetryPermission();
-    } else {
-      _syncFromDevice();
-    }
-  }
-
   String _greeting() {
     final h = DateTime.now().hour;
     if (h < 12) return 'Good morning';
@@ -258,16 +169,16 @@ class _DashboardState extends State<Dashboard> {
         description: 'Analyze PDFs or photos',
         icon: Icons.upload_file,
         color: C.blue600,
-        bgColor: C.blue100,
+        bgColor: C.blue50,
         credits: isPlus ? null : (used: uploadCount, total: 2),
         onTap: widget.onOpenUpload,
       ),
       QuickAction(
         title: 'AI Consultation',
-        description: 'Chat with AI assistant',
+        description: 'Chat with Ai Doc',
         icon: Icons.chat_bubble_outline,
         color: C.teal600,
-        bgColor: C.teal100,
+        bgColor: C.teal50,
         credits: isPlus ? null : (used: aiConsultCount, total: 3),
         onTap: widget.onOpenAIChat,
       ),
@@ -276,7 +187,7 @@ class _DashboardState extends State<Dashboard> {
         description: 'Check your wellbeing',
         icon: Icons.psychology,
         color: C.sky600,
-        bgColor: C.sky100,
+        bgColor: C.sky50,
         onTap: widget.onOpenStressTest,
       ),
       QuickAction(
@@ -284,16 +195,16 @@ class _DashboardState extends State<Dashboard> {
         description: 'Stress & psychosomatic assessment',
         icon: Icons.science_outlined,
         color: C.teal600,
-        bgColor: C.teal100,
+        bgColor: C.teal50,
         locked: !isPlus,
         onTap: widget.onOpenPsychoTest,
       ),
       QuickAction(
-        title: 'Family Health Tracking',
+        title: 'Family Health\nTracking',
         description: 'Add your family to track their health',
         icon: Icons.group,
         color: C.emerald600,
-        bgColor: C.emerald100,
+        bgColor: C.emerald50,
         comingSoon: true,
         onTap: () {},
       ),
@@ -314,89 +225,107 @@ class _DashboardState extends State<Dashboard> {
           [7500, 7600, 7700, 7800, steps.toDouble()]),
     ];
 
-    return Scaffold(
-      backgroundColor: C.gray50,
-      body: Column(
-        children: [
-          _header(auth),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 768),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 32, 24, 120),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(today, style: const TextStyle(fontSize: 14, color: C.gray500)),
-                        const SizedBox(height: 4),
-                        Text('${_greeting()}${firstName.isNotEmpty ? ', $firstName' : ''}!',
-                            style: const TextStyle(
-                                fontSize: 30, fontWeight: FontWeight.bold, color: C.gray900)),
-                        const SizedBox(height: 4),
-                        const Text("Here's your health overview for today.",
-                            style: TextStyle(color: C.gray500)),
-                        const SizedBox(height: 32),
-                        HealthIndexCard(score: healthIndex, status: 'good'),
-                        const SizedBox(height: 24),
-                        MetricsGrid(
-                          calories: calories,
-                          distance: double.tryParse(distanceFmt.value) ?? 0,
-                          activeTime: activeTime,
-                          distanceUnit: distanceFmt.unit,
-                        ),
-                        const SizedBox(height: 24),
-                        StepsCard(current: steps, goal: 10000),
-                        const SizedBox(height: 24),
-                        _healthConnectCard(unit),
-                        const SizedBox(height: 24),
-                        _privacyBanner(),
-                        const SizedBox(height: 24),
-                        QuickActions(actions: actions, onUpgrade: widget.onUpgrade),
-                        const SizedBox(height: 24),
-                        HealthMetricsChart(metrics: healthMetrics),
-                      ],
-                    ),
+    return Column(
+      children: [
+        _header(),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 768),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 26, 24, 120),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Text(today,
+                              style: TextStyle(fontSize: 14, color: C.gray500)),
+                          if (auth.user != null)
+                            Expanded(
+                              child: Text(auth.user!.email,
+                                  textAlign: TextAlign.right,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: C.gray500,
+                                      fontWeight: FontWeight.w500)),
+                            ),
+                        ],
+                      ),
+                      SizedBox(height: 3),
+                      Text('${_greeting()}${firstName.isNotEmpty ? ', $firstName' : ''}!',
+                          style: TextStyle(
+                              fontSize: 30, fontWeight: FontWeight.bold, color: C.gray900)),
+                      SizedBox(height: 3),
+                      Text("Here's your health overview for today.",
+                          style: TextStyle(color: C.gray500)),
+                      SizedBox(height: 26),
+                      HealthIndexCard(
+                        score: healthIndex,
+                        status: 'good',
+                        steps: steps,
+                        stepsGoal: 10000,
+                      ),
+                      SizedBox(height: 20),
+                      QuickActions(actions: actions, onUpgrade: widget.onUpgrade),
+                      SizedBox(height: 20),
+                      HealthMetricsChart(metrics: healthMetrics),
+                      SizedBox(height: 20),
+                      MetricsGrid(
+                        calories: calories,
+                        distance: double.tryParse(distanceFmt.value) ?? 0,
+                        activeTime: activeTime,
+                        distanceUnit: distanceFmt.unit,
+                      ),
+                      SizedBox(height: 20),
+                      _privacyBanner(),
+                    ],
                   ),
                 ),
               ),
             ),
           ),
+        ),
         ],
-      ),
     );
   }
 
-  Widget _header(AuthProvider auth) {
+  Widget _header() {
     return Container(
-      decoration: const BoxDecoration(
-        color: C.white,
-        border: Border(bottom: BorderSide(color: C.gray100)),
-        boxShadow: [BoxShadow(color: Color(0x0A000000), blurRadius: 6, offset: Offset(0, 2))],
+      decoration: BoxDecoration(
+        color: C.card,
+        border: Border(bottom: BorderSide(color: C.cardBorder.withValues(alpha: 0.3))),
+        boxShadow: const [BoxShadow(color: Color(0x3300D4FF), blurRadius: 12, offset: Offset(0, 2))],
       ),
       child: SafeArea(
         bottom: false,
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1152),
+            constraints: const BoxConstraints(maxWidth: 768),
             child: Padding(
-              padding: EdgeInsets.fromLTRB(24, 16, logicalMm(5), 16),
+              padding: const EdgeInsets.fromLTRB(24, 14, 24, 14),
               child: Row(
                 children: [
                   Container(
                     width: 40,
                     height: 40,
-                    decoration:
-                        BoxDecoration(color: C.blue500, borderRadius: BorderRadius.circular(12)),
-                    child: const Icon(Icons.favorite, color: C.white, size: 20),
+                    decoration: BoxDecoration(
+                      gradient: kBlueTealGradient,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: const [BoxShadow(color: Color(0x5500D4FF), blurRadius: 8)],
+                    ),
+                    child: Icon(Icons.favorite, color: C.white, size: 20),
                   ),
-                  const SizedBox(width: 12),
-                  Flexible(
-                    flex: 3,
+                  SizedBox(width: 12),
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text('PHA',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 18, color: C.gray900)),
@@ -407,33 +336,18 @@ class _DashboardState extends State<Dashboard> {
                       ],
                     ),
                   ),
-                  const Spacer(),
-                  if (auth.user != null) ...[
-                    Flexible(
-                      child: Text(auth.user!.email,
-                          textAlign: TextAlign.right,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontSize: 12, color: C.gray500, fontWeight: FontWeight.w500)),
-                    ),
-                    const SizedBox(width: 8),
-                  ],
                   Stack(
                     clipBehavior: Clip.none,
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Icon(Icons.notifications_outlined, size: 20, color: C.gray600),
-                      ),
+                      Icon(Icons.notifications_outlined, size: 24, color: C.gray600),
                       Positioned(
-                        top: 6,
-                        right: 6,
+                        top: 0,
+                        right: 0,
                         child: Container(
                           width: 8,
                           height: 8,
-                          decoration: const BoxDecoration(
-                              color: C.red500, shape: BoxShape.circle),
+                          decoration:
+                              const BoxDecoration(color: C.red500, shape: BoxShape.circle),
                         ),
                       ),
                     ],
@@ -447,144 +361,13 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  Widget _healthConnectCard(String unit) {
-    return Container(
-      decoration: cardDecoration(),
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration:
-                    BoxDecoration(color: C.green50, borderRadius: BorderRadius.circular(12)),
-                child: const Icon(Icons.smartphone, color: C.green600, size: 20),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Device Activity',
-                        style: TextStyle(fontWeight: FontWeight.w600, color: C.gray900)),
-                    Text(
-                        telemetrySupported
-                            ? 'Steps & distance from Apple Health'
-                            : 'Available on iPhone and Android',
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 12, color: C.gray400)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          if (telemetrySupported) ...[
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: syncing ? null : _onTelemetryAction,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: telemetryGranted ? C.green500 : C.blue500,
-                  foregroundColor: C.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(telemetryGranted ? Icons.refresh : Icons.lock_open, size: 14),
-                    const SizedBox(width: 6),
-                    Text(
-                        syncing
-                            ? 'Syncing…'
-                            : (telemetryGranted ? 'Sync now' : 'Allow access'),
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-                  ],
-                ),
-              ),
-            ),
-          ],
-          const SizedBox(height: 16),
-          if (syncError.isNotEmpty) ...[
-            AppBanner(
-                text: syncError,
-                bg: C.red50,
-                border: C.red50,
-                fg: C.red600,
-                icon: Icons.error_outline),
-            const SizedBox(height: 12),
-          ],
-          if (lastSync != null)
-            Row(
-              children: [
-                _syncStat('${lastSync!.steps}', 'steps'),
-                const SizedBox(width: 12),
-                _syncStat(formatDistance(lastSync!.distanceMeters / 1000, unit).value,
-                    formatDistance(lastSync!.distanceMeters / 1000, unit).unit),
-                const SizedBox(width: 12),
-                _syncStat('${lastSync!.caloriesCalculated.toInt()}', 'kcal'),
-              ],
-            )
-          else
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Center(
-                child: Text(
-                    telemetryGranted
-                        ? 'No sync data yet. Press Sync now.'
-                        : 'Allow access to import today\'s steps and distance.',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 14, color: C.gray400)),
-              ),
-            ),
-          if (lastSync != null) ...[
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                const Icon(Icons.check_circle, size: 14, color: C.green500),
-                const SizedBox(width: 6),
-                Text(
-                    'Last synced ${DateFormat('MMM d, h:mm a').format(lastSync!.syncedAt.toLocal())}',
-                    style: const TextStyle(fontSize: 12, color: C.gray400)),
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _syncStat(String value, String label) => Expanded(
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration:
-              BoxDecoration(color: C.gray50, borderRadius: BorderRadius.circular(12)),
-          child: Column(
-            children: [
-              Text(value,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold, color: C.gray900)),
-              const SizedBox(height: 2),
-              Text(label, style: const TextStyle(fontSize: 12, color: C.gray400)),
-            ],
-          ),
-        ),
-      );
-
   Widget _privacyBanner() {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [C.blue600, C.teal500]),
+        gradient: kNebulaGradient,
         borderRadius: BorderRadius.circular(16),
+        boxShadow: const [BoxShadow(color: Color(0x4400D4FF), blurRadius: 16)],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -594,20 +377,20 @@ class _DashboardState extends State<Dashboard> {
             decoration: BoxDecoration(
                 color: C.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8)),
-            child: const Icon(Icons.shield, color: C.white, size: 24),
+            child: Icon(Icons.shield, color: C.white, size: 24),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Your health, our priority',
+                Text('Your health, our priority',
                     style: TextStyle(
                         color: C.white, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(
                   'Track, analyze and improve your health with PHA. Your data stays private and secure.',
-                  style: TextStyle(color: C.blue100, fontSize: 14),
+                  style: TextStyle(color: C.onGradientMuted, fontSize: 14),
                 ),
               ],
             ),

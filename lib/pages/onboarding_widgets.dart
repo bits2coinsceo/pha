@@ -27,7 +27,7 @@ class OnboardingGameHud extends StatelessWidget {
         gradient: kBlueTealGradient,
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [
-          BoxShadow(color: Color(0x22000000), blurRadius: 8, offset: Offset(0, 2)),
+          BoxShadow(color: Color(0x6600D4FF), blurRadius: 14, offset: Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -37,17 +37,17 @@ class OnboardingGameHud extends StatelessWidget {
           Row(
             children: [
               _levelOrb(level),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Expanded(
                 child: Text.rich(
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   TextSpan(
-                    style: const TextStyle(fontSize: 11, height: 1.2),
+                    style: TextStyle(fontSize: 11, height: 1.2),
                     children: [
                       TextSpan(
                         text: 'Lv $level · $levelTitle',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: C.white,
                           fontWeight: FontWeight.w700,
                           fontSize: 12,
@@ -65,11 +65,11 @@ class OnboardingGameHud extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 6),
+              SizedBox(width: 6),
               _hpPill(hp),
             ],
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: TweenAnimationBuilder<double>(
@@ -100,7 +100,7 @@ class OnboardingGameHud extends StatelessWidget {
       ),
       alignment: Alignment.center,
       child: Text('$level',
-          style: const TextStyle(
+          style: TextStyle(
               color: C.white, fontWeight: FontWeight.w900, fontSize: 14)),
     );
   }
@@ -115,10 +115,10 @@ class OnboardingGameHud extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.favorite, size: 12, color: C.gray900),
-          const SizedBox(width: 3),
+          Icon(Icons.favorite, size: 12, color: C.gray900),
+          SizedBox(width: 3),
           Text('$hp HP',
-              style: const TextStyle(
+              style: TextStyle(
                   fontWeight: FontWeight.w800, fontSize: 11, color: C.gray900)),
         ],
       ),
@@ -191,7 +191,7 @@ class OnboardingQuestTrail extends StatelessWidget {
             color: color,
           ),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4),
         Text(label,
             style: TextStyle(
                 fontSize: 10,
@@ -215,7 +215,7 @@ class OnboardingBadgeStrip extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           for (var i = 0; i < badges.length; i++) ...[
-            if (i > 0) const SizedBox(width: 6),
+            if (i > 0) SizedBox(width: 6),
             Opacity(
               opacity: badges[i].unlocked ? 1 : 0.35,
               child: Container(
@@ -230,8 +230,8 @@ class OnboardingBadgeStrip extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(badges[i].emoji, style: const TextStyle(fontSize: 12)),
-                    const SizedBox(width: 3),
+                    Text(badges[i].emoji, style: TextStyle(fontSize: 12)),
+                    SizedBox(width: 3),
                     Text(
                       badges[i].label,
                       style: TextStyle(
@@ -275,15 +275,15 @@ class OnboardingHpToast extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Text('🎉', style: TextStyle(fontSize: 22)),
-            const SizedBox(width: 10),
+            Text('🎉', style: TextStyle(fontSize: 22)),
+            SizedBox(width: 10),
             Expanded(
               child: Text(message,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontWeight: FontWeight.w700, fontSize: 13, color: C.gray900)),
             ),
             Text('+$hp HP',
-                style: const TextStyle(
+                style: TextStyle(
                     fontWeight: FontWeight.w900, fontSize: 14, color: C.gray900)),
           ],
         ),
@@ -315,7 +315,7 @@ class OnboardingQuestCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: locked ? C.gray50 : accent.withValues(alpha: 0.08),
+        color: locked ? C.gray100 : accent.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: locked ? C.gray200 : accent.withValues(alpha: 0.35)),
       ),
@@ -330,7 +330,7 @@ class OnboardingQuestCard extends StatelessWidget {
             ),
             child: Icon(icon, color: locked ? C.gray400 : accent),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -340,7 +340,7 @@ class OnboardingQuestCard extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                         color: locked ? C.gray400 : C.gray900)),
                 Text(subtitle,
-                    style: TextStyle(fontSize: 12, color: locked ? C.gray400 : C.gray500)),
+                    style: TextStyle(fontSize: 13, color: locked ? C.gray400 : C.gray500, height: 1.3)),
               ],
             ),
           ),

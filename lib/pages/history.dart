@@ -17,7 +17,7 @@ class _MetricConfig {
   const _MetricConfig(this.label, this.icon, this.color, this.bg);
 }
 
-const _configs = <String, _MetricConfig>{
+Map<String, _MetricConfig> get _configs => {
   'steps': _MetricConfig('Steps', Icons.directions_walk, C.green600, C.green100),
   'calories': _MetricConfig('Calories', Icons.local_fire_department, C.orange600, C.orange100),
   'distance': _MetricConfig('Distance', Icons.place, C.blue600, C.blue100),
@@ -101,14 +101,12 @@ class _HistoryPageState extends State<HistoryPage> {
       grouped.putIfAbsent(key, () => []).add(m);
     }
 
-    return Scaffold(
-      backgroundColor: C.gray50,
-      body: Column(
+    return Column(
         children: [
           _pageHeader('Health History', 'Your recorded health metrics over time'),
           Expanded(
             child: loading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(child: CircularProgressIndicator())
                 : SingleChildScrollView(
                     child: Center(
                       child: ConstrainedBox(
@@ -129,12 +127,12 @@ class _HistoryPageState extends State<HistoryPage> {
                                             _chip(_configs[t]?.label ?? t, t)),
                                       ],
                                     ),
-                                    const SizedBox(height: 16),
+                                    SizedBox(height: 16),
                                     Text(
                                         '${filtered.length} record${filtered.length != 1 ? 's' : ''}',
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                             fontSize: 14, color: C.gray400)),
-                                    const SizedBox(height: 16),
+                                    SizedBox(height: 16),
                                     ...grouped.entries.map((e) => _dateGroup(e.key, e.value, sys)),
                                   ],
                                 ),
@@ -144,7 +142,6 @@ class _HistoryPageState extends State<HistoryPage> {
                   ),
           ),
         ],
-      ),
     );
   }
 
@@ -155,9 +152,9 @@ class _HistoryPageState extends State<HistoryPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? C.blue500 : C.white,
+          color: selected ? C.nebulaPurple : C.card,
           borderRadius: BorderRadius.circular(99),
-          border: Border.all(color: selected ? C.blue500 : C.gray200),
+          border: Border.all(color: selected ? C.neonCyan : C.gray200),
         ),
         child: Text(label,
             style: TextStyle(
@@ -172,14 +169,14 @@ class _HistoryPageState extends State<HistoryPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Text(date.toUpperCase(),
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 color: C.gray500,
                 letterSpacing: 0.5)),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         ...items.map((m) {
           final cfg = _configs[m.metricType];
           return Padding(
@@ -197,19 +194,19 @@ class _HistoryPageState extends State<HistoryPage> {
                     child: Icon(cfg?.icon ?? Icons.monitor_heart,
                         size: 20, color: cfg?.color ?? C.gray500),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(cfg?.label ?? m.metricType,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontWeight: FontWeight.w500, color: C.gray900)),
                         if (m.notes != null && m.notes!.isNotEmpty)
                           Text(m.notes!,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 12, color: C.gray400)),
+                              style: TextStyle(fontSize: 12, color: C.gray400)),
                       ],
                     ),
                   ),
@@ -217,10 +214,10 @@ class _HistoryPageState extends State<HistoryPage> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(_value(m, sys),
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold, color: C.gray900)),
                       Text(_unit(m.metricType, sys),
-                          style: const TextStyle(fontSize: 12, color: C.gray400)),
+                          style: TextStyle(fontSize: 12, color: C.gray400)),
                     ],
                   ),
                 ],
@@ -241,15 +238,15 @@ class _HistoryPageState extends State<HistoryPage> {
           Container(
             width: 64,
             height: 64,
-            decoration: const BoxDecoration(color: C.gray100, shape: BoxShape.circle),
-            child: const Icon(Icons.calendar_today, color: C.gray400, size: 32),
+            decoration: BoxDecoration(color: C.gray100, shape: BoxShape.circle),
+            child: Icon(Icons.calendar_today, color: C.gray400, size: 32),
           ),
-          const SizedBox(height: 16),
-          const Text('No metrics recorded yet',
+          SizedBox(height: 16),
+          Text('No metrics recorded yet',
               style: TextStyle(
                   fontSize: 18, fontWeight: FontWeight.w600, color: C.gray900)),
-          const SizedBox(height: 8),
-          const Text('Use the Log button on the dashboard to start tracking your health.',
+          SizedBox(height: 8),
+          Text('Use the Log button on the dashboard to start tracking your health.',
               textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: C.gray500)),
         ],
       ),
@@ -260,26 +257,44 @@ class _HistoryPageState extends State<HistoryPage> {
 Widget _pageHeader(String title, String subtitle) {
   return Container(
     width: double.infinity,
-    decoration: const BoxDecoration(
-      color: C.white,
-      border: Border(bottom: BorderSide(color: C.gray100)),
-      boxShadow: [BoxShadow(color: Color(0x0A000000), blurRadius: 6, offset: Offset(0, 2))],
+    decoration: BoxDecoration(
+      color: C.card,
+      border: Border(bottom: BorderSide(color: C.cardBorder.withValues(alpha: 0.3))),
+      boxShadow: const [BoxShadow(color: Color(0x3300D4FF), blurRadius: 12, offset: Offset(0, 2))],
     ),
     child: SafeArea(
       bottom: false,
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1152),
+          constraints: const BoxConstraints(maxWidth: 768),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            padding: const EdgeInsets.fromLTRB(24, 14, 24, 14),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(title,
-                    style: const TextStyle(
-                        fontSize: 22, fontWeight: FontWeight.bold, color: C.gray900)),
-                const SizedBox(height: 4),
-                Text(subtitle, style: const TextStyle(fontSize: 14, color: C.gray500)),
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    gradient: kBlueTealGradient,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: const [BoxShadow(color: Color(0x5500D4FF), blurRadius: 8)],
+                  ),
+                  child: Icon(Icons.favorite, color: C.white, size: 20),
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title,
+                          style: TextStyle(
+                              fontSize: 22, fontWeight: FontWeight.bold, color: C.gray900)),
+                      SizedBox(height: 2),
+                      Text(subtitle, style: TextStyle(fontSize: 14, color: C.gray500)),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),

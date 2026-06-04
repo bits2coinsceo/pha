@@ -112,19 +112,19 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
               border: atLimit ? C.amber200 : C.blue100,
               fg: atLimit ? C.amber700 : C.blue700,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
           ],
           if (error.isNotEmpty) ...[
             AppBanner(text: error, bg: C.red50, border: C.red200, fg: C.red700, icon: Icons.error_outline),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
           ],
           if (success) ...[
             AppBanner(text: 'File uploaded successfully!', bg: C.green50, border: C.green200, fg: C.teal700),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
           ],
-          const Text('File Type',
+          Text('File Type',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: C.gray700)),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           DropdownButtonFormField<String>(
             initialValue: fileType,
             decoration: appInput(''),
@@ -134,53 +134,53 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
             ],
             onChanged: atLimit ? null : (v) => setState(() => fileType = v!),
           ),
-          const SizedBox(height: 16),
-          const Text('Select File',
+          SizedBox(height: 16),
+          Text('Select File',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: C.gray700)),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           GestureDetector(
             onTap: atLimit ? null : _pickFile,
             child: Container(
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                color: atLimit ? C.gray50 : C.white,
+                color: C.gray100,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: atLimit ? C.gray200 : C.gray300),
+                border: Border.all(color: C.gray200),
               ),
               child: Column(
                 children: [
                   Icon(Icons.upload_file, size: 32, color: atLimit ? C.gray300 : C.gray400),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   if (fileName != null) ...[
                     Text(fileName!,
-                        style: const TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.w500, color: C.blue600)),
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w500, color: C.gray900)),
                     Text('${((fileSize ?? 0) / 1024).round()} KB — click to change',
-                        style: const TextStyle(fontSize: 12, color: C.gray400)),
+                        style: TextStyle(fontSize: 12, color: C.gray400)),
                   ] else ...[
                     Text(atLimit ? 'Limit reached' : 'Click to select a file',
                         style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: atLimit ? C.gray400 : C.gray700)),
+                            color: atLimit ? C.gray400 : C.gray600)),
                     Text(
                         atLimit
                             ? 'Upgrade to upload more'
                             : (fileType == 'pdf'
                                 ? 'PDF up to 2 pages (free plan)'
                                 : 'JPG, PNG, or GIF'),
-                        style: const TextStyle(fontSize: 12, color: C.gray400)),
+                        style: TextStyle(fontSize: 12, color: C.gray400)),
                   ],
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           atLimit
               ? PrimaryButton(
                   label: 'Upgrade to PHA Plus+',
                   color: C.amber500,
-                  icon: const Icon(Icons.auto_awesome, size: 16, color: C.white),
+                  icon: Icon(Icons.auto_awesome, size: 16, color: C.white),
                   onPressed: widget.onNeedUpgrade,
                 )
               : PrimaryButton(
@@ -289,7 +289,7 @@ class _AIChatModalState extends State<AIChatModal> {
                 border: atLimit ? C.amber200 : C.blue100,
                 fg: atLimit ? C.amber700 : C.blue600,
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
             ],
             Expanded(
               child: ListView.builder(
@@ -303,9 +303,9 @@ class _AIChatModalState extends State<AIChatModal> {
                 },
               ),
             ),
-            const SizedBox(height: 8),
-            const Divider(color: C.gray100, height: 1),
-            const SizedBox(height: 12),
+            SizedBox(height: 8),
+            Divider(color: C.gray100, height: 1),
+            SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
@@ -319,7 +319,7 @@ class _AIChatModalState extends State<AIChatModal> {
                         .copyWith(fillColor: C.gray50),
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 GestureDetector(
                   onTap: atLimit ? widget.onNeedUpgrade : _send,
                   child: Container(
@@ -454,19 +454,19 @@ class _StressTestModalState extends State<StressTestModal> {
                   Text('$avg',
                       style: TextStyle(
                           fontSize: 36, fontWeight: FontWeight.bold, color: color)),
-                  const Text('/100', style: TextStyle(fontSize: 12, color: C.gray500)),
+                  Text('/100', style: TextStyle(fontSize: 12, color: C.gray500)),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             Text(result,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 20, fontWeight: FontWeight.bold, color: C.gray900)),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(desc[result]!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14, color: C.gray500)),
-            const SizedBox(height: 20),
+                style: TextStyle(fontSize: 14, color: C.gray500)),
+            SizedBox(height: 20),
             PrimaryButton(label: 'Done', onPressed: () => Navigator.pop(context)),
           ],
         ),
@@ -484,12 +484,12 @@ class _StressTestModalState extends State<StressTestModal> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Question ${current + 1} of ${_questions.length}',
-                  style: const TextStyle(fontSize: 12, color: C.gray500)),
+                  style: TextStyle(fontSize: 12, color: C.gray500)),
               Text('${(progress * 100).round()}% complete',
-                  style: const TextStyle(fontSize: 12, color: C.gray500)),
+                  style: TextStyle(fontSize: 12, color: C.gray500)),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           ClipRRect(
             borderRadius: BorderRadius.circular(99),
             child: LinearProgressIndicator(
@@ -499,11 +499,11 @@ class _StressTestModalState extends State<StressTestModal> {
               valueColor: const AlwaysStoppedAnimation(C.blue500),
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           Text(_questions[current].$1,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 16, fontWeight: FontWeight.w600, color: C.gray900)),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           ...List.generate(5, (i) {
             final score = i + 1;
             return Padding(
@@ -521,12 +521,12 @@ class _StressTestModalState extends State<StressTestModal> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(_labels[i],
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                               color: C.gray800)),
                       Text('$score/5',
-                          style: const TextStyle(fontSize: 12, color: C.gray400)),
+                          style: TextStyle(fontSize: 12, color: C.gray400)),
                     ],
                   ),
                 ),
@@ -661,25 +661,25 @@ class _DailyVitalsDialogState extends State<DailyVitalsDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Today\'s vitals'),
+      title: Text('Today\'s vitals', style: TextStyle(color: C.gray900, fontWeight: FontWeight.bold)),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
+            Text(
               'Log blood pressure and glucose once per day. You can skip and log later.',
-              style: TextStyle(fontSize: 13, color: C.gray600),
+              style: TextStyle(fontSize: 13, color: C.gray500, height: 1.4),
             ),
             if (error.isNotEmpty) ...[
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               AppBanner(text: error, bg: C.red50, border: C.red200, fg: C.red700),
             ],
             if (widget.needBp) ...[
-              const SizedBox(height: 16),
-              const Text('Blood pressure (mmHg)',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-              const SizedBox(height: 8),
+              SizedBox(height: 16),
+              Text('Blood pressure (mmHg)',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: C.gray900)),
+              SizedBox(height: 8),
               Row(
                 children: [
                   Expanded(
@@ -689,7 +689,7 @@ class _DailyVitalsDialogState extends State<DailyVitalsDialog> {
                       decoration: appInput('Systolic'),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Expanded(
                     child: TextField(
                       controller: _diastolic,
@@ -701,12 +701,12 @@ class _DailyVitalsDialogState extends State<DailyVitalsDialog> {
               ),
             ],
             if (widget.needGlucose) ...[
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               Text(
                 'Blood glucose (${isImperial ? 'mg/dL' : 'mmol/L'})',
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               TextField(
                 controller: _glucose,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -728,7 +728,7 @@ class _DailyVitalsDialogState extends State<DailyVitalsDialog> {
                   }
                   if (context.mounted) Navigator.pop(context, false);
                 },
-          child: const Text('Not now'),
+          child: Text('Not now'),
         ),
         TextButton(
           onPressed: saving ? null : _save,
@@ -820,15 +820,15 @@ class _LogMetricModalState extends State<LogMetricModal> {
         children: [
           if (error.isNotEmpty) ...[
             AppBanner(text: error, bg: C.red50, border: C.red200, fg: C.red700, icon: Icons.error_outline),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
           ],
           if (success) ...[
             AppBanner(text: 'Metric saved!', bg: C.green50, border: C.green200, fg: C.teal700),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
           ],
-          const Text('Metric Type',
+          Text('Metric Type',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: C.gray700)),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           DropdownButtonFormField<String>(
             initialValue: metricType,
             decoration: appInput(''),
@@ -840,17 +840,17 @@ class _LogMetricModalState extends State<LogMetricModal> {
               _value.clear();
             }),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Text('Value  (${selected.unit})',
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: C.gray700)),
-          const SizedBox(height: 8),
-          TextField(controller: _value, decoration: appInput(selected.hint)),
-          const SizedBox(height: 16),
-          const Text('Notes  (optional)',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: C.gray700)),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
+          TextField(controller: _value, decoration: appInput(selected.hint)),
+          SizedBox(height: 16),
+          Text('Notes  (optional)',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: C.gray700)),
+          SizedBox(height: 8),
           TextField(controller: _notes, decoration: appInput('Any additional notes...')),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           PrimaryButton(
             label: saving ? 'Saving...' : 'Save Metric',
             onPressed: (_value.text.isEmpty || saving) ? null : _save,
@@ -898,14 +898,14 @@ class _UpgradeModalState extends State<UpgradeModal> {
             Container(
               width: 64,
               height: 64,
-              decoration: const BoxDecoration(color: C.amber50, shape: BoxShape.circle),
-              child: const Icon(Icons.check_circle, color: C.amber500, size: 32),
+              decoration: BoxDecoration(color: C.amber50, shape: BoxShape.circle),
+              child: Icon(Icons.check_circle, color: C.amber500, size: 32),
             ),
-            const SizedBox(height: 16),
-            const Text("You're on PHA Plus+!",
+            SizedBox(height: 16),
+            Text("You're on PHA Plus+!",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: C.gray900)),
-            const SizedBox(height: 8),
-            const Text(
+            SizedBox(height: 8),
+            Text(
                 'All features are now unlocked. Enjoy unlimited uploads and the PsychoTest.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, color: C.gray500)),
@@ -932,7 +932,7 @@ class _UpgradeModalState extends State<UpgradeModal> {
             decoration: BoxDecoration(gradient: kAmberGradient, borderRadius: BorderRadius.circular(99)),
             child: Row(
               mainAxisSize: MainAxisSize.min,
-              children: const [
+              children: [
                 Icon(Icons.auto_awesome, size: 16, color: C.white),
                 SizedBox(width: 8),
                 Text('PHA Plus+',
@@ -940,14 +940,14 @@ class _UpgradeModalState extends State<UpgradeModal> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
-          const Text('Unlock All Features',
+          SizedBox(height: 16),
+          Text('Unlock All Features',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: C.gray900)),
-          const SizedBox(height: 8),
-          const Text('Get the full power of your Personal Health Assistant',
+          SizedBox(height: 8),
+          Text('Get the full power of your Personal Health Assistant',
               style: TextStyle(fontSize: 14, color: C.gray500)),
           if (hpDiscount) ...[
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             AppBanner(
               text:
                   'You have $maxOnboardingHp HP! Redeem for $hpFirstPurchaseDiscountPercent% off 6-month or annual plans.',
@@ -956,7 +956,7 @@ class _UpgradeModalState extends State<UpgradeModal> {
               fg: C.amber700,
             ),
           ],
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
@@ -968,7 +968,7 @@ class _UpgradeModalState extends State<UpgradeModal> {
                   color: C.gray50,
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Row(
-                    children: const [
+                    children: [
                       Expanded(flex: 2, child: Text('FEATURE', style: _thStyle)),
                       Expanded(child: Text('FREE', textAlign: TextAlign.center, style: _thStyle)),
                       Expanded(
@@ -982,7 +982,7 @@ class _UpgradeModalState extends State<UpgradeModal> {
                   ),
                 ),
                 ...features.map((f) => Container(
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                           border: Border(top: BorderSide(color: C.gray100))),
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       child: Row(
@@ -990,18 +990,18 @@ class _UpgradeModalState extends State<UpgradeModal> {
                           Expanded(
                               flex: 2,
                               child: Text(f.$1,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                       color: C.gray700))),
                           Expanded(
                               child: Text(f.$2,
                                   textAlign: TextAlign.center,
-                                  style: const TextStyle(fontSize: 14, color: C.gray400))),
+                                  style: TextStyle(fontSize: 14, color: C.gray400))),
                           Expanded(
                               child: Text(f.$3,
                                   textAlign: TextAlign.center,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                       color: C.emerald600))),
@@ -1011,7 +1011,7 @@ class _UpgradeModalState extends State<UpgradeModal> {
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           IntrinsicHeight(
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1027,7 +1027,7 @@ class _UpgradeModalState extends State<UpgradeModal> {
                     discounted: false,
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Expanded(
                   child: _planCard(
                     plan: 'semiannual',
@@ -1040,7 +1040,7 @@ class _UpgradeModalState extends State<UpgradeModal> {
                     listPrice: planListPrice('semiannual'),
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Expanded(
                   child: _planCard(
                     plan: 'annual',
@@ -1056,11 +1056,11 @@ class _UpgradeModalState extends State<UpgradeModal> {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [C.teal50, C.blue50]),
+              gradient: LinearGradient(colors: [C.teal50, C.blue50]),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: C.teal100),
             ),
@@ -1071,13 +1071,13 @@ class _UpgradeModalState extends State<UpgradeModal> {
                   height: 40,
                   decoration:
                       BoxDecoration(color: C.teal100, borderRadius: BorderRadius.circular(8)),
-                  child: const Icon(Icons.psychology, color: C.teal600, size: 20),
+                  child: Icon(Icons.psychology, color: C.teal600, size: 20),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text('PsychoTest — Stress & Psychosomatic Assessment',
                           style: TextStyle(
                               fontSize: 14, fontWeight: FontWeight.w600, color: C.gray900)),
@@ -1096,7 +1096,7 @@ class _UpgradeModalState extends State<UpgradeModal> {
     );
   }
 
-  static const _thStyle =
+  static TextStyle get _thStyle =>
       TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: C.gray500);
 
   Widget _planCard({
@@ -1127,7 +1127,7 @@ class _UpgradeModalState extends State<UpgradeModal> {
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                         color: C.amber400, borderRadius: BorderRadius.circular(99)),
-                    child: const Text('BEST',
+                    child: Text('BEST',
                         style: TextStyle(
                             fontSize: 9, fontWeight: FontWeight.bold, color: C.white)),
                   )
@@ -1140,7 +1140,7 @@ class _UpgradeModalState extends State<UpgradeModal> {
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
                   color: best ? C.amber600 : C.gray500)),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
@@ -1150,26 +1150,26 @@ class _UpgradeModalState extends State<UpgradeModal> {
               children: [
                 if (discounted && listPrice != null) ...[
                   Text(listPrice,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 12,
                           decoration: TextDecoration.lineThrough,
                           color: C.gray400)),
-                  const SizedBox(width: 4),
+                  SizedBox(width: 4),
                 ],
                 Text(price,
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 18, fontWeight: FontWeight.w800, color: C.gray900)),
-                Text(per, style: const TextStyle(fontSize: 10, color: C.gray400)),
+                Text(per, style: TextStyle(fontSize: 10, color: C.gray400)),
               ],
             ),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(note,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 10, color: C.gray400, height: 1.2)),
-          const Spacer(),
-          const SizedBox(height: 8),
+              style: TextStyle(fontSize: 10, color: C.gray400, height: 1.2)),
+          Spacer(),
+          SizedBox(height: 8),
           GestureDetector(
             onTap: loadingPlan != null ? null : () => _upgrade(plan),
             child: Container(
@@ -1178,12 +1178,12 @@ class _UpgradeModalState extends State<UpgradeModal> {
                   BoxDecoration(gradient: kAmberGradient, borderRadius: BorderRadius.circular(8)),
               child: Center(
                 child: loadingPlan == plan
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 14,
                         height: 14,
                         child: CircularProgressIndicator(strokeWidth: 2, color: C.white),
                       )
-                    : const Icon(Icons.auto_awesome, size: 14, color: C.white),
+                    : Icon(Icons.auto_awesome, size: 14, color: C.white),
               ),
             ),
           ),

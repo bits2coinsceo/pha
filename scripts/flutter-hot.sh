@@ -53,6 +53,17 @@ fi
 
 echo "-> Hot $label on ${DEVICE}..."
 
+bundle_id="${PHA_BUNDLE_ID:-com.pha.phaFlutter}"
+
+# Hot restart (R): relaunch on simulator — works when `flutter attach` piping times out.
+if [[ "$KEY" == "R" ]] && xcrun simctl terminate "$DEVICE" "$bundle_id" 2>/dev/null; then
+  sleep 0.4
+  if xcrun simctl launch "$DEVICE" "$bundle_id" >/dev/null 2>&1; then
+    echo "OK: app restarted on $DEVICE"
+    exit 0
+  fi
+fi
+
 export KEY DEVICE VM_URL
 attach_cmd='( sleep 3; printf "%s\nq\n" "$KEY" ) | flutter attach -d "$DEVICE" --debug-url="$VM_URL"'
 

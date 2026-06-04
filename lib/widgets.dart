@@ -14,9 +14,12 @@ class AppModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: C.white,
+      backgroundColor: C.card,
       insetPadding: const EdgeInsets.all(16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: C.cardBorder.withValues(alpha: 0.45)),
+      ),
       child: ConstrainedBox(
         constraints: BoxConstraints(
           maxWidth: 448,
@@ -27,19 +30,19 @@ class AppModal extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(24),
-              decoration: const BoxDecoration(
-                border: Border(bottom: BorderSide(color: C.gray200)),
+              decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: C.cardBorder.withValues(alpha: 0.35))),
               ),
               child: Row(
                 children: [
                   Expanded(
                     child: Text(title,
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: C.gray900)),
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: C.gray900)),
                   ),
                   InkWell(
                     onTap: onClose,
                     borderRadius: BorderRadius.circular(8),
-                    child: const Padding(
+                    child: Padding(
                       padding: EdgeInsets.all(8),
                       child: Icon(Icons.close, size: 20, color: C.gray600),
                     ),
@@ -66,45 +69,84 @@ class PrimaryButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final Color color;
   final Widget? icon;
-  const PrimaryButton({super.key, required this.label, this.onPressed, this.color = C.blue500, this.icon});
+  /// When true, uses [kBlueTealGradient] instead of [color]-based gradient.
+  final bool cosmicGradient;
+
+  const PrimaryButton({
+    super.key,
+    required this.label,
+    this.onPressed,
+    this.color = C.nebulaPurple,
+    this.icon,
+    this.cosmicGradient = false,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final disabled = onPressed == null;
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: color,
-          disabledBackgroundColor: C.gray200,
-          foregroundColor: C.white,
-          disabledForegroundColor: C.gray400,
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-            if (icon != null) ...[const SizedBox(width: 6), icon!],
-          ],
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(12),
+          child: Ink(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              gradient: disabled
+                  ? null
+                  : (cosmicGradient
+                      ? kBlueTealGradient
+                      : LinearGradient(
+                          colors: [color, Color.lerp(color, C.neonCyan, 0.35)!],
+                        )),
+              color: disabled ? C.gray200 : null,
+              boxShadow: disabled
+                  ? null
+                  : const [
+                      BoxShadow(color: Color(0x5500D4FF), blurRadius: 12, offset: Offset(0, 2)),
+                    ],
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                      color: disabled ? C.gray400 : C.white,
+                      height: 1.2,
+                    ),
+                  ),
+                ),
+                if (icon != null) ...[SizedBox(width: 8), icon!],
+              ],
+            ),
+          ),
         ),
       ),
     );
   }
 }
 
-InputDecoration appInput(String hint, {Color focus = C.blue500}) => InputDecoration(
+InputDecoration appInput(String hint, {Color focus = C.neonCyan}) => InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(color: C.gray400),
+      hintStyle: TextStyle(color: C.gray400, fontSize: 15),
       isDense: true,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       filled: true,
-      fillColor: C.white,
+      fillColor: const Color(0xFF1E1A42),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: C.gray200),
+        borderSide: BorderSide(color: C.gray200.withValues(alpha: 0.6)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
@@ -134,7 +176,7 @@ class AppBanner extends StatelessWidget {
         children: [
           if (icon != null) ...[
             Icon(icon, size: 16, color: fg),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
           ],
           Expanded(child: Text(text, style: TextStyle(fontSize: 13, color: fg))),
         ],
@@ -159,10 +201,12 @@ class AppBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: C.white,
-        border: Border(top: BorderSide(color: C.gray200)),
-        boxShadow: [BoxShadow(color: Color(0x14000000), blurRadius: 12, offset: Offset(0, -2))],
+      decoration: BoxDecoration(
+        color: C.card,
+        border: Border(top: BorderSide(color: C.cardBorder.withValues(alpha: 0.35))),
+        boxShadow: const [
+          BoxShadow(color: Color(0x4400D4FF), blurRadius: 16, offset: Offset(0, -4)),
+        ],
       ),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
       child: SafeArea(
@@ -179,19 +223,25 @@ class AppBottomNav extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: selected ? C.blue50 : Colors.transparent,
-                    borderRadius: BorderRadius.circular(8),
+                    color: selected ? C.nebulaPurple.withValues(alpha: 0.55) : Colors.transparent,
+                    borderRadius: BorderRadius.circular(10),
+                    border: selected
+                        ? Border.all(color: C.neonCyan.withValues(alpha: 0.7), width: 1.5)
+                        : null,
+                    boxShadow: selected
+                        ? const [BoxShadow(color: Color(0x3300D4FF), blurRadius: 8)]
+                        : null,
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(it.$3, size: 24, color: selected ? C.blue600 : C.gray600),
-                      const SizedBox(height: 4),
+                      Icon(it.$3, size: 24, color: selected ? C.white : C.gray500),
+                      SizedBox(height: 4),
                       Text(it.$2,
                           style: TextStyle(
                               fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: selected ? C.blue600 : C.gray600)),
+                              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                              color: selected ? C.white : C.gray500)),
                     ],
                   ),
                 ),
@@ -204,11 +254,20 @@ class AppBottomNav extends StatelessWidget {
   }
 }
 
-// ── Health Index card (circular gauge) ───────────────────────────────────────
+// ── Health Index + daily steps (single overview card) ─────────────────────────
 class HealthIndexCard extends StatelessWidget {
   final int score;
   final String status;
-  const HealthIndexCard({super.key, required this.score, required this.status});
+  final int steps;
+  final int stepsGoal;
+
+  const HealthIndexCard({
+    super.key,
+    required this.score,
+    required this.status,
+    required this.steps,
+    this.stepsGoal = 10000,
+  });
 
   Color get _statusColor {
     switch (status.toLowerCase()) {
@@ -226,74 +285,204 @@ class HealthIndexCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cap = status.isEmpty ? status : status[0].toUpperCase() + status.substring(1);
+    final stepPct = (steps / stepsGoal).clamp(0.0, 1.0);
+    final stepFeedback = stepsFeedbackFor(steps);
     return Container(
       decoration: cardDecoration(),
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: const [
-              Text('Health Index', style: TextStyle(color: C.gray600, fontWeight: FontWeight.w500)),
-              SizedBox(width: 8),
-              Icon(Icons.info_outline, size: 16, color: C.gray400),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              SizedBox(
-                width: 128,
-                height: 128,
-                child: CustomPaint(
-                  painter: _GaugePainter(score / 100),
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('$score',
-                            style: const TextStyle(
-                                fontSize: 30, fontWeight: FontWeight.bold, color: C.gray900)),
-                        const Text('/100', style: TextStyle(fontSize: 12, color: C.gray500)),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 32),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.all(22),
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: _roundMetricColumn(
+                title: 'Health Index',
+                trailing: Icon(Icons.info_outline, size: 14, color: C.gray400),
+                fraction: score / 100,
+                progressColor: C.neonMint,
+                centerMain: '$score',
+                centerSub: '/100',
+                centerMainSize: 30,
+                belowGauge: Column(
                   children: [
-                    Text(cap, style: TextStyle(fontWeight: FontWeight.w600, color: _statusColor)),
-                    const SizedBox(height: 8),
-                    const Text("You're doing great!",
-                        style: TextStyle(color: C.gray600, fontSize: 14)),
+                    Text(cap,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w700, fontSize: 15, color: _statusColor)),
+                    SizedBox(height: 4),
+                    Text("You're doing well",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: C.gray500, fontSize: 13, height: 1.3)),
                   ],
                 ),
               ),
-            ],
-          ),
-        ],
+            ),
+            Container(width: 1, margin: const EdgeInsets.symmetric(horizontal: 16), color: C.gray200),
+            Expanded(
+              child: _roundMetricColumn(
+                title: 'Steps',
+                trailing: Icon(Icons.directions_walk, size: 14, color: C.green500),
+                fraction: stepPct,
+                progressColor: C.green500,
+                centerMain: _fmt(steps),
+                centerSub: '/${_fmt(stepsGoal)}',
+                centerMainSize: _fmt(steps).length > 5 ? 20 : 28,
+                belowGauge: Column(
+                  children: [
+                    Text(stepFeedback.range,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
+                            color: C.green500,
+                            height: 1.2)),
+                    SizedBox(height: 6),
+                    Text(stepFeedback.message,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: C.gray500, fontSize: 11, height: 1.35)),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _roundMetricColumn({
+    required String title,
+    required Widget trailing,
+    required double fraction,
+    required Color progressColor,
+    required String centerMain,
+    required String centerSub,
+    required double centerMainSize,
+    required Widget belowGauge,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(title,
+                style: TextStyle(
+                    color: C.gray500, fontWeight: FontWeight.w500, fontSize: 13)),
+            SizedBox(width: 6),
+            trailing,
+          ],
+        ),
+        SizedBox(height: 12),
+        SizedBox(
+          width: 120,
+          height: 120,
+          child: CustomPaint(
+            painter: _GaugePainter(fraction, progressColor: progressColor),
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(centerMain,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          fontSize: centerMainSize,
+                          fontWeight: FontWeight.bold,
+                          color: C.gray900)),
+                  Text(centerSub, style: TextStyle(fontSize: 12, color: C.gray500)),
+                ],
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: 14),
+        belowGauge,
+      ],
     );
   }
 }
 
+class _StepsFeedback {
+  final String range;
+  final String message;
+  const _StepsFeedback({required this.range, required this.message});
+}
+
+_StepsFeedback stepsFeedbackFor(int steps) {
+  if (steps <= 100) {
+    return const _StepsFeedback(
+      range: '0–100 steps',
+      message:
+          'Very little activity today. Even a short walk can be a great start.',
+    );
+  }
+  if (steps <= 3000) {
+    return const _StepsFeedback(
+      range: '101–3,000 steps',
+      message:
+          "Good start! You've already begun moving, but you can do even better.",
+    );
+  }
+  if (steps <= 5000) {
+    return const _StepsFeedback(
+      range: '3,001–5,000 steps',
+      message:
+          "Well done! You're staying active and making a positive impact on your health.",
+    );
+  }
+  if (steps <= 7000) {
+    return const _StepsFeedback(
+      range: '5,001–7,000 steps',
+      message:
+          "Excellent! You're steadily moving toward a healthier and more active lifestyle.",
+    );
+  }
+  if (steps <= 10000) {
+    return const _StepsFeedback(
+      range: '7,001–10,000 steps',
+      message:
+          "Amazing! Your dedication is paying off, and you're building a stronger, healthier you.",
+    );
+  }
+  if (steps <= 15000) {
+    return const _StepsFeedback(
+      range: '10,001–15,000 steps',
+      message:
+          "Outstanding! You've gone above and beyond today. Keep up the great work!",
+    );
+  }
+  if (steps <= 20000) {
+    return const _StepsFeedback(
+      range: '15,001–20,000 steps',
+      message:
+          "Fantastic! This level of activity shows real commitment. You're setting a great example.",
+    );
+  }
+  return const _StepsFeedback(
+    range: '20,000+ steps',
+    message:
+        "Legendary! You've achieved an exceptional result today and made a huge investment in your health.",
+  );
+}
+
 class _GaugePainter extends CustomPainter {
   final double fraction;
-  _GaugePainter(this.fraction);
+  final Color progressColor;
+  _GaugePainter(this.fraction, {this.progressColor = C.neonMint});
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2 * (45 / 60);
     final track = Paint()
-      ..color = C.gray200
+      ..color = C.gray200.withValues(alpha: 0.5)
       ..strokeWidth = 8
       ..style = PaintingStyle.stroke;
     final progress = Paint()
-      ..color = C.emerald500
+      ..color = progressColor
       ..strokeWidth = 8
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
@@ -308,67 +497,8 @@ class _GaugePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_GaugePainter old) => old.fraction != fraction;
-}
-
-// ── Steps card ───────────────────────────────────────────────────────────────
-class StepsCard extends StatelessWidget {
-  final int current;
-  final int goal;
-  const StepsCard({super.key, required this.current, required this.goal});
-
-  @override
-  Widget build(BuildContext context) {
-    final pct = (current / goal).clamp(0.0, 1.0);
-    return Container(
-      decoration: cardDecoration(),
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: C.green100, borderRadius: BorderRadius.circular(8)),
-                child: const Icon(Icons.directions_walk, size: 24, color: C.green600),
-              ),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Steps', style: TextStyle(fontWeight: FontWeight.w600, color: C.gray900)),
-                  Text('${(pct * 100).round()}% of daily goal',
-                      style: const TextStyle(fontSize: 14, color: C.gray500)),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(_fmt(current),
-                  style: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: C.gray900)),
-              const SizedBox(width: 8),
-              Text('/${_fmt(goal)}', style: const TextStyle(fontSize: 14, color: C.gray500)),
-            ],
-          ),
-          const SizedBox(height: 16),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(99),
-            child: LinearProgressIndicator(
-              value: pct,
-              minHeight: 8,
-              backgroundColor: C.gray200,
-              valueColor: const AlwaysStoppedAnimation(C.green500),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  bool shouldRepaint(_GaugePainter old) =>
+      old.fraction != fraction || old.progressColor != progressColor;
 }
 
 String _fmt(num n) {
@@ -415,14 +545,14 @@ class MetricsGrid extends StatelessWidget {
               child: Column(
                 children: [
                   Icon(it.$1, size: 24, color: it.$5),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   Text('${it.$3}',
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: C.gray900)),
-                  const SizedBox(height: 4),
-                  Text(it.$4, style: const TextStyle(fontSize: 12, color: C.gray500)),
-                  const SizedBox(height: 8),
+                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: C.gray900)),
+                  SizedBox(height: 4),
+                  Text(it.$4, style: TextStyle(fontSize: 12, color: C.gray500)),
+                  SizedBox(height: 8),
                   Text(it.$2,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 12, fontWeight: FontWeight.w500, color: C.gray600)),
                 ],
               ),
@@ -472,8 +602,13 @@ class QuickActions extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Quick Actions',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: C.gray900)),
+            Text('Quick Actions',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                  color: C.gray900,
+                  shadows: [Shadow(color: Color(0x5500D4FF), blurRadius: 10)],
+                )),
             GestureDetector(
               onTap: onUpgrade,
               child: Container(
@@ -482,7 +617,7 @@ class QuickActions extends StatelessWidget {
                     gradient: kAmberGradient, borderRadius: BorderRadius.circular(8)),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
-                  children: const [
+                  children: [
                     Icon(Icons.auto_awesome, size: 14, color: C.white),
                     SizedBox(width: 6),
                     Text('PHA Plus+',
@@ -494,7 +629,7 @@ class QuickActions extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 14),
         ...actions.map((a) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: _ActionTile(action: a, onUpgrade: onUpgrade),
@@ -518,40 +653,41 @@ class _ActionTile extends StatelessWidget {
     if (a.comingSoon) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        decoration: BoxDecoration(
-          color: C.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: C.gray200, style: BorderStyle.solid),
-        ),
+        decoration: cardDecoration(radius: 16),
         child: Opacity(
-          opacity: 0.7,
+          opacity: 0.85,
           child: Row(
             children: [
               _iconBox(a.icon, a.bgColor, a.color),
-              const SizedBox(width: 16),
+              SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Flexible(
+                        Expanded(
                           child: Text(a.title,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 14, color: C.gray500)),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                  color: C.gray900,
+                                  height: 1.25)),
                         ),
-                        const SizedBox(width: 8),
-                        _pill('Coming Soon', C.sky50, C.sky200, C.sky600, Icons.access_time),
+                        SizedBox(width: 8),
+                        _pill('Coming Soon', C.sky50, C.sky200, C.sky500, Icons.access_time),
                       ],
                     ),
                     Text(a.description,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 12, color: C.gray400)),
+                        style: TextStyle(fontSize: 12, color: C.gray500)),
                   ],
                 ),
               ),
-              const Icon(Icons.access_time, size: 16, color: C.gray300),
             ],
           ),
         ),
@@ -564,16 +700,11 @@ class _ActionTile extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        decoration: BoxDecoration(
-          color: C.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: blocked ? C.gray200 : C.gray100),
-          boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 6, offset: Offset(0, 2))],
-        ),
+        decoration: cardDecoration(radius: 16),
         child: Row(
           children: [
-            _iconBox(a.icon, a.locked ? C.gray100 : a.bgColor, a.locked ? C.gray400 : a.color),
-            const SizedBox(width: 16),
+            _iconBox(a.icon, a.locked ? C.gray200 : a.bgColor, a.locked ? C.gray400 : a.color),
+            SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -585,25 +716,25 @@ class _ActionTile extends StatelessWidget {
                             style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
-                                color: a.locked ? C.gray500 : C.gray900)),
+                                color: a.locked ? C.gray600 : C.gray900)),
                       ),
                       if (a.locked) ...[
-                        const SizedBox(width: 8),
-                        _pill('Plus+', C.amber50, C.amber200, C.amber600, Icons.lock),
+                        SizedBox(width: 8),
+                        _pill('Plus+', C.amber50, C.amber200, C.amber300, Icons.lock),
                       ],
                     ],
                   ),
                   Text(a.description,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 12, color: C.gray500)),
+                      style: TextStyle(fontSize: 12, color: C.gray500)),
                 ],
               ),
             ),
             if (!a.locked && a.credits != null) _creditsBadge(a.credits!, remaining!, exhausted),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Icon(blocked ? Icons.auto_awesome : Icons.arrow_forward,
-                size: 16, color: blocked ? C.amber400 : C.blue400),
+                size: 16, color: blocked ? C.amber300 : C.neonCyan),
           ],
         ),
       ),
@@ -625,7 +756,7 @@ class _ActionTile extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, size: 10, color: fg),
-            const SizedBox(width: 4),
+            SizedBox(width: 4),
             Text(text, style: TextStyle(fontSize: 12, color: fg, fontWeight: FontWeight.w500)),
           ],
         ),
@@ -654,7 +785,7 @@ class _ActionTile extends StatelessWidget {
             );
           }),
         ),
-        const SizedBox(width: 2),
+        SizedBox(width: 2),
         Text('${exhausted ? 0 : remaining}/${credits.total}',
             style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: color)),
       ],
@@ -684,15 +815,15 @@ class HealthMetricsChart extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Health Metrics',
+          Text('Health Metrics',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: C.gray900)),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           ...metrics.map((m) => Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration:
-                      BoxDecoration(color: C.gray50, borderRadius: BorderRadius.circular(12)),
+                      BoxDecoration(color: C.gray100, borderRadius: BorderRadius.circular(12)),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -700,26 +831,26 @@ class HealthMetricsChart extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(m.label,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontSize: 14, fontWeight: FontWeight.w500, color: C.gray500)),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.baseline,
                             textBaseline: TextBaseline.alphabetic,
                             children: [
                               Text(m.value,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontSize: 18, fontWeight: FontWeight.bold, color: C.gray900)),
                               if (m.unit.isNotEmpty) ...[
-                                const SizedBox(width: 4),
+                                SizedBox(width: 4),
                                 Text(m.unit,
-                                    style: const TextStyle(fontSize: 12, color: C.gray400)),
+                                    style: TextStyle(fontSize: 12, color: C.gray400)),
                               ],
                             ],
                           ),
                         ],
                       ),
                       if (m.trend.length > 1) ...[
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
                         SizedBox(
                           height: 40,
                           width: double.infinity,
@@ -781,7 +912,7 @@ class MiniBarChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (values.isEmpty) {
-      return const Text('No data', style: TextStyle(fontSize: 12, color: C.gray400));
+      return Text('No data', style: TextStyle(fontSize: 12, color: C.gray400));
     }
     final maxV = values.reduce(max);
     final minV = values.reduce(min);

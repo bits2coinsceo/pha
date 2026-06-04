@@ -14,7 +14,9 @@ import 'pages/login.dart';
 import 'pages/onboarding.dart';
 import 'pages/profile.dart';
 import 'telemetry_sync.dart';
+import 'cosmic_ui.dart';
 import 'theme.dart';
+import 'theme_mode.dart';
 import 'widgets.dart';
 
 Future<void> main() async {
@@ -22,8 +24,16 @@ Future<void> main() async {
   await Db.instance.init();
   final auth = AuthProvider();
   await auth.bootstrap();
+  final themeMode = ThemeModeController();
+  await themeMode.load();
   runApp(
-    ChangeNotifierProvider.value(value: auth, child: const PhaApp()),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: auth),
+        ChangeNotifierProvider.value(value: themeMode),
+      ],
+      child: const PhaApp(),
+    ),
   );
 }
 
@@ -32,10 +42,13 @@ class PhaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeMode = context.watch<ThemeModeController>();
     return MaterialApp(
       title: 'PHA — Personal Health Assistant',
       debugShowCheckedModeBanner: false,
-      theme: buildTheme(),
+      theme: buildAppTheme(isDark: false),
+      darkTheme: buildAppTheme(isDark: true),
+      themeMode: themeMode.mode,
       home: const AppContent(),
     );
   }
@@ -65,6 +78,7 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    TelemetrySyncService.stopLiveSync();
     super.dispose();
   }
 
@@ -77,10 +91,17 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
 
   void _scheduleTelemetrySync() {
     final auth = context.read<AuthProvider>();
-    if (auth.user == null || onboardingDone != true) return;
-    if (_telemetrySyncTask != null) return;
+    if (auth.user == null || onboardingDone != true) {
+      TelemetrySyncService.stopLiveSync();
+      return;
+    }
 
     final userId = auth.user!.id;
+    TelemetrySyncService.startLiveSync(userId, () {
+      if (mounted) setState(() => dashboardKey++);
+    });
+
+    if (_telemetrySyncTask != null) return;
     _telemetrySyncTask = TelemetrySyncService.onAppOpen(userId).then((synced) {
       _telemetrySyncTask = null;
       if (synced && mounted) setState(() => dashboardKey++);
@@ -139,6 +160,7 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
     }
 
     if (auth.user == null) {
+      TelemetrySyncService.stopLiveSync();
       if (onboardingDone != null) {
         onboardingDone = null;
         checkedForUserId = null;
@@ -166,7 +188,7 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
       );
     }
 
-    return Scaffold(
+    return CosmicScaffold(
       body: _buildPage(),
       bottomNavigationBar: AppBottomNav(
         current: currentPage,
@@ -213,15 +235,22 @@ class _Splash extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: C.gray50,
+    return CosmicScaffold(
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(color: C.blue500),
+            const CircularProgressIndicator(color: C.neonCyan),
             SizedBox(height: 16),
-            Text('Loading...', style: TextStyle(color: C.gray500, fontSize: 14)),
+            Text(
+              'Loading...',
+              style: TextStyle(
+                color: C.gray600,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.2,
+              ),
+            ),
           ],
         ),
       ),
