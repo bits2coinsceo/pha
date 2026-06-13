@@ -21,21 +21,21 @@ class CosmicBackground extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               CustomPaint(painter: _StarfieldPainter()),
-              Container(color: C.isDark ? const Color(0x9906041A) : const Color(0x55FFFFFF)),
+              Container(color: C.isDark ? const Color(0x9906041A) : const Color(0x18FFFFFF)),
               Positioned(
                 top: -80 + t * 24,
                 right: -60,
-                child: _nebulaOrb(220, C.nebulaPink.withValues(alpha: 0.12)),
+                child: _nebulaOrb(220, C.nebulaPink.withValues(alpha: C.isDark ? 0.12 : 0.06)),
               ),
               Positioned(
                 bottom: 40 - t * 18,
                 left: -90,
-                child: _nebulaOrb(280, C.nebulaBlue.withValues(alpha: 0.1)),
+                child: _nebulaOrb(280, C.nebulaBlue.withValues(alpha: C.isDark ? 0.1 : 0.05)),
               ),
               Positioned(
                 top: 180 + t * 12,
                 left: 30,
-                child: _nebulaOrb(120, C.neonCyan.withValues(alpha: 0.08)),
+                child: _nebulaOrb(120, C.neonCyan.withValues(alpha: C.isDark ? 0.08 : 0.04)),
               ),
             ],
           ),
@@ -66,9 +66,10 @@ class _StarfieldPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    final starColor = C.isDark ? Colors.white : C.accentPrimary;
     for (final s in _stars) {
       final paint = Paint()
-        ..color = Colors.white.withValues(alpha: s.alpha)
+        ..color = starColor.withValues(alpha: C.isDark ? s.alpha : s.alpha * 0.35)
         ..style = PaintingStyle.fill;
       canvas.drawCircle(Offset(s.x * size.width, s.y * size.height), s.size, paint);
     }
@@ -156,7 +157,7 @@ class CosmicSectionTitle extends StatelessWidget {
             fontWeight: FontWeight.w800,
             color: C.gray900,
             letterSpacing: 0.5,
-            shadows: [Shadow(color: Color(0x6600D4FF), blurRadius: 12)],
+            shadows: C.textGlow(),
           ),
         ),
       ],

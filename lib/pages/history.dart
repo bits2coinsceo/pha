@@ -152,15 +152,15 @@ class _HistoryPageState extends State<HistoryPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? C.nebulaPurple : C.card,
+          color: selected ? C.navActiveBg : C.card,
           borderRadius: BorderRadius.circular(99),
-          border: Border.all(color: selected ? C.neonCyan : C.gray200),
+          border: Border.all(color: selected ? C.navActiveBorder : C.gray200),
         ),
         child: Text(label,
             style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: selected ? C.white : C.gray600)),
+                color: selected ? C.navActiveFg : C.gray600)),
       ),
     );
   }
@@ -260,7 +260,7 @@ Widget _pageHeader(String title, String subtitle) {
     decoration: BoxDecoration(
       color: C.card,
       border: Border(bottom: BorderSide(color: C.cardBorder.withValues(alpha: 0.3))),
-      boxShadow: const [BoxShadow(color: Color(0x3300D4FF), blurRadius: 12, offset: Offset(0, 2))],
+      boxShadow: C.glowShadow(),
     ),
     child: SafeArea(
       bottom: false,
@@ -278,7 +278,7 @@ Widget _pageHeader(String title, String subtitle) {
                   decoration: BoxDecoration(
                     gradient: kBlueTealGradient,
                     borderRadius: BorderRadius.circular(12),
-                    boxShadow: const [BoxShadow(color: Color(0x5500D4FF), blurRadius: 8)],
+                    boxShadow: C.glowShadow(blur: 8),
                   ),
                   child: Icon(Icons.favorite, color: C.white, size: 20),
                 ),

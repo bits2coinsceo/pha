@@ -139,6 +139,12 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
     showDialog(context: context, builder: (_) => modal);
   }
 
+  void _openFullScreen(Widget page) {
+    Navigator.of(context).push(
+      MaterialPageRoute(fullscreenDialog: true, builder: (_) => page),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
@@ -211,7 +217,7 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
           key: ValueKey('dashboard-$dashboardKey'),
           onOpenUpload: () => _openModal(
               UploadAnalysisModal(onNeedUpgrade: _needUpgrade)),
-          onOpenAIChat: () => _openModal(
+          onOpenAIChat: () => _openFullScreen(
               AIChatModal(onNeedUpgrade: _needUpgrade)),
           onOpenStressTest: () => _openModal(const StressTestModal()),
           onOpenLogMetric: () => _openModal(
@@ -240,7 +246,7 @@ class _Splash extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const CircularProgressIndicator(color: C.neonCyan),
+            CircularProgressIndicator(color: C.accentPrimary),
             SizedBox(height: 16),
             Text(
               'Loading...',

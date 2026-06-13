@@ -230,7 +230,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ),
                                       child: Icon(
                                         themeMode.isDark ? Icons.dark_mode : Icons.light_mode,
-                                        color: C.neonCyan,
+                                        color: C.accentPrimary,
                                         size: 22,
                                       ),
                                     ),
@@ -255,7 +255,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     Switch(
                                       value: themeMode.isDark,
                                       activeThumbColor: C.white,
-                                      activeTrackColor: C.nebulaPurple,
+                                      activeTrackColor: C.accentSecondary,
                                       inactiveThumbColor: C.white,
                                       inactiveTrackColor: C.gray300,
                                       onChanged: (v) => themeMode.setDark(v),
@@ -281,7 +281,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       onPressed: () => auth.signOut(),
                                       style: OutlinedButton.styleFrom(
                                         foregroundColor: C.red500,
-                                        side: const BorderSide(color: C.red500, width: 2),
+                                        side: BorderSide(color: C.red500, width: 2),
                                         padding:
                                             const EdgeInsets.symmetric(vertical: 12),
                                         shape: RoundedRectangleBorder(

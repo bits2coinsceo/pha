@@ -455,7 +455,7 @@ class _HealthAnalysisCardState extends State<HealthAnalysisCard> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: [C.blue500, C.teal500]),
+                      gradient: LinearGradient(colors: [C.blue500, C.teal500]),
                       borderRadius: BorderRadius.circular(12)),
                   child: Icon(Icons.auto_awesome, color: C.white, size: 20),
                 ),

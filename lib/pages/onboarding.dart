@@ -1055,7 +1055,7 @@ class _OnboardingPageState extends State<OnboardingPage>
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1A42),
+        color: C.inputFill,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: C.gray100),
       ),

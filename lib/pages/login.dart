@@ -201,7 +201,7 @@ class _LoginPageState extends State<LoginPage> {
                   decoration: BoxDecoration(
                     gradient: kBlueTealGradient,
                     borderRadius: BorderRadius.circular(16),
-                    boxShadow: const [BoxShadow(color: Color(0x5500D4FF), blurRadius: 10)],
+                    boxShadow: C.glowShadow(blur: 10),
                   ),
                   child: Icon(Icons.favorite, color: C.white, size: 28),
                 ),

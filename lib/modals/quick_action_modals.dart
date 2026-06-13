@@ -211,7 +211,7 @@ class AIChatModal extends StatefulWidget {
 class _AIChatModalState extends State<AIChatModal> {
   final _messages = <_Msg>[
     _Msg(false,
-        "Hello! I'm your AI health assistant. Would you like us to use the data you provided during onboarding? After that, you can describe your problem in detail."),
+        "Hello! I'm your Ai Doc Assistant. Would you like us to use the data you provided during onboarding? After that, you can describe your problem in detail."),
   ];
   final _input = TextEditingController();
   final _scroll = ScrollController();
@@ -273,68 +273,94 @@ class _AIChatModalState extends State<AIChatModal> {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
-    return AppModal(
-      title: 'AI Health Assistant',
-      onClose: () => Navigator.pop(context),
-      child: SizedBox(
-        height: 400,
-        child: Column(
-          children: [
-            if (!auth.isPlus && consultCount != null) ...[
-              AppBanner(
-                text: atLimit
-                    ? 'Free consultation limit reached.'
-                    : '${3 - consultCount!} of 3 free consultations remaining.',
-                bg: atLimit ? C.amber50 : C.blue50,
-                border: atLimit ? C.amber200 : C.blue100,
-                fg: atLimit ? C.amber700 : C.blue600,
-              ),
-              SizedBox(height: 12),
-            ],
-            Expanded(
-              child: ListView.builder(
-                controller: _scroll,
-                itemCount: _messages.length + (loading ? 1 : 0),
-                itemBuilder: (context, i) {
-                  if (i == _messages.length) {
-                    return _bubble(_Msg(false, '…'));
-                  }
-                  return _bubble(_messages[i]);
-                },
-              ),
-            ),
-            SizedBox(height: 8),
-            Divider(color: C.gray100, height: 1),
-            SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _input,
-                    enabled: !loading && !atLimit,
-                    onSubmitted: (_) => _send(),
-                    decoration: appInput(atLimit
-                            ? 'Upgrade to continue chatting…'
-                            : 'Ask about sleep, exercise, nutrition...')
-                        .copyWith(fillColor: C.gray50),
-                  ),
+    return Scaffold(
+      backgroundColor: C.gray50,
+      appBar: AppBar(
+        backgroundColor: C.card,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(Icons.close, color: C.gray600),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Ai Doc Assistant',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: C.gray900,
+          ),
+        ),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Divider(
+            color: C.cardBorder.withValues(alpha: 0.35),
+            height: 1,
+          ),
+        ),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+          child: Column(
+            children: [
+              if (!auth.isPlus && consultCount != null) ...[
+                AppBanner(
+                  text: atLimit
+                      ? 'Free consultation limit reached.'
+                      : '${3 - consultCount!} of 3 free consultations remaining.',
+                  bg: atLimit ? C.amber50 : C.blue50,
+                  border: atLimit ? C.amber200 : C.blue100,
+                  fg: atLimit ? C.amber700 : C.blue600,
                 ),
-                SizedBox(width: 8),
-                GestureDetector(
-                  onTap: atLimit ? widget.onNeedUpgrade : _send,
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: atLimit ? C.amber500 : C.blue500,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(atLimit ? Icons.auto_awesome : Icons.send,
-                        size: 16, color: C.white),
-                  ),
-                ),
+                SizedBox(height: 12),
               ],
-            ),
-          ],
+              Expanded(
+                child: ListView.builder(
+                  controller: _scroll,
+                  itemCount: _messages.length + (loading ? 1 : 0),
+                  itemBuilder: (context, i) {
+                    if (i == _messages.length) {
+                      return _bubble(_Msg(false, '…'));
+                    }
+                    return _bubble(_messages[i]);
+                  },
+                ),
+              ),
+              SizedBox(height: 8),
+              Divider(color: C.gray100, height: 1),
+              SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _input,
+                      enabled: !loading && !atLimit,
+                      onSubmitted: (_) => _send(),
+                      decoration: appInput(atLimit
+                              ? 'Upgrade to continue chatting…'
+                              : 'Ask about your symptoms, diseases, concerns')
+                          .copyWith(fillColor: C.gray50),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: atLimit ? widget.onNeedUpgrade : _send,
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: atLimit ? C.amber500 : C.blue500,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(atLimit ? Icons.auto_awesome : Icons.send,
+                          size: 16, color: C.white),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -496,7 +522,7 @@ class _StressTestModalState extends State<StressTestModal> {
               value: progress,
               minHeight: 6,
               backgroundColor: C.gray100,
-              valueColor: const AlwaysStoppedAnimation(C.blue500),
+              valueColor: AlwaysStoppedAnimation(C.blue500),
             ),
           ),
           SizedBox(height: 24),

@@ -300,7 +300,7 @@ class _DashboardState extends State<Dashboard> {
       decoration: BoxDecoration(
         color: C.card,
         border: Border(bottom: BorderSide(color: C.cardBorder.withValues(alpha: 0.3))),
-        boxShadow: const [BoxShadow(color: Color(0x3300D4FF), blurRadius: 12, offset: Offset(0, 2))],
+        boxShadow: C.glowShadow(),
       ),
       child: SafeArea(
         bottom: false,
@@ -317,7 +317,7 @@ class _DashboardState extends State<Dashboard> {
                     decoration: BoxDecoration(
                       gradient: kBlueTealGradient,
                       borderRadius: BorderRadius.circular(12),
-                      boxShadow: const [BoxShadow(color: Color(0x5500D4FF), blurRadius: 8)],
+                      boxShadow: C.glowShadow(blur: 8),
                     ),
                     child: Icon(Icons.favorite, color: C.white, size: 20),
                   ),
@@ -347,7 +347,7 @@ class _DashboardState extends State<Dashboard> {
                           width: 8,
                           height: 8,
                           decoration:
-                              const BoxDecoration(color: C.red500, shape: BoxShape.circle),
+                              BoxDecoration(color: C.red500, shape: BoxShape.circle),
                         ),
                       ),
                     ],
@@ -367,7 +367,7 @@ class _DashboardState extends State<Dashboard> {
       decoration: BoxDecoration(
         gradient: kNebulaGradient,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: const [BoxShadow(color: Color(0x4400D4FF), blurRadius: 16)],
+        boxShadow: C.glowShadow(blur: 16, alphaDark: 0.27, alphaLight: 0.1),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

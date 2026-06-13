@@ -102,11 +102,7 @@ class PrimaryButton extends StatelessWidget {
                           colors: [color, Color.lerp(color, C.neonCyan, 0.35)!],
                         )),
               color: disabled ? C.gray200 : null,
-              boxShadow: disabled
-                  ? null
-                  : const [
-                      BoxShadow(color: Color(0x5500D4FF), blurRadius: 12, offset: Offset(0, 2)),
-                    ],
+              boxShadow: disabled ? null : C.glowShadow(),
             ),
             padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
             child: Row(
@@ -137,20 +133,20 @@ class PrimaryButton extends StatelessWidget {
   }
 }
 
-InputDecoration appInput(String hint, {Color focus = C.neonCyan}) => InputDecoration(
+InputDecoration appInput(String hint, {Color? focus}) => InputDecoration(
       hintText: hint,
       hintStyle: TextStyle(color: C.gray400, fontSize: 15),
       isDense: true,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       filled: true,
-      fillColor: const Color(0xFF1E1A42),
+      fillColor: C.inputFill,
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: C.gray200.withValues(alpha: 0.6)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: focus, width: 2),
+        borderSide: BorderSide(color: focus ?? C.accentFocus, width: 2),
       ),
     );
 
@@ -204,9 +200,7 @@ class AppBottomNav extends StatelessWidget {
       decoration: BoxDecoration(
         color: C.card,
         border: Border(top: BorderSide(color: C.cardBorder.withValues(alpha: 0.35))),
-        boxShadow: const [
-          BoxShadow(color: Color(0x4400D4FF), blurRadius: 16, offset: Offset(0, -4)),
-        ],
+        boxShadow: C.glowShadow(blur: 16, offset: Offset(0, -4), alphaDark: 0.27, alphaLight: 0.08),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
       child: SafeArea(
@@ -223,25 +217,21 @@ class AppBottomNav extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: selected ? C.nebulaPurple.withValues(alpha: 0.55) : Colors.transparent,
+                    color: selected ? C.navActiveBg : Colors.transparent,
                     borderRadius: BorderRadius.circular(10),
-                    border: selected
-                        ? Border.all(color: C.neonCyan.withValues(alpha: 0.7), width: 1.5)
-                        : null,
-                    boxShadow: selected
-                        ? const [BoxShadow(color: Color(0x3300D4FF), blurRadius: 8)]
-                        : null,
+                    border: selected ? Border.all(color: C.navActiveBorder, width: 1.5) : null,
+                    boxShadow: selected ? C.glowShadow(blur: 8, alphaDark: 0.2, alphaLight: 0.06) : null,
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(it.$3, size: 24, color: selected ? C.white : C.gray500),
+                      Icon(it.$3, size: 24, color: selected ? C.navActiveFg : C.gray500),
                       SizedBox(height: 4),
                       Text(it.$2,
                           style: TextStyle(
                               fontSize: 12,
                               fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                              color: selected ? C.white : C.gray500)),
+                              color: selected ? C.navActiveFg : C.gray500)),
                     ],
                   ),
                 ),
@@ -272,11 +262,11 @@ class HealthIndexCard extends StatelessWidget {
   Color get _statusColor {
     switch (status.toLowerCase()) {
       case 'good':
-        return C.green500;
+        return C.statusGood;
       case 'fair':
-        return C.yellow500;
+        return C.statusFair;
       case 'poor':
-        return C.red500;
+        return C.statusPoor;
       default:
         return C.gray500;
     }
@@ -299,7 +289,7 @@ class HealthIndexCard extends StatelessWidget {
                 title: 'Health Index',
                 trailing: Icon(Icons.info_outline, size: 14, color: C.gray400),
                 fraction: score / 100,
-                progressColor: C.neonMint,
+                progressColor: C.progressMint,
                 centerMain: '$score',
                 centerSub: '/100',
                 centerMainSize: 30,
@@ -321,9 +311,9 @@ class HealthIndexCard extends StatelessWidget {
             Expanded(
               child: _roundMetricColumn(
                 title: 'Steps',
-                trailing: Icon(Icons.directions_walk, size: 14, color: C.green500),
+                trailing: Icon(Icons.directions_walk, size: 14, color: C.statusGood),
                 fraction: stepPct,
-                progressColor: C.green500,
+                progressColor: C.progressGreen,
                 centerMain: _fmt(steps),
                 centerSub: '/${_fmt(stepsGoal)}',
                 centerMainSize: _fmt(steps).length > 5 ? 20 : 28,
@@ -334,7 +324,7 @@ class HealthIndexCard extends StatelessWidget {
                         style: TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 12,
-                            color: C.green500,
+                            color: C.statusGood,
                             height: 1.2)),
                     SizedBox(height: 6),
                     Text(stepFeedback.message,
@@ -470,19 +460,19 @@ _StepsFeedback stepsFeedbackFor(int steps) {
 
 class _GaugePainter extends CustomPainter {
   final double fraction;
-  final Color progressColor;
-  _GaugePainter(this.fraction, {this.progressColor = C.neonMint});
+  final Color? progressColor;
+  _GaugePainter(this.fraction, {this.progressColor});
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2 * (45 / 60);
     final track = Paint()
-      ..color = C.gray200.withValues(alpha: 0.5)
+      ..color = C.gaugeTrack
       ..strokeWidth = 8
       ..style = PaintingStyle.stroke;
     final progress = Paint()
-      ..color = progressColor
+      ..color = progressColor ?? C.progressMint
       ..strokeWidth = 8
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
@@ -607,7 +597,7 @@ class QuickActions extends StatelessWidget {
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
                   color: C.gray900,
-                  shadows: [Shadow(color: Color(0x5500D4FF), blurRadius: 10)],
+                  shadows: C.textGlow(),
                 )),
             GestureDetector(
               onTap: onUpgrade,
