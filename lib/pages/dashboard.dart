@@ -17,6 +17,7 @@ class Dashboard extends StatefulWidget {
   final VoidCallback onOpenStressTest;
   final VoidCallback onOpenLogMetric;
   final VoidCallback onOpenPsychoTest;
+  final VoidCallback onOpenTreatmentSchedule;
   final VoidCallback onUpgrade;
 
   const Dashboard({
@@ -26,6 +27,7 @@ class Dashboard extends StatefulWidget {
     required this.onOpenStressTest,
     required this.onOpenLogMetric,
     required this.onOpenPsychoTest,
+    required this.onOpenTreatmentSchedule,
     required this.onUpgrade,
   });
 
@@ -198,6 +200,15 @@ class _DashboardState extends State<Dashboard> {
         bgColor: C.teal50,
         locked: !isPlus,
         onTap: widget.onOpenPsychoTest,
+      ),
+      QuickAction(
+        title: 'Treatment Schedule',
+        description: 'Medicines & supplements reminders',
+        icon: Icons.medication_outlined,
+        color: C.purple600,
+        bgColor: C.purple100,
+        locked: !isPlus,
+        onTap: widget.onOpenTreatmentSchedule,
       ),
       QuickAction(
         title: 'Family Health\nTracking',

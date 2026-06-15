@@ -19,7 +19,7 @@ class Db {
     final path = p.join(dir.path, 'pha.db');
     _db = await databaseFactory.openDatabase(
       path,
-      options: OpenDatabaseOptions(version: 4, onCreate: _create, onUpgrade: _upgrade),
+      options: OpenDatabaseOptions(version: 6, onCreate: _create, onUpgrade: _upgrade),
     );
   }
 
@@ -38,6 +38,27 @@ class Db {
     if (oldVersion < 4) {
       await db.execute('ALTER TABLE profiles ADD COLUMN weight REAL');
     }
+    if (oldVersion < 5) {
+      await _createTreatmentSchedule(db);
+    }
+    if (oldVersion < 6) {
+      await db.execute('ALTER TABLE profiles ADD COLUMN gender TEXT');
+      await db.execute('ALTER TABLE onboarding_drafts ADD COLUMN gender TEXT');
+    }
+  }
+
+  Future<void> _createTreatmentSchedule(Database db) async {
+    await db.execute('''
+      CREATE TABLE treatment_schedule (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        doses_per_day INTEGER NOT NULL,
+        dose_times TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      )
+    ''');
   }
 
   Future<void> _createOnboardingDrafts(Database db) async {
@@ -48,6 +69,7 @@ class Db {
         age INTEGER,
         height INTEGER,
         weight REAL,
+        gender TEXT,
         metrics_json TEXT,
         step INTEGER NOT NULL DEFAULT 1,
         completed INTEGER NOT NULL DEFAULT 0,
@@ -67,6 +89,7 @@ class Db {
         age INTEGER,
         height REAL,
         weight REAL,
+        gender TEXT,
         onboarding_completed INTEGER NOT NULL DEFAULT 0,
         is_plus INTEGER NOT NULL DEFAULT 0,
         unit_system TEXT NOT NULL DEFAULT 'metric',
@@ -164,6 +187,7 @@ class Db {
         analyzed_at TEXT NOT NULL
       )
     ''');
+    await _createTreatmentSchedule(db);
     await _createOnboardingDrafts(db);
   }
 }

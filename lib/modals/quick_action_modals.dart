@@ -932,7 +932,7 @@ class _UpgradeModalState extends State<UpgradeModal> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: C.gray900)),
             SizedBox(height: 8),
             Text(
-                'All features are now unlocked. Enjoy unlimited uploads and the PsychoTest.',
+                'All features are now unlocked. Enjoy unlimited uploads, PsychoTest, and Treatment Schedule.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, color: C.gray500)),
           ],
@@ -944,6 +944,7 @@ class _UpgradeModalState extends State<UpgradeModal> {
       ('Analysis Uploads', '2 files', 'Unlimited'),
       ('Pages per File', '2 pages', 'Unlimited'),
       ('PsychoTest', 'Locked', 'Full access'),
+      ('Treatment Schedule', 'Locked', 'Full access'),
       ('AI Consultation', 'Included', 'Included'),
       ('Wellness Check', 'Included', 'Included'),
     ];

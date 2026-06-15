@@ -71,3 +71,6 @@ reset-full: sim clean purge
     {{flutter}} run -d "{{ios_device}}"
 
 reset-ios: reset
+
+# Alias: uninstall app from simulator and install fresh build
+reinstall: reset

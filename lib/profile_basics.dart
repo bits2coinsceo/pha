@@ -8,8 +8,15 @@ class ProfileBasicsService {
     int? age,
     int? heightCm,
     double? weightKg,
+    String? gender,
   }) async {
-    if (age == null && heightCm == null && weightKg == null && unitSystem == null) return;
+    if (age == null &&
+        heightCm == null &&
+        weightKg == null &&
+        unitSystem == null &&
+        gender == null) {
+      return;
+    }
     await Db.instance.raw.update(
       'profiles',
       {
@@ -17,6 +24,7 @@ class ProfileBasicsService {
         if (age != null) 'age': age,
         if (heightCm != null) 'height': heightCm,
         if (weightKg != null) 'weight': weightKg,
+        if (gender != null) 'gender': gender,
       },
       where: 'id = ?',
       whereArgs: [userId],

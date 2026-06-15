@@ -14,6 +14,7 @@ class OnboardingDraftData {
   final int? age;
   final int? heightCm;
   final double? weightKg;
+  final String? gender;
   final Map<String, double> extraMetrics;
   final int step;
   final bool completed;
@@ -24,6 +25,7 @@ class OnboardingDraftData {
     required this.age,
     required this.heightCm,
     required this.weightKg,
+    required this.gender,
     required this.extraMetrics,
     required this.step,
     required this.completed,
@@ -87,6 +89,7 @@ class OnboardingPrefs {
       age: r['age'] as int?,
       heightCm: r['height'] as int?,
       weightKg: (r['weight'] as num?)?.toDouble(),
+      gender: r['gender'] as String?,
       extraMetrics: extra,
       step: (r['step'] as int?) ?? 1,
       completed: ((r['completed'] as int?) ?? 0) == 1,
@@ -110,6 +113,7 @@ class OnboardingPrefs {
     int? age,
     int? heightCm,
     double? weightKg,
+    String? gender,
   }) async {
     await ensureDraft(unitSystem: unitSystem);
     final existing = await _row();
@@ -119,8 +123,10 @@ class OnboardingPrefs {
       if (age != null) 'age': age,
       if (heightCm != null) 'height': heightCm,
       if (weightKg != null) 'weight': weightKg,
+      if (gender != null) 'gender': gender,
     };
-    if ((age != null || heightCm != null || weightKg != null) && currentStep < 3) {
+    if ((age != null || heightCm != null || weightKg != null || gender != null) &&
+        currentStep < 3) {
       values['step'] = 2;
     }
     await _upsert(values);
@@ -132,12 +138,14 @@ class OnboardingPrefs {
     required int age,
     required int heightCm,
     required double weightKg,
+    required String gender,
   }) =>
       _upsert({
         'unit_system': unitSystem,
         'age': age,
         'height': heightCm,
         'weight': weightKg,
+        'gender': gender,
         'step': 3,
       });
 
@@ -163,7 +171,10 @@ class OnboardingPrefs {
     final age = r['age'] as int?;
     final height = r['height'] as int?;
     final weight = (r['weight'] as num?)?.toDouble();
-    if (!completed && age == null && height == null && weight == null) return;
+    final gender = r['gender'] as String?;
+    if (!completed && age == null && height == null && weight == null && gender == null) {
+      return;
+    }
 
     final unit = r['unit_system'] as String? ?? 'metric';
 
@@ -174,6 +185,7 @@ class OnboardingPrefs {
         if (age != null) 'age': age,
         if (height != null) 'height': height,
         if (weight != null) 'weight': weight,
+        if (gender != null) 'gender': gender,
         if (completed) 'onboarding_completed': 1,
         'health_points': ((r['health_points'] as int?) ?? 0).clamp(0, maxOnboardingHp),
       },

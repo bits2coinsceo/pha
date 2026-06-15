@@ -6,6 +6,7 @@ import 'db.dart';
 import 'onboarding_prefs.dart';
 import 'profile_basics.dart';
 import 'modals/psycho_test_modal.dart';
+import 'modals/treatment_schedule_modal.dart';
 import 'modals/quick_action_modals.dart';
 import 'pages/dashboard.dart';
 import 'pages/history.dart';
@@ -224,6 +225,9 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
               LogMetricModal(onSaved: () => setState(() => dashboardKey++))),
           onOpenPsychoTest: () => auth.isPlus
               ? _openModal(const PsychoTestModal())
+              : _openModal(const UpgradeModal()),
+          onOpenTreatmentSchedule: () => auth.isPlus
+              ? _openModal(const TreatmentScheduleModal())
               : _openModal(const UpgradeModal()),
           onUpgrade: () => _openModal(const UpgradeModal()),
         );
