@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
+import '../api.dart';
 import '../auth.dart';
 import '../daily_vitals.dart';
 import '../db.dart';
@@ -32,10 +33,12 @@ class UploadAnalysisModal extends StatefulWidget {
 class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
   String fileType = 'pdf';
   String? fileName;
+  String? filePath;
   int? fileSize;
   bool uploading = false;
   String error = '';
   bool success = false;
+  String? analysisResult;
   int? uploadCount;
 
   @override
@@ -57,6 +60,7 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
     if (result != null && result.files.isNotEmpty) {
       setState(() {
         fileName = result.files.first.name;
+        filePath = result.files.first.path;
         fileSize = result.files.first.size;
       });
     }
@@ -69,26 +73,41 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
       widget.onNeedUpgrade();
       return;
     }
+    if (filePath == null) {
+      setState(() => error = 'Could not read the selected file. Please pick it again.');
+      return;
+    }
     setState(() {
       uploading = true;
       error = '';
     });
     try {
+      // Send the file to the backend for AI analysis (Vertex AI Gemini).
+      final analysis = await ApiClient.analyze(
+        userId: auth.user!.id,
+        filePath: filePath!,
+      );
       await Db.instance.raw.insert('analysis_uploads', {
         'id': _uuid.v4(),
         'user_id': auth.user!.id,
         'file_path': '${auth.user!.id}/${DateTime.now().millisecondsSinceEpoch}_$fileName',
         'file_type': fileType,
+        'analysis': analysis,
         'uploaded_at': DateTime.now().toUtc().toIso8601String(),
       });
       setState(() {
         success = true;
+        analysisResult = analysis;
         fileName = null;
+        filePath = null;
+        if (!auth.isPlus && uploadCount != null) uploadCount = uploadCount! + 1;
       });
-      await Future.delayed(const Duration(milliseconds: 1500));
-      if (mounted) Navigator.pop(context);
+    } on ApiException catch (e) {
+      setState(() => error = e.isBudgetExhausted
+          ? 'You have reached your AI usage limit. Upgrade to PHA Plus+ to continue.'
+          : e.message);
     } catch (e) {
-      setState(() => error = e.toString());
+      setState(() => error = 'Upload failed: $e');
     } finally {
       if (mounted) setState(() => uploading = false);
     }
@@ -119,9 +138,30 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
             SizedBox(height: 16),
           ],
           if (success) ...[
-            AppBanner(text: 'File uploaded successfully!', bg: C.green50, border: C.green200, fg: C.teal700),
+            AppBanner(text: 'Analysis complete!', bg: C.green50, border: C.green200, fg: C.teal700),
+            SizedBox(height: 12),
+            if (analysisResult != null)
+              Container(
+                width: double.infinity,
+                constraints: const BoxConstraints(maxHeight: 320),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: C.gray50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: C.gray200),
+                ),
+                child: SingleChildScrollView(
+                  child: Text(
+                    analysisResult!,
+                    style: TextStyle(fontSize: 14, height: 1.5, color: C.gray800),
+                  ),
+                ),
+              ),
+            SizedBox(height: 16),
+            PrimaryButton(label: 'Done', onPressed: () => Navigator.pop(context)),
             SizedBox(height: 16),
           ],
+          if (!success) ...[
           Text('File Type',
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: C.gray700)),
           SizedBox(height: 8),
@@ -184,9 +224,10 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
                   onPressed: widget.onNeedUpgrade,
                 )
               : PrimaryButton(
-                  label: uploading ? 'Uploading...' : 'Upload File',
+                  label: uploading ? 'Analyzing...' : 'Upload File',
                   onPressed: (fileName == null || uploading) ? null : _upload,
                 ),
+          ],
         ],
       ),
     );
@@ -250,9 +291,16 @@ class _AIChatModalState extends State<AIChatModal> {
       loading = true;
     });
     _scrollDown();
-    await Future.delayed(const Duration(milliseconds: 600));
-    final reply = AiConsultationService.reply(text);
+    String reply;
+    try {
+      reply = await AiConsultationService.reply(auth.user!.id, text);
+    } on ApiException catch (e) {
+      reply = e.isBudgetExhausted
+          ? 'You have reached your AI usage limit. Please upgrade to continue.'
+          : e.message;
+    }
     await AiConsultationService.save(auth.user!.id, text, reply);
+    if (!mounted) return;
     setState(() {
       _messages.add(_Msg(false, reply));
       loading = false;

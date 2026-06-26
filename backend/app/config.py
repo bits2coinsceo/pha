@@ -11,7 +11,8 @@ from dataclasses import dataclass
 class Settings:
     # --- GCP / Vertex AI ---
     gcp_project: str = os.environ.get("GCP_PROJECT", "pha-personal-health-assistant")
-    gcp_location: str = os.environ.get("GCP_LOCATION", "us-central1")
+    # global нужен для Gemini 3.x — в региональных эндпоинтах их нет.
+    gcp_location: str = os.environ.get("GCP_LOCATION", "global")
 
     # Свитчер моделей: дешёвая/быстрая для простых ответов и более мощная
     # для сложных (мед-анализ, сопоставление текста и снимков).
@@ -28,12 +29,12 @@ class Settings:
     # Путь к SQLite-файлу со счётчиками (в Docker монтируется как volume).
     usage_db: str = os.environ.get("USAGE_DB", "usage.db")
 
-    # Цены за токены, USD за 1M (официальный прайс Vertex AI, июнь 2026).
-    # 2.5-flash: 0.30/2.50; 3.5-flash региональный us-central1: 1.65/9.90.
+    # Цены за токены, USD за 1M (Vertex AI global, июнь 2026).
+    # 2.5-flash: 0.30/2.50; 3.5-flash: 1.50/9.00.
     price_simple_in: float = float(os.environ.get("PRICE_SIMPLE_IN", "0.30"))
     price_simple_out: float = float(os.environ.get("PRICE_SIMPLE_OUT", "2.50"))
-    price_complex_in: float = float(os.environ.get("PRICE_COMPLEX_IN", "1.65"))
-    price_complex_out: float = float(os.environ.get("PRICE_COMPLEX_OUT", "9.90"))
+    price_complex_in: float = float(os.environ.get("PRICE_COMPLEX_IN", "1.50"))
+    price_complex_out: float = float(os.environ.get("PRICE_COMPLEX_OUT", "9.00"))
 
     def model_for(self, complexity: str) -> str:
         """Имя модели по уровню сложности запроса."""

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:uuid/uuid.dart';
 
+import 'api.dart';
 import 'db.dart';
 import 'health_telemetry.dart';
 import 'models.dart';
@@ -40,7 +41,21 @@ class AiConsultationService {
     ],
   };
 
-  static String reply(String message) {
+  /// Asks the backend (Vertex AI Gemini) for a reply. Falls back to the local
+  /// keyword responder if the backend is unreachable, so the chat keeps working
+  /// offline. Budget-exhausted (402) is rethrown so the UI can prompt upgrade.
+  static Future<String> reply(String userId, String message) async {
+    try {
+      return await ApiClient.chat(userId: userId, message: message);
+    } on ApiException catch (e) {
+      if (e.isBudgetExhausted) rethrow;
+      return _localReply(message);
+    } catch (_) {
+      return _localReply(message);
+    }
+  }
+
+  static String _localReply(String message) {
     final lower = message.toLowerCase();
     for (final entry in _responses.entries) {
       if (entry.key == 'default') continue;

@@ -55,5 +55,9 @@ migrate_working_dir/
 *.env
 .env.local
 
+# Backend service-account key + app build-time config holding the API key
+backend/secrets/
+dart_define.json
+
 # ── just local state ─────────────────────────────────────────────────────────
 .just/

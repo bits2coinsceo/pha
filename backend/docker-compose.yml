@@ -7,15 +7,15 @@ services:
       - "8080:8080"
     environment:
       - GCP_PROJECT=${GCP_PROJECT:-pha-personal-health-assistant}
-      - GCP_LOCATION=${GCP_LOCATION:-us-central1}
+      - GCP_LOCATION=${GCP_LOCATION:-global}
       - GEMINI_MODEL_SIMPLE=${GEMINI_MODEL_SIMPLE:-gemini-2.5-flash}
       - GEMINI_MODEL_COMPLEX=${GEMINI_MODEL_COMPLEX:-gemini-3.5-flash}
       - API_KEY=${API_KEY:-}
       - USER_BUDGET_USD=${USER_BUDGET_USD:-5}
       - PRICE_SIMPLE_IN=${PRICE_SIMPLE_IN:-0.30}
       - PRICE_SIMPLE_OUT=${PRICE_SIMPLE_OUT:-2.50}
-      - PRICE_COMPLEX_IN=${PRICE_COMPLEX_IN:-1.65}
-      - PRICE_COMPLEX_OUT=${PRICE_COMPLEX_OUT:-9.90}
+      - PRICE_COMPLEX_IN=${PRICE_COMPLEX_IN:-1.50}
+      - PRICE_COMPLEX_OUT=${PRICE_COMPLEX_OUT:-9.00}
       - USAGE_DB=/data/usage.db
       - GOOGLE_APPLICATION_CREDENTIALS=/secrets/sa.json
     volumes:
