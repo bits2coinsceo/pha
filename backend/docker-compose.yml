@@ -1,0 +1,36 @@
+services:
+  api:
+    build: .
+    image: pha-backend:latest
+    container_name: pha-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - GCP_PROJECT=${GCP_PROJECT:-pha-personal-health-assistant}
+      - GCP_LOCATION=${GCP_LOCATION:-us-central1}
+      - GEMINI_MODEL_SIMPLE=${GEMINI_MODEL_SIMPLE:-gemini-2.5-flash}
+      - GEMINI_MODEL_COMPLEX=${GEMINI_MODEL_COMPLEX:-gemini-3.5-flash}
+      - API_KEY=${API_KEY:-}
+      - USER_BUDGET_USD=${USER_BUDGET_USD:-5}
+      - PRICE_SIMPLE_IN=${PRICE_SIMPLE_IN:-0.30}
+      - PRICE_SIMPLE_OUT=${PRICE_SIMPLE_OUT:-2.50}
+      - PRICE_COMPLEX_IN=${PRICE_COMPLEX_IN:-1.65}
+      - PRICE_COMPLEX_OUT=${PRICE_COMPLEX_OUT:-9.90}
+      - USAGE_DB=/data/usage.db
+      - GOOGLE_APPLICATION_CREDENTIALS=/secrets/sa.json
+    volumes:
+      # Ключ сервис-аккаунта монтируется внутрь контейнера только для чтения.
+      # Положи файл в backend/secrets/sa.json (он в .gitignore).
+      - ./secrets/sa.json:/secrets/sa.json:ro
+      # Счётчики трат переживают пересборку контейнера.
+      - pha-usage:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8080/health').status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  pha-usage:

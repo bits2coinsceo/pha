@@ -1,0 +1,11 @@
+# Секреты — НИКОГДА не коммитим
+secrets/
+*.json.key
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
