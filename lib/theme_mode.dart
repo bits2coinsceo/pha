@@ -7,14 +7,14 @@ import 'theme.dart';
 class ThemeModeController extends ChangeNotifier {
   static const _prefKey = 'app_theme_is_dark';
 
-  bool _isDark = true;
+  bool _isDark = false;
 
   bool get isDark => _isDark;
   ThemeMode get mode => _isDark ? ThemeMode.dark : ThemeMode.light;
 
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
-    _isDark = prefs.getBool(_prefKey) ?? true;
+    _isDark = prefs.getBool(_prefKey) ?? false;
     C.applyDarkMode(_isDark);
     notifyListeners();
   }

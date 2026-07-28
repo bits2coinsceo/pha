@@ -5,6 +5,8 @@ import 'package:uuid/uuid.dart';
 
 import '../auth.dart';
 import '../db.dart';
+import '../health_index.dart';
+import '../medical_guidelines.dart';
 import '../theme.dart';
 import '../widgets.dart';
 
@@ -87,31 +89,33 @@ int _scorePercent(List<int> answers, int questionCount) {
 }
 
 ({String label, Color color, Color bg, Color border, String desc}) _level(int score) {
-  if (score >= 67) {
-    return (
-      label: 'High',
-      color: C.red600,
-      bg: C.red50,
-      border: C.red200,
-      desc: 'Your results indicate significant stress and psychosomatic tension. Consider speaking with a specialist and taking steps to reduce your load.'
-    );
+  final c = PsychoGuidelines.classifyLoad(score);
+  switch (c.band) {
+    case 'high':
+      return (
+        label: c.label,
+        color: C.red600,
+        bg: C.red50,
+        border: C.red200,
+        desc: c.message,
+      );
+    case 'moderate':
+      return (
+        label: c.label,
+        color: C.amber600,
+        bg: C.amber50,
+        border: C.amber200,
+        desc: c.message,
+      );
+    default:
+      return (
+        label: c.label,
+        color: C.emerald600,
+        bg: C.emerald50,
+        border: C.emerald200,
+        desc: c.message,
+      );
   }
-  if (score >= 34) {
-    return (
-      label: 'Moderate',
-      color: C.amber600,
-      bg: C.amber50,
-      border: C.amber200,
-      desc: 'You are experiencing a moderate level of stress. Pay attention to rest, relaxation routines, and setting healthy boundaries.'
-    );
-  }
-  return (
-    label: 'Low',
-    color: C.emerald600,
-    bg: C.emerald50,
-    border: C.emerald200,
-    desc: 'Your stress and psychosomatic indicators are within a healthy range. Keep maintaining your wellness habits.'
-  );
 }
 
 class PsychoTestModal extends StatefulWidget {
@@ -132,6 +136,8 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
   int get _totalQuestions => _blocks.fold(0, (a, b) => a + b.questions.length);
 
   Future<void> _answer(int value) async {
+    if (blockIndex < 0 || blockIndex >= _blocks.length) return;
+    if (blockIndex >= answers.length) return;
     answers[blockIndex].add(value);
     final block = _blocks[blockIndex];
     final lastQuestion = questionIndex == block.questions.length - 1;
@@ -164,6 +170,7 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
       'answers': jsonEncode(answers),
       'created_at': DateTime.now().toUtc().toIso8601String(),
     });
+    await HealthIndexService.recalculate(auth.user!.id);
     setState(() {
       result = (b1: b1, b2: b2, b3: b3, total: total);
       phase = 'result';
@@ -291,7 +298,13 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
   }
 
   Widget _question() {
+    if (blockIndex < 0 || blockIndex >= _blocks.length) {
+      return const SizedBox.shrink();
+    }
     final block = _blocks[blockIndex];
+    if (questionIndex < 0 || questionIndex >= block.questions.length) {
+      return const SizedBox.shrink();
+    }
     final question = block.questions[questionIndex];
     final answeredSoFar =
         answers.take(blockIndex).fold(0, (a, l) => a + l.length) + questionIndex;

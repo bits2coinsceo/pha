@@ -34,8 +34,12 @@ FastAPI app (`backend/app/`):
 - `usage.py` — per-`user_id` spend tracking in SQLite.
 
 **Model switcher** — request field `complexity`:
-- `simple` → `gemini-2.5-flash` (fast/cheap)
-- `complex` → `gemini-3.5-flash` (medical analysis, hard reasoning)
+- `simple` → `gemini-1.5-flash` by default
+- `complex` → `gemini-1.5-flash` by default
+
+Both paths currently use Gemini 1.5 Flash to reduce photo request rate-limit
+failures. Override with `GEMINI_MODEL_SIMPLE` / `GEMINI_MODEL_COMPLEX` only if
+the Vertex quota is available.
 
 **Per-user credit limit** — every request carries a `user_id`; cost is computed
 from token usage and accumulated in SQLite. Limit `USER_BUDGET_USD` (default `$5`).
@@ -69,6 +73,19 @@ Response: `{ "analysis": "...", "model": "...", "cost_usd": 0.0, "remaining_usd"
 
 ### `GET /usage/{user_id}`
 Auth required. `{ "user_id", "spent_usd", "remaining_usd", "limit_usd" }`
+
+### `GET /patient/exists?email=...`
+Auth required. `{ "email", "exists": true|false }` — whether a history file exists.
+
+### `GET /patient/history`
+Auth required. Headers:
+- `X-Patient-Email` — patient email (normalized lowercase)
+- `X-Sync-Token` — SHA256 of `pha-salt::password` (same as app `password_hash`)
+
+Returns full health history JSON (profile + all metric tables). `404` if none, `403` if wrong token.
+
+### `PUT /patient/history`
+Auth required. Same headers as GET. Body = full history snapshot (encrypted at rest on server, keyed by email).
 
 ### Errors
 - `401` — missing/wrong `X-API-Key`.

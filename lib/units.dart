@@ -1,5 +1,5 @@
 /// Unit conversion helpers — ported 1:1 from the web app's lib/units.ts.
-/// The DB always stores metric/SI values.
+/// Weight and distance are stored in kg / km. Glucose is stored as mg/dL.
 
 typedef UnitSystem = String; // 'metric' | 'imperial'
 
@@ -63,24 +63,34 @@ String getMetricUnit(String metricType, UnitSystem sys) {
 }
 
 double toStorageValue(String metricType, double userValue, UnitSystem sys) {
-  if (sys == 'metric') return userValue;
+  if (sys == 'metric') {
+    if (metricType == 'glucose') return mmolToMgdl(userValue);
+    return userValue;
+  }
   switch (metricType) {
     case 'weight':
-      return userValue / 2.20462;
+      return lbsToKg(userValue);
     case 'distance':
       return userValue / 0.621371;
+    case 'glucose':
+      return userValue;
     default:
       return userValue;
   }
 }
 
 double toDisplayValue(String metricType, double storedValue, UnitSystem sys) {
-  if (sys == 'metric') return storedValue;
+  if (sys == 'metric') {
+    if (metricType == 'glucose') return mgdlToMmol(storedValue);
+    return storedValue;
+  }
   switch (metricType) {
     case 'weight':
       return kgToLbs(storedValue);
     case 'distance':
       return kmToMiles(storedValue);
+    case 'glucose':
+      return storedValue;
     default:
       return storedValue;
   }

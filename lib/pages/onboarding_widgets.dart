@@ -75,7 +75,7 @@ class OnboardingGameHud extends StatelessWidget {
             child: TweenAnimationBuilder<double>(
               duration: const Duration(milliseconds: 600),
               curve: Curves.easeOutCubic,
-              tween: Tween(begin: 0, end: power),
+              tween: Tween<double>(begin: 0.0, end: power),
               builder: (_, v, __) => LinearProgressIndicator(
                 value: v,
                 minHeight: 4,
@@ -216,33 +216,39 @@ class OnboardingBadgeStrip extends StatelessWidget {
         children: [
           for (var i = 0; i < badges.length; i++) ...[
             if (i > 0) SizedBox(width: 6),
-            Opacity(
-              opacity: badges[i].unlocked ? 1 : 0.35,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: badges[i].unlocked ? C.amber50 : C.gray100,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: badges[i].unlocked ? C.amber300 : C.gray200,
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(badges[i].emoji, style: TextStyle(fontSize: 12)),
-                    SizedBox(width: 3),
-                    Text(
-                      badges[i].label,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                        color: badges[i].unlocked ? C.amber700 : C.gray400,
+            Builder(
+              builder: (context) {
+                if (i < 0 || i >= badges.length) return const SizedBox.shrink();
+                final badge = badges[i];
+                return Opacity(
+                  opacity: badge.unlocked ? 1 : 0.35,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: badge.unlocked ? C.amber50 : C.gray100,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: badge.unlocked ? C.amber300 : C.gray200,
                       ),
                     ),
-                  ],
-                ),
-              ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(badge.emoji, style: TextStyle(fontSize: 12)),
+                        SizedBox(width: 3),
+                        Text(
+                          badge.label,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: badge.unlocked ? C.amber700 : C.gray400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         ],
@@ -260,7 +266,7 @@ class OnboardingHpToast extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.9, end: 1),
+      tween: Tween<double>(begin: 0.9, end: 1.0),
       duration: const Duration(milliseconds: 400),
       curve: Curves.elasticOut,
       builder: (_, scale, child) => Transform.scale(scale: scale, child: child),
@@ -275,7 +281,7 @@ class OnboardingHpToast extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Text('🎉', style: TextStyle(fontSize: 22)),
+            Icon(Icons.celebration, size: 22, color: C.gray900),
             SizedBox(width: 10),
             Expanded(
               child: Text(message,

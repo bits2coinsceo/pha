@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:uuid/uuid.dart';
 
 import 'db.dart';
+import 'daily_metric_store.dart';
+import 'health_index.dart';
 import 'onboarding_hp.dart';
 
 const _uuid = Uuid();
@@ -203,17 +205,29 @@ class OnboardingPrefs {
       decoded.forEach((k, v) => metrics.add(MapEntry(k, (v as num).toDouble())));
     }
     for (final m in metrics) {
-      await Db.instance.raw.insert('health_metrics', {
-        'id': _uuid.v4(),
-        'user_id': userId,
-        'metric_type': m.key,
-        'value': m.value,
-        'recorded_at': now,
-        'created_at': now,
-      });
+      if (DailyMetricStore.isDailyLiveMetric(m.key)) {
+        await DailyMetricStore.upsertToday(
+          userId: userId,
+          metricType: m.key,
+          value: m.value,
+          source: 'onboarding',
+        );
+      } else {
+        await Db.instance.raw.insert('health_metrics', {
+          'id': _uuid.v4(),
+          'user_id': userId,
+          'metric_type': m.key,
+          'value': m.value,
+          'recorded_at': now,
+          'created_at': now,
+        });
+      }
     }
 
-    if (completed) await clear();
+    if (completed) {
+      await HealthIndexService.recalculate(userId);
+      await clear();
+    }
   }
 
   /// For tests / full reset.

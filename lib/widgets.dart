@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'medical_guidelines.dart';
 import 'theme.dart';
 
 // ── Modal ────────────────────────────────────────────────────────────────────
@@ -72,14 +73,14 @@ class PrimaryButton extends StatelessWidget {
   /// When true, uses [kBlueTealGradient] instead of [color]-based gradient.
   final bool cosmicGradient;
 
-  const PrimaryButton({
+  PrimaryButton({
     super.key,
     required this.label,
     this.onPressed,
-    this.color = C.nebulaPurple,
+    Color? color,
     this.icon,
     this.cosmicGradient = false,
-  });
+  }) : color = color ?? C.nebulaPurple;
 
   @override
   Widget build(BuildContext context) {
@@ -250,32 +251,46 @@ class HealthIndexCard extends StatelessWidget {
   final String status;
   final int steps;
   final int stepsGoal;
+  final VoidCallback? onHealthIndexTap;
 
   const HealthIndexCard({
     super.key,
     required this.score,
     required this.status,
     required this.steps,
-    this.stepsGoal = 10000,
+    this.stepsGoal = MedicalGuidelines.stepsGoal,
+    this.onHealthIndexTap,
   });
 
   Color get _statusColor {
     switch (status.toLowerCase()) {
+      case 'excellent':
       case 'good':
         return C.statusGood;
       case 'fair':
         return C.statusFair;
       case 'poor':
+      case 'needs_attention':
         return C.statusPoor;
       default:
         return C.gray500;
     }
   }
 
+  /// Ring + score use status color so danger (poor) reads red immediately.
+  Color get _gaugeColor => _statusColor;
+
+  String get _statusMessage => MedicalGuidelines.indexCardBlurb(status);
+
   @override
   Widget build(BuildContext context) {
-    final cap = status.isEmpty ? status : status[0].toUpperCase() + status.substring(1);
-    final stepPct = (steps / stepsGoal).clamp(0.0, 1.0);
+    final normalized = status.toLowerCase();
+    final cap = normalized == 'poor' || normalized == 'needs_attention'
+        ? 'Needs Attention'
+        : status.isEmpty
+            ? status
+            : status[0].toUpperCase() + status.substring(1);
+    final stepPct = (steps.toDouble() / stepsGoal.toDouble()).clamp(0.0, 1.0);
     final stepFeedback = stepsFeedbackFor(steps);
     return Container(
       decoration: cardDecoration(),
@@ -285,25 +300,36 @@ class HealthIndexCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
-              child: _roundMetricColumn(
-                title: 'Health Index',
-                trailing: Icon(Icons.info_outline, size: 14, color: C.gray400),
-                fraction: score / 100,
-                progressColor: C.progressMint,
-                centerMain: '$score',
-                centerSub: '/100',
-                centerMainSize: 30,
-                belowGauge: Column(
-                  children: [
-                    Text(cap,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontWeight: FontWeight.w700, fontSize: 15, color: _statusColor)),
-                    SizedBox(height: 4),
-                    Text("You're doing well",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: C.gray500, fontSize: 13, height: 1.3)),
-                  ],
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: onHealthIndexTap,
+                  borderRadius: BorderRadius.circular(12),
+                  child: _roundMetricColumn(
+                    title: 'Health Index',
+                    trailing: Icon(Icons.info_outline, size: 14, color: C.gray400),
+                    fraction: score.toDouble() / 100,
+                    progressColor: _gaugeColor,
+                    centerMain: '$score',
+                    centerSub: '/100',
+                    centerMainSize: 30,
+                    centerMainColor: _gaugeColor,
+                    belowGauge: Column(
+                      children: [
+                        Text(cap,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15,
+                                color: _statusColor)),
+                        SizedBox(height: 4),
+                        Text(_statusMessage,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: C.gray500, fontSize: 13, height: 1.3)),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -350,6 +376,7 @@ class HealthIndexCard extends StatelessWidget {
     required String centerSub,
     required double centerMainSize,
     required Widget belowGauge,
+    Color? centerMainColor,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -381,7 +408,7 @@ class HealthIndexCard extends StatelessWidget {
                       style: TextStyle(
                           fontSize: centerMainSize,
                           fontWeight: FontWeight.bold,
-                          color: C.gray900)),
+                          color: centerMainColor ?? C.gray900)),
                   Text(centerSub, style: TextStyle(fontSize: 12, color: C.gray500)),
                 ],
               ),
@@ -402,60 +429,8 @@ class _StepsFeedback {
 }
 
 _StepsFeedback stepsFeedbackFor(int steps) {
-  if (steps <= 100) {
-    return const _StepsFeedback(
-      range: '0–100 steps',
-      message:
-          'Very little activity today. Even a short walk can be a great start.',
-    );
-  }
-  if (steps <= 3000) {
-    return const _StepsFeedback(
-      range: '101–3,000 steps',
-      message:
-          "Good start! You've already begun moving, but you can do even better.",
-    );
-  }
-  if (steps <= 5000) {
-    return const _StepsFeedback(
-      range: '3,001–5,000 steps',
-      message:
-          "Well done! You're staying active and making a positive impact on your health.",
-    );
-  }
-  if (steps <= 7000) {
-    return const _StepsFeedback(
-      range: '5,001–7,000 steps',
-      message:
-          "Excellent! You're steadily moving toward a healthier and more active lifestyle.",
-    );
-  }
-  if (steps <= 10000) {
-    return const _StepsFeedback(
-      range: '7,001–10,000 steps',
-      message:
-          "Amazing! Your dedication is paying off, and you're building a stronger, healthier you.",
-    );
-  }
-  if (steps <= 15000) {
-    return const _StepsFeedback(
-      range: '10,001–15,000 steps',
-      message:
-          "Outstanding! You've gone above and beyond today. Keep up the great work!",
-    );
-  }
-  if (steps <= 20000) {
-    return const _StepsFeedback(
-      range: '15,001–20,000 steps',
-      message:
-          "Fantastic! This level of activity shows real commitment. You're setting a great example.",
-    );
-  }
-  return const _StepsFeedback(
-    range: '20,000+ steps',
-    message:
-        "Legendary! You've achieved an exceptional result today and made a huge investment in your health.",
-  );
+  final f = StepsGuidelines.feedback(steps);
+  return _StepsFeedback(range: f.range, message: f.message);
 }
 
 class _GaugePainter extends CustomPainter {
@@ -759,6 +734,7 @@ class _ActionTile extends StatelessWidget {
       children: [
         Row(
           children: List.generate(credits.total, (i) {
+            if (i < 0 || i >= credits.total) return const SizedBox.shrink();
             final filled = i < remaining;
             return Padding(
               padding: const EdgeInsets.only(right: 2),
@@ -867,8 +843,8 @@ class _LinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (trend.length < 2) return;
-    final minV = trend.reduce(min);
-    final maxV = trend.reduce(max);
+    final minV = trend.fold(trend.first, (double a, double b) => a < b ? a : b);
+    final maxV = trend.fold(trend.first, (double a, double b) => a > b ? a : b);
     final range = (maxV - minV) == 0 ? 1.0 : (maxV - minV);
     final path = Path();
     for (var i = 0; i < trend.length; i++) {
@@ -894,8 +870,14 @@ class _LinePainter extends CustomPainter {
 }
 
 // ── Mini bar chart (insights) ────────────────────────────────────────────────
+double _chartMax(List<double> values) =>
+    values.fold(values.first, (double a, double b) => a > b ? a : b);
+
+double _chartMin(List<double> values) =>
+    values.fold(values.first, (double a, double b) => a < b ? a : b);
+
 class MiniBarChart extends StatelessWidget {
-  final List<num> values;
+  final List<double> values;
   final Color color;
   const MiniBarChart({super.key, required this.values, required this.color});
 
@@ -904,15 +886,15 @@ class MiniBarChart extends StatelessWidget {
     if (values.isEmpty) {
       return Text('No data', style: TextStyle(fontSize: 12, color: C.gray400));
     }
-    final maxV = values.reduce(max);
-    final minV = values.reduce(min);
+    final maxV = _chartMax(values);
+    final minV = _chartMin(values);
     final range = (maxV - minV) == 0 ? 1.0 : (maxV - minV);
     return SizedBox(
       height: 40,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: values.map((v) {
-          final h = (((v - minV) / range) * 36 + 8).clamp(8.0, 44.0);
+          final h = (((v - minV) / range) * 36 + 8).clamp(8.0, 44.0).toDouble();
           return Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -929,4 +911,117 @@ class MiniBarChart extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Line chart with light horizontal grid (Health History steps trend).
+class MiniLineChart extends StatelessWidget {
+  final List<double> values;
+  final Color color;
+  final double height;
+  final int gridLines;
+
+  const MiniLineChart({
+    super.key,
+    required this.values,
+    required this.color,
+    this.height = 140,
+    this.gridLines = 5,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (values.isEmpty) {
+      return SizedBox(
+        height: height,
+        child: Center(
+          child: Text('No data', style: TextStyle(fontSize: 12, color: C.gray400)),
+        ),
+      );
+    }
+    return SizedBox(
+      height: height,
+      width: double.infinity,
+      child: CustomPaint(
+        painter: _GridLinePainter(
+          values: values,
+          color: color,
+          gridColor: C.gray200,
+          gridLines: gridLines,
+        ),
+      ),
+    );
+  }
+}
+
+class _GridLinePainter extends CustomPainter {
+  final List<double> values;
+  final Color color;
+  final Color gridColor;
+  final int gridLines;
+
+  _GridLinePainter({
+    required this.values,
+    required this.color,
+    required this.gridColor,
+    required this.gridLines,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final gridPaint = Paint()
+      ..color = gridColor
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+
+    final lines = gridLines.clamp(2, 12);
+    for (var i = 0; i < lines; i++) {
+      final y = size.height * i / (lines - 1);
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
+    }
+
+    if (values.length < 2) {
+      // Single point — draw a flat mid line hint.
+      if (values.length == 1) {
+        final y = size.height * 0.5;
+        canvas.drawCircle(Offset(size.width * 0.5, y), 3, Paint()..color = color);
+      }
+      return;
+    }
+
+    final maxV = values.fold<double>(0, (a, b) => a > b ? a : b);
+    // Always pin floor at 0 so empty days sit on the baseline.
+    final minV = 0.0;
+    final range = maxV <= minV ? 1.0 : maxV - minV;
+    final padY = 4.0;
+    final usableH = size.height - padY * 2;
+
+    final path = Path();
+    for (var i = 0; i < values.length; i++) {
+      final x = i / (values.length - 1) * size.width;
+      final y = padY + usableH - (values[i] - minV) / range * usableH;
+      if (i == 0) {
+        path.moveTo(x, y);
+      } else {
+        path.lineTo(x, y);
+      }
+    }
+
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = color
+        ..strokeWidth = 2.5
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..isAntiAlias = true,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _GridLinePainter old) =>
+      old.values != values ||
+      old.color != color ||
+      old.gridColor != gridColor ||
+      old.gridLines != gridLines;
 }

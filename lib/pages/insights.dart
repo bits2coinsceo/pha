@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../auth.dart';
+import '../daily_metric_store.dart';
 import '../db.dart';
 import '../models.dart';
 import '../services.dart';
@@ -22,6 +23,7 @@ Map<String, _StatusCfg> get _statusCfg => {
   'fair': _StatusCfg('Fair', C.yellow50, C.yellow200, C.yellow700, C.yellow400),
   'needs_attention':
       _StatusCfg('Needs Attention', C.red50, C.red200, C.red700, C.red500),
+  'poor': _StatusCfg('Needs Attention', C.red50, C.red200, C.red700, C.red500),
 };
 
 class _FindingCfg {
@@ -33,8 +35,18 @@ class _FindingCfg {
 Map<String, _FindingCfg> get _findingCfg => {
   'good': _FindingCfg(Icons.check_circle, C.green600, C.green50, C.green100),
   'info': _FindingCfg(Icons.info_outline, C.blue600, C.blue50, C.blue100),
-  'warning': _FindingCfg(Icons.warning_amber, C.yellow600, C.yellow50, C.yellow100),
-  'critical': _FindingCfg(Icons.error_outline, C.red600, C.red50, C.red100),
+  'warning': _FindingCfg(
+    Icons.warning_amber,
+    C.isDark ? C.yellow400 : C.yellow600,
+    C.yellow50,
+    C.yellow100,
+  ),
+  'critical': _FindingCfg(
+    Icons.error_outline,
+    C.isDark ? C.red400 : C.red600,
+    C.red50,
+    C.red100,
+  ),
 };
 
 Map<String, Color> get _priorityDot => {
@@ -67,18 +79,29 @@ class _InsightsPageState extends State<InsightsPage> {
     final db = Db.instance.raw;
     final stress = await db.query('stress_tests',
         where: 'user_id = ?', whereArgs: [userId], orderBy: 'created_at DESC', limit: 10);
-    final idx = await db.query('health_index',
-        where: 'user_id = ?', whereArgs: [userId], orderBy: 'calculated_at DESC', limit: 10);
-    final steps = await db.query('health_metrics',
-        columns: ['value'],
-        where: 'user_id = ? AND metric_type = ?',
-        whereArgs: [userId, 'steps'],
-        orderBy: 'recorded_at ASC',
-        limit: 14);
+    final dailyIndex = await DailyMetricStore.dailyHealthIndexSeries(
+      userId: userId,
+      limit: 14,
+    );
+    final steps = await DailyMetricStore.dailySeries(
+      userId: userId,
+      metricType: 'steps',
+      limit: 14,
+    );
     setState(() {
       stressTests = stress.map(StressTest.fromRow).toList();
-      healthIndexes = idx.map(HealthIndexEntry.fromRow).toList();
-      stepData = steps.map((r) => (r['value'] as num).toDouble()).toList();
+      // Newest first to match previous Insights list UI.
+      healthIndexes = dailyIndex.reversed
+          .map(
+            (e) => HealthIndexEntry(
+              id: DailyMetricStore.localDateKey(e.at),
+              score: e.score,
+              status: e.status,
+              calculatedAt: e.at,
+            ),
+          )
+          .toList();
+      stepData = steps;
       loading = false;
     });
   }
@@ -87,14 +110,18 @@ class _InsightsPageState extends State<InsightsPage> {
   Widget build(BuildContext context) {
     final avgHealth = healthIndexes.isEmpty
         ? null
-        : (healthIndexes.map((h) => h.score).reduce((a, b) => a + b) / healthIndexes.length)
+        : (healthIndexes.map((h) => h.score.toDouble()).reduce((a, b) => a + b) /
+                healthIndexes.length.toDouble())
             .round();
     final avgStress = stressTests.isEmpty
         ? null
-        : (stressTests.map((t) => t.score).reduce((a, b) => a + b) / stressTests.length)
+        : (stressTests.map((t) => t.score.toDouble()).reduce((a, b) => a + b) /
+                stressTests.length.toDouble())
             .round();
-    final healthValues = healthIndexes.reversed.map((h) => h.score).toList();
-    final stressValues = stressTests.reversed.map((t) => t.score).toList();
+    final healthValues =
+        healthIndexes.reversed.map((h) => h.score.toDouble()).toList();
+    final stressValues =
+        stressTests.reversed.map((t) => t.score.toDouble()).toList();
 
     return Column(
         children: [
@@ -106,7 +133,7 @@ class _InsightsPageState extends State<InsightsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        const HealthAnalysisCard(),
+                        HealthAnalysisCard(onAnalyzed: _load),
                         SizedBox(height: 24),
                         if (loading)
                           Padding(
@@ -115,14 +142,14 @@ class _InsightsPageState extends State<InsightsPage> {
                           )
                         else ...[
                           _statCard(Icons.favorite, C.blue100, C.blue600,
-                              'Avg Health Score', avgHealth, '/100', healthValues),
+                              'Avg Health Index', avgHealth, '/100', healthValues),
                           SizedBox(height: 16),
                           _statCard(Icons.psychology, C.teal100, C.teal600,
                               'Avg Wellness Score', avgStress, '/100', stressValues),
                           SizedBox(height: 16),
                           _stepStatCard(),
                           SizedBox(height: 24),
-                          _historyCard('Health Score History',
+                          _historyCard('Health Index History',
                               Icons.bar_chart, C.blue500, healthValues, true),
                           SizedBox(height: 24),
                           _historyCard('Wellness Check History',
@@ -148,7 +175,7 @@ class _InsightsPageState extends State<InsightsPage> {
   }
 
   Widget _statCard(IconData icon, Color iconBg, Color iconColor, String label, int? value,
-      String suffix, List<num> trend) {
+      String suffix, List<double> trend) {
     return Container(
       decoration: cardDecoration(),
       padding: const EdgeInsets.all(20),
@@ -233,7 +260,7 @@ class _InsightsPageState extends State<InsightsPage> {
     );
   }
 
-  Widget _trendIcon(List<num> values) {
+  Widget _trendIcon(List<double> values) {
     if (values.length < 2) return Icon(Icons.remove, size: 16, color: C.gray400);
     if (values.last > values.first) {
       return Icon(Icons.trending_up, size: 16, color: C.green500);
@@ -261,7 +288,7 @@ class _InsightsPageState extends State<InsightsPage> {
     );
   }
 
-  Widget _historyCard(String title, IconData icon, Color iconColor, List<num> values,
+  Widget _historyCard(String title, IconData icon, Color iconColor, List<double> values,
       bool isHealth) {
     return Container(
       decoration: cardDecoration(),
@@ -329,9 +356,9 @@ class _InsightsPageState extends State<InsightsPage> {
   }
 
   Widget _stepActivityCard() {
-    final minV = stepData.reduce((a, b) => a < b ? a : b);
-    final maxV = stepData.reduce((a, b) => a > b ? a : b);
-    final avg = stepData.reduce((a, b) => a + b) / stepData.length;
+    final minV = stepData.fold(stepData.first, (double a, double b) => a < b ? a : b);
+    final maxV = stepData.fold(stepData.first, (double a, double b) => a > b ? a : b);
+    final avg = stepData.fold<double>(0, (a, b) => a + b) / stepData.length;
     return Container(
       decoration: cardDecoration(),
       padding: const EdgeInsets.all(24),
@@ -345,7 +372,7 @@ class _InsightsPageState extends State<InsightsPage> {
               Text('Step Activity',
                   style: TextStyle(fontWeight: FontWeight.w600, color: C.gray900)),
               Spacer(),
-              Text('Last ${stepData.length} entries',
+              Text('Last ${stepData.length} days',
                   style: TextStyle(fontSize: 12, color: C.gray400)),
             ],
           ),
@@ -398,7 +425,9 @@ class _InsightsPageState extends State<InsightsPage> {
 
 // ── Health Analysis card ─────────────────────────────────────────────────────
 class HealthAnalysisCard extends StatefulWidget {
-  const HealthAnalysisCard({super.key});
+  final VoidCallback? onAnalyzed;
+
+  const HealthAnalysisCard({super.key, this.onAnalyzed});
 
   @override
   State<HealthAnalysisCard> createState() => _HealthAnalysisCardState();
@@ -418,8 +447,13 @@ class _HealthAnalysisCardState extends State<HealthAnalysisCard> {
 
   Future<void> _fetch() async {
     final userId = context.read<AuthProvider>().user!.id;
-    analysis = await HealthAnalysisService.latest(userId);
-    setState(() => loading = false);
+    // Always recompute so guideline fixes appear without a manual re-tap.
+    try {
+      analysis = await HealthAnalysisService.run(userId);
+    } catch (_) {
+      analysis = await HealthAnalysisService.latest(userId);
+    }
+    if (mounted) setState(() => loading = false);
   }
 
   Future<void> _run() async {
@@ -430,6 +464,7 @@ class _HealthAnalysisCardState extends State<HealthAnalysisCard> {
     });
     try {
       analysis = await HealthAnalysisService.run(userId);
+      widget.onAnalyzed?.call();
     } catch (e) {
       error = e.toString().replaceFirst('Exception: ', '');
     } finally {
@@ -466,7 +501,7 @@ class _HealthAnalysisCardState extends State<HealthAnalysisCard> {
                     children: [
                       Text('Health Analysis',
                           style: TextStyle(fontWeight: FontWeight.w600, color: C.gray900)),
-                      Text('Personalized assessment of your metrics',
+                      Text('Same score as Health Index, with findings & advice',
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(fontSize: 12, color: C.gray400)),
@@ -649,37 +684,55 @@ class _HealthAnalysisCardState extends State<HealthAnalysisCard> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                children: [
-                                  Flexible(
-                                    child: Text(f.category,
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                            color: C.gray800)),
-                                  ),
-                                  if (f.value != null) ...[
-                                    SizedBox(width: 8),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                          color: fc.bg,
-                                          borderRadius: BorderRadius.circular(4),
-                                          border: Border.all(color: fc.border)),
-                                      child: Text(f.value!,
-                                          style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w500,
-                                              color: fc.color)),
-                                    ),
-                                  ],
-                                ],
+                              Text(
+                                f.category,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: C.isDark ? C.gray900 : C.gray800,
+                                ),
                               ),
-                              SizedBox(height: 2),
-                              Text(f.message,
-                                  style: TextStyle(
-                                      fontSize: 12, color: C.gray600, height: 1.4)),
+                              if (f.value != null) ...[
+                                const SizedBox(height: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: C.isDark
+                                        ? fc.color.withValues(alpha: 0.18)
+                                        : fc.bg,
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(
+                                      color: fc.border.withValues(
+                                          alpha: C.isDark ? 0.8 : 1),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    f.value!,
+                                    softWrap: true,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: C.isDark
+                                          ? (f.status == 'warning'
+                                              ? C.yellow400
+                                              : f.status == 'critical'
+                                                  ? C.red400
+                                                  : fc.color)
+                                          : fc.color,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              const SizedBox(height: 6),
+                              Text(
+                                f.message,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  height: 1.45,
+                                  color: C.isDark ? C.gray800 : C.gray600,
+                                ),
+                              ),
                             ],
                           ),
                         ),

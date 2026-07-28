@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../auth.dart';
 import '../theme.dart';
+import '../treatment_notifications.dart';
 import '../treatment_schedule.dart';
 import '../widgets.dart';
 
@@ -82,6 +83,7 @@ class _TreatmentScheduleModalState extends State<TreatmentScheduleModal> {
   }
 
   Future<void> _pickTime(_DraftEntry draft, int index) async {
+    if (index < 0 || index >= draft.doseTimes.length) return;
     final picked = await showTimePicker(
       context: context,
       initialTime: draft.doseTimes[index],
@@ -96,7 +98,7 @@ class _TreatmentScheduleModalState extends State<TreatmentScheduleModal> {
         );
       },
     );
-    if (picked != null) {
+    if (picked != null && index >= 0 && index < draft.doseTimes.length) {
       setState(() => draft.doseTimes[index] = picked);
     }
   }
@@ -113,6 +115,7 @@ class _TreatmentScheduleModalState extends State<TreatmentScheduleModal> {
       _error = '';
     });
     try {
+      final permitted = await TreatmentNotificationService.ensurePermission();
       for (final draft in toSave) {
         await TreatmentScheduleService.save(
           userId: userId,
@@ -129,13 +132,24 @@ class _TreatmentScheduleModalState extends State<TreatmentScheduleModal> {
         ..add(_DraftEntry());
       await _load();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Treatment schedule saved'),
-            backgroundColor: C.statusGood,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        if (!permitted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'Schedule saved, but notifications are off. Enable alerts in Settings to get pill reminders with sound.'),
+              backgroundColor: C.amber700,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Treatment schedule saved — pill reminders are on'),
+              backgroundColor: C.statusGood,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
       }
     } catch (_) {
       if (mounted) setState(() => _error = 'Could not save. Please try again.');
@@ -249,6 +263,7 @@ class _TreatmentScheduleModalState extends State<TreatmentScheduleModal> {
   }
 
   Widget _draftCard(int index) {
+    if (index < 0 || index >= _drafts.length) return const SizedBox.shrink();
     final draft = _drafts[index];
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -323,6 +338,9 @@ class _TreatmentScheduleModalState extends State<TreatmentScheduleModal> {
           ),
           SizedBox(height: 16),
           ...List.generate(draft.dosesPerDay, (i) {
+            if (i < 0 || i >= draft.doseTimes.length) {
+              return const SizedBox.shrink();
+            }
             return Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: Column(

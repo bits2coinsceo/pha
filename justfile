@@ -7,6 +7,8 @@ flutter := "flutter"
 bundle_id := "com.pha.phaFlutter"
 ios_device := env_var_or_default("IOS_DEVICE_ID", "iPhone 17")
 simulator_app := "/Applications/Xcode.app/Contents/Developer/Applications/Simulator.app"
+dart_define_file := "dart_define.json"
+dart_defines := "--dart-define-from-file=" + dart_define_file
 
 default:
     @just --list
@@ -41,7 +43,7 @@ onboarding: sim purge
 run-ios: run
 
 run-macos:
-    {{flutter}} run -d macos
+    {{flutter}} run -d macos {{dart_defines}}
 
 clean:
     @echo "→ flutter clean…"
@@ -60,15 +62,13 @@ purge:
 
 # Сброс данных + запуск (без flutter clean — ~1–3 мин)
 reset: sim purge
-    @echo "→ flutter run…"
-    {{flutter}} run -d "{{ios_device}}"
+    @bash scripts/flutter-run-ios.sh
 
 reset-quick: reset
 
 # Полный сброс с пересборкой (долго — 5–15 мин, будет тишина на clean)
 reset-full: sim clean purge
-    @echo "→ flutter run…"
-    {{flutter}} run -d "{{ios_device}}"
+    @bash scripts/flutter-run-ios.sh
 
 reset-ios: reset
 

@@ -10,6 +10,8 @@ Python API (FastAPI) поверх **Vertex AI Gemini**. Отвечает на з
 | GET   | `/health`  | Статус сервиса, активная модель и проект            |
 | POST  | `/chat`    | `{ "message": "...", "complexity": "simple\|complex" }` → `{ "reply", "model" }` |
 | POST  | `/analyze` | multipart: `text_logs` + файл `pdf` (+ `complexity`) → `{ "analysis", "model" }` |
+| GET   | `/patient/exists` | `?email=` → `{ "exists" }` |
+| GET/PUT | `/patient/history` | Headers `X-Patient-Email`, `X-Sync-Token` — encrypted health history per email |
 | —     | `/docs`    | Авто-документация Swagger                            |
 
 Если в окружении задан `API_KEY`, все эндпоинты (кроме `/health`) требуют
@@ -88,8 +90,11 @@ scp .env            user@host:~/pha-backend/.env   # если используе
 
 Запрос выбирает модель полем `complexity`:
 
-- `simple`  → `GEMINI_MODEL_SIMPLE` (по умолчанию `gemini-2.5-flash`) — быстрые/дешёвые ответы;
-- `complex` → `GEMINI_MODEL_COMPLEX` (по умолчанию `gemini-3.5-flash`) — сложные рассуждения, мед-анализ.
+- `simple`  → `GEMINI_MODEL_SIMPLE` (по умолчанию `gemini-1.5-flash`);
+- `complex` → `GEMINI_MODEL_COMPLEX` (по умолчанию `gemini-1.5-flash`).
+
+Оба уровня сейчас по умолчанию используют Gemini 1.5 Flash, потому что более
+новые Flash-модели чаще упирались в quota/rate limits на запросах с фото.
 
 `/chat` по умолчанию `simple`, `/analyze` — `complex`. В ответе возвращается поле
 `model` — какая модель реально отработала.
@@ -101,10 +106,8 @@ scp .env            user@host:~/pha-backend/.env   # если используе
 `user_id`. Лимит — `USER_BUDGET_USD` (по умолчанию `5`). При исчерпании лимита
 запрос отклоняется с кодом `402 Payment Required`.
 
-Цены проставлены по официальному прайсу Vertex AI (июнь 2026), USD за 1M токенов:
-`gemini-2.5-flash` — $0.30 in / $2.50 out; `gemini-3.5-flash` (региональный
-us-central1) — $1.65 / $9.90. Меняются через `PRICE_SIMPLE_IN/OUT` и
-`PRICE_COMPLEX_IN/OUT` в `.env`. Учти: кэшированный ввод и batch-режим дешевле —
-этот расчёт берёт стандартный тариф, т.е. слегка завышает (лимит сработает раньше).
+Цены задаются через `PRICE_SIMPLE_IN/OUT` и `PRICE_COMPLEX_IN/OUT` в `.env`
+(USD за 1M токенов). При смене модели обнови эти значения по актуальному
+прайсу Vertex AI; кэшированный ввод и batch-режим могут стоить дешевле.
 
 Проверить остаток: `GET /usage/{user_id}` → `{ "user_id", "spent_usd", "remaining_usd", "limit_usd" }`.

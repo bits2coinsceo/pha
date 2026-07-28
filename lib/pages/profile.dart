@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../auth.dart';
 import '../db.dart';
+import '../legal.dart';
+import '../medical_guidelines.dart';
 import '../profile_basics.dart';
 import '../cosmic_ui.dart';
 import '../theme.dart';
@@ -67,9 +69,9 @@ class _ProfilePageState extends State<ProfilePage> {
     int? age;
     if (_age.text.isNotEmpty) {
       age = int.tryParse(_age.text);
-      if (age == null || age < 1 || age > 120) {
+      if (VitalValidation.age(age) != null) {
         setState(() {
-          error = 'Age must be between 1 and 120.';
+          error = VitalValidation.age(age)!;
           saving = false;
         });
         return;
@@ -78,9 +80,10 @@ class _ProfilePageState extends State<ProfilePage> {
     int? height;
     if (_height.text.isNotEmpty) {
       height = int.tryParse(_height.text);
-      if (height == null || height < 50 || height > 250) {
+      final hErr = VitalValidation.heightCm(height?.toDouble());
+      if (hErr != null) {
         setState(() {
-          error = 'Height must be between 50 and 250 cm.';
+          error = hErr;
           saving = false;
         });
         return;
@@ -89,9 +92,10 @@ class _ProfilePageState extends State<ProfilePage> {
     double? weight;
     if (_weight.text.isNotEmpty) {
       weight = double.tryParse(_weight.text.trim());
-      if (weight == null || weight < 20 || weight > 300) {
+      final wErr = VitalValidation.weightKg(weight);
+      if (wErr != null) {
         setState(() {
-          error = 'Weight must be between 20 and 300 kg.';
+          error = wErr;
           saving = false;
         });
         return;
@@ -191,22 +195,57 @@ class _ProfilePageState extends State<ProfilePage> {
                                     SizedBox(height: 32),
                                     _label('Display Name', null, null),
                                     TextField(
-                                        controller: _name,
-                                        decoration: appInput('Your name')),
+                                      controller: _name,
+                                      style: TextStyle(
+                                        color: C.gray900,
+                                        fontSize: 16,
+                                      ),
+                                      cursorColor: C.accentFocus,
+                                      textInputAction: TextInputAction.next,
+                                      decoration: appInput('Your name'),
+                                    ),
                                     SizedBox(height: 16),
                                     _label('Age', Icons.account_circle, C.orange500),
                                     TextField(
-                                        controller: _age, decoration: appInput('e.g. 32')),
+                                      controller: _age,
+                                      style: TextStyle(
+                                        color: C.gray900,
+                                        fontSize: 16,
+                                      ),
+                                      cursorColor: C.accentFocus,
+                                      keyboardType: TextInputType.number,
+                                      textInputAction: TextInputAction.next,
+                                      decoration: appInput('e.g. 32'),
+                                    ),
                                     SizedBox(height: 16),
                                     _label('Height (cm)', Icons.straighten, C.sky500),
                                     TextField(
-                                        controller: _height,
-                                        decoration: appInput('e.g. 175')),
+                                      controller: _height,
+                                      style: TextStyle(
+                                        color: C.gray900,
+                                        fontSize: 16,
+                                      ),
+                                      cursorColor: C.accentFocus,
+                                      keyboardType: TextInputType.number,
+                                      textInputAction: TextInputAction.next,
+                                      decoration: appInput('e.g. 175'),
+                                    ),
                                     SizedBox(height: 16),
                                     _label('Weight (kg)', Icons.monitor_weight, C.blue500),
                                     TextField(
-                                        controller: _weight,
-                                        decoration: appInput('e.g. 70')),
+                                      controller: _weight,
+                                      style: TextStyle(
+                                        color: C.gray900,
+                                        fontSize: 16,
+                                      ),
+                                      cursorColor: C.accentFocus,
+                                      keyboardType:
+                                          const TextInputType.numberWithOptions(
+                                        decimal: true,
+                                      ),
+                                      textInputAction: TextInputAction.done,
+                                      decoration: appInput('e.g. 70'),
+                                    ),
                                     SizedBox(height: 24),
                                     PrimaryButton(
                                       label: saving ? 'Saving...' : 'Save Changes',
@@ -276,7 +315,40 @@ class _ProfilePageState extends State<ProfilePage> {
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
                                             color: C.gray900)),
-                                    SizedBox(height: 16),
+                                    SizedBox(height: 12),
+                                    ListTile(
+                                      contentPadding: EdgeInsets.zero,
+                                      leading: Icon(Icons.description_outlined,
+                                          color: C.blue500),
+                                      title: Text('Agreement',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              color: C.gray900)),
+                                      subtitle: Text('Terms of Service & Disclaimer',
+                                          style: TextStyle(
+                                              fontSize: 12, color: C.gray500)),
+                                      trailing: Icon(Icons.chevron_right,
+                                          color: C.gray400),
+                                      onTap: () => LegalDocumentPage.open(
+                                          context, LegalDocument.termsOfService),
+                                    ),
+                                    ListTile(
+                                      contentPadding: EdgeInsets.zero,
+                                      leading: Icon(Icons.privacy_tip_outlined,
+                                          color: C.teal600),
+                                      title: Text('Privacy Policy',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              color: C.gray900)),
+                                      subtitle: Text('How we handle your data',
+                                          style: TextStyle(
+                                              fontSize: 12, color: C.gray500)),
+                                      trailing: Icon(Icons.chevron_right,
+                                          color: C.gray400),
+                                      onTap: () => LegalDocumentPage.open(
+                                          context, LegalDocument.privacyPolicy),
+                                    ),
+                                    SizedBox(height: 8),
                                     OutlinedButton(
                                       onPressed: () => auth.signOut(),
                                       style: OutlinedButton.styleFrom(

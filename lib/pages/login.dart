@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../auth.dart';
 import '../cosmic_ui.dart';
+import '../legal.dart';
 import '../theme.dart';
 import '../widgets.dart';
 
@@ -17,6 +18,8 @@ class _LoginPageState extends State<LoginPage> {
   bool isSignUp = false;
   bool showPassword = false;
   bool loading = false;
+  bool acceptedTerms = false;
+  bool acceptedPrivacy = false;
   String error = '';
   final _email = TextEditingController();
   final _password = TextEditingController();
@@ -38,7 +41,14 @@ class _LoginPageState extends State<LoginPage> {
     final auth = context.read<AuthProvider>();
     try {
       if (isSignUp) {
-        if (_password.text.length < 8) throw Exception('Password must be at least 8 characters.');
+        if (!acceptedTerms || !acceptedPrivacy) {
+          throw Exception(
+            'Please read and accept the Agreement and Privacy Policy to continue.',
+          );
+        }
+        if (_password.text.length < 8) {
+          throw Exception('Password must be at least 8 characters.');
+        }
         await auth.signUp(_email.text, _password.text, _name.text);
       } else {
         await auth.signIn(_email.text, _password.text);
@@ -54,10 +64,16 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       isSignUp = !isSignUp;
       error = '';
+      acceptedTerms = false;
+      acceptedPrivacy = false;
       _email.clear();
       _password.clear();
       _name.clear();
     });
+  }
+
+  Future<void> _openLegal(LegalDocument doc) async {
+    await LegalDocumentPage.open(context, doc);
   }
 
   @override
@@ -264,12 +280,34 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
+                    if (isSignUp) ...[
+                      SizedBox(height: 16),
+                      _legalCheckbox(
+                        value: acceptedTerms,
+                        onChanged: (v) =>
+                            setState(() => acceptedTerms = v ?? false),
+                        document: LegalDocument.termsOfService,
+                        prefix: 'I have read and agree to the ',
+                      ),
+                      SizedBox(height: 8),
+                      _legalCheckbox(
+                        value: acceptedPrivacy,
+                        onChanged: (v) =>
+                            setState(() => acceptedPrivacy = v ?? false),
+                        document: LegalDocument.privacyPolicy,
+                        prefix: 'I have read and agree to the ',
+                      ),
+                    ],
                     SizedBox(height: 20),
                     PrimaryButton(
                       label: loading
                           ? (isSignUp ? 'Creating account…' : 'Signing in…')
                           : (isSignUp ? 'Create account' : 'Sign in'),
-                      onPressed: loading ? null : _submit,
+                      onPressed: loading
+                          ? null
+                          : (isSignUp && (!acceptedTerms || !acceptedPrivacy))
+                              ? null
+                              : _submit,
                     ),
                     SizedBox(height: 24),
                     Divider(color: C.gray100, height: 1),
@@ -289,7 +327,9 @@ class _LoginPageState extends State<LoginPage> {
                             child: Text(
                               isSignUp ? 'Sign in' : 'Sign up for free',
                               style: TextStyle(
-                                  fontSize: 14, color: C.blue500, fontWeight: FontWeight.w600),
+                                  fontSize: 14,
+                                  color: C.blue500,
+                                  fontWeight: FontWeight.w600),
                             ),
                           ),
                         ],
@@ -301,15 +341,72 @@ class _LoginPageState extends State<LoginPage> {
               if (isSignUp) ...[
                 SizedBox(height: 16),
                 Text(
-                  'By creating an account you agree to our Terms of Service and Privacy Policy.',
+                  'You must open and accept both documents before creating an account. '
+                  'PHA is a wellness assistant — not medical advice.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 12, color: C.gray400),
+                  style: TextStyle(fontSize: 12, color: C.gray400, height: 1.4),
                 ),
               ],
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _legalCheckbox({
+    required bool value,
+    required ValueChanged<bool?> onChanged,
+    required LegalDocument document,
+    required String prefix,
+  }) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 24,
+          height: 24,
+          child: Checkbox(
+            value: value,
+            onChanged: onChanged,
+            activeColor: C.blue500,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            visualDensity: VisualDensity.compact,
+          ),
+        ),
+        SizedBox(width: 8),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Text(
+                  prefix,
+                  style: TextStyle(fontSize: 13, color: C.gray700, height: 1.35),
+                ),
+                GestureDetector(
+                  onTap: () => _openLegal(document),
+                  child: Text(
+                    document.shortTitle,
+                    style: TextStyle(
+                      fontSize: 13,
+                      height: 1.35,
+                      color: C.blue500,
+                      fontWeight: FontWeight.w600,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+                Text(
+                  '.',
+                  style: TextStyle(fontSize: 13, color: C.gray700, height: 1.35),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 

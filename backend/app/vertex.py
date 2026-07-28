@@ -6,10 +6,15 @@ GOOGLE_APPLICATION_CREDENTIALS, указывающей на JSON-ключ сер
 """
 from __future__ import annotations
 
+import logging
+import time
+
 import vertexai
 from vertexai.generative_models import GenerativeModel, Part
 
 from .config import settings
+
+logger = logging.getLogger(__name__)
 
 # Кэш инстансов моделей по имени, чтобы не пересоздавать на каждый запрос.
 _models: dict[str, GenerativeModel] = {}
@@ -36,12 +41,53 @@ def _token_counts(response) -> tuple[int, int]:
     return in_tokens, out_tokens
 
 
+def _is_retryable_vertex_error(exc: Exception) -> bool:
+    """Retry quota/rate-limit and temporary transport errors from Vertex AI."""
+    message = str(exc).lower()
+    return (
+        "429" in message
+        or "resource has been exhausted" in message
+        or "resource_exhausted" in message
+        or "rate limit" in message
+        or "quota" in message
+        or "timeout" in message
+        or "temporarily unavailable" in message
+        or "503" in message
+        or "504" in message
+    )
+
+
+def _generate_with_retry(model_name: str, parts: list[object], max_attempts: int = 5):
+    """Call Gemini with exponential backoff: 1s, 2s, 4s, 8s."""
+    model = _get_model(model_name)
+    for attempt in range(max_attempts):
+        try:
+            return model.generate_content(parts)
+        except Exception as exc:
+            is_last = attempt == max_attempts - 1
+            if is_last or not _is_retryable_vertex_error(exc):
+                raise
+
+            delay = 2**attempt
+            logger.warning(
+                "Gemini retry %s/%s for %s after %ss: %s",
+                attempt + 1,
+                max_attempts,
+                model_name,
+                delay,
+                exc,
+            )
+            time.sleep(delay)
+
+    raise RuntimeError("Max retries reached for Gemini call")
+
+
 def generate_text(message: str, model_name: str) -> tuple[str, int, int]:
     """Простой текстовый запрос к выбранной модели (чат).
 
     Возвращает (текст ответа, входные токены, выходные токены).
     """
-    response = _get_model(model_name).generate_content([message])
+    response = _generate_with_retry(model_name, [message])
     in_tokens, out_tokens = _token_counts(response)
     return response.text, in_tokens, out_tokens
 
@@ -65,6 +111,6 @@ def analyze_medical_data(
     if pdf_bytes:
         parts.append(Part.from_data(data=pdf_bytes, mime_type=mime_type))
 
-    response = _get_model(model_name).generate_content(parts)
+    response = _generate_with_retry(model_name, parts)
     in_tokens, out_tokens = _token_counts(response)
     return response.text, in_tokens, out_tokens

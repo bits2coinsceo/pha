@@ -11,13 +11,13 @@ from dataclasses import dataclass
 class Settings:
     # --- GCP / Vertex AI ---
     gcp_project: str = os.environ.get("GCP_PROJECT", "pha-personal-health-assistant")
-    # global нужен для Gemini 3.x — в региональных эндпоинтах их нет.
+    # Use a regional endpoint for Gemini 1.5 Flash to reduce rate-limit pressure.
     gcp_location: str = os.environ.get("GCP_LOCATION", "global")
 
-    # Свитчер моделей: дешёвая/быстрая для простых ответов и более мощная
-    # для сложных (мед-анализ, сопоставление текста и снимков).
-    gemini_model_simple: str = os.environ.get("GEMINI_MODEL_SIMPLE", "gemini-2.5-flash")
-    gemini_model_complex: str = os.environ.get("GEMINI_MODEL_COMPLEX", "gemini-3.5-flash")
+    # Keep both complexity levels on Gemini 1.5 Flash. Newer Flash models were
+    # hitting quota even for a couple of photo requests in this project.
+    gemini_model_simple: str = os.environ.get("GEMINI_MODEL_SIMPLE", "gemini-1.5-flash")
+    gemini_model_complex: str = os.environ.get("GEMINI_MODEL_COMPLEX", "gemini-1.5-flash")
 
     # --- Доступ к API ---
     # Если задан — клиент обязан присылать заголовок X-API-Key с этим значением.
@@ -28,6 +28,11 @@ class Settings:
     user_budget_usd: float = float(os.environ.get("USER_BUDGET_USD", "5"))
     # Путь к SQLite-файлу со счётчиками (в Docker монтируется как volume).
     usage_db: str = os.environ.get("USAGE_DB", "usage.db")
+
+    # --- Хранение истории пациента (зашифрованные файлы по email) ---
+    patient_data_dir: str = os.environ.get("PATIENT_DATA_DIR", "patient_data")
+    # Fernet key (urlsafe base64, 32 bytes). Generate: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+    patient_encryption_key: str | None = os.environ.get("PATIENT_ENCRYPTION_KEY") or None
 
     # Цены за токены, USD за 1M (Vertex AI global, июнь 2026).
     # 2.5-flash: 0.30/2.50; 3.5-flash: 1.50/9.00.

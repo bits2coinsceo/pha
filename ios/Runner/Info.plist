@@ -51,6 +51,10 @@
 	<string>PHA reads your steps and walking distance from Apple Health to show activity on your dashboard.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>PHA may save activity summaries you choose to log in Apple Health.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>PHA uses the camera to photograph meals for calorie analysis.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>PHA uses your photo library to analyze meal photos for calories.</string>
 	<!-- TEMPORARY: backend is served over plain HTTP on an IP (no TLS yet).
 	     iOS App Transport Security blocks cleartext by default, so we allow it
 	     here. REMOVE this once the backend is behind HTTPS with a real domain. -->

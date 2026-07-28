@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 import 'db.dart';
+import 'treatment_notifications.dart';
 
 const _uuid = Uuid();
 
@@ -79,9 +80,20 @@ class TreatmentScheduleService {
       'created_at': now,
       'updated_at': now,
     });
+    await TreatmentNotificationService.rescheduleForUser(userId);
   }
 
   static Future<void> delete(String id) async {
+    final rows = await Db.instance.raw.query(
+      'treatment_schedule',
+      where: 'id = ?',
+      whereArgs: [id],
+      limit: 1,
+    );
+    final userId = rows.isEmpty ? null : rows.first['user_id'] as String?;
     await Db.instance.raw.delete('treatment_schedule', where: 'id = ?', whereArgs: [id]);
+    if (userId != null) {
+      await TreatmentNotificationService.rescheduleForUser(userId);
+    }
   }
 }

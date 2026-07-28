@@ -12,7 +12,7 @@ class CosmicBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: drift ?? const AlwaysStoppedAnimation(0),
+      animation: drift ?? const AlwaysStoppedAnimation<double>(0.0),
       builder: (_, __) {
         final t = drift?.value ?? 0;
         return Container(
@@ -21,21 +21,21 @@ class CosmicBackground extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               CustomPaint(painter: _StarfieldPainter()),
-              Container(color: C.isDark ? const Color(0x9906041A) : const Color(0x18FFFFFF)),
+              Container(color: C.isDark ? const Color(0xAA0C0F14) : const Color(0x18FFFFFF)),
               Positioned(
                 top: -80 + t * 24,
                 right: -60,
-                child: _nebulaOrb(220, C.nebulaPink.withValues(alpha: C.isDark ? 0.12 : 0.06)),
+                child: _nebulaOrb(220, C.nebulaPink.withValues(alpha: C.isDark ? 0.06 : 0.06)),
               ),
               Positioned(
                 bottom: 40 - t * 18,
                 left: -90,
-                child: _nebulaOrb(280, C.nebulaBlue.withValues(alpha: C.isDark ? 0.1 : 0.05)),
+                child: _nebulaOrb(280, C.nebulaBlue.withValues(alpha: C.isDark ? 0.05 : 0.05)),
               ),
               Positioned(
                 top: 180 + t * 12,
                 left: 30,
-                child: _nebulaOrb(120, C.neonCyan.withValues(alpha: C.isDark ? 0.08 : 0.04)),
+                child: _nebulaOrb(120, C.accentPrimary.withValues(alpha: C.isDark ? 0.05 : 0.04)),
               ),
             ],
           ),
@@ -147,7 +147,7 @@ class CosmicSectionTitle extends StatelessWidget {
     return Row(
       children: [
         if (icon != null) ...[
-          Icon(icon, size: 22, color: C.neonCyan),
+          Icon(icon, size: 22, color: C.accentPrimary),
           SizedBox(width: 8),
         ],
         Text(
@@ -156,7 +156,7 @@ class CosmicSectionTitle extends StatelessWidget {
             fontSize: 24,
             fontWeight: FontWeight.w800,
             color: C.gray900,
-            letterSpacing: 0.5,
+            letterSpacing: 0.3,
             shadows: C.textGlow(),
           ),
         ),

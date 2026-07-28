@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+
+import 'daily_metric_store.dart';
 
 /// Local SQLite database — replaces Supabase Postgres for the Flutter port.
 /// Stores all health data on-device.
@@ -9,18 +14,35 @@ class Db {
   static final Db instance = Db._();
 
   Database? _db;
-  Database get raw => _db!;
+  bool get isReady => _db != null;
+  Database get raw {
+    final db = _db;
+    if (db == null) {
+      throw StateError('Db.init() has not completed');
+    }
+    return db;
+  }
 
   Future<void> init() async {
     if (_db != null) return;
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
     final dir = await getApplicationSupportDirectory();
     final path = p.join(dir.path, 'pha.db');
-    _db = await databaseFactory.openDatabase(
-      path,
-      options: OpenDatabaseOptions(version: 6, onCreate: _create, onUpgrade: _upgrade),
-    );
+    if (Platform.isIOS || Platform.isAndroid) {
+      // Use native sqflite on mobile — do not override databaseFactory.
+      _db = await sqflite.openDatabase(
+        path,
+        version: 12,
+        onCreate: _create,
+        onUpgrade: _upgrade,
+      );
+    } else {
+      sqfliteFfiInit();
+      databaseFactory = databaseFactoryFfi;
+      _db = await databaseFactory.openDatabase(
+        path,
+        options: OpenDatabaseOptions(version: 12, onCreate: _create, onUpgrade: _upgrade),
+      );
+    }
   }
 
   Future<void> _upgrade(Database db, int oldVersion, int newVersion) async {
@@ -45,6 +67,107 @@ class Db {
       await db.execute('ALTER TABLE profiles ADD COLUMN gender TEXT');
       await db.execute('ALTER TABLE onboarding_drafts ADD COLUMN gender TEXT');
     }
+    if (oldVersion < 7) {
+      await _createMealCalorieChecks(db);
+    }
+    if (oldVersion < 8) {
+      await _createBadHabitChecks(db);
+    }
+    if (oldVersion < 9) {
+      await _createPhysicalActivityPrograms(db);
+    }
+    if (oldVersion < 10) {
+      await _createPhysicalActivityCheckins(db);
+    }
+    if (oldVersion < 11) {
+      await _upgradeMealCalorieChecksV11(db);
+    }
+    if (oldVersion < 12) {
+      await DailyMetricStore.collapseDuplicateDailyMetrics(db);
+      await DailyMetricStore.collapseDuplicateHealthIndex(db);
+    }
+  }
+
+  Future<void> _upgradeMealCalorieChecksV11(Database db) async {
+    Future<void> add(String sql) async {
+      try {
+        await db.execute(sql);
+      } catch (_) {
+        // Column may already exist on partial upgrades.
+      }
+    }
+
+    await add('ALTER TABLE meal_calorie_checks ADD COLUMN meal_name TEXT');
+    await add('ALTER TABLE meal_calorie_checks ADD COLUMN portion TEXT');
+    await add('ALTER TABLE meal_calorie_checks ADD COLUMN protein_g REAL');
+    await add('ALTER TABLE meal_calorie_checks ADD COLUMN carbs_g REAL');
+    await add('ALTER TABLE meal_calorie_checks ADD COLUMN fat_g REAL');
+    await add(
+      'ALTER TABLE meal_calorie_checks ADD COLUMN confirmed INTEGER NOT NULL DEFAULT 1',
+    );
+  }
+
+  Future<void> _createPhysicalActivityCheckins(Database db) async {
+    await db.execute('''
+      CREATE TABLE physical_activity_checkins (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        program_id TEXT NOT NULL,
+        program_label TEXT NOT NULL,
+        status TEXT NOT NULL,
+        checkin_date TEXT NOT NULL,
+        created_at TEXT NOT NULL
+      )
+    ''');
+  }
+
+  Future<void> _createPhysicalActivityPrograms(Database db) async {
+    await db.execute('''
+      CREATE TABLE physical_activity_programs (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        program_id TEXT NOT NULL,
+        program_label TEXT NOT NULL,
+        created_at TEXT NOT NULL
+      )
+    ''');
+  }
+
+  Future<void> _createBadHabitChecks(Database db) async {
+    await db.execute('''
+      CREATE TABLE bad_habit_checks (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        smokes INTEGER NOT NULL,
+        smoking_level TEXT,
+        drinks_alcohol INTEGER NOT NULL,
+        alcohol_level TEXT,
+        social_media_level TEXT NOT NULL,
+        created_at TEXT NOT NULL
+      )
+    ''');
+  }
+
+  Future<void> _createMealCalorieChecks(Database db) async {
+    await db.execute('''
+      CREATE TABLE meal_calorie_checks (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        file_path TEXT NOT NULL,
+        analysis TEXT NOT NULL,
+        calories INTEGER,
+        category TEXT NOT NULL,
+        category_label TEXT,
+        meal_name TEXT,
+        portion TEXT,
+        protein_g REAL,
+        carbs_g REAL,
+        fat_g REAL,
+        confirmed INTEGER NOT NULL DEFAULT 1,
+        checked_at TEXT NOT NULL,
+        created_at TEXT NOT NULL
+      )
+    ''');
   }
 
   Future<void> _createTreatmentSchedule(Database db) async {
@@ -189,5 +312,9 @@ class Db {
     ''');
     await _createTreatmentSchedule(db);
     await _createOnboardingDrafts(db);
+    await _createMealCalorieChecks(db);
+    await _createBadHabitChecks(db);
+    await _createPhysicalActivityPrograms(db);
+    await _createPhysicalActivityCheckins(db);
   }
 }

@@ -8,8 +8,8 @@ services:
     environment:
       - GCP_PROJECT=${GCP_PROJECT:-pha-personal-health-assistant}
       - GCP_LOCATION=${GCP_LOCATION:-global}
-      - GEMINI_MODEL_SIMPLE=${GEMINI_MODEL_SIMPLE:-gemini-2.5-flash}
-      - GEMINI_MODEL_COMPLEX=${GEMINI_MODEL_COMPLEX:-gemini-3.5-flash}
+      - GEMINI_MODEL_SIMPLE=${GEMINI_MODEL_SIMPLE:-gemini-1.5-flash}
+      - GEMINI_MODEL_COMPLEX=${GEMINI_MODEL_COMPLEX:-gemini-1.5-flash}
       - API_KEY=${API_KEY:-}
       - USER_BUDGET_USD=${USER_BUDGET_USD:-5}
       - PRICE_SIMPLE_IN=${PRICE_SIMPLE_IN:-0.30}
@@ -17,6 +17,8 @@ services:
       - PRICE_COMPLEX_IN=${PRICE_COMPLEX_IN:-1.50}
       - PRICE_COMPLEX_OUT=${PRICE_COMPLEX_OUT:-9.00}
       - USAGE_DB=/data/usage.db
+      - PATIENT_DATA_DIR=/data/patients
+      - PATIENT_ENCRYPTION_KEY=${PATIENT_ENCRYPTION_KEY:-}
       - GOOGLE_APPLICATION_CREDENTIALS=/secrets/sa.json
     volumes:
       # Ключ сервис-аккаунта монтируется внутрь контейнера только для чтения.

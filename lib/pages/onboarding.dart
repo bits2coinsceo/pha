@@ -5,8 +5,11 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../auth.dart';
+import '../daily_metric_store.dart';
 import '../daily_vitals.dart';
 import '../db.dart';
+import '../health_index.dart';
+import '../medical_guidelines.dart';
 import '../profile_basics.dart';
 import '../onboarding_hp.dart';
 import '../cosmic_ui.dart';
@@ -334,7 +337,18 @@ class _OnboardingPageState extends State<OnboardingPage>
 
   Future<void> _insertMetrics(AuthProvider auth, List<Map<String, dynamic>> inserts) async {
     for (final row in inserts) {
-      await Db.instance.raw.insert('health_metrics', row);
+      final type = row['metric_type'] as String;
+      if (DailyMetricStore.isDailyLiveMetric(type)) {
+        await DailyMetricStore.upsertToday(
+          userId: row['user_id'] as String,
+          metricType: type,
+          value: (row['value'] as num).toDouble(),
+          notes: row['notes'] as String?,
+          source: row['source'] as String? ?? 'onboarding',
+        );
+      } else {
+        await Db.instance.raw.insert('health_metrics', row);
+      }
     }
   }
 
@@ -482,15 +496,16 @@ class _OnboardingPageState extends State<OnboardingPage>
         }
         final sys = double.tryParse(_systolic.text.trim());
         final dia = double.tryParse(_diastolic.text.trim());
-        if (sys == null || sys < 60 || sys > 250 || dia == null || dia < 40 || dia > 150) {
+        final bpErr = VitalValidation.bloodPressure(sys, dia);
+        if (bpErr != null) {
           setState(() {
-            error = 'Check blood pressure values.';
+            error = bpErr;
             saving = false;
           });
           return;
         }
-        extraMetrics['blood_pressure_systolic'] = sys;
-        extraMetrics['blood_pressure_diastolic'] = dia;
+        extraMetrics['blood_pressure_systolic'] = sys!;
+        extraMetrics['blood_pressure_diastolic'] = dia!;
         bonusHp += hpBpReward;
         _badges['heart'] = true;
         await DailyVitalsService.markBpLogged(_vitalsScope);
@@ -499,26 +514,19 @@ class _OnboardingPageState extends State<OnboardingPage>
       if (_needGlucoseToday && _glucose.text.trim().isNotEmpty) {
         final g = double.tryParse(_glucose.text.trim());
         double? glucoseMgdl;
-        if (isImperial) {
-          if (g == null || g < 20 || g > 600) {
-            setState(() {
-              error = 'Glucose 20–600 mg/dL.';
-              saving = false;
-            });
-            return;
-          }
-          glucoseMgdl = g;
-        } else {
-          if (g == null || g < 1 || g > 33) {
-            setState(() {
-              error = 'Glucose 1–33 mmol/L.';
-              saving = false;
-            });
-            return;
-          }
-          glucoseMgdl = (mmolToMgdl(g) * 10).round() / 10;
+        final gErr = VitalValidation.glucoseUserInput(
+          g,
+          isImperial ? 'imperial' : 'metric',
+          onValid: (mgdl) => glucoseMgdl = mgdl,
+        );
+        if (gErr != null) {
+          setState(() {
+            error = gErr;
+            saving = false;
+          });
+          return;
         }
-        extraMetrics['glucose'] = glucoseMgdl;
+        extraMetrics['glucose'] = glucoseMgdl!;
         bonusHp += hpGlucoseReward;
         _badges['glucose'] = true;
         await DailyVitalsService.markGlucoseLogged(_vitalsScope);
@@ -553,6 +561,7 @@ class _OnboardingPageState extends State<OnboardingPage>
         whereArgs: [auth.user!.id],
       );
       await auth.refreshPlanStatus();
+      await HealthIndexService.recalculate(auth.user!.id);
     }
 
     if (mounted) {
@@ -636,8 +645,8 @@ class _OnboardingPageState extends State<OnboardingPage>
         OnboardingBadgeStrip(
           badges: [
             (emoji: '🎯', label: 'Unit Pro', unlocked: _badges['units']!),
-            (emoji: '🏗️', label: 'Foundation', unlocked: _badges['foundation']!),
-            (emoji: '❤️', label: 'Heart Track', unlocked: _badges['heart']!),
+            (emoji: '🏗', label: 'Foundation', unlocked: _badges['foundation']!),
+            (emoji: '♥', label: 'Heart Track', unlocked: _badges['heart']!),
             (emoji: '💧', label: 'Sugar Sense', unlocked: _badges['glucose']!),
             (emoji: '🏆', label: 'Champion', unlocked: _badges['champion']!),
           ],
@@ -674,9 +683,9 @@ class _OnboardingPageState extends State<OnboardingPage>
           accent: C.blue500,
         ),
         SizedBox(height: 16),
-        _unitOption('imperial', '🇺🇸', 'Imperial', 'ft · lbs · mg/dL', C.neonCyan),
+        _unitOption('imperial', Icons.flag_outlined, 'Imperial', 'ft · lbs · mg/dL', C.neonCyan),
         SizedBox(height: 10),
-        _unitOption('metric', '🌍', 'Metric', 'cm · kg · mmol/L', C.neonMint),
+        _unitOption('metric', Icons.public, 'Metric', 'cm · kg · mmol/L', C.neonMint),
         SizedBox(height: 16),
         _themeToggle(),
         SizedBox(height: 12),
@@ -735,7 +744,7 @@ class _OnboardingPageState extends State<OnboardingPage>
     );
   }
 
-  Widget _unitOption(String value, String emoji, String title, String desc, Color accent) {
+  Widget _unitOption(String value, IconData icon, String title, String desc, Color accent) {
     final selected = unitSystem == value;
     return GestureDetector(
       onTap: () => setState(() => unitSystem = value),
@@ -749,7 +758,7 @@ class _OnboardingPageState extends State<OnboardingPage>
         ),
         child: Row(
           children: [
-            Text(emoji, style: TextStyle(fontSize: 28)),
+            Icon(icon, size: 28, color: accent),
             SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -942,7 +951,7 @@ class _OnboardingPageState extends State<OnboardingPage>
               if (showBp)
                 Expanded(
                   child: _bonusTile(
-                    '❤️ BP',
+                    '♥ BP',
                     '+$hpBpReward HP',
                     hasBp && _diastolic.text.isNotEmpty && _systolic.text.isNotEmpty,
                   ),
@@ -1071,8 +1080,8 @@ class _OnboardingPageState extends State<OnboardingPage>
         OnboardingBadgeStrip(
           badges: [
             (emoji: '🎯', label: 'Unit Pro', unlocked: _badges['units']!),
-            (emoji: '🏗️', label: 'Foundation', unlocked: _badges['foundation']!),
-            (emoji: '❤️', label: 'Heart Track', unlocked: _badges['heart']!),
+            (emoji: '🏗', label: 'Foundation', unlocked: _badges['foundation']!),
+            (emoji: '♥', label: 'Heart Track', unlocked: _badges['heart']!),
             (emoji: '💧', label: 'Sugar Sense', unlocked: _badges['glucose']!),
             (emoji: '🏆', label: 'Champion', unlocked: _badges['champion']!),
           ],
