@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../l10n/l10n_ext.dart';
+
 import '../theme.dart';
 
 /// Gamified HUD: level, HP, health power meter.
@@ -21,6 +23,7 @@ class OnboardingGameHud extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
@@ -46,7 +49,7 @@ class OnboardingGameHud extends StatelessWidget {
                     style: TextStyle(fontSize: 11, height: 1.2),
                     children: [
                       TextSpan(
-                        text: 'Lv $level · $levelTitle',
+                        text: '${l10n.onboardingLevelShort} $level · $levelTitle',
                         style: TextStyle(
                           color: C.white,
                           fontWeight: FontWeight.w700,
@@ -54,7 +57,7 @@ class OnboardingGameHud extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: ' · $streak-day streak · Health Power',
+                        text: ' · ${l10n.onboardingDayStreak(streak)} · ${l10n.onboardingHudHealthPower}',
                         style: TextStyle(
                           color: C.white.withValues(alpha: 0.75),
                           fontWeight: FontWeight.w500,
@@ -142,13 +145,14 @@ class OnboardingQuestTrail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Row(
       children: [
-        _node(1, 'Units', quest1Done, currentStep >= 1),
+        _node(1, l10n.onboardingTrailUnits, quest1Done, currentStep >= 1),
         _connector(quest1Done),
-        _node(2, 'Basics', quest2Done, currentStep >= 2),
+        _node(2, l10n.onboardingTrailBasics, quest2Done, currentStep >= 2),
         _connector(quest2Done),
-        _node(3, 'Boost', quest3Done, currentStep >= 3),
+        _node(3, l10n.onboardingTrailBoost, quest3Done, currentStep >= 3),
       ],
     );
   }

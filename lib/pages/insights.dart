@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../auth.dart';
 import '../daily_metric_store.dart';
 import '../db.dart';
+import '../l10n/l10n_ext.dart';
 import '../models.dart';
 import '../services.dart';
 import '../theme.dart';
@@ -17,13 +18,13 @@ class _StatusCfg {
   const _StatusCfg(this.label, this.bg, this.border, this.text, this.bar);
 }
 
-Map<String, _StatusCfg> get _statusCfg => {
-  'excellent': _StatusCfg('Excellent', C.green50, C.green200, C.teal700, C.green500),
-  'good': _StatusCfg('Good', C.blue50, C.blue200, C.blue700, C.blue500),
-  'fair': _StatusCfg('Fair', C.yellow50, C.yellow200, C.yellow700, C.yellow400),
+Map<String, _StatusCfg> _statusCfgOf(AppLocalizations l10n) => {
+  'excellent': _StatusCfg(l10n.statusExcellent, C.green50, C.green200, C.teal700, C.green500),
+  'good': _StatusCfg(l10n.statusGood, C.blue50, C.blue200, C.blue700, C.blue500),
+  'fair': _StatusCfg(l10n.statusFair, C.yellow50, C.yellow200, C.yellow700, C.yellow400),
   'needs_attention':
-      _StatusCfg('Needs Attention', C.red50, C.red200, C.red700, C.red500),
-  'poor': _StatusCfg('Needs Attention', C.red50, C.red200, C.red700, C.red500),
+      _StatusCfg(l10n.statusNeedsAttention, C.red50, C.red200, C.red700, C.red500),
+  'poor': _StatusCfg(l10n.statusNeedsAttention, C.red50, C.red200, C.red700, C.red500),
 };
 
 class _FindingCfg {
@@ -125,7 +126,7 @@ class _InsightsPageState extends State<InsightsPage> {
 
     return Column(
         children: [
-          pageHeader('Health Insights', 'Trends and patterns from your health data'),
+          pageHeader(context.l10n.insightsTitle, context.l10n.insightsSubtitle),
           Expanded(
             child: SingleChildScrollView(
               child: Padding(
@@ -142,17 +143,17 @@ class _InsightsPageState extends State<InsightsPage> {
                           )
                         else ...[
                           _statCard(Icons.favorite, C.blue100, C.blue600,
-                              'Avg Health Index', avgHealth, '/100', healthValues),
+                              context.l10n.avgHealthIndex, avgHealth, '/100', healthValues),
                           SizedBox(height: 16),
                           _statCard(Icons.psychology, C.teal100, C.teal600,
-                              'Avg Wellness Score', avgStress, '/100', stressValues),
+                              context.l10n.avgWellnessScore, avgStress, '/100', stressValues),
                           SizedBox(height: 16),
                           _stepStatCard(),
                           SizedBox(height: 24),
-                          _historyCard('Health Index History',
+                          _historyCard(context.l10n.healthIndexHistory,
                               Icons.bar_chart, C.blue500, healthValues, true),
                           SizedBox(height: 24),
-                          _historyCard('Wellness Check History',
+                          _historyCard(context.l10n.wellnessCheckHistory,
                               Icons.psychology, C.teal500, stressValues, false),
                           if (stepData.length > 1) ...[
                             SizedBox(height: 24),
@@ -215,7 +216,7 @@ class _InsightsPageState extends State<InsightsPage> {
               ],
             )
           else
-            Text('No data yet', style: TextStyle(fontSize: 14, color: C.gray400)),
+            Text(context.l10n.noDataYet, style: TextStyle(fontSize: 14, color: C.gray400)),
         ],
       ),
     );
@@ -237,7 +238,7 @@ class _InsightsPageState extends State<InsightsPage> {
                 child: Icon(Icons.directions_walk, size: 16, color: C.green600),
               ),
               SizedBox(width: 8),
-              Text('Step Trend',
+              Text(context.l10n.stepTrend,
                   style: TextStyle(
                       fontSize: 14, fontWeight: FontWeight.w500, color: C.gray600)),
             ],
@@ -254,7 +255,7 @@ class _InsightsPageState extends State<InsightsPage> {
               ],
             )
           else
-            Text('No data yet', style: TextStyle(fontSize: 14, color: C.gray400)),
+            Text(context.l10n.noDataYet, style: TextStyle(fontSize: 14, color: C.gray400)),
         ],
       ),
     );
@@ -344,8 +345,8 @@ class _InsightsPageState extends State<InsightsPage> {
               child: Center(
                 child: Text(
                     isHealth
-                        ? 'No health index data recorded yet'
-                        : 'No wellness checks yet. Try the Wellness Check on the home screen.',
+                        ? context.l10n.noHealthIndexYet
+                        : context.l10n.noWellnessYet,
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 14, color: C.gray400)),
               ),
@@ -369,10 +370,10 @@ class _InsightsPageState extends State<InsightsPage> {
             children: [
               Icon(Icons.directions_walk, size: 20, color: C.green500),
               SizedBox(width: 8),
-              Text('Step Activity',
+              Text(context.l10n.stepActivity,
                   style: TextStyle(fontWeight: FontWeight.w600, color: C.gray900)),
               Spacer(),
-              Text('Last ${stepData.length} days',
+              Text(context.l10n.lastNDays(stepData.length),
                   style: TextStyle(fontSize: 12, color: C.gray400)),
             ],
           ),
@@ -382,11 +383,11 @@ class _InsightsPageState extends State<InsightsPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Min: ${fmtThousands(minV)}',
+              Text(context.l10n.minLabel(fmtThousands(minV)),
                   style: TextStyle(fontSize: 12, color: C.gray400)),
-              Text('Avg: ${fmtThousands(avg)}',
+              Text(context.l10n.avgLabel(fmtThousands(avg)),
                   style: TextStyle(fontSize: 12, color: C.gray400)),
-              Text('Max: ${fmtThousands(maxV)}',
+              Text(context.l10n.maxLabel(fmtThousands(maxV)),
                   style: TextStyle(fontSize: 12, color: C.gray400)),
             ],
           ),
@@ -409,12 +410,12 @@ class _InsightsPageState extends State<InsightsPage> {
             child: Icon(Icons.bar_chart, color: C.gray400, size: 32),
           ),
           SizedBox(height: 16),
-          Text('No insights yet',
+          Text(context.l10n.noInsightsYet,
               style: TextStyle(
                   fontSize: 18, fontWeight: FontWeight.w600, color: C.gray900)),
           SizedBox(height: 8),
           Text(
-              'Start tracking your health metrics and completing wellness checks to see insights here.',
+              context.l10n.noInsightsHint,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, color: C.gray500)),
         ],
@@ -438,18 +439,36 @@ class _HealthAnalysisCardState extends State<HealthAnalysisCard> {
   bool loading = true;
   bool running = false;
   String error = '';
+  Locale? _lastLocale;
 
   @override
   void initState() {
     super.initState();
-    _fetch();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _fetch();
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final locale = Localizations.localeOf(context);
+    if (_lastLocale != null &&
+        _lastLocale!.languageCode != locale.languageCode) {
+      _fetch();
+    }
+    _lastLocale = locale;
   }
 
   Future<void> _fetch() async {
+    if (!mounted) return;
     final userId = context.read<AuthProvider>().user!.id;
-    // Always recompute so guideline fixes appear without a manual re-tap.
+    final l10n = context.l10n;
+    setState(() => loading = true);
+    // Always recompute with the current locale so Insights never shows a
+    // stale English (or other-language) snapshot from the DB.
     try {
-      analysis = await HealthAnalysisService.run(userId);
+      analysis = await HealthAnalysisService.run(userId, l10n);
     } catch (_) {
       analysis = await HealthAnalysisService.latest(userId);
     }
@@ -458,12 +477,13 @@ class _HealthAnalysisCardState extends State<HealthAnalysisCard> {
 
   Future<void> _run() async {
     final userId = context.read<AuthProvider>().user!.id;
+    final l10n = context.l10n;
     setState(() {
       running = true;
       error = '';
     });
     try {
-      analysis = await HealthAnalysisService.run(userId);
+      analysis = await HealthAnalysisService.run(userId, l10n);
       widget.onAnalyzed?.call();
     } catch (e) {
       error = e.toString().replaceFirst('Exception: ', '');
@@ -474,8 +494,9 @@ class _HealthAnalysisCardState extends State<HealthAnalysisCard> {
 
   @override
   Widget build(BuildContext context) {
+    final statusMap = _statusCfgOf(context.l10n);
     final cfg = analysis != null
-        ? (_statusCfg[analysis!.overallStatus] ?? _statusCfg['good']!)
+        ? (statusMap[analysis!.overallStatus] ?? statusMap['good']!)
         : null;
     return Container(
       decoration: cardDecoration(),
@@ -484,54 +505,64 @@ class _HealthAnalysisCardState extends State<HealthAnalysisCard> {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [C.blue500, C.teal500]),
-                      borderRadius: BorderRadius.circular(12)),
-                  child: Icon(Icons.auto_awesome, color: C.white, size: 20),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                          gradient: LinearGradient(colors: [C.blue500, C.teal500]),
+                          borderRadius: BorderRadius.circular(12)),
+                      child: Icon(Icons.auto_awesome, color: C.white, size: 20),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(context.l10n.healthAnalysis,
+                              style: TextStyle(fontWeight: FontWeight.w600, color: C.gray900)),
+                          const SizedBox(height: 2),
+                          Text(context.l10n.healthAnalysisSubtitle,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontSize: 12, color: C.gray400)),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Health Analysis',
-                          style: TextStyle(fontWeight: FontWeight.w600, color: C.gray900)),
-                      Text('Same score as Health Index, with findings & advice',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 12, color: C.gray400)),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: running ? null : _run,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: C.blue500,
-                    foregroundColor: C.white,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    shape:
-                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.refresh, size: 14),
-                      SizedBox(width: 6),
-                      Text(running
-                          ? 'Analyzing…'
-                          : analysis != null
-                              ? 'Re-analyze'
-                              : 'Analyze',
-                          style: TextStyle(
-                              fontSize: 14, fontWeight: FontWeight.w500)),
-                    ],
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton(
+                    onPressed: running ? null : _run,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: C.blue500,
+                      foregroundColor: C.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      shape:
+                          RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.refresh, size: 14),
+                        SizedBox(width: 6),
+                        Text(running
+                            ? context.l10n.analyzing
+                            : analysis != null
+                                ? context.l10n.reAnalyze
+                                : context.l10n.analyze,
+                            style: TextStyle(
+                                fontSize: 13, fontWeight: FontWeight.w500)),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -566,7 +597,7 @@ class _HealthAnalysisCardState extends State<HealthAnalysisCard> {
                   ),
                   SizedBox(height: 12),
                   Text(
-                      'No analysis yet. Press Analyze to get a personalized health conclusion based on your logged metrics.',
+                      context.l10n.noAnalysisYet,
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 14, color: C.gray500)),
                 ],
@@ -660,7 +691,7 @@ class _HealthAnalysisCardState extends State<HealthAnalysisCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Metric Findings',
+              Text(context.l10n.metricFindings,
                   style: TextStyle(
                       fontSize: 14, fontWeight: FontWeight.w600, color: C.gray700)),
               SizedBox(height: 12),
@@ -750,7 +781,7 @@ class _HealthAnalysisCardState extends State<HealthAnalysisCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Recommendations',
+                Text(context.l10n.recommendations,
                     style: TextStyle(
                         fontSize: 14, fontWeight: FontWeight.w600, color: C.gray700)),
                 SizedBox(height: 12),
@@ -790,7 +821,7 @@ class _HealthAnalysisCardState extends State<HealthAnalysisCard> {
         Padding(
           padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
           child: Text(
-              'Last analyzed: ${DateFormat('MMM d, h:mm a').format(analysis!.analyzedAt.toLocal())}',
+              context.l10n.lastAnalyzed(DateFormat('MMM d, h:mm a', Localizations.localeOf(context).toString()).format(analysis!.analyzedAt.toLocal())),
               style: TextStyle(fontSize: 12, color: C.gray400)),
         ),
       ],

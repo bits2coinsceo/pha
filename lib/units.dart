@@ -3,6 +3,24 @@
 
 typedef UnitSystem = String; // 'metric' | 'imperial'
 
+/// Parses a user-typed number accepting `,` or `.` as the decimal separator
+/// (iOS decimal keyboards in many locales only offer a comma).
+double? parseUserNumber(String raw) {
+  var t = raw.trim().replaceAll('\u00A0', '').replaceAll(' ', '');
+  if (t.isEmpty) return null;
+  // European "1.234,5" → strip thousand separators when both appear.
+  if (t.contains(',') && t.contains('.')) {
+    if (t.lastIndexOf(',') > t.lastIndexOf('.')) {
+      t = t.replaceAll('.', '').replaceAll(',', '.');
+    } else {
+      t = t.replaceAll(',', '');
+    }
+  } else {
+    t = t.replaceAll(',', '.');
+  }
+  return double.tryParse(t);
+}
+
 double kgToLbs(double kg) => kg * 2.20462;
 double lbsToKg(double lbs) => lbs * 0.45359237;
 double kmToMiles(double km) => km * 0.621371;

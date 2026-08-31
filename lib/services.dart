@@ -11,12 +11,15 @@ import 'health_telemetry.dart';
 import 'image_compress.dart';
 import 'medical_guidelines.dart';
 import 'models.dart';
+import 'locale_controller.dart';
+import 'l10n/generated/app_localizations.dart';
+import 'l10n/medical_l10n.dart';
 import 'units.dart';
 
 const _uuid = Uuid();
 final _rng = Random();
 
-const _aiDocResponseStyle =
+const _aiDocDailyBriefStyle =
     'RESPONSE STYLE (mandatory): Be clear, practical, and a little more detailed. '
     'Start with a short direct answer (2–3 sentences). '
     'Then add a short section with what looks good, what needs attention, and why. '
@@ -24,6 +27,30 @@ const _aiDocResponseStyle =
     'Aim for roughly 150–250 words — enough to explain, not a lecture. '
     'Use plain patient-friendly language. No greetings, no fluff, no repeated disclaimers. '
     'Remind once that this is wellness guidance, not a formal medical diagnosis.';
+
+const _aiDocFocusedReplyStyle =
+    'RESPONSE STYLE (mandatory): Answer ONLY the patient\'s specific question. '
+    'Keep it concise (roughly 60–120 words). '
+    'Do NOT repeat a full vitals review or restate blood pressure, glucose, weight, '
+    'steps, or Health Index unless the question is directly about those metrics. '
+    'Do NOT add "what looks good / what needs attention" sections — that was already '
+    'covered in today\'s first message. '
+    'Use the patient history above only when it directly helps answer this question. '
+    'No greetings, no fluff. One brief wellness disclaimer at most.';
+
+const _aiDocSupplementGuidance =
+    'DIETARY SUPPLEMENTS & BIOACTIVE ADDITIVES (including БАД): When the patient '
+    'asks about vitamins, minerals, herbal products, probiotics, or dietary supplements, '
+    'give practical, evidence-informed suggestions tailored to their profile and question '
+    '(what may help, typical timing/dose ranges when well-established, cautions or '
+    'interactions when relevant). Do not refuse solely because the topic is a supplement. '
+    'End every supplement-related answer with one short sentence advising them to confirm '
+    'with their doctor or pharmacist before starting, stopping, or changing supplements. '
+    'If they already take a product and ask follow-up questions, answer those directly first; '
+    'add a brief consult-a-specialist note at the end only.';
+
+/// Legacy alias used in onboarding / upload prompts that expect the daily format.
+const _aiDocResponseStyle = _aiDocDailyBriefStyle;
 
 /// Optional messages injected when opening Ai Doc (e.g. after an analysis upload).
 class AiChatSeedMessage {
@@ -117,39 +144,39 @@ class OnboardingHealthSnapshot {
     );
     return buf.toString();
   }
+
+  /// Async variant that appends language + response rules.
+  Future<String> toDiagnosisPromptLocalized() async {
+    final base = toDiagnosisPrompt();
+    final rules = await AiConsultationService.aiDocResponseRules(dailyBrief: true);
+    return '$base\n\n$rules';
+  }
 }
 
 // ── AI consultation ──────────────────────────────────────────────────────────
 // Ported from supabase/functions/ai-consultation.
 class AiConsultationService {
-  static const _responseStyle = _aiDocResponseStyle;
+  /// Language, response style, and supplement policy for Gemini prompts.
+  static Future<String> aiDocResponseRules({required bool dailyBrief}) async {
+    final lang = await LocaleController.aiLanguageInstruction();
+    final style = dailyBrief ? _aiDocDailyBriefStyle : _aiDocFocusedReplyStyle;
+    return '$lang$style\n$_aiDocSupplementGuidance';
+  }
 
-  static const _responses = <String, List<String>>{
-    'sleep': [
-      "Getting adequate sleep is crucial for your health. Aim for 7-9 hours per night. Try maintaining a consistent sleep schedule and creating a relaxing bedtime routine.",
-      "Sleep affects your immune system, mood, and metabolism. If you're having trouble sleeping, consider limiting screen time before bed and avoiding caffeine late in the day.",
-    ],
-    'exercise': [
-      "Regular physical activity is key to good health. Aim for at least 150 minutes of moderate exercise per week. Find activities you enjoy!",
-      "Exercise improves cardiovascular health, mood, and energy levels. Start with activities you enjoy and gradually increase intensity.",
-    ],
-    'stress': [
-      "Managing stress is important for your well-being. Try meditation, deep breathing exercises, or activities you find relaxing.",
-      "High stress can affect your physical and mental health. Consider talking to someone you trust or seeking professional support if needed.",
-    ],
-    'nutrition': [
-      "A balanced diet with plenty of fruits, vegetables, and whole grains supports your health. Stay hydrated and limit processed foods.",
-      "Good nutrition provides energy and supports all body functions. Consider consulting a nutritionist for personalized advice.",
-    ],
-    'weight': [
-      "Maintaining a healthy weight requires balanced diet and regular exercise. Small, sustainable changes are more effective than drastic ones.",
-      "Your weight is just one aspect of health. Focus on how you feel and building healthy habits rather than the number on the scale.",
-    ],
-    'default': [
-      "That's a great health question! Focus on balanced nutrition, regular exercise, adequate sleep, and stress management for overall wellness.",
-      "Taking care of your physical and mental health is important. Don't hesitate to consult with healthcare professionals for personalized advice.",
-    ],
-  };
+  /// Prompt for uploaded lab PDFs / images (not DICOM).
+  static Future<String> buildAnalysisUploadPrompt(String userId) async {
+    final context = await buildFullPatientContext(userId);
+    final rules = await aiDocResponseRules(dailyBrief: true);
+    return '''
+$context
+
+The patient uploaded a medical lab report or analysis file (PDF or image).
+Read all visible values, explain what is normal vs out of range in plain language,
+relate findings to the patient profile above when relevant, and suggest sensible next steps.
+Quote test names as written on the document; explain everything else in the app UI language.
+$rules
+''';
+  }
 
   /// Asks the backend (Vertex AI Gemini) for a reply. Falls back to the local
   /// keyword responder only when the backend is unreachable (network/timeout).
@@ -159,9 +186,15 @@ class AiConsultationService {
     String message, {
     String complexity = 'simple',
     bool includeContext = true,
+    bool? dailyBrief,
   }) async {
+    final brief = dailyBrief ?? await isFirstChatMessageToday(userId);
     final payload = includeContext
-        ? await _wrapWithPatientContext(userId, message)
+        ? await _wrapWithPatientContext(
+            userId,
+            message,
+            dailyBrief: brief,
+          )
         : message;
     try {
       return await ApiClient.chat(
@@ -171,9 +204,9 @@ class AiConsultationService {
       );
     } on ApiException catch (e) {
       if (e.isBudgetExhausted || e.isAuthError) rethrow;
-      return _localReply(message);
+      return await _localReply(message);
     } catch (_) {
-      return _localReply(message);
+      return await _localReply(message);
     }
   }
 
@@ -184,6 +217,7 @@ class AiConsultationService {
     String caption = '',
   }) async {
     final context = await buildFullPatientContext(userId);
+    final rules = await aiDocResponseRules(dailyBrief: false);
     final note = caption.trim().isEmpty
         ? ''
         : '\nPatient note with the photo: "${caption.trim()}"\n';
@@ -192,8 +226,10 @@ $context
 $note
 The patient shared a photo in Ai Doc chat.
 Look carefully at the image (meal, lab report, skin, medication, wound, etc.).
-Explain what you see, how it may relate to their health data in the app, and give practical advice.
-$_responseStyle
+Explain what you see and give practical advice tied to the photo.
+Only mention stored vitals if directly relevant to what is in the image.
+Quote labels on the document as written; explain everything in the app UI language.
+$rules
 ''';
     final uploadPath = await compressImageForUpload(
       filePath,
@@ -209,6 +245,40 @@ $_responseStyle
     );
   }
 
+  /// Thorough DICOM imaging review — pathology-focused prompt for Gemini.
+  static Future<String> analyzeDicomUpload({
+    required String userId,
+    required String filePath,
+  }) async {
+    final context = await buildFullPatientContext(userId);
+    final rules = await aiDocResponseRules(dailyBrief: true);
+    final prompt = '''
+$context
+
+The patient uploaded a DICOM medical imaging study for an in-depth clinical review.
+Perform a systematic, radiology-style analysis with extra care for pathology:
+
+1. Identify modality (CT, MRI, X-ray, ultrasound, PET, etc.) and anatomical region.
+2. Describe visible structures and any abnormal findings in plain language.
+3. Flag signs that may suggest pathology: masses, nodules, fractures, hemorrhage,
+   inflammation, effusion, obstruction, ischemia, or other concerning patterns.
+4. Note study limitations (single image vs series, quality, missing contrast phases).
+5. Relate findings to the patient's profile and history above when relevant.
+6. Recommend sensible next steps (specialist referral, repeat imaging, urgent care)
+   when warranted — use cautious, non-diagnostic language.
+
+This is clinical decision support only; the patient must confirm with a radiologist
+or treating physician.
+$rules
+''';
+    return ApiClient.analyze(
+      userId: userId,
+      filePath: filePath,
+      textLogs: prompt,
+      complexity: 'complex',
+    );
+  }
+
   /// Builds a full patient picture for Gemini: profile, metric trends,
   /// previous Ai Doc chats, uploaded analyses, and health assessments.
   static Future<String> buildFullPatientContext(String userId) async {
@@ -216,9 +286,9 @@ $_responseStyle
     final buf = StringBuffer(
       'You are Ai Doc, the patient\'s personal health assistant in PHA. '
       'Below is their complete history stored in the app. '
-      'Compare past and current health indicators when relevant and maintain '
-      'continuity with previous consultations.\n\n'
-      '$_responseStyle\n',
+      'Use this background data to inform answers — do not recite all metrics '
+      'unless the patient asks or it is their first message of the day.\n\n'
+      '$_aiDocSupplementGuidance\n',
     );
 
     final snapshot = await gatherOnboardingHealthData(userId);
@@ -362,12 +432,41 @@ $_responseStyle
 
   static Future<String> _wrapWithPatientContext(
     String userId,
-    String newMessage,
-  ) async {
+    String newMessage, {
+    required bool dailyBrief,
+  }) async {
     final context = await buildFullPatientContext(userId);
+    final rules = await aiDocResponseRules(dailyBrief: dailyBrief);
+    if (dailyBrief) {
+      return '$context\n\n---\n\n'
+          'Patient\'s new message:\n$newMessage\n\n'
+          'This is the patient\'s first Ai Doc message today. '
+          'Give a concise daily health brief (what looks good, what needs attention) '
+          'and answer their question.\n$rules';
+    }
     return '$context\n\n---\n\n'
         'Patient\'s new message:\n$newMessage\n\n'
-        'Reply now. $_responseStyle';
+        'Reply now.\n$rules';
+  }
+
+  /// True when the user has not yet sent an Ai Doc message today (local day).
+  static Future<bool> isFirstChatMessageToday(String userId) async {
+    if (!Db.instance.isReady) return true;
+    final now = DateTime.now();
+    final start = DateTime(now.year, now.month, now.day);
+    final end = start.add(const Duration(days: 1));
+    final rows = await Db.instance.raw.query(
+      'ai_consultations',
+      where: 'user_id = ?',
+      whereArgs: [userId],
+      orderBy: 'created_at DESC',
+      limit: 20,
+    );
+    for (final r in rows) {
+      final at = DateTime.parse(r['created_at'] as String).toLocal();
+      if (!at.isBefore(start) && at.isBefore(end)) return false;
+    }
+    return true;
   }
 
   static String _clip(String text, int maxLen) {
@@ -427,8 +526,9 @@ $_responseStyle
     try {
       return await reply(
         userId,
-        data.toDiagnosisPrompt(),
+        await data.toDiagnosisPromptLocalized(),
         complexity: 'complex',
+        dailyBrief: true,
       );
     } on ApiException {
       rethrow;
@@ -462,16 +562,30 @@ $_responseStyle
     return RegExp(r'^(no|nope|nah|skip|not now)(\s|!|\.)?').hasMatch(t);
   }
 
-  static String _localReply(String message) {
+  static Future<String> _localReply(String message) async {
+    final l10n = await LocaleController.loadLocalizations();
     final lower = message.toLowerCase();
-    for (final entry in _responses.entries) {
-      if (entry.key == 'default') continue;
-      if (lower.contains(entry.key)) {
-        return entry.value[_rng.nextInt(entry.value.length)];
-      }
+    if (lower.contains('sleep')) {
+      return _rng.nextBool() ? l10n.aiOfflineSleep1 : l10n.aiOfflineSleep2;
     }
-    final d = _responses['default']!;
-    return d[_rng.nextInt(d.length)];
+    if (lower.contains('exercise') ||
+        lower.contains('activity') ||
+        lower.contains('walk')) {
+      return _rng.nextBool() ? l10n.aiOfflineExercise1 : l10n.aiOfflineExercise2;
+    }
+    if (lower.contains('stress') || lower.contains('anx')) {
+      return _rng.nextBool() ? l10n.aiOfflineStress1 : l10n.aiOfflineStress2;
+    }
+    if (lower.contains('nutrition') ||
+        lower.contains('diet') ||
+        lower.contains('food') ||
+        lower.contains('eat')) {
+      return _rng.nextBool() ? l10n.aiOfflineNutrition1 : l10n.aiOfflineNutrition2;
+    }
+    if (lower.contains('weight') || lower.contains('bmi')) {
+      return _rng.nextBool() ? l10n.aiOfflineWeight1 : l10n.aiOfflineWeight2;
+    }
+    return _rng.nextBool() ? l10n.aiOfflineDefault1 : l10n.aiOfflineDefault2;
   }
 
   static Future<void> save(String userId, String message, String response) async {
@@ -489,12 +603,10 @@ $_responseStyle
     String userId, {
     required String fileName,
     required String analysis,
+    String? userMessage,
   }) async {
-    await save(
-      userId,
-      'I uploaded my analysis: $fileName',
-      analysis,
-    );
+    final msg = userMessage ?? 'I uploaded my analysis: $fileName';
+    await save(userId, msg, analysis);
   }
 
   /// Profile + recent vitals sent with `/analyze` so the backend has context.
@@ -541,185 +653,146 @@ $_responseStyle
 // Narrative layer on top of Health Index: same score/status, richer findings
 // and actionable advice across every Index component that has data.
 class HealthAnalysisService {
-  static Finding _bp(double s, double d, {int? age, String? gender}) {
+  static Finding _bp(double s, double d, AppLocalizations l10n, {int? age, String? gender}) {
     final c = BloodPressure.classify(s, d, age: age, gender: gender);
     return Finding(
-      category: 'Blood Pressure',
+      category: l10n.categoryBloodPressure,
       status: c.status,
-      value: c.label,
-      message: c.message,
+      value: c.label.replaceAll('mmHg', l10n.unitMmhg),
+      message: l10n.bpMessage(c.band),
     );
   }
 
-  static Finding _glucose(double gMgdl, UnitSystem sys) {
+  static Finding _glucose(double gMgdl, UnitSystem sys, AppLocalizations l10n) {
     final c = GlucoseGuidelines.classify(gMgdl, sys);
     return Finding(
-      category: 'Blood Glucose',
+      category: l10n.categoryBloodGlucose,
       status: c.status,
       value: c.label,
-      message: c.message,
+      message: l10n.glucoseMessage(c.band),
     );
   }
 
-  static Finding _weight(double weight, double? heightCm) {
+  static Finding _weight(double weight, double? heightCm, AppLocalizations l10n) {
     final c = BmiGuidelines.classify(weight, heightCm);
+    final String value;
+    if (c.band == 'weight_only' || heightCm == null || heightCm <= 0) {
+      value = '${weight.toStringAsFixed(1)} ${l10n.unitKg}';
+    } else {
+      final bmi = weight / ((heightCm / 100) * (heightCm / 100));
+      value = l10n.clinicalBmiValue(bmi.toStringAsFixed(1));
+    }
     return Finding(
-      category: c.band == 'weight_only' ? 'Weight' : 'Weight / BMI',
+      category: c.band == 'weight_only' ? l10n.categoryWeight : l10n.categoryWeightBmi,
       status: c.status,
-      value: c.label,
-      message: c.message,
+      value: value,
+      message: l10n.bmiMessage(c.band),
     );
   }
 
-  static Finding _steps(double steps) {
+  static Finding _steps(double steps, AppLocalizations l10n) {
     final c = StepsGuidelines.classify(steps);
     return Finding(
-      category: 'Daily Activity',
+      category: l10n.categoryDailyActivity,
       status: c.status,
-      value: c.label,
-      message: c.message,
+      value: l10n.stepsLabel('${steps.round()}'),
+      message: l10n.stepsFeedback(steps.round()).message,
     );
   }
 
-  static Finding _calories(double calories, double steps) {
+  static Finding _calories(double calories, double steps, AppLocalizations l10n) {
     final expMin = steps * 0.04;
     final expMax = steps * 0.06;
     if (calories >= expMin && calories <= expMax * 1.5) {
       return Finding(
-        category: 'Calorie Burn',
+        category: l10n.categoryCalorieBurn,
         status: 'good',
-        value: '${calories.toInt()} kcal',
-        message:
-            'Calorie expenditure looks consistent with your steps. Pair it with '
-            'balanced meals to support recovery.',
+        value: '${calories.toInt()} ${l10n.unitKcal}',
+        message: l10n.calorieBurnGood,
       );
     }
     return Finding(
-      category: 'Calorie Burn',
+      category: l10n.categoryCalorieBurn,
       status: 'info',
-      value: '${calories.toInt()} kcal',
-      message:
-          'You burned ${calories.toInt()} kcal from activity. Use meal logging '
-          'to match intake to your goals.',
+      value: '${calories.toInt()} ${l10n.unitKcal}',
+      message: l10n.calorieBurnInfo(calories.toInt()),
     );
   }
 
-  static Finding _wellness(int score) {
+  static Finding _wellness(int score, AppLocalizations l10n) {
     final c = WellnessGuidelines.classify(score);
     return Finding(
-      category: 'Mental Wellness',
+      category: l10n.categoryMentalWellness,
       status: c.status,
       value: c.label,
-      message: c.message,
+      message: l10n.wellnessMessage(c.band),
     );
   }
 
-  static Finding? _smoking(Map<String, dynamic> h) {
+  static Finding? _smoking(Map<String, dynamic> h, AppLocalizations l10n) {
     final smokes = (h['smokes'] as num).toInt() == 1;
     if (!smokes) {
       return Finding(
-        category: 'Smoking',
+        category: l10n.categorySmoking,
         status: 'good',
-        value: 'Non-smoker',
-        message:
-            'No smoking reported — one of the strongest protective factors for '
-            'heart and lung health.',
+        value: l10n.smokingNonSmoker,
+        message: l10n.smokingGood,
       );
     }
     final level = h['smoking_level'] as String?;
     final label = switch (level) {
-      'less_than_one_pack' => '<1 pack/day',
-      'one_pack' => '~1 pack/day',
-      'more_than_one_pack' => '>1 pack/day',
-      _ => 'Active smoker',
+      'less_than_one_pack' => l10n.smokingLessPack,
+      'one_pack' => l10n.smokingOnePack,
+      'more_than_one_pack' => l10n.smokingMorePack,
+      _ => l10n.smokingActive,
     };
     return Finding(
-      category: 'Smoking',
+      category: l10n.categorySmoking,
       status: level == 'less_than_one_pack' ? 'warning' : 'critical',
       value: label,
-      message:
-          'Smoking is a top Health Index risk factor. Set a quit date, remove '
-          'triggers, and use Plus+ → Check Your Bad Habits to track progress.',
+      message: l10n.smokingWarning,
     );
   }
 
-  static Finding? _alcohol(Map<String, dynamic> h) {
+  static Finding? _alcohol(Map<String, dynamic> h, AppLocalizations l10n) {
     final drinks = (h['drinks_alcohol'] as num).toInt() == 1;
     if (!drinks) {
       return Finding(
-        category: 'Alcohol',
+        category: l10n.categoryAlcohol,
         status: 'good',
-        value: 'None',
-        message:
-            'No alcohol use reported — helpful for BP, sleep, and liver health.',
+        value: l10n.alcoholNone,
+        message: l10n.alcoholGood,
       );
     }
     final level = h['alcohol_level'] as String?;
     final (status, label, tip) = switch (level) {
-      'occasionally' => (
-          'info',
-          'Occasional',
-          'Keep alcohol occasional and alcohol-free most days of the week.',
-        ),
-      'regularly' => (
-          'warning',
-          'Regular',
-          'Cut toward fewer drinking days; alcohol raises BP and calorie load.',
-        ),
-      'heavy' => (
-          'critical',
-          'Heavy',
-          'Heavy use strongly hurts your Health Index — seek support to cut down safely.',
-        ),
-      _ => (
-          'warning',
-          'Drinks alcohol',
-          'Track frequency this week and aim for several alcohol-free days.',
-        ),
+      'occasionally' => ('info', l10n.alcoholOccasional, l10n.alcoholOccasionalTip),
+      'regularly' => ('warning', l10n.alcoholRegular, l10n.alcoholRegularTip),
+      'heavy' => ('critical', l10n.alcoholHeavy, l10n.alcoholHeavyTip),
+      _ => ('warning', l10n.alcoholDefault, l10n.alcoholDefaultTip),
     };
-    return Finding(category: 'Alcohol', status: status, value: label, message: tip);
+    return Finding(category: l10n.categoryAlcohol, status: status, value: label, message: tip);
   }
 
-  static Finding? _screenTime(Map<String, dynamic> h) {
+  static Finding? _screenTime(Map<String, dynamic> h, AppLocalizations l10n) {
     final level = h['social_media_level'] as String?;
     if (level == null) return null;
     final (status, label, tip) = switch (level) {
-      'rarely' => (
-          'good',
-          'Rarely',
-          'Low social-media load — good for sleep and focus.',
-        ),
-      'under_hour' => (
-          'info',
-          '<1 h/day',
-          'Reasonable screen habit. Keep phones out of the bedroom if sleep slips.',
-        ),
-      'one_to_two_hours' => (
-          'info',
-          '1–2 h/day',
-          'Moderate use. Try a 30-minute evening cutoff to protect recovery.',
-        ),
-      'constantly' => (
-          'warning',
-          'Constant',
-          'High screen time crowds out movement and sleep. Set app limits and '
-              'swap one scroll block for a walk.',
-        ),
-      _ => (
-          'info',
-          level,
-          'Review screen habits — small evening limits often help wellness scores.',
-        ),
+      'rarely' => ('good', l10n.screenRarely, l10n.screenRarelyTip),
+      'under_hour' => ('info', l10n.screenUnderHour, l10n.screenUnderHourTip),
+      'one_to_two_hours' => ('info', l10n.screenOneTwoHours, l10n.screenOneTwoTip),
+      'constantly' => ('warning', l10n.screenConstant, l10n.screenConstantTip),
+      _ => ('info', level, l10n.screenDefaultTip),
     };
     return Finding(
-      category: 'Screen Time',
+      category: l10n.categoryScreenTime,
       status: status,
       value: label,
       message: tip,
     );
   }
 
-  static Finding? _nutrition(List<Map<String, dynamic>> meals) {
+  static Finding? _nutrition(List<Map<String, dynamic>> meals, AppLocalizations l10n) {
     if (meals.isEmpty) return null;
     var excellent = 0, ok = 0, attention = 0;
     for (final m in meals) {
@@ -733,45 +806,49 @@ class HealthAnalysisService {
       }
     }
     final n = meals.length;
-    final value = '$n recent meals';
+    final value = l10n.nutritionRecentMeals(n);
     if (attention >= (n + 1) ~/ 2) {
       return Finding(
-        category: 'Nutrition',
+        category: l10n.categoryNutrition,
         status: 'warning',
         value: value,
-        message:
-            'Several recent meals need attention. Favor vegetables, protein, and '
-            'fewer ultra-processed snacks; log the next meal for feedback.',
+        message: l10n.nutritionWarning,
       );
     }
     if (excellent >= ok && attention == 0) {
       return Finding(
-        category: 'Nutrition',
+        category: l10n.categoryNutrition,
         status: 'good',
         value: value,
-        message:
-            'Recent meal quality looks strong. Keep the pattern — it supports '
-            'glucose and weight in your Health Index.',
+        message: l10n.nutritionGood,
       );
     }
     return Finding(
-      category: 'Nutrition',
+      category: l10n.categoryNutrition,
       status: 'info',
       value: value,
-      message:
-          'Mixed meal quality lately. Aim for one upgrade per day (more fiber '
-          'or protein, less sugary drinks).',
+      message: l10n.nutritionInfo,
     );
   }
 
-  static Finding? _psychotest(Map<String, dynamic> row) {
+  static Finding? _psychotest(Map<String, dynamic> row, AppLocalizations l10n) {
     final total = (row['total_score'] as num).toInt();
     final c = PsychoGuidelines.classifyLoad(total);
+    final label = switch (c.band) {
+      'low' => l10n.psychoLow,
+      'moderate' => l10n.psychoModerate,
+      _ => l10n.psychoHigh,
+    };
+    final msg = switch (c.band) {
+      'low' => l10n.psychoLowMsg,
+      'moderate' => l10n.psychoModerateMsg,
+      _ => l10n.psychoHighMsg,
+    };
     return Finding(
-      category: 'PsychoTest',
+      category: l10n.categoryPsychoTest,
       status: c.status,
-      value: 'Load $total · ${c.label}',
-      message: c.message,
+      value: l10n.psychoLoad(total, label),
+      message: msg,
     );
   }
 
@@ -782,31 +859,19 @@ class HealthAnalysisService {
   }
 
   static String _summary({
+    required AppLocalizations l10n,
     required String uiStatus,
     required int score,
     required List<Finding> findings,
     required HealthIndexResult index,
   }) {
-    const openers = {
-      'excellent': 'Your Health Index is excellent.',
-      'good': 'Your Health Index looks good overall.',
-      'fair': 'Your Health Index is fair — a few levers will move it up.',
-      'needs_attention':
-          'Your Health Index needs attention — focus on the highest-impact gaps below.',
-    };
-    var s = '${openers[uiStatus] ?? 'Here is your health summary.'} Score $score/100 matches the Home Health Index.';
-
-    final ranked = _rankedGaps(index);
-    final strengths = findings.where((f) => f.status == 'good').toList();
-    if (strengths.isNotEmpty) {
-      final names = strengths.take(3).map((f) => f.category).join(', ');
-      s += ' Strengths: $names.';
-    }
-    if (ranked.isNotEmpty) {
-      final focus = ranked.take(3).map((e) => _componentLabel(e.key)).join(', ');
-      s += ' Biggest Index drag right now: $focus.';
-    }
-    return s;
+    final gapKeys = _rankedGaps(index).map((e) => e.key).toList();
+    return l10n.analysisSummary(
+      uiStatus,
+      score,
+      findings.map((f) => (category: f.category, status: f.status)).toList(),
+      gapKeys,
+    );
   }
 
   static List<MapEntry<String, double>> _rankedGaps(HealthIndexResult index) {
@@ -822,21 +887,11 @@ class HealthAnalysisService {
     return gaps;
   }
 
-  static String _componentLabel(String key) => switch (key) {
-        'blood_pressure' => 'Blood Pressure',
-        'smoking' => 'Smoking',
-        'glucose' => 'Blood Glucose',
-        'bmi' => 'Weight / BMI',
-        'activity' => 'Activity',
-        'alcohol' => 'Alcohol',
-        'nutrition' => 'Nutrition',
-        'wellness' => 'Mental Wellness',
-        'psychotest' => 'PsychoTest',
-        'screen_time' => 'Screen Time',
-        _ => key,
-      };
+  static String _componentLabel(String key, AppLocalizations l10n) =>
+      l10n.componentLabel(key);
 
   static List<Recommendation> _recommendations({
+    required AppLocalizations l10n,
     required HealthIndexResult index,
     required List<Finding> findings,
   }) {
@@ -857,7 +912,7 @@ class HealthAnalysisService {
           : score < 70
               ? 'medium'
               : 'low';
-      for (final tip in _adviceForComponent(gap.key, score)) {
+      for (final tip in _adviceForComponent(gap.key, score, l10n)) {
         add(priority, tip);
         if (recs.length >= 8) break;
       }
@@ -873,86 +928,55 @@ class HealthAnalysisService {
     if (recs.isEmpty) {
       add(
         'low',
-        'All scored Health Index factors look solid. Keep logging vitals, '
-        'meals, and activity so trends stay visible.',
+        l10n.analysisAllSolid,
       );
     } else if (index.score >= 70) {
       add(
         'low',
-        'Protect what works: keep today’s activity and meal pattern, and '
-        're-check BP/glucose on a consistent schedule.',
+        l10n.adviceProtectWhatWorks,
       );
     }
 
     return recs.take(8).toList();
   }
 
-  static List<String> _adviceForComponent(String key, double score) {
+  static List<String> _adviceForComponent(String key, double score, AppLocalizations l10n) {
     switch (key) {
       case 'blood_pressure':
         return [
-          'Blood pressure: measure at the same time of day, seated and rested. '
-              'Cut packaged salt, and walk most days — lifestyle is first-line '
-              'before medication decisions.',
-          if (score < 60)
-            'If readings stay ≥140/90 on repeat checks, book a clinician visit '
-                'with your home log.',
+          l10n.adviceBloodPressure1,
+          if (score < 60) l10n.adviceBloodPressure2,
         ];
       case 'smoking':
-        return [
-          'Smoking: pick a quit day this week, tell someone, and remove cigarettes '
-              'from easy reach. Update Plus+ → Check Your Bad Habits after you cut down.',
-        ];
+        return [l10n.adviceSmoking];
       case 'glucose':
         return [
-          'Glucose: swap sugary drinks for water, add fiber/protein to breakfast, '
-              'and take a 10–15 minute walk after your largest meal.',
-          if (score < 50)
-            'If fasting glucose stays high, ask your clinician about labs '
-                '(HbA1c) rather than relying on one reading.',
+          l10n.adviceGlucose1,
+          if (score < 50) l10n.adviceGlucose2,
         ];
       case 'bmi':
-        return [
-          'Weight: target a gentle weekly change, not a crash diet — prioritize '
-              'protein, vegetables, and your step habit from Health Insights.',
-          'Log meals with Calorie Check so nutrition advice matches what you actually eat.',
-        ];
+        return [l10n.adviceBmi1, l10n.adviceBmi2];
       case 'activity':
-        return [
-          'Activity: schedule two fixed walk slots (e.g. after lunch and evening). '
-              'Answer the physical-activity check-in so adherence counts in your Index.',
-        ];
+        return [l10n.adviceActivity];
       case 'alcohol':
-        return [
-          'Alcohol: plan alcohol-free days first, then shrink portion size on '
-              'drinking days. This often improves sleep and next-day BP.',
-        ];
+        return [l10n.adviceAlcohol];
       case 'nutrition':
-        return [
-          'Nutrition: upgrade one meal today — more plants and protein, less '
-              'ultra-processed snacks. Re-scan a meal for fresh feedback.',
-        ];
+        return [l10n.adviceNutrition];
       case 'wellness':
-        return [
-          'Wellness: protect a consistent sleep window and do one short recovery '
-              'block daily (breathing, stretch, or outdoor light). Retake the '
-              'Wellness Check after a few days.',
-        ];
+        return [l10n.adviceWellness];
       case 'psychotest':
-        return [
-          'PsychoTest load: reduce stacked stressors where you can, and use brief '
-              'body-calming routines. Retake PsychoTest when life is calmer to '
-              'see the Index move.',
-        ];
+        return [l10n.advicePsychotest];
       case 'screen_time':
+        return [l10n.adviceScreenTime];
+      case 'heart_rate':
         return [
-          'Screen time: set a hard evening cutoff and replace one scroll session '
-              'with movement — it supports both activity and wellness scores.',
+          l10n.adviceHeartRate1,
+          if (score < 60) l10n.adviceHeartRate2,
         ];
+      case 'stress':
+        return [l10n.adviceStress];
       default:
-        return [
-          'Review ${_componentLabel(key)} in the app and make one small change today.',
-        ];
+        return [];
     }
   }
 
@@ -968,7 +992,7 @@ class HealthAnalysisService {
   }
 
   /// Fresh narrative analysis aligned with Health Index (same score/status).
-  static Future<HealthAnalysis> run(String userId) async {
+  static Future<HealthAnalysis> run(String userId, AppLocalizations l10n) async {
     final db = Db.instance.raw;
 
     // Single source of truth for the headline number.
@@ -1036,38 +1060,38 @@ class HealthAnalysisService {
     final sys = latest['blood_pressure_systolic'];
     final dia = latest['blood_pressure_diastolic'];
     if (sys != null && dia != null) {
-      findings.add(_bp(sys, dia, age: age, gender: gender));
+      findings.add(_bp(sys, dia, l10n, age: age, gender: gender));
     }
     final glucose = latest['glucose'];
-    if (glucose != null) findings.add(_glucose(glucose, unitSystem));
+    if (glucose != null) findings.add(_glucose(glucose, unitSystem, l10n));
 
     final weight =
         latest['weight'] ?? (profileRows.isNotEmpty
             ? (profileRows.first['weight'] as num?)?.toDouble()
             : null);
-    if (weight != null) findings.add(_weight(weight, heightCm));
+    if (weight != null) findings.add(_weight(weight, heightCm, l10n));
 
     final steps = latest['steps'];
-    if (steps != null) findings.add(_steps(steps));
+    if (steps != null) findings.add(_steps(steps, l10n));
     final calories = latest['calories'];
     if (calories != null && steps != null) {
-      findings.add(_calories(calories, steps));
+      findings.add(_calories(calories, steps, l10n));
     }
     if (wellnessRows.isNotEmpty) {
-      findings.add(_wellness((wellnessRows.first['score'] as num).toInt()));
+      findings.add(_wellness((wellnessRows.first['score'] as num).toInt(), l10n));
     }
     if (habitRows.isNotEmpty) {
-      final smoking = _smoking(habitRows.first);
+      final smoking = _smoking(habitRows.first, l10n);
       if (smoking != null) findings.add(smoking);
-      final alcohol = _alcohol(habitRows.first);
+      final alcohol = _alcohol(habitRows.first, l10n);
       if (alcohol != null) findings.add(alcohol);
-      final screens = _screenTime(habitRows.first);
+      final screens = _screenTime(habitRows.first, l10n);
       if (screens != null) findings.add(screens);
     }
-    final nutrition = _nutrition(meals);
+    final nutrition = _nutrition(meals, l10n);
     if (nutrition != null) findings.add(nutrition);
     if (psychoRows.isNotEmpty) {
-      final psycho = _psychotest(psychoRows.first);
+      final psycho = _psychotest(psychoRows.first, l10n);
       if (psycho != null) findings.add(psycho);
     }
 
@@ -1081,48 +1105,101 @@ class HealthAnalysisService {
       diastolic: dia,
       fastingGlucoseMgdl: glucose,
     ));
-    final correlationFindings = correlation.toFindings();
-    bool hasWeightFinding(String category) =>
-        category == 'weight' || category == 'weight / bmi';
-    final existingCategories =
-        findings.map((f) => f.category.toLowerCase()).toSet();
+    final correlationFindings = correlation.toFindings(l10n);
+    bool hasWeightFinding(String category) {
+      final c = category.toLowerCase();
+      return c.contains('weight') ||
+          c.contains('bmi') ||
+          c.contains('вес') ||
+          c.contains('peso') ||
+          c.contains('体重') ||
+          c.contains('وزن');
+    }
+
+    String metricKey(String category) {
+      final c = category.toLowerCase();
+      if (c.contains('glucose') ||
+          c.contains('глюкоз') ||
+          c.contains('sugar') ||
+          c.contains('azúcar') ||
+          c.contains('血糖') ||
+          c.contains('جلوكوز')) {
+        return 'glucose';
+      }
+      if (c.contains('blood pressure') ||
+          c.contains('давлен') ||
+          c.contains('presión') ||
+          c.contains('血压') ||
+          c.contains('ضغط')) {
+        return 'bp';
+      }
+      if (hasWeightFinding(c)) return 'weight';
+      return c;
+    }
+
+    bool isClinicalExtra(String category) {
+      return category == l10n.clinicalCategoryWhatMeans ||
+          category == l10n.clinicalCategoryHealthyWeight ||
+          category == l10n.clinicalCategoryMetabolic ||
+          category == l10n.clinicalCategoryCombinedRisk ||
+          category == l10n.clinicalCategoryForAge ||
+          () {
+            final c = category.toLowerCase();
+            return c.contains('what this means') ||
+                c.contains('что это значит') ||
+                c.contains('healthy weight') ||
+                c.contains('здоровый') ||
+                c.contains('metabolic') ||
+                c.contains('метаболическ') ||
+                c.contains('overall heart') ||
+                c.contains('сердечно') ||
+                c.contains('for your age') ||
+                c.contains('для вашего возраста') ||
+                c.contains('ideal weight') ||
+                c.contains('cardiometabolic') ||
+                c.contains('clinical pattern') ||
+                c.contains('age-specific') ||
+                c.contains('aha/acc');
+          }();
+    }
+
+    final existingKeys = findings.map((f) => metricKey(f.category)).toSet();
     final bpIsGood = findings.any(
       (f) =>
-          f.category.toLowerCase() == 'blood pressure' &&
+          metricKey(f.category) == 'bp' &&
           (f.status == 'good' || f.status == 'info'),
     );
-    for (final f in correlationFindings) {
-      final cat = f.category.toLowerCase();
-      // Never show "High BP…" flags when the main BP finding is already healthy.
+    for (final raw in correlationFindings) {
+      final f = Finding(
+        category: l10n.findingCategory(raw.category),
+        status: raw.status,
+        value: raw.value,
+        message: raw.message,
+      );
+      final key = metricKey(raw.category);
+      if (key == 'glucose' || key == 'bp' || key == 'weight') {
+        if (existingKeys.contains(key)) continue;
+        existingKeys.add(key);
+      }
+      // Never show young-HTN flags when the main BP finding is already healthy.
       if (bpIsGood &&
-          cat.contains('what this means') &&
-          (f.value?.toLowerCase().contains('high bp') == true ||
-              f.message.toLowerCase().contains('high blood pressure'))) {
+          raw.category == l10n.clinicalCategoryWhatMeans &&
+          (f.value == l10n.clinicalFlagYoungHtnTitle ||
+              (f.value?.toLowerCase().contains('high bp') == true))) {
         continue;
       }
       final duplicatesExistingWeight =
-          hasWeightFinding(cat) &&
-          existingCategories.any(hasWeightFinding);
-      // Add dual-guideline & syndrome findings; skip duplicate BMI/BP/glucose headlines.
-      if (cat.contains('ideal weight') ||
-          cat.contains('healthy weight') ||
-          cat.contains('metabolic') ||
-          cat.contains('cardiometabolic') ||
-          cat.contains('overall heart') ||
-          cat.contains('clinical pattern') ||
-          cat.contains('what this means') ||
-          cat.contains('for your age') ||
-          cat.contains('age-specific') ||
-          cat.contains('aha/acc')) {
+          hasWeightFinding(raw.category) && existingKeys.contains('weight');
+      if (isClinicalExtra(raw.category)) {
         findings.add(f);
-      } else if (!existingCategories.contains(cat) &&
-          !duplicatesExistingWeight) {
+      } else if (!existingKeys.contains(key) && !duplicatesExistingWeight) {
         findings.add(f);
+        existingKeys.add(key);
       }
     }
 
     if (findings.isEmpty && index.componentScores.isEmpty) {
-      throw Exception('No health data found. Please log some metrics first.');
+      throw Exception(l10n.analysisNoData);
     }
 
     // Sort: critical → warning → info → good
@@ -1134,13 +1211,14 @@ class HealthAnalysisService {
     final score = index.score;
     final status = _uiStatus(index.status);
     final summary = _summary(
+      l10n: l10n,
       uiStatus: status,
       score: score,
       findings: findings,
       index: index,
     );
-    final recommendations = _recommendations(index: index, findings: findings);
-    final correlationRecs = correlation.toRecommendations();
+    final recommendations = _recommendations(l10n: l10n, index: index, findings: findings);
+    final correlationRecs = correlation.toRecommendations(l10n);
     for (final r in correlationRecs) {
       if (!recommendations.any((x) => x.text == r.text)) {
         recommendations.insert(0, r);
@@ -1189,7 +1267,12 @@ class HealthConnectService {
     return rows.isEmpty ? null : LastSync.fromRow(rows.first);
   }
 
-  static Future<void> sync(String userId, {required int steps, required double distanceMeters}) async {
+  static Future<void> sync(
+    String userId, {
+    required int steps,
+    required double distanceMeters,
+    DateTime? day,
+  }) async {
     final db = Db.instance.raw;
     final weightRows = await db.query('health_metrics',
         where: 'user_id = ? AND metric_type = ?',
@@ -1200,17 +1283,19 @@ class HealthConnectService {
     final calories = _calories(steps, distanceMeters, weightKg);
     final distanceKm = (distanceMeters / 1000 * 100).round() / 100;
     final now = DateTime.now().toUtc().toIso8601String();
+    final targetDay = day ?? DateTime.now();
 
-    // One live row per metric for today; yesterday stays frozen after midnight.
+    // One live row per metric for the target local day.
     for (final m in [
       {'metric_type': 'steps', 'value': steps.toDouble()},
       {'metric_type': 'distance', 'value': distanceKm},
       {'metric_type': 'calories', 'value': calories},
     ]) {
-      await DailyMetricStore.upsertToday(
+      await DailyMetricStore.upsertOnLocalDay(
         userId: userId,
         metricType: m['metric_type'] as String,
         value: m['value'] as double,
+        day: targetDay,
         source: 'health_connect',
       );
     }
@@ -1221,7 +1306,11 @@ class HealthConnectService {
       'steps': steps,
       'distance_meters': distanceMeters,
       'calories_calculated': calories,
-      'raw_payload': jsonEncode({'steps': steps, 'distance_meters': distanceMeters}),
+      'raw_payload': jsonEncode({
+        'steps': steps,
+        'distance_meters': distanceMeters,
+        'day': DailyMetricStore.localDateKey(targetDay),
+      }),
     });
     await HealthIndexService.recalculate(userId);
   }
@@ -1259,6 +1348,42 @@ class HealthConnectService {
       userId,
       steps: snapshot.steps,
       distanceMeters: snapshot.distanceMeters,
+    );
+    return true;
+  }
+
+  /// Pulls a specific local calendar [day] from HealthKit / Health Connect and
+  /// freezes it into SQLite (used before the morning “yesterday” push).
+  static Future<bool> syncDayFromDevice(String userId, DateTime day) async {
+    if (!HealthTelemetryService.isSupported) return false;
+    if (Platform.isAndroid && !await HealthTelemetryService.hasPermission()) {
+      return false;
+    }
+    final local = day.toLocal();
+    final target = DateTime(local.year, local.month, local.day);
+    final snapshot = await HealthTelemetryService.fetchForDay(target);
+    if (snapshot == null) return false;
+
+    final bounds = DailyMetricStore.localDayBounds(target);
+    final existing = await Db.instance.raw.query(
+      'health_metrics',
+      columns: ['value'],
+      where:
+          'user_id = ? AND metric_type = ? AND recorded_at >= ? AND recorded_at < ?',
+      whereArgs: [userId, 'steps', bounds.startIso, bounds.endIso],
+      orderBy: 'recorded_at DESC',
+      limit: 1,
+    );
+    if (existing.isNotEmpty) {
+      final prev = (existing.first['value'] as num).toInt();
+      if (prev == snapshot.steps) return false;
+    }
+
+    await sync(
+      userId,
+      steps: snapshot.steps,
+      distanceMeters: snapshot.distanceMeters,
+      day: target,
     );
     return true;
   }

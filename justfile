@@ -74,3 +74,11 @@ reset-ios: reset
 
 # Alias: uninstall app from simulator and install fresh build
 reinstall: reset
+
+# Install debug build on the plugged-in physical iPhone (not simulator).
+phone:
+    @bash scripts/flutter-run-phone.sh
+
+# Release install on physical iPhone (no hot reload).
+phone-release:
+    @bash scripts/flutter-run-phone.sh --release

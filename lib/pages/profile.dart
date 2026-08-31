@@ -3,13 +3,16 @@ import 'package:provider/provider.dart';
 
 import '../auth.dart';
 import '../db.dart';
+import '../l10n/l10n_ext.dart';
 import '../legal.dart';
 import '../medical_guidelines.dart';
 import '../profile_basics.dart';
 import '../cosmic_ui.dart';
 import '../theme.dart';
 import '../theme_mode.dart';
+import '../units.dart';
 import '../widgets.dart';
+import '../widgets/language_picker.dart';
 import 'history.dart' show pageHeader;
 
 class ProfilePage extends StatefulWidget {
@@ -69,9 +72,9 @@ class _ProfilePageState extends State<ProfilePage> {
     int? age;
     if (_age.text.isNotEmpty) {
       age = int.tryParse(_age.text);
-      if (VitalValidation.age(age) != null) {
+      if (VitalValidation.age(age, context.l10n) != null) {
         setState(() {
-          error = VitalValidation.age(age)!;
+          error = VitalValidation.age(age, context.l10n)!;
           saving = false;
         });
         return;
@@ -80,7 +83,7 @@ class _ProfilePageState extends State<ProfilePage> {
     int? height;
     if (_height.text.isNotEmpty) {
       height = int.tryParse(_height.text);
-      final hErr = VitalValidation.heightCm(height?.toDouble());
+      final hErr = VitalValidation.heightCm(height?.toDouble(), context.l10n);
       if (hErr != null) {
         setState(() {
           error = hErr;
@@ -91,8 +94,8 @@ class _ProfilePageState extends State<ProfilePage> {
     }
     double? weight;
     if (_weight.text.isNotEmpty) {
-      weight = double.tryParse(_weight.text.trim());
-      final wErr = VitalValidation.weightKg(weight);
+      weight = parseUserNumber(_weight.text);
+      final wErr = VitalValidation.weightKg(weight, context.l10n);
       if (wErr != null) {
         setState(() {
           error = wErr;
@@ -103,7 +106,8 @@ class _ProfilePageState extends State<ProfilePage> {
     }
     await Db.instance.raw.update(
       'profiles',
-      {'display_name': _name.text},
+      // Keep the name exactly as the user typed it — never localize/transliterate.
+      {'display_name': _name.text.trim()},
       where: 'id = ?',
       whereArgs: [userId],
     );
@@ -115,7 +119,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
     setState(() {
       saving = false;
-      success = 'Profile updated successfully!';
+      success = context.l10n.profileUpdatedSuccess;
     });
   }
 
@@ -126,7 +130,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return CosmicScaffold(
       body: Column(
         children: [
-          pageHeader('Profile', 'Manage your account settings'),
+          pageHeader(context.l10n.profileTitle, context.l10n.profileSubtitle),
           Expanded(
             child: loading
                 ? Center(child: CircularProgressIndicator())
@@ -178,7 +182,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              Text('Email',
+                                              Text(context.l10n.email,
                                                   style: TextStyle(
                                                       fontSize: 14, color: C.gray600)),
                                               Text(auth.user?.email ?? '',
@@ -193,7 +197,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ],
                                     ),
                                     SizedBox(height: 32),
-                                    _label('Display Name', null, null),
+                                    _label(context.l10n.displayName, null, null),
                                     TextField(
                                       controller: _name,
                                       style: TextStyle(
@@ -202,10 +206,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ),
                                       cursorColor: C.accentFocus,
                                       textInputAction: TextInputAction.next,
-                                      decoration: appInput('Your name'),
+                                      decoration: appInput(context.l10n.yourName),
                                     ),
                                     SizedBox(height: 16),
-                                    _label('Age', Icons.account_circle, C.orange500),
+                                    _label(context.l10n.age, Icons.account_circle, C.orange500),
                                     TextField(
                                       controller: _age,
                                       style: TextStyle(
@@ -215,10 +219,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                       cursorColor: C.accentFocus,
                                       keyboardType: TextInputType.number,
                                       textInputAction: TextInputAction.next,
-                                      decoration: appInput('e.g. 32'),
+                                      decoration: appInput(context.l10n.onboardingAgeHint),
                                     ),
                                     SizedBox(height: 16),
-                                    _label('Height (cm)', Icons.straighten, C.sky500),
+                                    _label(context.l10n.heightCm, Icons.straighten, C.sky500),
                                     TextField(
                                       controller: _height,
                                       style: TextStyle(
@@ -228,10 +232,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                       cursorColor: C.accentFocus,
                                       keyboardType: TextInputType.number,
                                       textInputAction: TextInputAction.next,
-                                      decoration: appInput('e.g. 175'),
+                                      decoration: appInput(context.l10n.onboardingHeightHintMetric),
                                     ),
                                     SizedBox(height: 16),
-                                    _label('Weight (kg)', Icons.monitor_weight, C.blue500),
+                                    _label(context.l10n.weightKg, Icons.monitor_weight, C.blue500),
                                     TextField(
                                       controller: _weight,
                                       style: TextStyle(
@@ -244,16 +248,19 @@ class _ProfilePageState extends State<ProfilePage> {
                                         decimal: true,
                                       ),
                                       textInputAction: TextInputAction.done,
-                                      decoration: appInput('e.g. 70'),
+                                      decoration: appInput(context.l10n.onboardingWeightHintMetric),
                                     ),
                                     SizedBox(height: 24),
                                     PrimaryButton(
-                                      label: saving ? 'Saving...' : 'Save Changes',
+                                      label: saving ? context.l10n.loading : context.l10n.saveChanges,
                                       onPressed: saving ? null : _save,
                                     ),
                                   ],
                                 ),
                               ),
+                              SizedBox(height: 24),
+                              // Not const — must rebuild with ThemeModeController / C.* colors.
+                              LanguagePicker(expanded: true),
                               SizedBox(height: 24),
                               Container(
                                 width: double.infinity,
@@ -278,13 +285,15 @@ class _ProfilePageState extends State<ProfilePage> {
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text('Appearance',
+                                          Text(context.l10n.appearance,
                                               style: TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.w700,
                                                   color: C.gray900)),
                                           Text(
-                                            themeMode.isDark ? 'Dark theme' : 'Light theme',
+                                            themeMode.isDark
+                                                ? context.l10n.themeDark
+                                                : context.l10n.themeLight,
                                             style: TextStyle(
                                                 fontSize: 13, color: C.gray500),
                                           ),
@@ -310,7 +319,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Account',
+                                    Text(context.l10n.account,
                                         style: TextStyle(
                                             fontSize: 18,
                                             fontWeight: FontWeight.bold,
@@ -320,11 +329,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                       contentPadding: EdgeInsets.zero,
                                       leading: Icon(Icons.description_outlined,
                                           color: C.blue500),
-                                      title: Text('Agreement',
+                                      title: Text(context.l10n.agreement,
                                           style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                               color: C.gray900)),
-                                      subtitle: Text('Terms of Service & Disclaimer',
+                                      subtitle: Text(context.l10n.termsOfService,
                                           style: TextStyle(
                                               fontSize: 12, color: C.gray500)),
                                       trailing: Icon(Icons.chevron_right,
@@ -336,11 +345,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                       contentPadding: EdgeInsets.zero,
                                       leading: Icon(Icons.privacy_tip_outlined,
                                           color: C.teal600),
-                                      title: Text('Privacy Policy',
+                                      title: Text(context.l10n.privacyPolicy,
                                           style: TextStyle(
                                               fontWeight: FontWeight.w600,
                                               color: C.gray900)),
-                                      subtitle: Text('How we handle your data',
+                                      subtitle: Text(context.l10n.howWeHandleData,
                                           style: TextStyle(
                                               fontSize: 12, color: C.gray500)),
                                       trailing: Icon(Icons.chevron_right,
@@ -365,7 +374,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         children: [
                                           Icon(Icons.logout, size: 20),
                                           SizedBox(width: 8),
-                                          Text('Sign Out',
+                                          Text(context.l10n.signOut,
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w500)),
                                         ],

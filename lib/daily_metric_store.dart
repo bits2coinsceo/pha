@@ -13,6 +13,11 @@ const kDailyLiveMetricTypes = {
   'distance',
   'calories',
   'active_time',
+  'resting_heart_rate',
+  'walking_heart_rate',
+  'hrv_sdnn',
+  'heart_rate_avg',
+  'irregular_rhythm',
 };
 
 /// Upsert helpers so Health Indicator shows one value per day.
@@ -41,7 +46,11 @@ class DailyMetricStore {
   static bool isDailyLiveMetric(String metricType) =>
       kDailyLiveMetricTypes.contains(metricType);
 
-  /// Insert or update today's row for [metricType]. Past days are never overwritten.
+  /// Insert or update today's row for [metricType].
+  ///
+  /// Pass [at] to target another local calendar day (e.g. finalize yesterday
+  /// from HealthKit). [recorded_at] always stays inside that day's bounds so
+  /// history queries do not lose the row after midnight.
   static Future<void> upsertToday({
     required String userId,
     required String metricType,
@@ -50,9 +59,41 @@ class DailyMetricStore {
     String? source,
     DateTime? at,
   }) async {
+    final local = (at ?? DateTime.now()).toLocal();
+    await upsertOnLocalDay(
+      userId: userId,
+      metricType: metricType,
+      value: value,
+      day: local,
+      notes: notes,
+      source: source,
+    );
+  }
+
+  /// Insert or update the single live row for [day]'s local calendar date.
+  static Future<void> upsertOnLocalDay({
+    required String userId,
+    required String metricType,
+    required double value,
+    required DateTime day,
+    String? notes,
+    String? source,
+  }) async {
     if (!Db.instance.isReady) return;
-    final now = (at ?? DateTime.now()).toUtc().toIso8601String();
-    final bounds = localDayBounds(at);
+    final local = day.toLocal();
+    final dayStart = DateTime(local.year, local.month, local.day);
+    final todayStart = DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      DateTime.now().day,
+    );
+    // Today stays live (now); past days freeze at end-of-day so the timestamp
+    // never drifts into the next calendar day.
+    final stamp = dayStart.isAtSameMomentAs(todayStart)
+        ? DateTime.now()
+        : dayStart.add(const Duration(hours: 23, minutes: 59, seconds: 59));
+    final stampIso = stamp.toUtc().toIso8601String();
+    final bounds = localDayBounds(dayStart);
     final existing = await Db.instance.raw.query(
       'health_metrics',
       columns: ['id'],
@@ -68,8 +109,8 @@ class DailyMetricStore {
         'health_metrics',
         {
           'value': value,
-          'recorded_at': now,
-          'created_at': now,
+          'recorded_at': stampIso,
+          'created_at': stampIso,
           if (notes != null) 'notes': notes,
           if (source != null) 'source': source,
         },
@@ -84,10 +125,10 @@ class DailyMetricStore {
       'user_id': userId,
       'metric_type': metricType,
       'value': value,
-      'recorded_at': now,
+      'recorded_at': stampIso,
       'notes': notes,
       'source': source,
-      'created_at': now,
+      'created_at': stampIso,
     });
   }
 

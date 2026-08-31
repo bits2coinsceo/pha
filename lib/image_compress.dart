@@ -17,18 +17,25 @@ Future<String> compressImageForUpload(
   if (!await source.exists()) return filePath;
 
   final ext = p.extension(filePath).toLowerCase();
-  if (ext == '.pdf') return filePath;
+  if (ext == '.pdf' || ext == '.dcm' || ext == '.dicom') return filePath;
 
   try {
-    // Already small enough — skip work to avoid needless recompression.
     final bytes = await source.length();
-    if (bytes > 0 && bytes <= 350 * 1024) return filePath;
-
     final dir = await getTemporaryDirectory();
     final targetPath = p.join(
       dir.path,
       'pha_upload_${DateTime.now().millisecondsSinceEpoch}.jpg',
     );
+
+    // Always re-encode HEIC/PNG/WebP to JPEG — backend expects common formats.
+    final needsConvert = ext == '.heic' ||
+        ext == '.heif' ||
+        ext == '.png' ||
+        ext == '.webp' ||
+        ext == '.tif' ||
+        ext == '.tiff';
+    // Already small JPEG/etc. — skip needless recompression.
+    if (!needsConvert && bytes > 0 && bytes <= 350 * 1024) return filePath;
 
     final compressed = await FlutterImageCompress.compressAndGetFile(
       source.absolute.path,

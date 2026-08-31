@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'l10n/generated/app_localizations.dart';
+import 'l10n/l10n_ext.dart';
 import 'theme.dart';
 import 'widgets.dart';
 
@@ -11,14 +13,14 @@ enum LegalDocument {
 }
 
 extension LegalDocumentX on LegalDocument {
-  String get title => switch (this) {
-        LegalDocument.termsOfService => 'Terms of Service & Agreement',
-        LegalDocument.privacyPolicy => 'Privacy Policy',
+  String title(AppLocalizations l10n) => switch (this) {
+        LegalDocument.termsOfService => l10n.termsOfService,
+        LegalDocument.privacyPolicy => l10n.privacyPolicy,
       };
 
-  String get shortTitle => switch (this) {
-        LegalDocument.termsOfService => 'Agreement',
-        LegalDocument.privacyPolicy => 'Privacy Policy',
+  String shortTitle(AppLocalizations l10n) => switch (this) {
+        LegalDocument.termsOfService => l10n.agreement,
+        LegalDocument.privacyPolicy => l10n.privacyPolicy,
       };
 
   String get assetPath => switch (this) {
@@ -85,7 +87,7 @@ class _LegalDocumentPageState extends State<LegalDocumentPage> {
         foregroundColor: C.gray900,
         elevation: 0,
         title: Text(
-          widget.document.title,
+          widget.document.title(context.l10n),
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
@@ -126,7 +128,7 @@ class _LegalDocumentPageState extends State<LegalDocumentPage> {
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
                         child: PrimaryButton(
-                          label: 'Close',
+                          label: context.l10n.close,
                           onPressed: () => Navigator.pop(context),
                         ),
                       ),

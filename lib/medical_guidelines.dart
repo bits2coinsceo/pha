@@ -10,6 +10,7 @@ library;
 import 'dart:math';
 
 import 'blood_pressure.dart';
+import 'l10n/generated/app_localizations.dart';
 import 'units.dart';
 
 export 'blood_pressure.dart';
@@ -74,6 +75,24 @@ abstract final class MedicalGuidelines {
   static const mealExcellentMaxKcal = 400;
   static const mealSatisfactoryMaxKcal = 650;
 
+  /// Daily meal-intake chart zones (confirmed photo meals).
+  /// ≤ deficitMax → green (deficit); ≤ moderateMax → yellow; above → red.
+  static const mealIntakeDeficitMaxKcal = 1700;
+  static const mealIntakeModerateMaxKcal = 2000;
+
+  /// Resting heart-rate wellness bands (bpm). Tunable; not a diagnosis.
+  static const restingHrMin = 60;
+  static const restingHrMax = 95;
+  static const restingHrMaxYoung = 95;
+  static const restingHrMaxSenior = 95;
+  static const restingHrAthleteMin = 40;
+  /// Soft elevated cut-off: flag if resting HR stays in/above 80–95.
+  static const restingHrElevatedCutOff = 80;
+  /// Upper of the elevated band — at/above this is a risk signal.
+  static const restingHrElevatedHigh = 95;
+  /// Day-to-day rise that counts as a sharp change.
+  static const restingHrSharpChangeBpm = 10;
+
   /// Soft daily energy target (Mifflin–St Jeor × light activity 1.4).
   /// Used for deficit / surplus feedback — not a medical prescription.
   static int estimatedDailyCalorieTarget({
@@ -97,18 +116,40 @@ abstract final class MedicalGuidelines {
     return (bmr * 1.4).round().clamp(1200, 4000);
   }
 
-  /// Relative Health Index weights (sum 100 when all present).
-  static const indexWeights = <String, double>{
-    'blood_pressure': 18,
-    'smoking': 15,
-    'glucose': 14,
-    'bmi': 12,
-    'activity': 12,
-    'alcohol': 10,
+  /// Foundation Health Index weights — vitals, body metrics, and habits.
+  /// These form the base score before lifestyle modifiers.
+  static const foundationWeights = <String, double>{
+    'blood_pressure': 22,
+    'glucose': 18,
+    'bmi': 16,
+    'smoking': 16,
+    'alcohol': 12,
+    'age': 10,
+    'screen_time': 6,
+  };
+
+  /// Lifestyle modifiers applied on top of the foundation score.
+  /// [heart_rate] is only included when there is meaningful daily activity.
+  static const lifestyleWeights = <String, double>{
+    'activity': 70,
+    'heart_rate': 15,
     'nutrition': 8,
-    'wellness': 6,
+    'wellness': 4,
     'psychotest': 3,
-    'screen_time': 2,
+  };
+
+  /// How strongly lifestyle pulls the foundation score (0–1).
+  static const lifestyleBlend = 0.28;
+
+  /// Stress (elevated HR without activity) pull on the final score.
+  static const stressBlend = 0.12;
+
+  /// @Deprecated Prefer [foundationWeights] + [lifestyleWeights].
+  /// Kept for Insights gap labeling of known keys.
+  static const indexWeights = <String, double>{
+    ...foundationWeights,
+    ...lifestyleWeights,
+    'stress': 8,
   };
 
   static String indexStatus(int score) {
@@ -158,17 +199,20 @@ abstract final class MedicalGuidelines {
 
 /// Plausibility validation for forms (onboarding, daily vitals, log metric).
 abstract final class VitalValidation {
-  static String? bloodPressure(double? sys, double? dia) {
-    if (sys == null || dia == null) return 'Check blood pressure values.';
+  static String? bloodPressure(double? sys, double? dia, AppLocalizations l10n) {
+    if (sys == null || dia == null) return l10n.validationBpCheck;
     if (sys < MedicalGuidelines.bpSysMin ||
         sys > MedicalGuidelines.bpSysMax ||
         dia < MedicalGuidelines.bpDiaMin ||
         dia > MedicalGuidelines.bpDiaMax) {
-      return 'Check blood pressure values '
-          '(${MedicalGuidelines.bpSysMin.toInt()}–${MedicalGuidelines.bpSysMax.toInt()} / '
-          '${MedicalGuidelines.bpDiaMin.toInt()}–${MedicalGuidelines.bpDiaMax.toInt()} mmHg).';
+      return l10n.validationBpRange(
+        MedicalGuidelines.bpSysMin.toInt(),
+        MedicalGuidelines.bpSysMax.toInt(),
+        MedicalGuidelines.bpDiaMin.toInt(),
+        MedicalGuidelines.bpDiaMax.toInt(),
+      );
     }
-    if (dia >= sys) return 'Diastolic should be lower than systolic.';
+    if (dia >= sys) return l10n.validationBpDiaLower;
     return null;
   }
 
@@ -176,15 +220,18 @@ abstract final class VitalValidation {
   /// Returns error message or null; [mgdlOut] is filled on success.
   static String? glucoseUserInput(
     double? userValue,
-    UnitSystem unitSys, {
+    UnitSystem unitSys,
+    AppLocalizations l10n, {
     required void Function(double mgdl) onValid,
   }) {
-    if (userValue == null) return 'Enter a glucose value.';
+    if (userValue == null) return l10n.validationGlucoseEnter;
     if (unitSys == 'imperial') {
       if (userValue < MedicalGuidelines.glucoseMgdlMin ||
           userValue > MedicalGuidelines.glucoseMgdlMax) {
-        return 'Glucose ${MedicalGuidelines.glucoseMgdlMin.toInt()}–'
-            '${MedicalGuidelines.glucoseMgdlMax.toInt()} mg/dL.';
+        return l10n.validationGlucoseRangeMgdl(
+          MedicalGuidelines.glucoseMgdlMin.toInt(),
+          MedicalGuidelines.glucoseMgdlMax.toInt(),
+        );
       }
       onValid(userValue);
       return null;
@@ -192,73 +239,86 @@ abstract final class VitalValidation {
     final minMmol = mgdlToMmol(MedicalGuidelines.glucoseMgdlMin);
     final maxMmol = mgdlToMmol(MedicalGuidelines.glucoseMgdlMax);
     if (userValue < minMmol || userValue > maxMmol) {
-      return 'Glucose ${minMmol.toStringAsFixed(1)}–'
-          '${maxMmol.toStringAsFixed(1)} mmol/L.';
+      return l10n.validationGlucoseRangeMmol(
+        minMmol.toStringAsFixed(1),
+        maxMmol.toStringAsFixed(1),
+      );
     }
     onValid((mmolToMgdl(userValue) * 10).round() / 10);
     return null;
   }
 
-  static String? weightKg(double? kg) {
-    if (kg == null) return 'Enter a valid weight.';
+  static String? weightKg(double? kg, AppLocalizations l10n) {
+    if (kg == null) return l10n.validationWeightEnter;
     if (kg < MedicalGuidelines.weightKgMin ||
         kg > MedicalGuidelines.weightKgMax) {
-      return 'Weight ${MedicalGuidelines.weightKgMin.toInt()}–'
-          '${MedicalGuidelines.weightKgMax.toInt()} kg.';
+      return l10n.validationWeightRange(
+        MedicalGuidelines.weightKgMin.toInt(),
+        MedicalGuidelines.weightKgMax.toInt(),
+      );
     }
     return null;
   }
 
-  static String? heightCm(double? cm) {
-    if (cm == null) return 'Enter a valid height.';
+  static String? heightCm(double? cm, AppLocalizations l10n) {
+    if (cm == null) return l10n.validationHeightEnter;
     if (cm < MedicalGuidelines.heightCmMin ||
         cm > MedicalGuidelines.heightCmMax) {
-      return 'Height ${MedicalGuidelines.heightCmMin.toInt()}–'
-          '${MedicalGuidelines.heightCmMax.toInt()} cm.';
+      return l10n.validationHeightRange(
+        MedicalGuidelines.heightCmMin.toInt(),
+        MedicalGuidelines.heightCmMax.toInt(),
+      );
     }
     return null;
   }
 
-  static String? age(int? age) {
-    if (age == null) return 'Enter a valid age.';
+  static String? age(int? age, AppLocalizations l10n) {
+    if (age == null) return l10n.validationAgeEnter;
     if (age < MedicalGuidelines.ageMin || age > MedicalGuidelines.ageMax) {
-      return 'Age ${MedicalGuidelines.ageMin}–${MedicalGuidelines.ageMax}.';
+      return l10n.validationAgeRange(
+        MedicalGuidelines.ageMin,
+        MedicalGuidelines.ageMax,
+      );
     }
     return null;
   }
 
   /// Validates a free-form log metric after converting to storage units.
-  static String? metricStorage(String metricType, double storageValue) {
+  static String? metricStorage(
+    String metricType,
+    double storageValue,
+    AppLocalizations l10n,
+  ) {
     switch (metricType) {
       case 'glucose':
         if (storageValue < MedicalGuidelines.glucoseMgdlMin ||
             storageValue > MedicalGuidelines.glucoseMgdlMax) {
-          return 'Glucose out of allowed range.';
+          return l10n.validationGlucoseOutOfRange;
         }
       case 'weight':
         if (storageValue < MedicalGuidelines.weightKgMin ||
             storageValue > MedicalGuidelines.weightKgMax) {
-          return 'Weight out of allowed range.';
+          return l10n.validationWeightOutOfRange;
         }
       case 'steps':
         if (storageValue < 0 || storageValue > 100000) {
-          return 'Steps look unrealistic.';
+          return l10n.validationStepsUnrealistic;
         }
       case 'calories':
         if (storageValue < 0 || storageValue > 20000) {
-          return 'Calories look unrealistic.';
+          return l10n.validationCaloriesUnrealistic;
         }
       case 'water':
         if (storageValue < 0 || storageValue > 15000) {
-          return 'Water intake looks unrealistic.';
+          return l10n.validationWaterUnrealistic;
         }
       case 'active_time':
         if (storageValue < 0 || storageValue > 1440) {
-          return 'Active time must be 0–1440 minutes.';
+          return l10n.validationActiveTimeRange;
         }
       case 'distance':
         if (storageValue < 0 || storageValue > 500) {
-          return 'Distance looks unrealistic.';
+          return l10n.validationDistanceUnrealistic;
         }
     }
     return null;
@@ -396,6 +456,9 @@ abstract final class BmiGuidelines {
 }
 
 /// Unified step bands for Home feedback, Insights findings, and Index score.
+///
+/// Scores are intentionally generous once the user clears sedentary levels —
+/// a meaningful daily step count is treated as a real Health Index contribution.
 abstract final class StepsGuidelines {
   static MedResult classify(double steps) {
     final n = steps.round();
@@ -404,7 +467,7 @@ abstract final class StepsGuidelines {
       return MedResult(
         band: 'sedentary',
         status: 'warning',
-        score: n < 1000 ? 28 : 48,
+        score: n < 1000 ? 30 : 50,
         label: v,
         message:
             'Low activity today. Start with a 15-minute walk — consistency beats '
@@ -415,7 +478,7 @@ abstract final class StepsGuidelines {
       return MedResult(
         band: 'building',
         status: 'info',
-        score: 60,
+        score: 68,
         label: v,
         message:
             'You are building a walking habit. Aim toward '
@@ -425,8 +488,8 @@ abstract final class StepsGuidelines {
     if (n < MedicalGuidelines.stepsStrong) {
       return MedResult(
         band: 'baseline',
-        status: 'info',
-        score: 72,
+        status: 'good',
+        score: 82,
         label: v,
         message:
             'Solid baseline activity. A few more short walks can reach the '
@@ -436,8 +499,8 @@ abstract final class StepsGuidelines {
     if (n < MedicalGuidelines.stepsGoal) {
       return MedResult(
         band: 'strong',
-        status: 'info',
-        score: 88,
+        status: 'good',
+        score: 94,
         label: v,
         message:
             'Strong activity level — well above sedentary. Keep this rhythm; '
@@ -447,7 +510,7 @@ abstract final class StepsGuidelines {
     return MedResult(
       band: 'goal',
       status: 'good',
-      score: 98,
+      score: 100,
       label: v,
       message:
           'Excellent activity level — you are meeting the classic '

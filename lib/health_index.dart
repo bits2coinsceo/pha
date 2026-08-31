@@ -4,6 +4,9 @@ import 'package:uuid/uuid.dart';
 
 import 'daily_metric_store.dart';
 import 'db.dart';
+import 'heart_rate.dart';
+import 'locale_controller.dart';
+import 'l10n/medical_l10n.dart';
 import 'medical_guidelines.dart';
 
 const _uuid = Uuid();
@@ -25,19 +28,20 @@ class HealthIndexResult {
   });
 }
 
-/// Evidence-weighted Health Index (0–100) from all local patient data.
+/// Two-layer Health Index (0–100) from local patient data.
 ///
-/// Relative impact follows WHO STEPS / Global Burden of Disease ranking of
-/// major NCD risk factors (raised BP, tobacco, raised glucose, overweight,
-/// physical inactivity, harmful alcohol, unhealthy diet), plus app wellness
-/// signals (stress check, PsychoTest, screen-time habits).
+/// 1. **Foundation** — age, BMI (height/weight), blood pressure, glucose,
+///    and harmful habits (smoking, alcohol, screen time).
+/// 2. **Lifestyle** — daily steps & physical-activity check-ins (and meals /
+///    wellness / PsychoTest when present) pull that foundation up or down.
+/// 3. **Heart rate** — counted as fitness only when there is meaningful
+///    activity; without activity, an elevated pulse is treated as stress.
 ///
-/// Only factors with available data are used; their weights are renormalized
-/// so missing inputs do not unfairly lower the score.
+/// Missing inputs are skipped; layer weights are renormalized.
 class HealthIndexService {
   HealthIndexService._();
 
-  /// Relative impact weights — single source: [MedicalGuidelines.indexWeights].
+  /// Combined map for Insights / gap tools.
   static const weights = MedicalGuidelines.indexWeights;
 
   /// Recalculate from SQLite and upsert today's Health Index row.
@@ -94,7 +98,7 @@ class HealthIndexService {
     return HealthIndexResult(
       score: (r['score'] as num).toInt(),
       status: r['status'] as String,
-      summary: _summaryFor((r['score'] as num).toInt(), r['status'] as String),
+      summary: await _summaryFor((r['score'] as num).toInt(), r['status'] as String),
       componentScores: const {},
       appliedWeights: const {},
     );
@@ -106,6 +110,7 @@ class HealthIndexService {
     final profiles =
         await db.query('profiles', where: 'id = ?', whereArgs: [userId], limit: 1);
     final profile = profiles.isEmpty ? null : profiles.first;
+    final age = (profile?['age'] as num?)?.toInt();
 
     final metrics = await db.query(
       'health_metrics',
@@ -122,36 +127,32 @@ class HealthIndexService {
       );
     }
 
-    final scores = <String, double>{};
+    final foundation = <String, double>{};
+    final lifestyle = <String, double>{};
+    final applied = <String, double>{};
+    final allScores = <String, double>{};
 
-    // BMI from profile / weight metric
+    // ── 1. Foundation: vitals, body, habits, age ───────────────────────────
+    if (age != null) {
+      foundation['age'] = _scoreAgeBaseline(age);
+    }
+
     final heightCm = (profile?['height'] as num?)?.toDouble();
     final weightKg =
         (profile?['weight'] as num?)?.toDouble() ?? latest['weight'];
     if (heightCm != null && heightCm > 0 && weightKg != null) {
-      scores['bmi'] = _scoreBmi(weightKg / pow(heightCm / 100, 2));
+      foundation['bmi'] = _scoreBmi(weightKg / pow(heightCm / 100, 2));
     }
 
     final sys = latest['blood_pressure_systolic'];
     final dia = latest['blood_pressure_diastolic'];
     if (sys != null && dia != null) {
-      scores['blood_pressure'] = _scoreBp(sys, dia);
+      foundation['blood_pressure'] = _scoreBp(sys, dia);
     }
 
     final glucose = latest['glucose'];
     if (glucose != null) {
-      scores['glucose'] = _scoreGlucose(glucose);
-    }
-
-    // Activity: steps + recent program check-ins
-    final steps = latest['steps'];
-    final activityParts = <double>[];
-    if (steps != null) activityParts.add(_scoreSteps(steps));
-    final checkinScore = await _scoreActivityCheckins(userId);
-    if (checkinScore != null) activityParts.add(checkinScore);
-    if (activityParts.isNotEmpty) {
-      scores['activity'] =
-          activityParts.reduce((a, b) => a + b) / activityParts.length;
+      foundation['glucose'] = _scoreGlucose(glucose);
     }
 
     final habits = await db.query(
@@ -163,16 +164,47 @@ class HealthIndexService {
     );
     if (habits.isNotEmpty) {
       final h = habits.first;
-      scores['smoking'] = _scoreSmoking(
+      foundation['smoking'] = _scoreSmoking(
         (h['smokes'] as num).toInt() == 1,
         h['smoking_level'] as String?,
       );
-      scores['alcohol'] = _scoreAlcohol(
+      foundation['alcohol'] = _scoreAlcohol(
         (h['drinks_alcohol'] as num).toInt() == 1,
         h['alcohol_level'] as String?,
       );
-      scores['screen_time'] =
+      foundation['screen_time'] =
           _scoreScreenTime(h['social_media_level'] as String?);
+    }
+
+    // ── 2. Lifestyle: steps / activity, nutrition, wellness, psycho ────────
+    final steps = latest['steps'];
+    final checkinScore = await _scoreActivityCheckins(userId);
+    double? activityScore;
+    if (steps != null && checkinScore != null) {
+      activityScore = _scoreSteps(steps) * 0.75 + checkinScore * 0.25;
+    } else if (steps != null) {
+      activityScore = _scoreSteps(steps);
+    } else if (checkinScore != null) {
+      activityScore = checkinScore;
+    }
+    if (activityScore != null) {
+      lifestyle['activity'] = activityScore;
+    }
+
+    final hasActivity = _hasMeaningfulActivity(
+      steps: steps,
+      checkinScore: checkinScore,
+    );
+
+    final meals = await db.query(
+      'meal_calorie_checks',
+      where: 'user_id = ? AND confirmed = 1',
+      whereArgs: [userId],
+      orderBy: 'checked_at DESC',
+      limit: 5,
+    );
+    if (meals.isNotEmpty) {
+      lifestyle['nutrition'] = _scoreNutrition(meals);
     }
 
     final wellness = await db.query(
@@ -183,7 +215,8 @@ class HealthIndexService {
       limit: 1,
     );
     if (wellness.isNotEmpty) {
-      scores['wellness'] = (wellness.first['score'] as num).toDouble().clamp(0, 100);
+      lifestyle['wellness'] =
+          (wellness.first['score'] as num).toDouble().clamp(0, 100);
     }
 
     final psycho = await db.query(
@@ -195,54 +228,145 @@ class HealthIndexService {
     );
     if (psycho.isNotEmpty) {
       final total = (psycho.first['total_score'] as num).toInt();
-      scores['psychotest'] = PsychoGuidelines.indexContribution(total);
+      lifestyle['psychotest'] = PsychoGuidelines.indexContribution(total);
     }
 
-    final meals = await db.query(
-      'meal_calorie_checks',
-      where: 'user_id = ? AND confirmed = 1',
-      whereArgs: [userId],
-      orderBy: 'checked_at DESC',
-      limit: 5,
+    // Heart rate: fitness only with activity; otherwise elevated = stress.
+    final restingHr = latest['resting_heart_rate'];
+    final hrv = latest['hrv_sdnn'];
+    final avgHr = latest['heart_rate_avg'];
+    final irregular = (latest['irregular_rhythm'] ?? 0) > 0;
+    final heartScore = HeartRateGuidelines.indexContribution(
+      restingBpm: restingHr,
+      hrvMs: hrv,
+      avgBpm: avgHr,
+      irregularRhythm: irregular,
+      age: age,
     );
-    if (meals.isNotEmpty) {
-      scores['nutrition'] = _scoreNutrition(meals);
+    double? stressScore;
+    if (heartScore != null) {
+      if (hasActivity) {
+        lifestyle['heart_rate'] = heartScore;
+      } else if (_looksLikeStress(
+        restingBpm: restingHr,
+        hrvMs: hrv,
+        irregular: irregular,
+        heartScore: heartScore,
+      )) {
+        stressScore = heartScore;
+      }
     }
 
-    // If almost nothing yet, seed from age alone (primary onboarding)
-    if (scores.isEmpty) {
-      final age = (profile?['age'] as num?)?.toInt();
+    allScores.addAll(foundation);
+    allScores.addAll(lifestyle);
+    if (stressScore != null) allScores['stress'] = stressScore;
+
+    // Nothing at all → age seed or neutral baseline.
+    if (foundation.isEmpty && lifestyle.isEmpty && stressScore == null) {
       final seed = age == null ? 72.0 : _scoreAgeBaseline(age);
       return HealthIndexResult(
         score: seed.round().clamp(10, 100),
         status: _statusFor(seed.round()),
-        summary: _summaryFor(seed.round(), _statusFor(seed.round())),
+        summary: await _summaryFor(seed.round(), _statusFor(seed.round())),
         componentScores: {'baseline': seed},
         appliedWeights: {'baseline': 100},
       );
     }
 
+    final foundationScore = foundation.isEmpty
+        ? (age == null ? 72.0 : _scoreAgeBaseline(age))
+        : _weightedAverage(
+            foundation,
+            MedicalGuidelines.foundationWeights,
+            applied,
+          );
+
+    var score = foundationScore;
+
+    if (lifestyle.isNotEmpty) {
+      final lifestyleScore = _weightedAverage(
+        lifestyle,
+        MedicalGuidelines.lifestyleWeights,
+        applied,
+      );
+      final blend = MedicalGuidelines.lifestyleBlend;
+      score = foundationScore * (1 - blend) + lifestyleScore * blend;
+    }
+
+    // Elevated HR without activity → stress pull on the final score.
+    if (stressScore != null) {
+      final sb = MedicalGuidelines.stressBlend;
+      score = score * (1 - sb) + stressScore * sb;
+      applied['stress'] = MedicalGuidelines.indexWeights['stress'] ?? 8;
+    }
+
+    // Record foundation weights that actually applied.
+    for (final e in foundation.entries) {
+      final w = MedicalGuidelines.foundationWeights[e.key] ?? 0;
+      if (w > 0) applied.putIfAbsent(e.key, () => w);
+    }
+
+    final rounded = score.round().clamp(10, 100);
+    final status = _statusFor(rounded);
+    return HealthIndexResult(
+      score: rounded,
+      status: status,
+      summary: await _summaryFor(rounded, status),
+      componentScores: allScores,
+      appliedWeights: applied,
+    );
+  }
+
+  /// Meaningful movement today / recently — gates heart-rate-as-fitness.
+  static bool _hasMeaningfulActivity({
+    double? steps,
+    double? checkinScore,
+  }) {
+    if (steps != null && steps >= MedicalGuidelines.stepsBaseline) return true;
+    if (steps != null &&
+        steps >= MedicalGuidelines.stepsSedentary &&
+        checkinScore != null &&
+        checkinScore >= 60) {
+      return true;
+    }
+    if (checkinScore != null && checkinScore >= 70) return true;
+    return false;
+  }
+
+  /// Elevated resting pulse / low HRV / irregular rhythm without activity.
+  static bool _looksLikeStress({
+    double? restingBpm,
+    double? hrvMs,
+    required bool irregular,
+    required double heartScore,
+  }) {
+    if (irregular) return true;
+    if (restingBpm != null &&
+        restingBpm >= MedicalGuidelines.restingHrElevatedCutOff) {
+      return true;
+    }
+    if (hrvMs != null && hrvMs < 40) return true;
+    return heartScore < 70;
+  }
+
+  static double _weightedAverage(
+    Map<String, double> scores,
+    Map<String, double> weightTable,
+    Map<String, double> appliedOut,
+  ) {
     var weightSum = 0.0;
     var weighted = 0.0;
-    final applied = <String, double>{};
     for (final e in scores.entries) {
-      final w = weights[e.key] ?? 0;
+      final w = weightTable[e.key] ?? 0;
       if (w <= 0) continue;
       weightSum += w;
       weighted += e.value * w;
-      applied[e.key] = w;
+      appliedOut[e.key] = w;
     }
-
-    final raw = weightSum == 0 ? 70.0 : weighted / weightSum;
-    final score = raw.round().clamp(10, 100);
-    final status = _statusFor(score);
-    return HealthIndexResult(
-      score: score,
-      status: status,
-      summary: _summaryFor(score, status),
-      componentScores: scores,
-      appliedWeights: applied,
-    );
+    if (weightSum == 0) {
+      return scores.values.reduce((a, b) => a + b) / scores.length;
+    }
+    return weighted / weightSum;
   }
 
   // ── Component scorers — delegated to MedicalGuidelines ───────────────────
@@ -298,6 +422,8 @@ class HealthIndexService {
 
   static String _statusFor(int score) => MedicalGuidelines.indexStatus(score);
 
-  static String _summaryFor(int score, String status) =>
-      MedicalGuidelines.indexSummary(score, status);
+  static Future<String> _summaryFor(int score, String status) async {
+    final l10n = await LocaleController.loadLocalizations();
+    return l10n.indexSummary(status);
+  }
 }

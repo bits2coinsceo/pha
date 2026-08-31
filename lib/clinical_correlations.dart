@@ -9,6 +9,8 @@ import 'dart:math';
 
 import 'medical_guidelines.dart';
 import 'models.dart';
+import 'l10n/generated/app_localizations.dart';
+import 'l10n/medical_l10n.dart';
 
 /// Adult vitals snapshot for correlation analysis.
 class ClinicalInput {
@@ -162,10 +164,11 @@ class ClinicalCorrelationReport {
     this.ageInsights = const [],
   });
 
-  List<Finding> toFindings() => ClinicalCorrelationEngine.findingsFrom(this);
+  List<Finding> toFindings(AppLocalizations l10n) =>
+      ClinicalCorrelationEngine.findingsFrom(this, l10n);
 
-  List<Recommendation> toRecommendations() =>
-      ClinicalCorrelationEngine.recommendationsFrom(this);
+  List<Recommendation> toRecommendations(AppLocalizations l10n) =>
+      ClinicalCorrelationEngine.recommendationsFrom(this, l10n);
 }
 
 /// Deterministic cardiometabolic correlation engine.
@@ -173,10 +176,7 @@ abstract final class ClinicalCorrelationEngine {
   static ClinicalCorrelationReport analyze(ClinicalInput input) {
     if (input.age != null && input.age! < 18) {
       return ClinicalCorrelationReport(
-        ageInsights: const [
-          'Pediatric percentiles apply under 18 — adult BMI/BP/glucose cut-offs '
-          'are not used here.',
-        ],
+        ageInsights: const ['pediatric'],
       );
     }
 
@@ -239,204 +239,252 @@ abstract final class ClinicalCorrelationEngine {
     );
   }
 
-  static List<Finding> findingsFrom(ClinicalCorrelationReport r) {
+  static List<Finding> findingsFrom(ClinicalCorrelationReport r, AppLocalizations l10n) {
     final out = <Finding>[];
 
     if (r.bmi != null) {
       final b = r.bmi!;
+      final band = b.bmi < MedicalGuidelines.bmiUnder
+          ? 'underweight'
+          : b.bmi < MedicalGuidelines.bmiNormal
+              ? 'healthy'
+              : b.bmi < MedicalGuidelines.bmiOver
+                  ? 'overweight'
+                  : b.bmi < MedicalGuidelines.bmiObeseI
+                      ? 'obesity_class_i'
+                      : 'obesity_class_ii_plus';
       final action = b.bmi >= MedicalGuidelines.bmiOver
-          ? ' Focus on smaller portions, more vegetables, and daily walks. '
-              'A 5–7% weight loss already helps heart and blood sugar.'
+          ? l10n.clinicalBmiActionOver
           : b.bmi >= MedicalGuidelines.bmiNormal
-              ? ' Small daily habits (steps + protein at meals) help keep '
-                  'weight from creeping up.'
+              ? l10n.clinicalBmiActionNormal
               : b.bmi < MedicalGuidelines.bmiUnder
-                  ? ' Eat protein-rich meals more often and check with a '
-                      'doctor if weight loss was not planned.'
+                  ? l10n.clinicalBmiActionUnder
                   : '';
       out.add(Finding(
-        category: 'Weight',
+        category: l10n.categoryWeight,
         status: b.riskMultiplier >= 1.5
             ? 'critical'
             : b.riskMultiplier >= 1.2
                 ? 'warning'
                 : 'good',
-        value: 'BMI ${b.bmi.toStringAsFixed(1)}',
-        message: '${_plainBmiSummary(b)}$action',
+        value: l10n.clinicalBmiValue(b.bmi.toStringAsFixed(1)),
+        message: '${l10n.bmiMessage(band)}$action',
       ));
     }
 
     if (r.idealWeight != null && r.bmi != null) {
       final i = r.idealWeight!;
       out.add(Finding(
-        category: 'Healthy weight range',
+        category: l10n.clinicalCategoryHealthyWeight,
         status: 'info',
-        value: 'Around ${i.midpointKg.toStringAsFixed(0)} kg',
-        message: IdealWeightEstimates.limitationNote,
+        value: l10n.clinicalAroundKg(i.midpointKg.round()),
+        message: l10n.clinicalIdealWeightNote,
       ));
     }
 
     if (r.ahaBp != null) {
       final a = r.ahaBp!;
       out.add(Finding(
-        category: 'Blood Pressure',
+        category: l10n.categoryBloodPressure,
         status: a.status,
-        value: _plainBpBand(a.band),
-        message: a.treatmentNote,
+        value: _localizedBpBand(a.band, l10n),
+        message: _localizedBpTreatment(a, l10n),
       ));
     } else if (r.escBpSummary != null) {
       out.add(Finding(
-        category: 'Blood Pressure',
+        category: l10n.categoryBloodPressure,
         status: 'info',
         value: r.escBpSummary,
-        message:
-            'Your reading looks a bit high-normal. Cut salt, stay active, '
-            'and check BP again on another day.',
+        message: l10n.clinicalBpHighNormalMsg,
       ));
     }
 
     if (r.glucose != null) {
       final g = r.glucose!;
       out.add(Finding(
-        category: 'Blood Glucose',
+        category: l10n.categoryBloodGlucose,
         status: g.status,
-        value: _plainGlucoseBand(g.adaFastingBand),
-        message: _plainGlucoseMessage(g),
+        value: _localizedGlucoseBand(g.adaFastingBand, l10n),
+        message: _localizedGlucoseMessage(g, l10n),
       ));
     }
 
     if (r.metabolicSyndrome != null) {
       final m = r.metabolicSyndrome!;
       out.add(Finding(
-        category: 'Metabolic health',
+        category: l10n.clinicalCategoryMetabolic,
         status: m.likelyPresent == true
             ? 'critical'
             : m.criteriaMet >= 2
                 ? 'warning'
                 : 'info',
         value: m.likelyPresent == null
-            ? '${m.criteriaMet} warning signs'
+            ? l10n.clinicalWarningSigns(m.criteriaMet)
             : m.likelyPresent!
-                ? 'Needs attention'
-                : 'Looking okay',
-        message: m.message,
+                ? l10n.statusNeedsAttention
+                : l10n.clinicalLookingOkay,
+        message: _localizedMetabolicMessage(m.message, l10n),
       ));
     }
 
     if (r.combinedRisk != null) {
       final c = r.combinedRisk!;
       out.add(Finding(
-        category: 'Overall heart & sugar risk',
+        category: l10n.clinicalCategoryCombinedRisk,
         status: c.tier == 'very_high' || c.tier == 'high'
             ? 'critical'
             : c.tier == 'moderate'
                 ? 'warning'
                 : 'good',
-        value: _plainRiskTier(c.tier),
-        message: c.message,
+        value: _localizedRiskTier(c.tier, l10n),
+        message: _localizedRiskMessage(c.tier, l10n),
       ));
       for (final flag in c.pathologyFlags) {
-        final parts = flag.split('|');
+        final localized = _localizedPathologyFlag(flag, l10n);
         out.add(Finding(
-          category: 'What this means',
+          category: l10n.clinicalCategoryWhatMeans,
           status: 'warning',
-          value: parts.first,
-          message: parts.length > 1 ? parts[1] : flag,
+          value: localized.$1,
+          message: localized.$2,
         ));
       }
     }
 
     for (final insight in r.ageInsights) {
       out.add(Finding(
-        category: 'For your age',
+        category: l10n.clinicalCategoryForAge,
         status: 'info',
-        message: insight,
+        message: _localizedAgeInsight(insight, l10n),
       ));
     }
 
     return out;
   }
 
-  static String _plainBmiSummary(BmiAnalysis b) {
-    if (b.bmi < MedicalGuidelines.bmiUnder) {
-      return 'Your weight is lower than the healthy range for your height.';
-    }
-    if (b.bmi < MedicalGuidelines.bmiNormal) {
-      return 'Your weight is in a healthy range for your height. Nice work!';
-    }
-    if (b.bmi < MedicalGuidelines.bmiOver) {
-      return 'Your weight is a bit above the healthy range.';
-    }
-    if (b.bmi < MedicalGuidelines.bmiObeseI) {
-      return 'Your weight is clearly above the healthy range. This can '
-          'raise blood pressure and blood sugar over time.';
-    }
-    return 'Your weight is well above the healthy range. This can strain '
-        'your heart and metabolism — a doctor can help you plan safely.';
-  }
-
-  static String _plainBpBand(String band) {
+  static String _localizedBpTreatment(AhaBpClassification a, AppLocalizations l10n) {
+    final band = a.band;
+    String base;
     if (band.contains('grade 3') || band.contains('crisis')) {
-      return 'Very high — seek care';
+      base = l10n.bpMsgGrade3;
+    } else if (band.contains('grade 2')) {
+      base = l10n.bpMsgGrade2;
+    } else if (band.contains('grade 1') || band.contains('Hypertension')) {
+      base = l10n.bpMsgGrade1;
+    } else if (band.contains('High-normal')) {
+      base = l10n.bpMsgHighNormal;
+    } else if (band.contains('Optimal')) {
+      base = l10n.bpMsgOptimal;
+    } else if (band.contains('Normal')) {
+      base = l10n.bpMsgNormal;
+    } else if (band.contains('Low')) {
+      base = l10n.bpMsgLow;
+    } else {
+      base = a.treatmentNote;
     }
-    if (band.contains('grade 2')) return 'High (grade 2)';
-    if (band.contains('grade 1') || band.contains('Hypertension')) {
-      return 'High';
+    if (a.treatmentNote == 'older_adult') {
+      return '$base ${l10n.clinicalBpOlderAdultSuffix}';
     }
-    if (band.contains('High-normal')) return 'A little high';
-    if (band.contains('Normal') || band.contains('Optimal')) return 'Normal';
-    if (band.contains('Low')) return 'Low';
+    return base;
+  }
+
+  static String _localizedMetabolicMessage(String key, AppLocalizations l10n) =>
+      switch (key) {
+        'insufficient' => l10n.clinicalMetabolicInsufficient,
+        'present' => l10n.clinicalMetabolicPresent,
+        'partial' => l10n.clinicalMetabolicPartial,
+        'ok' => l10n.clinicalMetabolicOk,
+        _ => key,
+      };
+
+  static String _localizedRiskMessage(String tier, AppLocalizations l10n) =>
+      switch (tier) {
+        'very_high' || 'high' => l10n.clinicalRiskMsgHigh,
+        'moderate' => l10n.clinicalRiskMsgModerate,
+        _ => l10n.clinicalRiskMsgLow,
+      };
+
+  static (String, String) _localizedPathologyFlag(String key, AppLocalizations l10n) =>
+      switch (key) {
+        'extra_weight' => (
+            l10n.clinicalFlagExtraWeightTitle,
+            l10n.clinicalFlagExtraWeightBody,
+          ),
+        'weight_bp_sugar' => (
+            l10n.clinicalFlagTripleTitle,
+            l10n.clinicalFlagTripleBody,
+          ),
+        'low_weight_bp' => (
+            l10n.clinicalFlagLowWeightBpTitle,
+            l10n.clinicalFlagLowWeightBpBody,
+          ),
+        'high_sugar_lean' => (
+            l10n.clinicalFlagLeanDiabetesTitle,
+            l10n.clinicalFlagLeanDiabetesBody,
+          ),
+        'high_bp_young' => (
+            l10n.clinicalFlagYoungHtnTitle,
+            l10n.clinicalFlagYoungHtnBody,
+          ),
+        _ => () {
+            final parts = key.split('|');
+            return (parts.first, parts.length > 1 ? parts[1] : key);
+          }(),
+      };
+
+  static String _localizedAgeInsight(String key, AppLocalizations l10n) =>
+      switch (key) {
+        'pediatric' => l10n.clinicalAgePediatric,
+        'age45_weight_sugar' => l10n.clinicalAge45WeightSugar,
+        'age60_systolic' => l10n.clinicalAge60Systolic,
+        'age65_target' => l10n.clinicalAge65Target,
+        'young_diabetes_lean' => l10n.clinicalAgeYoungDiabetesLean,
+        _ => key,
+      };
+
+  static String _localizedBpBand(String band, AppLocalizations l10n) {
+    if (band.contains('grade 3') || band.contains('crisis')) return l10n.clinicalBpVeryHigh;
+    if (band.contains('grade 2')) return l10n.clinicalBpHighGrade2;
+    if (band.contains('grade 1') || band.contains('Hypertension')) return l10n.clinicalBpHigh;
+    if (band.contains('High-normal')) return l10n.clinicalBpALittleHigh;
+    if (band.contains('Normal') || band.contains('Optimal')) return l10n.clinicalGlucoseNormal;
+    if (band.contains('Low')) return l10n.clinicalBpLow;
     return band;
   }
 
-  static String _plainGlucoseBand(String band) {
-    if (band.contains('hypoglycemia') || band.contains('Below')) {
-      return 'Too low';
-    }
-    if (band.contains('Normal')) return 'Normal';
-    if (band.contains('Prediabetes')) return 'Prediabetes range';
-    if (band.contains('Diabetes')) return 'Diabetes range';
+  static String _localizedGlucoseBand(String band, AppLocalizations l10n) {
+    if (band.contains('hypoglycemia') || band.contains('Below')) return l10n.clinicalGlucoseTooLow;
+    if (band.contains('Normal')) return l10n.clinicalGlucoseNormal;
+    if (band.contains('Prediabetes')) return l10n.clinicalGlucosePrediabetes;
+    if (band.contains('Diabetes')) return l10n.clinicalGlucoseDiabetes;
     return band;
   }
 
-  static String _plainGlucoseMessage(GlucoseCorrelation g) {
+  static String _localizedGlucoseMessage(GlucoseCorrelation g, AppLocalizations l10n) {
     if (g.status == 'critical' && g.adaFastingBand.contains('Below')) {
-      return 'Your blood sugar is too low. Have a quick carb snack '
-          '(juice, glucose tablets) and tell a doctor if this happens often.';
+      return l10n.glucoseMessage('hypoglycemia');
     }
-    if (g.status == 'good') {
-      return 'Your fasting blood sugar looks healthy. Keep up balanced meals '
-          'and regular activity.';
-    }
-    if (g.adaFastingBand.contains('Prediabetes')) {
-      return 'Your blood sugar is higher than normal, but not diabetes yet. '
-          'Cut sugary drinks, add fiber at meals, walk 10–15 minutes after eating, '
-          'and recheck with your doctor.';
-    }
-    return 'Your blood sugar is in the diabetes range. Please see a doctor '
-        'soon for confirmation and a care plan.';
+    if (g.status == 'good') return l10n.glucoseMessage('normal');
+    if (g.adaFastingBand.contains('Prediabetes')) return l10n.glucoseMessage('prediabetes');
+    return l10n.glucoseMessage('diabetes');
   }
 
-  static String _plainRiskTier(String tier) => switch (tier) {
-        'very_high' => 'High — act now',
-        'high' => 'Elevated',
-        'moderate' => 'Moderate',
-        _ => 'Low',
+  static String _localizedRiskTier(String tier, AppLocalizations l10n) => switch (tier) {
+        'very_high' => l10n.clinicalRiskVeryHigh,
+        'high' => l10n.clinicalRiskElevated,
+        'moderate' => l10n.clinicalRiskModerate,
+        _ => l10n.clinicalRiskLow,
       };
 
   static List<Recommendation> recommendationsFrom(
     ClinicalCorrelationReport r,
+    AppLocalizations l10n,
   ) {
     final out = <Recommendation>[];
 
     if (r.metabolicSyndrome?.likelyPresent == true) {
       out.add(Recommendation(
         priority: 'high',
-        text:
-            'Several warning signs are present together (weight, blood pressure, '
-            'or blood sugar). Lose a little weight if you can, eat more plants and '
-            'less salt, walk most days, and ask your doctor for cholesterol and '
-            'sugar blood tests.',
+        text: l10n.clinicalRecMetabolicCluster,
       ));
     }
 
@@ -445,36 +493,28 @@ abstract final class ClinicalCorrelationEngine {
             r.combinedRisk!.tier == 'very_high')) {
       out.add(Recommendation(
         priority: 'high',
-        text:
-            'More than one risk is elevated. Book a checkup soon so your doctor '
-            'can review blood pressure, blood sugar, and cholesterol with you.',
+        text: l10n.clinicalRecCombinedHigh,
       ));
     }
 
     if (r.bmi != null && r.bmi!.pctDeviationFromIdeal > 10) {
       out.add(Recommendation(
         priority: 'medium',
-        text:
-            'Aim for a gentle 5–7% weight loss over a few months — that alone '
-            'often improves blood pressure and blood sugar.',
+        text: l10n.clinicalRecWeightLoss5to7,
       ));
     }
 
     if (r.glucose?.adaFastingBand.contains('Prediabetes') == true) {
       out.add(Recommendation(
         priority: 'high',
-        text:
-            'Your sugar is in the prediabetes range. Cut sugary drinks, walk '
-            'after meals, and recheck fasting glucose or HbA1c with your doctor.',
+        text: l10n.clinicalRecPrediabetes,
       ));
     }
 
     if (_isHypertensive(r.ahaBp)) {
       out.add(Recommendation(
         priority: 'high',
-        text:
-            'Your blood pressure is high. Reduce salt, stay active, measure BP '
-            'at home for a few days, and share the averages with your doctor.',
+        text: l10n.clinicalRecHighBp,
       ));
     }
 
@@ -573,11 +613,9 @@ abstract final class ClinicalCorrelationEngine {
       BpBand.grade3 => 'Hypertension grade 3 (≥180 or ≥110)',
     };
 
-    var treatment = esc.message;
+    var treatment = '';
     if (age != null && age >= 65 && s >= 140 && d < 90) {
-      treatment +=
-          ' In older adults, the top number often rises first — focus on '
-          'that trend and share home averages with your doctor.';
+      treatment = 'older_adult';
     }
 
     return AhaBpClassification(
@@ -685,9 +723,7 @@ abstract final class ClinicalCorrelationEngine {
         criteriaMet: met.length,
         criteriaChecked: checked,
         metCriteria: met,
-        message:
-            'Not enough data yet. Log blood pressure, blood sugar, and weight '
-            '(and waist if you can) so we can spot metabolic warning signs.',
+        message: 'insufficient',
       );
     }
 
@@ -699,13 +735,10 @@ abstract final class ClinicalCorrelationEngine {
       criteriaChecked: checked,
       metCriteria: met,
       message: present
-          ? 'Several risk factors are present together (weight, blood pressure, '
-              'or blood sugar). This raises heart and diabetes risk — see a doctor '
-              'for cholesterol and sugar tests, and improve diet and activity.'
+          ? 'present'
           : partial
-              ? 'A couple of warning signs are present. Improve diet, walk more, '
-                  'and watch weight — small changes help a lot.'
-              : 'From the data we have, metabolic warning signs look under control.',
+              ? 'partial'
+              : 'ok',
     );
   }
 
@@ -747,11 +780,7 @@ abstract final class ClinicalCorrelationEngine {
     if (bmi != null) {
       mult *= bmi.riskMultiplier;
       if (bmi.bmi >= MedicalGuidelines.bmiOver) {
-        flags.add(
-          'Extra weight|'
-          'Carrying extra weight raises the chance of high blood sugar and '
-          'heart problems. Smaller portions, more vegetables, and daily walks help.',
-        );
+        flags.add('extra_weight');
       }
     }
 
@@ -785,11 +814,7 @@ abstract final class ClinicalCorrelationEngine {
         !glucose.adaFastingBand.contains('hypoglycemia');
     if (obese && htn && dysgly) {
       mult = max(mult, 3.0);
-      flags.add(
-        'Weight + BP + sugar|'
-        'Extra weight, higher blood pressure, and higher blood sugar together '
-        'greatly raise diabetes and heart risk. Focus on food, walks, and a doctor visit.',
-      );
+      flags.add('weight_bp_sugar');
     }
 
     if (bmi != null &&
@@ -798,31 +823,19 @@ abstract final class ClinicalCorrelationEngine {
         input.systolic! < 100 &&
         input.age != null &&
         input.age! >= 65) {
-      flags.add(
-        'Low weight + low BP|'
-        'Low weight with low blood pressure in older age can mean frailty. '
-        'Eat enough protein and ask a doctor before cutting calories.',
-      );
+      flags.add('low_weight_bp');
     }
 
     if (bmi != null &&
         bmi.bmi < MedicalGuidelines.bmiOver &&
         glucose != null &&
         glucose.adaFastingBand.contains('Diabetes')) {
-      flags.add(
-        'High sugar, not much weight|'
-        'Blood sugar is high even without much extra weight. A doctor should '
-        'check what type of diabetes this might be.',
-      );
+      flags.add('high_sugar_lean');
     }
 
     // Only true hypertension (≥140/≥90) — never for healthy 120/80.
     if (input.age != null && input.age! < 40 && _isHypertensive(aha)) {
-      flags.add(
-        'High BP under 40|'
-        'High blood pressure at a young age should be confirmed with repeat '
-        'readings. Ask a doctor if another cause needs checking.',
-      );
+      flags.add('high_bp_young');
     }
 
     mult = mult.clamp(1.0, 4.0);
@@ -838,17 +851,7 @@ abstract final class ClinicalCorrelationEngine {
       relativeRiskMultiplier: mult,
       tier: tier,
       pathologyFlags: flags,
-      message: switch (tier) {
-        'very_high' || 'high' =>
-          'Several risks are elevated together. This is a strong signal to '
-              'improve food and activity and see a doctor for a checkup.',
-        'moderate' =>
-          'Your overall heart and sugar risk is higher than ideal. Small daily '
-              'changes — walks, less salt and sugar — make a real difference.',
-        _ =>
-          'Your overall heart and sugar risk looks relatively low based on '
-              'weight, blood pressure, and blood sugar.',
-      },
+      message: tier, // localized in findingsFrom via tier
     );
   }
 
@@ -868,10 +871,7 @@ abstract final class ClinicalCorrelationEngine {
         bmi.bmi >= MedicalGuidelines.bmiOver &&
         glucose != null &&
         !glucose.adaFastingBand.contains('Normal')) {
-      insights.add(
-        'After 45, extra weight plus higher blood sugar raise diabetes risk. '
-        'Ask your doctor about a sugar check every 1–3 years.',
-      );
+      insights.add('age45_weight_sugar');
     }
 
     if (age >= 60 &&
@@ -879,17 +879,11 @@ abstract final class ClinicalCorrelationEngine {
         input.systolic! >= 140 &&
         input.diastolic != null &&
         input.diastolic! < 90) {
-      insights.add(
-        'After 60, the top blood-pressure number often rises first. Track home '
-        'averages and share them with your doctor.',
-      );
+      insights.add('age60_systolic');
     }
 
     if (age >= 65) {
-      insights.add(
-        'Over 65, many people aim for blood pressure under 140/90 if they feel well. '
-        'Your doctor may set a different target if you are frail.',
-      );
+      insights.add('age65_target');
     }
 
     if (age < 40 &&
@@ -897,10 +891,7 @@ abstract final class ClinicalCorrelationEngine {
         glucose.adaFastingBand.contains('Diabetes') &&
         bmi != null &&
         bmi.bmi < MedicalGuidelines.bmiNormal) {
-      insights.add(
-        'Under 40 with high blood sugar but normal weight — see a doctor to '
-        'find out what type of diabetes this might be.',
-      );
+      insights.add('young_diabetes_lean');
     }
 
     return insights;

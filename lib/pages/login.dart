@@ -5,7 +5,9 @@ import '../auth.dart';
 import '../cosmic_ui.dart';
 import '../legal.dart';
 import '../theme.dart';
+import '../l10n/l10n_ext.dart';
 import '../widgets.dart';
+import '../widgets/language_picker.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -42,12 +44,10 @@ class _LoginPageState extends State<LoginPage> {
     try {
       if (isSignUp) {
         if (!acceptedTerms || !acceptedPrivacy) {
-          throw Exception(
-            'Please read and accept the Agreement and Privacy Policy to continue.',
-          );
+          throw Exception(context.l10n.pleaseAcceptLegal);
         }
         if (_password.text.length < 8) {
-          throw Exception('Password must be at least 8 characters.');
+          throw Exception(context.l10n.passwordTooShort);
         }
         await auth.signUp(_email.text, _password.text, _name.text);
       } else {
@@ -102,15 +102,23 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _brandingPanel() {
     final features = [
-      (Icons.favorite, 'Track vitals & glucose', C.rose500, C.rose50),
-      (Icons.monitor_heart, 'AI health insights', C.blue500, C.blue50),
-      (Icons.shield, 'Private & secure', C.teal500, C.teal50),
-      (Icons.auto_awesome, 'Smart analysis', C.amber500, C.amber50),
+      (Icons.favorite, context.l10n.featureTrackVitals, C.rose500, C.rose50),
+      (
+        Icons.monitor_heart,
+        context.l10n.featureAiInsights,
+        C.blue500,
+        C.blue50,
+      ),
+      (Icons.shield, context.l10n.featurePrivateSecure, C.teal500, C.teal50),
+      (
+        Icons.auto_awesome,
+        context.l10n.featureSmartAnalysis,
+        C.amber500,
+        C.amber50,
+      ),
     ];
     return Container(
-      decoration: BoxDecoration(
-        gradient: kNebulaGradient,
-      ),
+      decoration: BoxDecoration(gradient: kNebulaGradient),
       padding: const EdgeInsets.all(48),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -123,16 +131,25 @@ class _LoginPageState extends State<LoginPage> {
                   width: 64,
                   height: 64,
                   decoration: BoxDecoration(
-                      color: C.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(16)),
+                    color: C.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   child: Icon(Icons.favorite, color: C.white, size: 32),
                 ),
                 SizedBox(height: 12),
-                Text('PHA',
-                    style: TextStyle(
-                        color: C.white, fontWeight: FontWeight.bold, fontSize: 30, letterSpacing: -1)),
-                Text('Personal Health Assistant',
-                    style: TextStyle(color: C.onGradientMuted, fontSize: 14)),
+                Text(
+                  context.l10n.appNameShort,
+                  style: TextStyle(
+                    color: C.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 30,
+                    letterSpacing: -1,
+                  ),
+                ),
+                Text(
+                  context.l10n.personalHealthAssistant,
+                  style: TextStyle(color: C.onGradientMuted, fontSize: 14),
+                ),
               ],
             ),
           ),
@@ -142,18 +159,29 @@ class _LoginPageState extends State<LoginPage> {
               RichText(
                 text: TextSpan(
                   style: TextStyle(
-                      fontSize: 36, fontWeight: FontWeight.bold, height: 1.2, color: C.white),
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold,
+                    height: 1.2,
+                    color: C.white,
+                  ),
                   children: [
-                    const TextSpan(text: 'Your health,\n'),
-                    TextSpan(text: 'intelligently\n', style: TextStyle(color: C.teal200)),
-                    const TextSpan(text: 'tracked.'),
+                    TextSpan(text: '${context.l10n.loginHeroLine1}\n'),
+                    TextSpan(
+                      text: '${context.l10n.loginHeroLine2}\n',
+                      style: TextStyle(color: C.teal200),
+                    ),
+                    TextSpan(text: context.l10n.loginHeroLine3),
                   ],
                 ),
               ),
               SizedBox(height: 16),
               Text(
-                'Monitor your metrics, get AI-powered insights, and take control of your wellness journey.',
-                style: TextStyle(color: C.onGradientMuted, fontSize: 18, height: 1.5),
+                context.l10n.loginHeroBody,
+                style: TextStyle(
+                  color: C.onGradientMuted,
+                  fontSize: 18,
+                  height: 1.5,
+                ),
               ),
               SizedBox(height: 32),
               GridView.count(
@@ -177,14 +205,21 @@ class _LoginPageState extends State<LoginPage> {
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                              color: f.$4, borderRadius: BorderRadius.circular(8)),
+                            color: f.$4,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                           child: Icon(f.$1, size: 16, color: f.$3),
                         ),
                         SizedBox(width: 10),
                         Expanded(
-                          child: Text(f.$2,
-                              style: TextStyle(
-                                  color: C.white, fontSize: 13, fontWeight: FontWeight.w500)),
+                          child: Text(
+                            f.$2,
+                            style: TextStyle(
+                              color: C.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -193,8 +228,10 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ],
           ),
-          Text('Trusted by health-conscious individuals worldwide.',
-              style: TextStyle(color: C.blue200, fontSize: 12)),
+          Text(
+            context.l10n.loginTrustedBy,
+            style: TextStyle(color: C.blue200, fontSize: 12),
+          ),
         ],
       ),
     );
@@ -222,30 +259,49 @@ class _LoginPageState extends State<LoginPage> {
                   child: Icon(Icons.favorite, color: C.white, size: 28),
                 ),
                 SizedBox(height: 12),
-                Text('PHA',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 24, color: C.gray900)),
-                Text('Personal Health Assistant',
-                    style: TextStyle(color: C.gray500, fontSize: 14)),
+                Text(
+                  context.l10n.appNameShort,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                    color: C.gray900,
+                  ),
+                ),
+                Text(
+                  context.l10n.personalHealthAssistant,
+                  style: TextStyle(color: C.gray500, fontSize: 14),
+                ),
                 SizedBox(height: 32),
               ],
               Container(
                 decoration: cardDecoration(),
-                padding: const EdgeInsets.all(32),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 32,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(isSignUp ? 'Create your account' : 'Welcome back',
-                        style: TextStyle(
-                            fontSize: 22, fontWeight: FontWeight.bold, color: C.gray900)),
+                    Text(
+                      isSignUp
+                          ? context.l10n.createYourAccount
+                          : context.l10n.welcomeBack,
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: C.gray900,
+                      ),
+                    ),
                     SizedBox(height: 4),
                     Text(
                       isSignUp
-                          ? 'Start tracking your health today — free forever.'
-                          : 'Sign in to access your health dashboard.',
+                          ? context.l10n.loginSignUpSubtitle
+                          : context.l10n.loginSignInSubtitle,
                       style: TextStyle(color: C.gray500, fontSize: 14),
                     ),
-                    SizedBox(height: 24),
+                    SizedBox(height: 16),
+                    LanguagePicker(expanded: true),
+                    SizedBox(height: 16),
                     if (error.isNotEmpty) ...[
                       AppBanner(
                         text: error,
@@ -257,28 +313,42 @@ class _LoginPageState extends State<LoginPage> {
                       SizedBox(height: 16),
                     ],
                     if (isSignUp) ...[
-                      _label('Full name'),
-                      TextField(controller: _name, decoration: appInput('Jane Smith')),
+                      _label(context.l10n.loginFullName),
+                      TextField(
+                        controller: _name,
+                        decoration: appInput(context.l10n.loginNamePlaceholder),
+                      ),
                       SizedBox(height: 16),
                     ],
-                    _label('Email address'),
+                    _label(context.l10n.loginEmailLabel),
                     TextField(
                       controller: _email,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: appInput('you@example.com'),
+                      decoration: appInput(context.l10n.loginEmailPlaceholder),
                     ),
                     SizedBox(height: 16),
-                    _label('Password'),
+                    _label(context.l10n.password),
                     TextField(
                       controller: _password,
                       obscureText: !showPassword,
-                      decoration: appInput(isSignUp ? 'At least 8 characters' : '••••••••').copyWith(
-                        suffixIcon: IconButton(
-                          icon: Icon(showPassword ? Icons.visibility_off : Icons.visibility,
-                              size: 18, color: C.gray400),
-                          onPressed: () => setState(() => showPassword = !showPassword),
-                        ),
-                      ),
+                      decoration:
+                          appInput(
+                            isSignUp
+                                ? context.l10n.loginPasswordHintSignUp
+                                : context.l10n.loginPasswordHintSignIn,
+                          ).copyWith(
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                showPassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                size: 18,
+                                color: C.gray400,
+                              ),
+                              onPressed: () =>
+                                  setState(() => showPassword = !showPassword),
+                            ),
+                          ),
                     ),
                     if (isSignUp) ...[
                       SizedBox(height: 16),
@@ -287,7 +357,7 @@ class _LoginPageState extends State<LoginPage> {
                         onChanged: (v) =>
                             setState(() => acceptedTerms = v ?? false),
                         document: LegalDocument.termsOfService,
-                        prefix: 'I have read and agree to the ',
+                        prefix: context.l10n.legalAgreePrefix,
                       ),
                       SizedBox(height: 8),
                       _legalCheckbox(
@@ -295,44 +365,37 @@ class _LoginPageState extends State<LoginPage> {
                         onChanged: (v) =>
                             setState(() => acceptedPrivacy = v ?? false),
                         document: LegalDocument.privacyPolicy,
-                        prefix: 'I have read and agree to the ',
+                        prefix: context.l10n.legalAgreePrefix,
                       ),
                     ],
                     SizedBox(height: 20),
                     PrimaryButton(
                       label: loading
-                          ? (isSignUp ? 'Creating account…' : 'Signing in…')
-                          : (isSignUp ? 'Create account' : 'Sign in'),
+                          ? (isSignUp
+                                ? context.l10n.creatingAccount
+                                : context.l10n.signingIn)
+                          : (isSignUp
+                                ? context.l10n.createAccount
+                                : context.l10n.signIn),
                       onPressed: loading
                           ? null
                           : (isSignUp && (!acceptedTerms || !acceptedPrivacy))
-                              ? null
-                              : _submit,
+                          ? null
+                          : _submit,
                     ),
                     SizedBox(height: 24),
                     Divider(color: C.gray100, height: 1),
                     SizedBox(height: 24),
                     Center(
-                      child: Wrap(
-                        alignment: WrapAlignment.center,
-                        children: [
-                          Text(
-                            isSignUp
-                                ? 'Already have an account? '
-                                : "Don't have an account? ",
-                            style: TextStyle(fontSize: 14, color: C.gray500),
-                          ),
-                          GestureDetector(
-                            onTap: _switchMode,
-                            child: Text(
-                              isSignUp ? 'Sign in' : 'Sign up for free',
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  color: C.blue500,
-                                  fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                        ],
+                      child: GestureDetector(
+                        onTap: _switchMode,
+                        child: Text(
+                          isSignUp
+                              ? context.l10n.alreadyHaveAccount
+                              : context.l10n.dontHaveAccount,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 14, color: C.gray500),
+                        ),
                       ),
                     ),
                   ],
@@ -341,8 +404,7 @@ class _LoginPageState extends State<LoginPage> {
               if (isSignUp) ...[
                 SizedBox(height: 16),
                 Text(
-                  'You must open and accept both documents before creating an account. '
-                  'PHA is a wellness assistant — not medical advice.',
+                  context.l10n.loginLegalFooter,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 12, color: C.gray400, height: 1.4),
                 ),
@@ -383,12 +445,16 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 Text(
                   prefix,
-                  style: TextStyle(fontSize: 13, color: C.gray700, height: 1.35),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: C.gray700,
+                    height: 1.35,
+                  ),
                 ),
                 GestureDetector(
                   onTap: () => _openLegal(document),
                   child: Text(
-                    document.shortTitle,
+                    document.shortTitle(context.l10n),
                     style: TextStyle(
                       fontSize: 13,
                       height: 1.35,
@@ -400,7 +466,11 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 Text(
                   '.',
-                  style: TextStyle(fontSize: 13, color: C.gray700, height: 1.35),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: C.gray700,
+                    height: 1.35,
+                  ),
                 ),
               ],
             ),
@@ -411,9 +481,14 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _label(String t) => Padding(
-        padding: const EdgeInsets.only(bottom: 6),
-        child: Text(t,
-            style: TextStyle(
-                fontSize: 14, fontWeight: FontWeight.w500, color: C.gray700)),
-      );
+    padding: const EdgeInsets.only(bottom: 6),
+    child: Text(
+      t,
+      style: TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+        color: C.gray700,
+      ),
+    ),
+  );
 }

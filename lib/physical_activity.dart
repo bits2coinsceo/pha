@@ -7,6 +7,8 @@ import 'package:uuid/uuid.dart';
 import 'daily_notifications.dart';
 import 'db.dart';
 import 'health_index.dart';
+import 'locale_controller.dart';
+import 'l10n/l10n_ext.dart';
 import 'theme.dart';
 import 'widgets.dart';
 
@@ -132,8 +134,9 @@ class PhysicalActivityService {
     await plugin.cancel(notifId);
     if (program == null) return;
 
-    final label = program['program_label'] as String? ?? 'your program';
-    const details = NotificationDetails(
+    final l10n = await LocaleController.loadLocalizations();
+    final label = program['program_label'] as String? ?? l10n.activityYourProgramFallback;
+    final details = NotificationDetails(
       iOS: DarwinNotificationDetails(
         presentAlert: true,
         presentSound: true,
@@ -144,8 +147,8 @@ class PhysicalActivityService {
       ),
       android: AndroidNotificationDetails(
         'pha_activity',
-        'Physical activity check-in',
-        channelDescription: 'Daily reminder to log whether you completed your workout',
+        l10n.notifActivityTitle,
+        channelDescription: l10n.notifActivityChannelDesc,
         importance: Importance.max,
         priority: Priority.high,
         playSound: true,
@@ -157,8 +160,8 @@ class PhysicalActivityService {
     try {
       await plugin.zonedSchedule(
         notifId,
-        'Physical activity check-in',
-        'Did you complete $label today?',
+        l10n.notifActivityTitle,
+        l10n.notifActivityBody(label),
         _nextEuropeTime(checkHour, checkMinute),
         details,
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -222,14 +225,15 @@ class _PhysicalActivityCheckinDialogState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return AppModal(
-      title: 'Physical activity today',
+      title: l10n.notifActivityTitle,
       onClose: () => Navigator.pop(context, false),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Did you complete ${widget.programLabel} today?',
+            l10n.notifActivityBody(widget.programLabel),
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -239,7 +243,7 @@ class _PhysicalActivityCheckinDialogState
           ),
           const SizedBox(height: 8),
           Text(
-            'Your answer is saved to your health history.',
+            l10n.activityCheckinSavedHint,
             style: TextStyle(fontSize: 13, color: C.gray500, height: 1.4),
           ),
           const SizedBox(height: 20),
@@ -250,13 +254,13 @@ class _PhysicalActivityCheckinDialogState
             )
           else ...[
             PrimaryButton(
-              label: 'Yes',
+              label: l10n.yes,
               color: C.teal600,
               onPressed: () => _answer('yes'),
             ),
             const SizedBox(height: 10),
             PrimaryButton(
-              label: 'Partial',
+              label: l10n.partially,
               color: C.blue600,
               onPressed: () => _answer('partially'),
             ),
@@ -271,7 +275,7 @@ class _PhysicalActivityCheckinDialogState
                 ),
               ),
               child: Text(
-                'No',
+                l10n.no,
                 style: TextStyle(fontWeight: FontWeight.w600, color: C.gray700),
               ),
             ),

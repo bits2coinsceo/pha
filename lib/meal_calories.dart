@@ -1,6 +1,8 @@
 import 'package:uuid/uuid.dart';
 
 import 'api.dart';
+import 'locale_controller.dart';
+import 'l10n/generated/app_localizations.dart';
 import 'db.dart';
 import 'health_index.dart';
 import 'image_compress.dart';
@@ -148,7 +150,8 @@ class MealCalorieService {
   }) async {
     final patientContext =
         await AiConsultationService.buildFullPatientContext(userId);
-    final prompt = _mealAnalysisPrompt(patientContext);
+    final rules = await AiConsultationService.aiDocResponseRules(dailyBrief: false);
+    final prompt = '${_mealAnalysisPrompt(patientContext)}$rules';
     final uploadPath = await compressImageForUpload(
       filePath,
       quality: 60,
@@ -161,7 +164,7 @@ class MealCalorieService {
       textLogs: prompt,
       complexity: 'complex',
     );
-    return _parseAnalysis(analysis);
+    return await _parseAnalysis(analysis);
   }
 
   /// Confirms the patient ate this meal — persists for daily totals & index.
@@ -219,6 +222,53 @@ class MealCalorieService {
         .toList();
   }
 
+  /// Sum of confirmed meal-photo calories per local day (oldest → newest).
+  /// Days with no logged meals are `0`.
+  static Future<List<({DateTime day, double value})>> lastNCalendarDaysIntake({
+    required String userId,
+    int days = 7,
+  }) async {
+    final now = DateTime.now().toLocal();
+    final today = DateTime(now.year, now.month, now.day);
+    final start = today.subtract(Duration(days: days - 1));
+    final end = today.add(const Duration(days: 1));
+    final byDay = <String, double>{};
+
+    if (Db.instance.isReady) {
+      final rows = await Db.instance.raw.query(
+        'meal_calorie_checks',
+        columns: ['calories', 'checked_at'],
+        where: 'user_id = ? AND confirmed = 1',
+        whereArgs: [userId],
+        orderBy: 'checked_at ASC',
+      );
+      for (final r in rows) {
+        final at = DateTime.parse(r['checked_at'] as String).toLocal();
+        if (at.isBefore(start) || !at.isBefore(end)) continue;
+        final key =
+            '${at.year}-${at.month.toString().padLeft(2, '0')}-${at.day.toString().padLeft(2, '0')}';
+        byDay[key] =
+            (byDay[key] ?? 0) + ((r['calories'] as num?)?.toDouble() ?? 0);
+      }
+    }
+
+    return List.generate(days, (i) {
+      final day = start.add(Duration(days: i));
+      final key =
+          '${day.year}-${day.month.toString().padLeft(2, '0')}-${day.day.toString().padLeft(2, '0')}';
+      return (day: day, value: byDay[key] ?? 0);
+    });
+  }
+
+  /// Green / yellow / red band for a day's meal intake total.
+  /// `none` = no meals logged that day.
+  static String intakeZone(double kcal) {
+    if (kcal <= 0) return 'none';
+    if (kcal <= MedicalGuidelines.mealIntakeDeficitMaxKcal) return 'deficit';
+    if (kcal <= MedicalGuidelines.mealIntakeModerateMaxKcal) return 'moderate';
+    return 'surplus';
+  }
+
   static Future<DailyMealSummary> summaryForDay(
     String userId,
     DateTime day,
@@ -234,8 +284,11 @@ class MealCalorieService {
       carbs += m.carbsG ?? 0;
       fat += m.fatG ?? 0;
     }
-    final target = await estimatedDailyTarget(userId);
-    final quality = _dayQuality(meals, total, target);
+    // In the meal modal we show the calorie-deficit ceiling, not a maintenance
+    // estimate, so the daily intake guidance stays aligned with weight-loss UX.
+    const target = MedicalGuidelines.mealIntakeDeficitMaxKcal;
+    final l10n = await LocaleController.loadLocalizations();
+    final quality = _dayQuality(meals, total, target, l10n);
     return DailyMealSummary(
       meals: meals,
       totalCalories: total,
@@ -248,66 +301,49 @@ class MealCalorieService {
     );
   }
 
-  static Future<int> estimatedDailyTarget(String userId) async {
-    if (!Db.instance.isReady) return 2000;
-    final rows = await Db.instance.raw.query(
-      'profiles',
-      columns: ['age', 'weight', 'height', 'gender'],
-      where: 'id = ?',
-      whereArgs: [userId],
-      limit: 1,
-    );
-    if (rows.isEmpty) return 2000;
-    return MedicalGuidelines.estimatedDailyCalorieTarget(
-      age: (rows.first['age'] as num?)?.toInt(),
-      weightKg: (rows.first['weight'] as num?)?.toDouble(),
-      heightCm: (rows.first['height'] as num?)?.toDouble(),
-      gender: rows.first['gender'] as String?,
-    );
-  }
-
   static (String, String) _dayQuality(
     List<MealLogEntry> meals,
     int total,
     int target,
+    AppLocalizations l10n,
   ) {
     if (meals.isEmpty) {
-      return ('No meals logged', 'Confirm meals after analysis to track intake.');
+      return (l10n.mealQualityNoMeals, l10n.mealConfirmHint);
     }
     final attention = meals.where((m) => m.category == 'attention').length;
     final excellent = meals.where((m) => m.category == 'excellent').length;
     final balance = target - total;
     if (attention >= 2 || total > target + 400) {
       return (
-        'Heavy day',
+        l10n.mealQualityHeavyDay,
         balance < 0
-            ? 'About ${-balance} kcal over your ~$target kcal target.'
-            : 'Several high-calorie choices today — ease up next meals.',
+            ? l10n.mealQualityHeavyOverKcal(-balance, target)
+            : l10n.mealQualityHeavyHighCal,
       );
     }
     if (excellent >= meals.length ~/ 2 && balance >= 0) {
       return (
-        'Good choices',
+        l10n.mealQualityGoodChoices,
         balance > 120
-            ? 'Solid day — ~$balance kcal under your ~$target kcal target.'
-            : 'On track with your ~$target kcal target.',
+            ? l10n.mealQualityGoodUnderKcal(balance, target)
+            : l10n.mealQualityGoodOnTrack(target),
       );
     }
     if (balance < -200) {
       return (
-        'Over target',
-        'About ${-balance} kcal over ~$target kcal — prefer lighter options next.',
+        l10n.mealQualityOverTarget,
+        l10n.mealQualityOverKcal(-balance, target),
       );
     }
     if (balance > 400 && meals.length <= 2) {
       return (
-        'Under target',
-        '~$balance kcal under goal — make sure meals are logged if you ate more.',
+        l10n.mealQualityUnderTarget,
+        l10n.mealQualityUnderKcal(balance),
       );
     }
     return (
-      'Balanced',
-      'Intake ~$total kcal vs ~$target kcal target today.',
+      l10n.mealQualityBalanced,
+      l10n.mealQualityBalancedHint(total, target),
     );
   }
 
@@ -338,20 +374,21 @@ Respond using EXACTLY this structure (one line each):
 ''';
   }
 
-  static MealCalorieResult _parseAnalysis(String analysis) {
+  static Future<MealCalorieResult> _parseAnalysis(String analysis) async {
+    final l10n = await LocaleController.loadLocalizations();
     final calories = _extractCalories(analysis);
     final category = _extractCategory(analysis, calories);
     final label = switch (category) {
-      MealCalorieCategory.excellent => 'Excellent',
-      MealCalorieCategory.satisfactory => 'Satisfactory',
-      MealCalorieCategory.attention => 'Attention',
+      MealCalorieCategory.excellent => l10n.mealCategoryExcellent,
+      MealCalorieCategory.satisfactory => l10n.mealCategorySatisfactory,
+      MealCalorieCategory.attention => l10n.mealCategoryAttention,
     };
     return MealCalorieResult(
       analysis: analysis,
       mealName: _extractField(analysis, 'Name') ??
           _extractField(analysis, 'Meal') ??
-          'Meal',
-      portion: _extractField(analysis, 'Portion') ?? 'one serving',
+          l10n.mealFallbackName,
+      portion: _extractField(analysis, 'Portion') ?? l10n.mealOneServing,
       calories: calories,
       proteinG: _extractGrams(analysis, 'Protein'),
       carbsG: _extractGrams(analysis, 'Carbs') ??

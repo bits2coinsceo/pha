@@ -107,11 +107,13 @@ class AuthProvider extends ChangeNotifier {
     final now = DateTime.now().toUtc().toIso8601String();
     final id = _uuid.v4();
     final token = _hash(password);
+    // Preserve display name exactly as typed (no locale/transliteration).
+    final nameAsEntered = displayName.trim();
     await Db.instance.raw.insert('profiles', {
       'id': id,
       'email': email,
       'password_hash': token,
-      'display_name': displayName,
+      'display_name': nameAsEntered,
       'onboarding_completed': 0,
       'is_plus': 0,
       'unit_system': 'metric',

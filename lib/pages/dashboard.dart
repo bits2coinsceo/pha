@@ -18,6 +18,8 @@ import '../physical_activity.dart';
 import '../theme.dart';
 import '../units.dart';
 import '../widgets.dart';
+import '../l10n/l10n_ext.dart';
+import '../l10n/medical_l10n.dart';
 
 class Dashboard extends StatefulWidget {
   final VoidCallback onOpenUpload;
@@ -26,6 +28,7 @@ class Dashboard extends StatefulWidget {
   final VoidCallback onOpenStressTest;
   final VoidCallback onOpenBadHabits;
   final VoidCallback onOpenPhysicalActivity;
+  final VoidCallback onOpenHeartRate;
   final VoidCallback onOpenLogMetric;
   final VoidCallback onOpenPsychoTest;
   final VoidCallback onOpenTreatmentSchedule;
@@ -42,6 +45,7 @@ class Dashboard extends StatefulWidget {
     required this.onOpenStressTest,
     required this.onOpenBadHabits,
     required this.onOpenPhysicalActivity,
+    required this.onOpenHeartRate,
     required this.onOpenLogMetric,
     required this.onOpenPsychoTest,
     required this.onOpenTreatmentSchedule,
@@ -115,7 +119,7 @@ class _DashboardState extends State<Dashboard> {
       barrierDismissible: false,
       builder: (_) => PhysicalActivityCheckinDialog(
         userId: _userId,
-        programLabel: program['program_label'] as String? ?? 'your program',
+        programLabel: program['program_label'] as String? ?? context.l10n.activityYourProgramFallback,
       ),
     );
   }
@@ -125,12 +129,16 @@ class _DashboardState extends State<Dashboard> {
   }
 
   Future<void> _openNotifications() async {
-    await showDialog<bool>(
+    final result = await showDialog<Object>(
       context: context,
       builder: (_) => TodayNotificationsPanel(userId: _userId),
     );
     await DailyNotificationService.markAllReadToday(_userId);
     if (!mounted) return;
+    if (result == 'insights') {
+      widget.onOpenInsights();
+      return;
+    }
     // Refresh index in case check-in answers were saved inline.
     await _loadNotificationBadge();
     await _loadHealthData();
@@ -262,21 +270,24 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
-  String _greeting() {
+  String _greeting(AppLocalizations l10n) {
     final h = DateTime.now().hour;
-    if (h < 12) return 'Good morning';
-    if (h < 17) return 'Good afternoon';
-    return 'Good evening';
+    if (h < 12) return l10n.goodMorning;
+    if (h < 17) return l10n.goodAfternoon;
+    return l10n.goodEvening;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final auth = context.watch<AuthProvider>();
     final isPlus = auth.isPlus;
     final trialLocked = !isPlus && auth.isTrialExpired;
     final unit = auth.unitSystem;
-    final firstName = displayName.isNotEmpty
-        ? displayName.split(' ').first
+    // Display name is stored verbatim (any script) and never localized.
+    final storedName = displayName.trim();
+    final firstName = storedName.isNotEmpty
+        ? storedName.split(RegExp(r'\s+')).first
         : (auth.user?.email.split('@').first ?? '');
 
     final glucoseFmt = formatGlucose(glucose, unit);
@@ -288,8 +299,8 @@ class _DashboardState extends State<Dashboard> {
 
     final actions = [
       QuickAction(
-        title: 'Upload Analysis',
-        description: 'Analyze PDFs or photos',
+        title: l10n.actionUploadAnalysis,
+        description: l10n.actionUploadAnalysisDesc,
         icon: Icons.upload_file,
         color: C.blue600,
         bgColor: C.blue50,
@@ -298,8 +309,8 @@ class _DashboardState extends State<Dashboard> {
         onTap: widget.onOpenUpload,
       ),
       QuickAction(
-        title: 'AI Consultation',
-        description: 'Chat with Ai Doc',
+        title: l10n.actionAiConsultation,
+        description: l10n.actionAiConsultationDesc,
         icon: Icons.chat_bubble_outline,
         color: C.teal600,
         bgColor: C.teal50,
@@ -308,8 +319,8 @@ class _DashboardState extends State<Dashboard> {
         onTap: widget.onOpenAIChat,
       ),
       QuickAction(
-        title: 'Wellness Check',
-        description: 'Check your wellbeing',
+        title: l10n.actionWellnessCheck,
+        description: l10n.actionWellnessCheckDesc,
         icon: Icons.psychology,
         color: C.sky600,
         bgColor: C.sky50,
@@ -317,8 +328,8 @@ class _DashboardState extends State<Dashboard> {
         onTap: widget.onOpenStressTest,
       ),
       QuickAction(
-        title: 'Check Your Bad Habits',
-        description: 'Smoking, alcohol & screen time',
+        title: l10n.actionBadHabits,
+        description: l10n.actionBadHabitsDesc,
         icon: Icons.fact_check_outlined,
         color: C.rose600,
         bgColor: C.rose50,
@@ -326,8 +337,8 @@ class _DashboardState extends State<Dashboard> {
         onTap: widget.onOpenBadHabits,
       ),
       QuickAction(
-        title: 'Start physical activity',
-        description: 'Choose your daily workout program',
+        title: l10n.actionPhysicalActivity,
+        description: l10n.actionPhysicalActivityDesc,
         icon: Icons.fitness_center_outlined,
         color: C.emerald600,
         bgColor: C.emerald50,
@@ -335,8 +346,17 @@ class _DashboardState extends State<Dashboard> {
         onTap: widget.onOpenPhysicalActivity,
       ),
       QuickAction(
-        title: 'Check Meal Calories',
-        description: 'Photo → calories & nutrition advice',
+        title: l10n.actionHeartRate,
+        description: l10n.actionHeartRateDesc,
+        icon: Icons.favorite_outline,
+        color: C.rose600,
+        bgColor: C.rose50,
+        locked: !isPlus,
+        onTap: widget.onOpenHeartRate,
+      ),
+      QuickAction(
+        title: l10n.actionMealCalories,
+        description: l10n.actionMealCaloriesDesc,
         icon: Icons.restaurant_outlined,
         color: C.orange600,
         bgColor: C.orange50,
@@ -347,8 +367,8 @@ class _DashboardState extends State<Dashboard> {
         onTap: widget.onOpenMealCalories,
       ),
       QuickAction(
-        title: 'PsychoTest',
-        description: 'Stress & psychosomatic assessment',
+        title: l10n.actionPsychoTest,
+        description: l10n.actionPsychoTestDesc,
         icon: Icons.science_outlined,
         color: C.teal600,
         bgColor: C.teal50,
@@ -356,8 +376,8 @@ class _DashboardState extends State<Dashboard> {
         onTap: widget.onOpenPsychoTest,
       ),
       QuickAction(
-        title: 'Treatment Schedule',
-        description: 'Medicines & supplements reminders',
+        title: l10n.actionTreatmentSchedule,
+        description: l10n.actionTreatmentScheduleDesc,
         icon: Icons.medication_outlined,
         color: C.purple600,
         bgColor: C.purple100,
@@ -365,8 +385,8 @@ class _DashboardState extends State<Dashboard> {
         onTap: widget.onOpenTreatmentSchedule,
       ),
       QuickAction(
-        title: 'Family Health\nTracking',
-        description: 'Add your family to track their health',
+        title: l10n.actionFamilyHealth,
+        description: l10n.actionFamilyHealthDesc,
         icon: Icons.group,
         color: C.emerald600,
         bgColor: C.emerald50,
@@ -375,18 +395,19 @@ class _DashboardState extends State<Dashboard> {
       ),
     ];
 
-    final today = DateFormat('EEEE, MMMM d').format(DateTime.now());
+    final localeTag = Localizations.localeOf(context).toString();
+    final today = DateFormat('EEEE, MMMM d', localeTag).format(DateTime.now());
 
     final healthMetrics = [
-      ChartData('Age', age != null ? '$age' : '—', 'yrs', C.orange500, const []),
-      ChartData('Height', heightFmt.value, heightFmt.unit, C.sky500, const []),
-      ChartData('Weight', weightFmt.value, weightFmt.unit, C.blue500,
+      ChartData(l10n.age, age != null ? '$age' : '—', l10n.unitYears, C.orange500, const []),
+      ChartData(l10n.height, heightFmt.value, l10n.localizeUnitLabel(heightFmt.unit), C.sky500, const []),
+      ChartData(l10n.weight, weightFmt.value, l10n.localizeUnitLabel(weightFmt.unit), C.blue500,
           weight != null ? [weight!.toDouble()] : const []),
-      ChartData('Blood Pressure', bpValue, 'mmHg', C.green500,
+      ChartData(l10n.bloodPressure, bpValue, l10n.unitMmhg, C.green500,
           systolic != null && diastolic != null ? [systolic!.toDouble()] : const []),
-      ChartData('Glucose', glucoseFmt.value, glucoseFmt.unit, C.red500,
+      ChartData(l10n.bloodGlucose, glucoseFmt.value, l10n.localizeUnitLabel(glucoseFmt.unit), C.red500,
           glucose != null ? [glucose!.toDouble()] : const []),
-      ChartData('Steps', fmtThousands(steps), 'steps', C.teal500, stepHistory),
+      ChartData(l10n.steps, fmtThousands(steps), l10n.unitSteps, C.teal500, stepHistory),
     ];
 
     return Column(
@@ -422,13 +443,31 @@ class _DashboardState extends State<Dashboard> {
                         ],
                       ),
                       const SizedBox(height: 2),
-                      Text('${_greeting()}${firstName.isNotEmpty ? ', $firstName' : ''}!',
+                      Text.rich(
+                        TextSpan(
                           style: TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                              color: C.gray900)),
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: C.gray900,
+                          ),
+                          children: [
+                            TextSpan(text: _greeting(l10n)),
+                            if (firstName.isNotEmpty) ...[
+                              const TextSpan(text: ', '),
+                              // Name stays as entered — independent of UI locale.
+                              TextSpan(
+                                text: firstName,
+                                locale: const Locale.fromSubtags(
+                                  languageCode: 'und',
+                                ),
+                              ),
+                            ],
+                            const TextSpan(text: '!'),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 2),
-                      Text("Here's your health overview for today.",
+                      Text(l10n.healthOverviewToday,
                           style: TextStyle(color: C.gray500)),
                       const SizedBox(height: 16),
                       HealthIndexCard(
@@ -498,10 +537,10 @@ class _DashboardState extends State<Dashboard> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('PHA',
+                        Text(context.l10n.appNameShort,
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 18, color: C.gray900)),
-                        Text('Personal Health Assistant',
+                        Text(context.l10n.personalHealthAssistant,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(fontSize: 12, color: C.gray400)),
@@ -517,7 +556,7 @@ class _DashboardState extends State<Dashboard> {
                         border: Border.all(color: C.blue100),
                       ),
                       child: Text(
-                        '7-day free trial',
+                        context.l10n.trialSevenDayFree,
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -592,12 +631,12 @@ class _DashboardState extends State<Dashboard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Your health, our priority',
+                Text(context.l10n.tagline,
                     style: TextStyle(
                         color: C.white, fontWeight: FontWeight.w600)),
                 SizedBox(height: 4),
                 Text(
-                  'Track, analyze and improve your health with PHA. Your data stays private and secure.',
+                  context.l10n.taglineBody,
                   style: TextStyle(
                     color: C.white.withValues(alpha: 0.92),
                     fontSize: 14,

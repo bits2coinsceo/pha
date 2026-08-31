@@ -17,6 +17,7 @@ import 'profile_basics.dart';
 import 'modals/psycho_test_modal.dart';
 import 'modals/treatment_schedule_modal.dart';
 import 'modals/quick_action_modals.dart';
+import 'modals/heart_rate_modal.dart';
 import 'services.dart';
 import 'pages/dashboard.dart';
 import 'pages/history.dart';
@@ -28,6 +29,9 @@ import 'telemetry_sync.dart';
 import 'cosmic_ui.dart';
 import 'theme.dart';
 import 'theme_mode.dart';
+import 'locale_controller.dart';
+import 'l10n/generated/app_localizations.dart';
+import 'l10n/l10n_ext.dart';
 import 'widgets.dart';
 
 bool _errorWidgetInstalled = false;
@@ -97,9 +101,10 @@ Widget _materialAppBuilder(BuildContext context, Widget? child) {
     };
   }
   if (child == null) {
-    return const Scaffold(
-      backgroundColor: Color(0xFFF4F6FB),
-      body: Center(child: Text('No content')),
+    final l10n = AppLocalizations.of(context);
+    return Scaffold(
+      backgroundColor: const Color(0xFFF4F6FB),
+      body: Center(child: Text(l10n?.noContent ?? 'No content')),
     );
   }
   return child;
@@ -116,6 +121,7 @@ class PhaRoot extends StatefulWidget {
 class _PhaRootState extends State<PhaRoot> {
   final AuthProvider _auth = AuthProvider();
   final ThemeModeController _themeMode = ThemeModeController();
+  final LocaleController _locale = LocaleController();
 
   bool _ready = false;
   Object? _fatalError;
@@ -203,6 +209,23 @@ class _PhaRootState extends State<PhaRoot> {
       );
     }
 
+    // Locale
+    try {
+      AppLogger.d('Loading locale…', category: LogCategory.bootstrap);
+      await _locale.load().timeout(const Duration(seconds: 5));
+      AppLogger.i(
+        'Locale OK (${_locale.locale.languageCode})',
+        category: LogCategory.bootstrap,
+      );
+    } catch (e, st) {
+      AppLogger.w(
+        'Locale load failed (non-fatal)',
+        error: e,
+        stackTrace: st,
+        category: LogCategory.bootstrap,
+      );
+    }
+
     if (!mounted) return;
     setState(() {
       _fatalError = fatal;
@@ -230,15 +253,31 @@ class _PhaRootState extends State<PhaRoot> {
       providers: [
         ChangeNotifierProvider.value(value: _auth),
         ChangeNotifierProvider.value(value: _themeMode),
+        ChangeNotifierProvider.value(value: _locale),
       ],
-      child: MaterialApp(
-        title: 'PHA — Personal Health Assistant',
-        debugShowCheckedModeBanner: false,
-        theme: buildAppTheme(isDark: false),
-        darkTheme: buildAppTheme(isDark: true),
-        themeMode: _ready ? _themeMode.mode : ThemeMode.light,
-        builder: _materialAppBuilder,
-        home: home,
+      child: AnimatedBuilder(
+        animation: Listenable.merge([_themeMode, _locale]),
+        builder: (context, _) {
+          return MaterialApp(
+            title: 'PHA',
+            onGenerateTitle: (context) {
+              try {
+                return context.l10n.appTitle;
+              } catch (_) {
+                return 'PHA';
+              }
+            },
+            debugShowCheckedModeBanner: false,
+            theme: buildAppTheme(isDark: false),
+            darkTheme: buildAppTheme(isDark: true),
+            themeMode: _ready ? _themeMode.mode : ThemeMode.light,
+            locale: _locale.locale,
+            supportedLocales: LocaleController.supportedLocales,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            builder: _materialAppBuilder,
+            home: home,
+          );
+        },
       ),
     );
   }
@@ -305,10 +344,10 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
           await showDialog<bool>(
             context: context,
             barrierDismissible: false,
-            builder: (_) => PhysicalActivityCheckinDialog(
+            builder: (ctx) => PhysicalActivityCheckinDialog(
               userId: auth.user!.id,
-              programLabel:
-                  program['program_label'] as String? ?? 'your program',
+              programLabel: program['program_label'] as String? ??
+                  ctx.l10n.activityYourProgramFallback,
             ),
           );
           return;
@@ -547,14 +586,22 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
           onOpenUpload: () => _guardFreeFeature(() => _openModal(UploadAnalysisModal(
             onNeedUpgrade: _needUpgrade,
             onAnalysisDelivered: (analysis, fileName) {
-              Navigator.pop(context);
-              _openFullScreen(AIChatModal(
-                onNeedUpgrade: _needUpgrade,
-                seedMessages: [
-                  AiChatSeedMessage(true, 'I uploaded my analysis: $fileName'),
-                  AiChatSeedMessage(false, analysis),
-                ],
-              ));
+              // Close upload sheet, then open Ai Doc with the analysis already in chat.
+              Navigator.of(context).pop();
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!mounted) return;
+                final l10n = context.l10n;
+                _openFullScreen(AIChatModal(
+                  onNeedUpgrade: _needUpgrade,
+                  seedMessages: [
+                    AiChatSeedMessage(
+                      true,
+                      l10n.aiDocUploadedAnalysis(fileName),
+                    ),
+                    AiChatSeedMessage(false, analysis),
+                  ],
+                ));
+              });
             },
           ))),
           onOpenMealCalories: () => _guardFreeFeature(() => _openModal(
@@ -568,6 +615,9 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
               : _openModal(const UpgradeModal()),
           onOpenPhysicalActivity: () => auth.isPlus
               ? _openModal(const PhysicalActivityModal())
+              : _openModal(const UpgradeModal()),
+          onOpenHeartRate: () => auth.isPlus
+              ? _openModal(const HeartRateModal())
               : _openModal(const UpgradeModal()),
           onOpenLogMetric: () => _openModal(
               LogMetricModal(onSaved: () => setState(() => dashboardKey++))),
@@ -616,17 +666,21 @@ class _ColdStartSplash extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xFFF4F6FB),
+    String label = 'Starting PHA…';
+    try {
+      label = AppLocalizations.of(context).startingPha;
+    } catch (_) {}
+    return Scaffold(
+      backgroundColor: const Color(0xFFF4F6FB),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(color: Color(0xFF4F46E5)),
-            SizedBox(height: 16),
+            const CircularProgressIndicator(color: Color(0xFF4F46E5)),
+            const SizedBox(height: 16),
             Text(
-              'Starting PHA…',
-              style: TextStyle(
+              label,
+              style: const TextStyle(
                 color: Color(0xFF475569),
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -652,7 +706,7 @@ class _Splash extends StatelessWidget {
             CircularProgressIndicator(color: C.accentPrimary),
             SizedBox(height: 16),
             Text(
-              'Loading...',
+              context.l10n.loading,
               style: TextStyle(
                 color: C.gray600,
                 fontSize: 14,
@@ -685,7 +739,7 @@ class _StartupError extends StatelessWidget {
               Icon(Icons.error_outline, color: C.red500, size: 40),
               SizedBox(height: 16),
               Text(
-                'Startup failed',
+                context.l10n.startupFailed,
                 style: TextStyle(
                   color: C.gray900,
                   fontSize: 20,

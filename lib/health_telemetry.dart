@@ -58,30 +58,56 @@ class HealthTelemetryService {
   static Future<bool> requestPermission() async {
     if (!isSupported) return false;
     await _ensureConfigured();
-    final granted =
-        await _health.requestAuthorization(_types, permissions: _permissions);
-    if (granted && Platform.isIOS) {
+    // iOS 26+: calling requestAuthorization again after the user already
+    // decided can present a blank undismissable sheet (looks like a white
+    // screen). Skip the system prompt if we already asked once.
+    if (Platform.isIOS) {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool(_iosAuthKey, true);
+      if (prefs.getBool(_iosAuthKey) ?? false) {
+        return true;
+      }
     }
-    return granted;
+    try {
+      final granted =
+          await _health.requestAuthorization(_types, permissions: _permissions);
+      if (granted && Platform.isIOS) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool(_iosAuthKey, true);
+      }
+      return granted;
+    } catch (e) {
+      debugPrint('HealthTelemetryService.requestPermission failed: $e');
+      return false;
+    }
   }
 
   static Future<DeviceTelemetrySnapshot?> fetchToday() async {
+    final now = DateTime.now();
+    return fetchForDay(DateTime(now.year, now.month, now.day));
+  }
+
+  /// Steps + walking distance for a local calendar [day] (00:00 → next midnight).
+  /// For today, the end bound is [DateTime.now] so totals stay live.
+  static Future<DeviceTelemetrySnapshot?> fetchForDay(DateTime day) async {
     if (!isSupported) return null;
     await _ensureConfigured();
     if (Platform.isAndroid && !await hasPermission()) return null;
 
+    final start = DateTime(day.year, day.month, day.day);
+    final dayEnd = start.add(const Duration(days: 1));
     final now = DateTime.now();
-    final midnight = DateTime(now.year, now.month, now.day);
+    final end = dayEnd.isAfter(now) ? now : dayEnd;
+    if (!end.isAfter(start)) {
+      return const DeviceTelemetrySnapshot(steps: 0, distanceMeters: 0);
+    }
 
-    final steps = await _health.getTotalStepsInInterval(midnight, now) ?? 0;
+    final steps = await _health.getTotalStepsInInterval(start, end) ?? 0;
 
     var distanceMeters = 0.0;
     final points = await _health.getHealthDataFromTypes(
       types: [HealthDataType.DISTANCE_WALKING_RUNNING],
-      startTime: midnight,
-      endTime: now,
+      startTime: start,
+      endTime: end,
     );
     for (final point in points) {
       if (point.type != HealthDataType.DISTANCE_WALKING_RUNNING) continue;

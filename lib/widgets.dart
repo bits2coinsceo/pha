@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'l10n/l10n_ext.dart';
+import 'l10n/medical_l10n.dart';
 import 'medical_guidelines.dart';
 import 'theme.dart';
 
@@ -188,57 +190,53 @@ class AppBottomNav extends StatelessWidget {
   final ValueChanged<String> onChange;
   const AppBottomNav({super.key, required this.current, required this.onChange});
 
-  static const _items = [
-    ('home', 'Home', Icons.home_outlined),
-    ('history', 'History', Icons.access_time),
-    ('insights', 'Insights', Icons.bar_chart),
-    ('profile', 'Profile', Icons.person_outline),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final items = [
+      ('home', l10n.navHome, Icons.home_outlined),
+      ('history', l10n.navHistory, Icons.access_time),
+      ('insights', l10n.navInsights, Icons.bar_chart),
+      ('profile', l10n.navProfile, Icons.person_outline),
+    ];
     return Container(
       decoration: BoxDecoration(
         color: C.card,
         border: Border(top: BorderSide(color: C.cardBorder.withValues(alpha: 0.35))),
         boxShadow: C.glowShadow(blur: 16, offset: Offset(0, -4), alphaDark: 0.27, alphaLight: 0.08),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
       child: SafeArea(
         top: false,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 448),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: _items.map((it) {
-              final selected = current == it.$1;
-              return InkWell(
+        child: Row(
+          children: items.map((it) {
+            final selected = current == it.$1;
+            return Expanded(
+              child: InkWell(
                 onTap: () => onChange(it.$1),
                 borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: selected ? C.navActiveBg : Colors.transparent,
-                    borderRadius: BorderRadius.circular(10),
-                    border: selected ? Border.all(color: C.navActiveBorder, width: 1.5) : null,
-                    boxShadow: selected ? C.glowShadow(blur: 8, alphaDark: 0.2, alphaLight: 0.06) : null,
-                  ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(it.$3, size: 24, color: selected ? C.navActiveFg : C.gray500),
-                      SizedBox(height: 4),
-                      Text(it.$2,
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                              color: selected ? C.navActiveFg : C.gray500)),
+                      Icon(it.$3, size: 22, color: selected ? C.navActiveFg : C.gray500),
+                      const SizedBox(height: 4),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(it.$2,
+                            maxLines: 1,
+                            style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                                color: selected ? C.navActiveFg : C.gray500)),
+                      ),
                     ],
                   ),
                 ),
-              );
-            }).toList(),
-          ),
+              ),
+            );
+          }).toList(),
         ),
       ),
     );
@@ -280,89 +278,93 @@ class HealthIndexCard extends StatelessWidget {
   /// Ring + score use status color so danger (poor) reads red immediately.
   Color get _gaugeColor => _statusColor;
 
-  String get _statusMessage => MedicalGuidelines.indexCardBlurb(status);
-
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final normalized = status.toLowerCase();
-    final cap = normalized == 'poor' || normalized == 'needs_attention'
-        ? 'Needs Attention'
-        : status.isEmpty
-            ? status
-            : status[0].toUpperCase() + status.substring(1);
+    final cap = l10n.statusLabel(normalized == 'poor' || normalized == 'needs_attention'
+        ? 'needs_attention'
+        : status);
+    final statusMessage = l10n.indexCardBlurb(status);
     final stepPct = (steps.toDouble() / stepsGoal.toDouble()).clamp(0.0, 1.0);
-    final stepFeedback = stepsFeedbackFor(steps);
+    final stepFeedback = l10n.stepsFeedback(steps);
     return Container(
       decoration: cardDecoration(),
-      padding: const EdgeInsets.all(22),
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: onHealthIndexTap,
-                  borderRadius: BorderRadius.circular(12),
-                  child: _roundMetricColumn(
-                    title: 'Health Index',
-                    trailing: Icon(Icons.info_outline, size: 14, color: C.gray400),
-                    fraction: score.toDouble() / 100,
-                    progressColor: _gaugeColor,
-                    centerMain: '$score',
-                    centerSub: '/100',
-                    centerMainSize: 30,
-                    centerMainColor: _gaugeColor,
-                    belowGauge: Column(
-                      children: [
-                        Text(cap,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 15,
-                                color: _statusColor)),
-                        SizedBox(height: 4),
-                        Text(_statusMessage,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: C.gray500, fontSize: 13, height: 1.3)),
-                      ],
-                    ),
+      padding: const EdgeInsets.all(18),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onHealthIndexTap,
+                borderRadius: BorderRadius.circular(12),
+                child: _roundMetricColumn(
+                  title: context.l10n.healthIndex,
+                  trailing: Icon(Icons.info_outline, size: 14, color: C.gray400),
+                  fraction: score.toDouble() / 100,
+                  progressColor: _gaugeColor,
+                  centerMain: '$score',
+                  centerSub: '/100',
+                  centerMainSize: 26,
+                  centerMainColor: _gaugeColor,
+                  belowGauge: Column(
+                    children: [
+                      Text(cap,
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                              color: _statusColor)),
+                      const SizedBox(height: 4),
+                      Text(statusMessage,
+                          textAlign: TextAlign.center,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              color: C.gray500, fontSize: 11, height: 1.25)),
+                    ],
                   ),
                 ),
               ),
             ),
-            Container(width: 1, margin: const EdgeInsets.symmetric(horizontal: 16), color: C.gray200),
-            Expanded(
-              child: _roundMetricColumn(
-                title: 'Steps',
-                trailing: Icon(Icons.directions_walk, size: 14, color: C.statusGood),
-                fraction: stepPct,
-                progressColor: C.progressGreen,
-                centerMain: _fmt(steps),
-                centerSub: '/${_fmt(stepsGoal)}',
-                centerMainSize: _fmt(steps).length > 5 ? 20 : 28,
-                belowGauge: Column(
-                  children: [
-                    Text(stepFeedback.range,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12,
-                            color: C.statusGood,
-                            height: 1.2)),
-                    SizedBox(height: 6),
-                    Text(stepFeedback.message,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: C.gray500, fontSize: 11, height: 1.35)),
-                  ],
-                ),
+          ),
+          Container(width: 1, margin: const EdgeInsets.symmetric(horizontal: 6), color: C.gray200),
+          Expanded(
+            child: _roundMetricColumn(
+              title: l10n.steps,
+              trailing: Icon(Icons.directions_walk, size: 14, color: C.statusGood),
+              fraction: stepPct,
+              progressColor: C.progressGreen,
+              centerMain: _fmt(steps),
+              centerSub: '/${_fmt(stepsGoal)}',
+              centerMainSize: _fmt(steps).length > 5 ? 18 : 24,
+              belowGauge: Column(
+                children: [
+                  Text(stepFeedback.range,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 11,
+                          color: C.statusGood,
+                          height: 1.2)),
+                  const SizedBox(height: 4),
+                  Text(stepFeedback.message,
+                      textAlign: TextAlign.center,
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          color: C.gray500, fontSize: 10, height: 1.3)),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -379,44 +381,68 @@ class HealthIndexCard extends StatelessWidget {
     Color? centerMainColor,
   }) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
           children: [
-            Text(title,
+            Flexible(
+              child: Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                    color: C.gray500, fontWeight: FontWeight.w500, fontSize: 13)),
-            SizedBox(width: 6),
+                  color: C.gray500,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+            const SizedBox(width: 4),
             trailing,
           ],
         ),
-        SizedBox(height: 12),
+        const SizedBox(height: 10),
         SizedBox(
-          width: 120,
-          height: 120,
+          width: 136,
+          height: 136,
           child: CustomPaint(
             painter: _GaugePainter(fraction, progressColor: progressColor),
             child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(centerMain,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      centerMain,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
                       style: TextStyle(
-                          fontSize: centerMainSize,
-                          fontWeight: FontWeight.bold,
-                          color: centerMainColor ?? C.gray900)),
-                  Text(centerSub, style: TextStyle(fontSize: 12, color: C.gray500)),
-                ],
+                        fontSize: centerMainSize,
+                        fontWeight: FontWeight.bold,
+                        color: centerMainColor ?? C.gray900,
+                        height: 1.05,
+                      ),
+                    ),
+                    Text(
+                      centerSub,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 11, color: C.gray500),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
-        SizedBox(height: 14),
-        belowGauge,
+        const SizedBox(height: 14),
+        SizedBox(width: double.infinity, child: belowGauge),
       ],
     );
   }
@@ -494,10 +520,11 @@ class MetricsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final items = [
-      (Icons.local_fire_department, 'Calories', calories, 'kcal', C.orange500),
-      (Icons.place, 'Distance', distance, distanceUnit, C.blue500),
-      (Icons.access_time, 'Active Time', activeTime, 'min', C.teal600),
+      (Icons.local_fire_department, l10n.calories, calories, l10n.unitKcal, C.orange500),
+      (Icons.place, l10n.distance, distance, l10n.localizeUnitLabel(distanceUnit), C.blue500),
+      (Icons.access_time, l10n.activeTime, activeTime, l10n.unitMin, C.teal600),
     ];
     return Row(
       children: items.map((it) {
@@ -567,7 +594,7 @@ class QuickActions extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Quick Actions',
+            Text(context.l10n.quickActions,
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w800,
@@ -585,7 +612,7 @@ class QuickActions extends StatelessWidget {
                   children: [
                     Icon(Icons.auto_awesome, size: 14, color: C.white),
                     SizedBox(width: 6),
-                    Text('PHA Plus+',
+                    Text(context.l10n.phaPlus,
                         style: TextStyle(
                             color: C.white, fontSize: 12, fontWeight: FontWeight.w600)),
                   ],
@@ -643,7 +670,7 @@ class _ActionTile extends StatelessWidget {
                                   height: 1.25)),
                         ),
                         SizedBox(width: 8),
-                        _pill('Coming Soon', C.sky50, C.sky200, C.sky500, Icons.access_time),
+                        _pill(context.l10n.comingSoon, C.sky50, C.sky200, C.sky500, Icons.access_time),
                       ],
                     ),
                     Text(a.description,
@@ -777,42 +804,42 @@ class HealthMetricsChart extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: cardDecoration(),
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Health Metrics',
+          Text(context.l10n.healthMetrics,
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: C.gray900)),
-          SizedBox(height: 24),
+          SizedBox(height: 16),
           ...metrics.map((m) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.only(bottom: 10),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                   decoration:
                       BoxDecoration(color: C.gray100, borderRadius: BorderRadius.circular(12)),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text(m.label,
-                              style: TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.w500, color: C.gray500)),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.baseline,
-                            textBaseline: TextBaseline.alphabetic,
-                            children: [
-                              Text(m.value,
-                                  style: TextStyle(
-                                      fontSize: 18, fontWeight: FontWeight.bold, color: C.gray900)),
-                              if (m.unit.isNotEmpty) ...[
-                                SizedBox(width: 4),
-                                Text(m.unit,
-                                    style: TextStyle(fontSize: 12, color: C.gray400)),
-                              ],
-                            ],
+                          Expanded(
+                            child: Text(m.label,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    fontSize: 14, fontWeight: FontWeight.w500, color: C.gray500)),
                           ),
+                          const SizedBox(width: 10),
+                          Text(m.value,
+                              textAlign: TextAlign.end,
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold, color: C.gray900)),
+                          if (m.unit.isNotEmpty) ...[
+                            const SizedBox(width: 4),
+                            Text(m.unit,
+                                style: TextStyle(fontSize: 11, color: C.gray400)),
+                          ],
                         ],
                       ),
                       if (m.trend.length > 1) ...[
@@ -884,7 +911,7 @@ class MiniBarChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (values.isEmpty) {
-      return Text('No data', style: TextStyle(fontSize: 12, color: C.gray400));
+      return Text(context.l10n.noData, style: TextStyle(fontSize: 12, color: C.gray400));
     }
     final maxV = _chartMax(values);
     final minV = _chartMin(values);
@@ -934,7 +961,7 @@ class MiniLineChart extends StatelessWidget {
       return SizedBox(
         height: height,
         child: Center(
-          child: Text('No data', style: TextStyle(fontSize: 12, color: C.gray400)),
+          child: Text(context.l10n.noData, style: TextStyle(fontSize: 12, color: C.gray400)),
         ),
       );
     }

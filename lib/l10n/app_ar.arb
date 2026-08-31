@@ -1,0 +1,1468 @@
+{
+  "@@locale": "ar",
+  "appTitle": "PHA — مساعد الصحة الشخصي",
+  "appNameShort": "PHA",
+  "personalHealthAssistant": "مساعد الصحة الشخصي",
+  "tagline": "صحتك أولويتنا",
+  "taglineBody": "تتبّع وحلّل وحسّن صحتك مع PHA. تبقى بياناتك خاصة وآمنة.",
+  "startingPha": "جارٍ تشغيل PHA…",
+  "loading": "جارٍ التحميل…",
+  "startupFailed": "فشل التشغيل",
+  "noContent": "لا يوجد محتوى",
+  "retry": "إعادة المحاولة",
+  "cancel": "إلغاء",
+  "close": "إغلاق",
+  "done": "تم",
+  "save": "حفظ",
+  "continueAction": "متابعة",
+  "back": "رجوع",
+  "next": "التالي",
+  "yes": "نعم",
+  "no": "لا",
+  "ok": "حسنًا",
+  "delete": "حذف",
+  "edit": "تعديل",
+  "add": "إضافة",
+  "noDataYet": "لا توجد بيانات بعد",
+  "noData": "لا بيانات",
+  "comingSoon": "قريبًا",
+  "navHome": "الرئيسية",
+  "navHistory": "السجل",
+  "navInsights": "الرؤى",
+  "navProfile": "الملف",
+  "quickActions": "إجراءات سريعة",
+  "healthIndex": "مؤشر الصحة",
+  "healthMetrics": "مقاييس الصحة",
+  "steps": "الخطوات",
+  "calories": "السعرات",
+  "distance": "المسافة",
+  "activeTime": "وقت النشاط",
+  "weight": "الوزن",
+  "height": "الطول",
+  "water": "الماء",
+  "bloodGlucose": "سكر الدم",
+  "bloodPressure": "ضغط الدم",
+  "bpSystolic": "الضغط الانقباضي",
+  "bpDiastolic": "الضغط الانبساطي",
+  "language": "اللغة",
+  "chooseLanguage": "اختر لغتك",
+  "chooseLanguageSubtitle": "يمكنك تغييرها لاحقًا من الملف الشخصي.",
+  "languageEnglish": "English",
+  "languageSpanish": "Español",
+  "languageRussian": "Русский",
+  "languageChinese": "普通话",
+  "languageArabic": "العربية",
+  "theme": "المظهر",
+  "themeLight": "فاتح",
+  "themeDark": "داكن",
+  "appearance": "المظهر",
+  "goodMorning": "صباح الخير",
+  "goodAfternoon": "مساء الخير",
+  "goodEvening": "مساء الخير",
+  "welcomeBack": "مرحبًا بعودتك",
+  "createYourAccount": "أنشئ حسابك",
+  "signIn": "تسجيل الدخول",
+  "signUp": "إنشاء حساب",
+  "createAccount": "إنشاء حساب",
+  "signUpForFree": "سجّل مجانًا",
+  "alreadyHaveAccount": "لديك حساب؟ سجّل الدخول",
+  "dontHaveAccount": "ليس لديك حساب؟ أنشئ حسابًا",
+  "email": "البريد الإلكتروني",
+  "password": "كلمة المرور",
+  "displayName": "الاسم المعروض",
+  "yourName": "اسمك",
+  "signOut": "تسجيل الخروج",
+  "account": "الحساب",
+  "agreement": "الاتفاقية",
+  "privacyPolicy": "سياسة الخصوصية",
+  "acceptAgreement": "أوافق على الاتفاقية",
+  "acceptPrivacy": "أوافق على سياسة الخصوصية",
+  "pleaseAcceptLegal": "يُرجى قراءة الاتفاقية وسياسة الخصوصية والموافقة عليهما للمتابعة.",
+  "passwordTooShort": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل.",
+  "featureTrackVitals": "تتبّع العلامات الحيوية والسكر",
+  "featureAiInsights": "رؤى صحية بالذكاء الاصطناعي",
+  "featureSmartAnalysis": "تحليل ذكي",
+  "profileTitle": "الملف الشخصي",
+  "profileSubtitle": "إدارة إعدادات حسابك",
+  "age": "العمر",
+  "heightCm": "الطول (سم)",
+  "weightKg": "الوزن (كغ)",
+  "saveChanges": "حفظ التغييرات",
+  "profileSaved": "تم حفظ الملف",
+  "historyTitle": "سجل الصحة",
+  "historySubtitle": "مقاييسك الصحية المسجّلة عبر الزمن",
+  "stepsChartTitle": "الخطوات",
+  "stepsAvgPerDay": "المتوسط {avg}/يوم",
+  "days7": "7 أيام",
+  "days30": "30 يومًا",
+  "days90": "90 يومًا",
+  "allFilter": "الكل",
+  "recordsCount": "{count} سجلات",
+  "recordCountOne": "سجل واحد",
+  "noMetricsYet": "لا مقاييس مسجّلة بعد",
+  "noMetricsHint": "استخدم زر التسجيل في الصفحة الرئيسية لبدء تتبّع صحتك.",
+  "insightsTitle": "رؤى الصحة",
+  "insightsSubtitle": "اتجاهات وأنماط من بياناتك الصحية",
+  "avgHealthIndex": "متوسط مؤشر الصحة",
+  "avgWellnessScore": "متوسط درجة العافية",
+  "stepTrend": "اتجاه الخطوات",
+  "healthIndexHistory": "سجل مؤشر الصحة",
+  "wellnessCheckHistory": "سجل فحوصات العافية",
+  "stepActivity": "نشاط الخطوات",
+  "lastNDays": "آخر {count} يومًا",
+  "minLabel": "الأدنى: {value}",
+  "avgLabel": "المتوسط: {value}",
+  "maxLabel": "الأعلى: {value}",
+  "noInsightsYet": "لا رؤى بعد",
+  "noInsightsHint": "ابدأ بتسجيل المقاييس وإكمال فحوصات العافية لرؤية الرؤى هنا.",
+  "noHealthIndexYet": "لا بيانات لمؤشر الصحة بعد",
+  "noWellnessYet": "لا فحوصات عافية بعد. جرّب فحص العافية من الشاشة الرئيسية.",
+  "healthAnalysis": "تحليل الصحة",
+  "healthAnalysisSubtitle": "نفس درجة مؤشر الصحة مع النتائج والنصائح",
+  "analyze": "تحليل",
+  "reAnalyze": "إعادة التحليل",
+  "analyzing": "جارٍ التحليل…",
+  "noAnalysisYet": "لا تحليل بعد. اضغط تحليل للحصول على خلاصة صحية مخصّصة بناءً على مقاييسك.",
+  "metricFindings": "نتائج المقاييس",
+  "recommendations": "التوصيات",
+  "lastAnalyzed": "آخر تحليل: {when}",
+  "statusExcellent": "ممتاز",
+  "statusGood": "جيد",
+  "statusFair": "مقبول",
+  "statusNeedsAttention": "يحتاج انتباهًا",
+  "actionUploadAnalysis": "رفع تحليل",
+  "actionUploadAnalysisDesc": "تحليل ملفات PDF أو الصور",
+  "actionAiConsultation": "استشارة ذكاء اصطناعي",
+  "actionAiConsultationDesc": "الدردشة مع Ai Doc",
+  "actionWellnessCheck": "فحص العافية",
+  "actionWellnessCheckDesc": "تحقّق من شعورك العام",
+  "actionBadHabits": "تحقّق من عاداتك السيئة",
+  "actionBadHabitsDesc": "التدخين والكحول ووقت الشاشة",
+  "actionPhysicalActivity": "بدء النشاط البدني",
+  "actionPhysicalActivityDesc": "اختر برنامج التمرين اليومي",
+  "actionMealCalories": "سعرات الوجبة",
+  "actionMealCaloriesDesc": "صورة ← سعرات ونصائح غذائية",
+  "actionPsychoTest": "اختبار نفسي",
+  "actionPsychoTestDesc": "تقييم الضغط والأعراض النفسية الجسدية",
+  "actionTreatmentSchedule": "جدول العلاج",
+  "actionTreatmentScheduleDesc": "تذكيرات الأدوية والمكمّلات",
+  "actionFamilyHealth": "تتبّع صحة العائلة",
+  "actionFamilyHealthDesc": "أضف أفراد عائلتك لتتبّع صحتهم",
+  "logMetric": "تسجيل",
+  "todayVitals": "علامات اليوم الحيوية",
+  "onboardingQuest1TitleBefore": "المهمة 1: اختر عالمك",
+  "onboardingQuest1TitleAfter": "اختر وحدات القياس",
+  "onboardingQuest1BodyBefore": "ابدأ رحلتك الصحية — 3 مهام سريعة ثم سجّل.",
+  "onboardingQuest1BodyAfter": "خصّص الرسوم والنصائح لمنطقتك.",
+  "onboardingQuest1CardTitle": "المهمة 1 · نظام القياس",
+  "onboardingQuest1CardSubtitle": "افتح الرسوم بلغتك",
+  "imperial": "إمبراطوري",
+  "imperialUnits": "قدم · رطل · مغ/دل",
+  "metric": "متري",
+  "metricUnits": "سم · كغ · مليمول/ل",
+  "startQuest1": "ابدأ المهمة 1 ←",
+  "onboardingQuest2Title": "المهمة 2: عنك",
+  "onboardingQuest3Title": "المهمة 3: علاماتك الحيوية",
+  "onboardingVictoryTitle": "أنت جاهز!",
+  "onboardingVictoryBody": "رحلتك الصحية تبدأ الآن.",
+  "activityYourPlan": "خطة نشاطك",
+  "activityCurrentPlan": "الخطة الحالية",
+  "activityWhatsIncluded": "ما الذي يشمله",
+  "activityChangePlan": "تغيير الخطة",
+  "activityStartTitle": "بدء النشاط البدني",
+  "activityChangeTitle": "تغيير الخطة",
+  "activityChooseProgram": "اختر برنامجك. ابدأ نشاطك البدني اليومي.",
+  "activityChangeHint": "اختر برنامجًا جديدًا. سيتبع التسجيل المسائي الخطة الجديدة.",
+  "activityKeepCurrent": "الإبقاء على الخطة الحالية",
+  "activityProgramStarted": "بدأ البرنامج",
+  "activityProgramSaved": "تم حفظ خطة النشاط اليومي. كل مساء سنسأل إن أكملتها.",
+  "activityStartThis": "ابدأ هذا البرنامج",
+  "activitySwitchToThis": "التبديل إلى هذه الخطة",
+  "activityChooseAnother": "اختر برنامجًا آخر",
+  "activityCurrentBadge": "الحالية",
+  "activityStarter": "مبتدئ",
+  "activityStarterSubtitle": "ابدأ نشاطك البدني اليومي",
+  "activityAdvanced": "متقدم",
+  "activityAdvancedSubtitle": "ابنِ الاستمرارية بمجموعات منظّمة",
+  "activityProfessional": "محترف",
+  "activityProfessionalSubtitle": "تدريب يومي عالي الحجم بوزن الجسم",
+  "activitySuperman": "سوبرمان",
+  "activitySupermanSubtitle": "تدريب قوي في الصالة الرياضية",
+  "partially": "جزئيًا",
+  "notifications": "الإشعارات",
+  "phaPlus": "PHA Plus+",
+  "upgrade": "ترقية",
+  "trialExpired": "انتهت الفترة التجريبية",
+  "unitSteps": "خطوة",
+  "unitKcal": "سعرة",
+  "unitMin": "دقيقة",
+  "unitMl": "مل",
+  "unitMmhg": "مم زئبق",
+  "healthOverviewToday": "إليك نظرة عامة على صحتك لليوم.",
+  "unitYears": "سنة",
+  "unitKg": "كغ",
+  "unitCm": "سم",
+  "unitLbs": "lbs",
+  "unitMmol": "mmol/L",
+  "unitMgdl": "mg/dL",
+  "unitKm": "كم",
+  "unitMiles": "miles",
+  "healthIndexAvgScore": "متوسط {score}/100",
+  "@healthIndexAvgScore": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "indexCardExcellent": "ممتاز — استمر.",
+  "indexCardGood": "أنت بخير.",
+  "indexCardFair": "بعض المجالات تحتاج اهتماماً.",
+  "indexCardNeedsAttention": "يحتاج تركيزاً — راجع عاداتك.",
+  "stepsMsgSedentary": "نشاط منخفض اليوم. ابدأ بمشي 15 دقيقة — الاستمرار أهم من الشدة لصحة القلب.",
+  "stepsMsgBuilding": "أنت تبني عادة المشي. استهدف {goal}+ خطوة لفائدة أيضية أقوى.",
+  "@stepsMsgBuilding": {
+    "placeholders": {
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "stepsMsgBaseline": "نشاط أساسي متين. مشي قصير إضافي قد يصل لنطاق {goal}+ الذي تعتبره كثير من الإرشادات مفيداً.",
+  "@stepsMsgBaseline": {
+    "placeholders": {
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "stepsMsgStrong": "مستوى نشاط قوي — أعلى بكثير من الخمول. حافظ على الإيقاع؛ {goal} خطوة هدف إضافي لا إلزام.",
+  "@stepsMsgStrong": {
+    "placeholders": {
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "stepsMsgGoal": "نشاط ممتاز — تحقق يوم {goal} خطوة الكلاسيكي.",
+  "@stepsMsgGoal": {
+    "placeholders": {
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "stepsRangeSedentary": "0–{max} steps",
+  "@stepsRangeSedentary": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "stepsRangeBuilding": "{min}–{max} steps",
+  "@stepsRangeBuilding": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "stepsRangeBaseline": "{min}–{max} steps",
+  "@stepsRangeBaseline": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "stepsRangeStrong": "{min}–{max} steps",
+  "@stepsRangeStrong": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "stepsRangeGoal": "{min}+ steps",
+  "@stepsRangeGoal": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "todaysNotifications": "إشعارات اليوم",
+  "morningNotificationTitle": "صباح الخير — ملخص صحتك",
+  "noNotificationsToday": "No notifications for today yet.",
+  "notificationsAppearHere": "Notifications that already arrived today appear here.",
+  "phaPlusUnlockedTitle": "أنت على PHA Plus+!",
+  "phaPlusUnlockedBody": "جميع الميزات مفتوحة. استمتع بالرفع غير المحدود وPsychoTest وجدول العلاج.",
+  "onboardingQuest2BuildAvatar": "Quest 2: Build your avatar",
+  "onboardingQuest2FillFields": "Fill all 3 fields — earn +{hp} HP on complete.",
+  "@onboardingQuest2FillFields": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      }
+    }
+  },
+  "rewardedStats": "Rewarded stats",
+  "yourGender": "جنسك",
+  "male": "ذكر",
+  "female": "أنثى",
+  "unitYearsLong": "years",
+  "completeQuest2": "Complete Quest 2 (+{hp} HP)",
+  "@completeQuest2": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      }
+    }
+  },
+  "backToQuest2": "Back to Quest 2",
+  "onboardingQuest3PowerUp": "Quest 3: Power-up (bonus)",
+  "onboardingQuest3BpDone": "You already logged BP and glucose today. Come back tomorrow for your next reading.",
+  "onboardingQuest3Optional": "Optional vitals — +{bpHp} HP for BP, +{glucoseHp} HP for glucose. Once per day.",
+  "@onboardingQuest3Optional": {
+    "placeholders": {
+      "bpHp": {
+        "type": "int"
+      },
+      "glucoseHp": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingAllQuestsComplete": "All quests complete!",
+  "onboardingEarnedHp": "You earned {hp} HP · Level {level} {title}",
+  "@onboardingEarnedHp": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      },
+      "level": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingBonusVitals": "Bonus vitals unlocked extra insights!",
+  "healthPower": "Health Power",
+  "onboardingCreateAccount": "Create account and become healthy →",
+  "onboardingEnterDashboard": "Enter dashboard →",
+  "badgeUnitPro": "Unit Pro",
+  "badgeFoundation": "Foundation",
+  "badgeHeartTrack": "تتبع القلب",
+  "badgeSugarSense": "Sugar Sense",
+  "badgeChampion": "Champion",
+  "levelHealthRookie": "Health Rookie",
+  "levelProfileBuilder": "Profile Builder",
+  "levelVitalsPro": "Vitals Pro",
+  "picked": "PICKED",
+  "saving": "Saving…",
+  "claimBonusFinish": "Claim bonus & finish 🏆",
+  "skipBonusQuest": "Skip bonus quest",
+  "calculatingRewards": "Calculating rewards…",
+  "categoryBloodPressure": "ضغط الدم",
+  "categoryBloodGlucose": "سكر الدم",
+  "categoryWeight": "Weight",
+  "categoryWeightBmi": "الوزن / مؤشر كتلة الجسم",
+  "categoryDailyActivity": "النشاط اليومي",
+  "categoryCalorieBurn": "حرق السعرات",
+  "categoryMentalWellness": "الرفاهية النفسية",
+  "categorySmoking": "التدخين",
+  "categoryAlcohol": "الكحول",
+  "categoryScreenTime": "وقت الشاشة",
+  "categoryNutrition": "التغذية",
+  "categoryPsychoTest": "PsychoTest",
+  "categoryActivity": "النشاط",
+  "categoryHeartRate": "معدل وإيقاع القلب",
+  "categoryAge": "العمر",
+  "categoryStress": "توتر (نبض مرتفع)",
+  "analysisSummaryExcellent": "مؤشر صحتك ممتاز.",
+  "analysisSummaryGood": "مؤشر صحتك جيد بشكل عام.",
+  "analysisSummaryFair": "مؤشر صحتك مقبول — بعض التغييرات سترفعه.",
+  "analysisSummaryNeedsAttention": "مؤشر صحتك يحتاج اهتماماً — ركز على الفجوات الأكثر تأثيراً.",
+  "analysisSummaryDefault": "إليك ملخص صحتك.",
+  "analysisScoreMatches": "النتيجة {score}/100 تطابق مؤشر الصحة في الصفحة الرئيسية.",
+  "@analysisScoreMatches": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "analysisStrengths": "نقاط القوة: {names}.",
+  "@analysisStrengths": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisBiggestDrag": "أكثر ما يخفض المؤشر الآن: {names}.",
+  "@analysisBiggestDrag": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "glucoseMsgHypoglycemia": "سكر الدم منخفض (نقص سكر الدم). تناول كربوهيدرات سريعة واستشر طبيبك.",
+  "glucoseMsgNormal": "سكر الدم الصائم ضمن المعدل الطبيعي. صحة أيضية جيدة.",
+  "glucoseMsgPrediabetes": "سكر الدم في نطاق ما قبل السكري. قلل المشروبات السكرية، أضف الألياف لكل وجبة وامشِ 10–15 دقيقة بعد الأكل.",
+  "glucoseMsgDiabetes": "سكر الدم في نطاق السكري. استشر مقدم الرعاية الصحية.",
+  "bmiMsgWeightOnly": "تم تسجيل الوزن. أضف طولك في الملف لحساب مؤشر كتلة الجسم في مؤشر الصحة.",
+  "bmiMsgUnderweight": "وزنك أقل قليلاً بالنسبة لطولك. زد الوجبات الغنية بالبروتين؛ استشر الطبيب إن لم تكن تنوي إنقاص الوزن.",
+  "bmiMsgHealthy": "وزنك يبدو صحياً بالنسبة لطولك. أحسنت!",
+  "bmiMsgOverweight": "وزنك أعلى قليلاً من النطاق الصحي. استهدف إنقاصاً أسبوعياً لطيفاً، حافظ على البروتين وخطواتك اليومية.",
+  "bmiMsgObeseI": "وزنك أعلى بوضوح من النطاق الصحي. قد يرفع ضغط الدم وسكر الدم. طعام أفضل ومزيد من المشي وخطة مع الطبيب تساعد كثيراً.",
+  "bmiMsgObeseII": "وزنك أعلى بكثير من النطاق الصحي. راجع الطبيب لخطة آمنة تحمي قلبك والأيض.",
+  "stepsLabel": "{count} steps",
+  "@stepsLabel": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "calorieBurnGood": "إنفاق السعرات يبدو متسقاً مع خطواتك. اربطه بوجبات متوازنة لدعم التعافي.",
+  "calorieBurnInfo": "حرقت {calories} سعرة من النشاط. استخدم تسجيل الوجبات لمطابقة الاستهلاك مع أهدافك.",
+  "@calorieBurnInfo": {
+    "placeholders": {
+      "calories": {
+        "type": "int"
+      }
+    }
+  },
+  "wellnessMsgExcellent": "درجة عافية ممتازة — ضغط منخفض ومرونة نفسية جيدة.",
+  "wellnessMsgGood": "عافية جيدة. تحسينات صغيرة في النوم أو التعافي قد توصل للامتياز.",
+  "wellnessMsgModerate": "عافية معتدلة. جرّب 5 دقائق تنفس أو مشي خارجاً أو إطفاء أبكر.",
+  "wellnessMsgNeedsAttention": "درجة العافية تشير لضغط مرتفع. احمِ النوم وقلل الكافيين المتأخر وتواصل اجتماعياً هذا الأسبوع.",
+  "wellnessMsgCritical": "حمل ضغط عالٍ. أعد Wellness Check وتحدث مع مختص إن استمر.",
+  "smokingGood": "لا تدخين مُبلغ — من أقوى عوامل الحماية للقلب والرئتين.",
+  "smokingLessPack": "<1 pack/day",
+  "smokingOnePack": "~1 pack/day",
+  "smokingMorePack": ">1 pack/day",
+  "smokingActive": "Active smoker",
+  "smokingNonSmoker": "Non-smoker",
+  "smokingWarning": "التدخين عامل خطر رئيسي لمؤشر الصحة. حدد يوم إقلاع، أزل المحفزات واستخدم Plus+ → العادات السيئة لتتبع التقدم.",
+  "alcoholNone": "لا شيء",
+  "alcoholGood": "لا استخدام كحول مُبلغ — مفيد للضغط والنوم والكبد.",
+  "alcoholOccasional": "أحياناً",
+  "alcoholOccasionalTip": "أبقِ الكحول عرضياً ومعظم أيام الأسبوع بلا كحول.",
+  "alcoholRegular": "منتظم",
+  "alcoholRegularTip": "قلل أيام الشرب؛ الكحول يرفع الضغط والسعرات.",
+  "alcoholHeavy": "كثيف",
+  "alcoholHeavyTip": "الاستخدام الكثيف يضر مؤشر الصحة بشدة — اطلب دعماً للتقليل بأمان.",
+  "alcoholDefault": "يشرب الكحول",
+  "alcoholDefaultTip": "تتبع التكرار هذا الأسبوع واستهدف عدة أيام بلا كحول.",
+  "screenRarely": "نادراً",
+  "screenRarelyTip": "حمل شبكات اجتماعية منخفض — جيد للنوم والتركيز.",
+  "screenUnderHour": "<1 ساعة/يوم",
+  "screenUnderHourTip": "عادة معقولة. أبقِ الهاتف خارج غرفة النوم إن تأثر النوم.",
+  "screenOneTwoHours": "1–2 ساعة/يوم",
+  "screenOneTwoTip": "استخدام معتدل. جرّب حداً مسائياً 30 دقيقة لحماية التعافي.",
+  "screenConstant": "مستمر",
+  "screenConstantTip": "وقت شاشة عالٍ يزاحم الحركة والنوم. ضع حدوداً واستبدل تمرير بمشي.",
+  "screenDefaultTip": "راجع عادات الشاشة — حدود مسائية صغيرة غالباً تساعد العافية.",
+  "nutritionRecentMeals": "{count} recent meals",
+  "@nutritionRecentMeals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "nutritionWarning": "عدة وجبات حديثة تحتاج انتباهاً. فضّل الخضار والبروتين وقلل المعالج؛ سجّل الوجبة التالية للملاحظات.",
+  "nutritionGood": "جودة الوجبات الأخيرة قوية. حافظ على النمط — يدعم السكر والوزن في المؤشر.",
+  "nutritionInfo": "جودة وجبات مختلطة مؤخراً. استهدف تحسيناً واحداً يومياً (مزيد ألياف أو بروتين، أقل مشروبات سكرية).",
+  "psychoLoad": "Load {total} · {label}",
+  "@psychoLoad": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "psychoLow": "منخفض",
+  "psychoModerate": "معتدل",
+  "psychoHigh": "مرتفع",
+  "psychoLowMsg": "مؤشرات نفسية جسدية ضمن نطاق صحي. واصل عادات العافية.",
+  "psychoModerateMsg": "حمل نفسي جسدي معتدل. انتبه للراحة والاسترخاء والحدود الصحية.",
+  "psychoHighMsg": "ضغط وتوتر نفسي جسدي ملحوظ. فكر بالتحدث مع مختص وتقليل الحمل.",
+  "priorityHigh": "High",
+  "priorityMedium": "Medium",
+  "priorityLow": "Low",
+  "profileUpdatedSuccess": "Profile updated successfully!",
+  "termsOfService": "Terms of Service & Disclaimer",
+  "howWeHandleData": "How we handle your data",
+  "sameScoreHint": "Same score as on Home",
+  "eveningNotificationTitle": "تسجيل مسائي",
+  "bpMsgLow": "ضغط الدم أقل من النطاق المعتاد (انخفاض الضغط). اشرب سوائل كافية واستشر الطبيب عند الدوخة.",
+  "bpMsgOptimal": "ضغط الدم مثالي (<120/<80). واصل أسلوب الحياة الصحي.",
+  "bpMsgNormal": "ضغط الدم ضمن النطاق الطبيعي للبالغين (حوالي 120/80). هدف صحي لمعظم البالغين.",
+  "bpMsgHighNormal": "ضغط الدم مرتفع قليلاً (ليس فرط ضغط بعد). راقب بانتظام؛ قلل الملح وكن نشيطاً وراقب الاتجاهات.",
+  "bpMsgGrade1": "ضغط الدم مرتفع. غيّر أسلوب الحياة أولاً — أقل ملحاً وأكثر مشياً. أعد القياس واستشر الطبيب إن استمر.",
+  "bpMsgGrade2": "ضغط الدم مرتفع بوضوح. راجع الطبيب قريباً.",
+  "bpMsgGrade3": "ضغط الدم مرتفع جداً. اطلب رعاية طبية دون تأخير.",
+  "bpMsgDiabetes": "ضغط الدم مرتفع جداً. اطلب رعاية طبية دون تأخير.",
+  "uploadAnalysisTitle": "رفع التحليل",
+  "uploadFileType": "File Type",
+  "uploadPdf": "PDF Document",
+  "uploadPhoto": "Photo / Image",
+  "uploadSelectFile": "Select File",
+  "uploadClickToSelect": "Click to select a file",
+  "uploadClickToChange": "{size} KB — click to change",
+  "@uploadClickToChange": {
+    "placeholders": {
+      "size": {
+        "type": "int"
+      }
+    }
+  },
+  "uploadLimitReached": "Limit reached",
+  "uploadUpgradeMore": "Upgrade to upload more",
+  "uploadFile": "Upload File",
+  "uploadAnalyzing": "Analyzing...",
+  "uploadAnalyzingAiDoc": "Analyzing your file with Ai Doc…",
+  "uploadFailed": "Upload failed. Please try again.",
+  "uploadCouldNotRead": "Could not read the selected file. Please pick it again.",
+  "uploadLimitMessage": "Upload limit reached. Upgrade to PHA Plus+ for unlimited uploads.",
+  "uploadFreePlan": "Free plan: {count}/2 uploads used. Max 2 pages per file.",
+  "@uploadFreePlan": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mealTakePhoto": "التقط أو ارفع صورة لوجبتك",
+  "mealAfterAnalysis": "After analysis, tap ✓ only if you ate this dish — it adds to today's calories.",
+  "mealCamera": "Camera",
+  "mealGallery": "Gallery",
+  "mealAnalyze": "Analyze Meal",
+  "mealAnalyzing": "Analyzing…",
+  "mealFailed": "Analysis failed. Please try again.",
+  "mealFreeLimit": "Free limit reached (2 meals per 24h). Upgrade to PHA Plus+ for unlimited meal checks.",
+  "mealFreePlan": "Free plan: {count}/{limit} meals logged in the last 24 hours.",
+  "@mealFreePlan": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "mealLogged": "Meal logged — counted in today's intake & Health Index.",
+  "mealTapConfirm": "Tap ✓ to confirm you ate this — adds to today's intake.",
+  "mealDiscard": "Discard",
+  "mealTotalIntake": "Total Intake",
+  "mealCarb": "Carb",
+  "mealProteins": "Proteins",
+  "mealFat": "Fat",
+  "mealNoMealsToday": "No meals confirmed today yet.",
+  "mealNoMealsLogged": "No meals logged · target ~{target} kcal",
+  "@mealNoMealsLogged": {
+    "placeholders": {
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealConfirmHint": "Confirm meals after analysis to track intake.",
+  "aiDocTitle": "مساعد Ai Doc",
+  "aiDocWelcome": "Hello! I'm your Ai Doc Assistant. Would you like us to use the data you provided during onboarding? After that, you can describe your problem in detail — or share a photo of a meal, lab result, or anything health-related.",
+  "aiDocOffline": "Ai Doc is offline — API key not set.",
+  "aiDocFreeLimit": "Free consultation limit reached.",
+  "aiDocFreeRemaining": "{remaining} of 3 free consultations remaining.",
+  "@aiDocFreeRemaining": {
+    "placeholders": {
+      "remaining": {
+        "type": "int"
+      }
+    }
+  },
+  "aiDocAnalyzingHealth": "Analyzing your health data…",
+  "aiDocLooking": "Looking at that…",
+  "aiDocAskPlaceholder": "Ask about symptoms, or add a photo note",
+  "aiDocUpgradeChat": "Upgrade to continue chatting…",
+  "aiDocNoProblem": "No problem! Whenever you're ready, describe your symptoms or health concerns in detail — or share a photo.",
+  "aiDocPhoto": "Photo",
+  "wellnessResults": "Wellness Results",
+  "wellnessQuestion": "Question {current} of {total}",
+  "@wellnessQuestion": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "percentComplete": "{percent}% complete",
+  "@percentComplete": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "questionUnavailable": "Question unavailable",
+  "wellnessVeryPoor": "Very poor",
+  "wellnessPoor": "Poor",
+  "wellnessModerate": "Moderate",
+  "wellnessGood": "Good",
+  "wellnessExcellent": "Excellent",
+  "badHabitsSummaryTitle": "Bad Habits Summary",
+  "badHabitsSaved": "Saved to your health history. Honest tracking is the first step toward change.",
+  "badHabitsSocialMediaLabel": "Social media",
+  "badHabitsStep": "Step {step} of {total}",
+  "@badHabitsStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "badHabitsDoYouSmoke": "هل تدخن؟",
+  "badHabitsHowMuchSmoke": "How much do you smoke?",
+  "badHabitsDoYouDrink": "Do you drink alcohol?",
+  "badHabitsHowMuchDrink": "How often and how much do you drink?",
+  "badHabitsSocialMedia": "How much time do you spend uselessly on social media?",
+  "treatmentYourSchedule": "جدولك",
+  "treatmentAddMedicine": "Add medicine or supplement",
+  "treatmentNewEntry": "New entry",
+  "treatmentMedicineName": "Name of medicine or dietary supplement",
+  "treatmentMedicinePlaceholder": "e.g. Vitamin D, Metformin",
+  "treatmentHowManyTimes": "How many times a day",
+  "treatmentDoseTime": "Dose {n} time",
+  "@treatmentDoseTime": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "treatmentAddAnother": "Add another",
+  "treatmentSaveSchedule": "حفظ الجدول",
+  "treatmentSaved": "Treatment schedule saved — pill reminders are on",
+  "treatmentEnterName": "Enter at least one medicine or supplement name.",
+  "treatmentSaveFailed": "Could not save. Please try again.",
+  "treatmentNotifOff": "Schedule saved, but notifications are off. Enable alerts in Settings to get pill reminders.",
+  "psychoTestSubtitle": "Stress & Psychosomatic Self-Assessment",
+  "psychoTestIntro": "This assessment contains 3 blocks with a total of 20 questions. Answer honestly — there are no right or wrong answers. Results are saved to your profile.",
+  "psychoBlock1Title": "BLOCK 1",
+  "psychoBlock1Subtitle": "Stress Awareness",
+  "psychoBlock2Title": "BLOCK 2",
+  "psychoBlock2Subtitle": "Physical Symptoms",
+  "psychoBlock3Title": "BLOCK 3",
+  "psychoBlock3Subtitle": "Behavioral Profile",
+  "psychoAnswerHint": "Each question has 3 answer options: Never · Sometimes · Often",
+  "psychoStartAssessment": "بدء التقييم",
+  "psychoYourResult": "YOUR RESULT",
+  "psychoRetake": "Retake",
+  "psychoNever": "Never",
+  "psychoSometimes": "Sometimes",
+  "psychoOften": "Often",
+  "psychoQuestionsCount": "{count} questions",
+  "@psychoQuestionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingBackToQuest2": "Back to Quest 3",
+  "onboardingBpGlucose": "BP / +{hp} HP",
+  "@onboardingBpGlucose": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingGlucoseHp": "Glucose / +{hp} HP",
+  "@onboardingGlucoseHp": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingSys": "Sys",
+  "onboardingDia": "Dia",
+  "onboardingReadyForPha": "{percent}% — ready for PHA",
+  "@onboardingReadyForPha": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingRedeemHp": "Redeem your {hp} HP for {percent}% off your first 6-month or annual PHA Plus+ subscription.",
+  "@onboardingRedeemHp": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "activityCurrentPlanSubtitle": "خطة نشاطك البدني الحالية",
+  "activityCustomPlanHint": "خطتك نشطة. أكمل التمرين اليومي وأجب على تسجيل المساء.",
+  "activityRestNote": "Rest no more than 2 minutes between sets.",
+  "dailyLabel": "Daily",
+  "fileTypePdf": "PDF up to 2 pages (free plan)",
+  "upgradeToPhaPlus": "Upgrade to PHA Plus+",
+  "healthAnalysisSubtitleShort": "Same score as Home Health Index",
+  "wellnessQ1": "ما مدى الشعور بالتوتر الآن؟",
+  "wellnessQ2": "كيف كان نومك الليلة الماضية؟",
+  "wellnessQ3": "كيف مستوى طاقتك اليوم؟",
+  "wellnessQ4": "كيف تقيّم مزاجك؟",
+  "wellnessQ5": "كيف حالك العام؟",
+  "badHabitsSmokeLessPack": "أقل من علبة واحدة يومياً",
+  "badHabitsSmokeOnePack": "علبة واحدة يومياً",
+  "badHabitsSmokeMorePack": "أكثر من علبة واحدة يومياً",
+  "badHabitsAlcoholOccasionally": "أحياناً — أقل من 100 جم كحول قوي أو 1–2 كأس نبيذ أو حتى علبتين بيرة أسبوعياً",
+  "badHabitsAlcoholRegularly": "بانتظام — 200–300 جم كحول قوي أو 1–2 زجاجة نبيذ أو أكثر من 2 لتر بيرة أسبوعياً",
+  "badHabitsAlcoholHeavy": "أسكر 1–2 مرات أسبوعياً حتى فقدان الذاكرة",
+  "badHabitsSocialRarely": "نادراً أو أبداً",
+  "badHabitsSocialUnderHour": "أقل من ساعة يومياً",
+  "badHabitsSocialOneTwoHours": "حوالي 1–2 ساعة يومياً",
+  "badHabitsSocialConstantly": "أتصفح باستمرار في وقت فراغي",
+  "activitySwitchHint": "التبديل إلى هذا البرنامج:",
+  "activityStartHint": "ابدأ نشاطك اليومي بهذا البرنامج:",
+  "activityStarterEx1": "سأقوم بـ 15 تمرين ضغط خلال اليوم",
+  "activityStarterEx2": "20 قرفصاء يومياً",
+  "activityStarterEx3": "20 تمرين بطن",
+  "activityStarterEx4": "15 ضغط من أريكة أو جسم خلف الظهر",
+  "activityAdvancedEx1": "45 ضغط يومياً. موصى: 20، 15، 10",
+  "activityAdvancedEx2": "50 قرفصاء يومياً، مجموعتان × 25",
+  "activityAdvancedEx3": "30 بطن، 20 رفع أمامي، 10 رفع ساقين",
+  "activityAdvancedEx4": "25 ضغط من الأريكة: 15 و 10",
+  "activityProEx1": "أكثر من 100 ضغط يومياً",
+  "activityProEx2": "أكثر من 100 قرفصاء خلال اليوم",
+  "activityProEx3": "أكثر من 70 تمرين بطن يومياً",
+  "activityProEx4": "أكثر من 60 ضغط خلف الظهر خلال اليوم",
+  "activitySupermanEx1": "أتمرن في الصالة 3+ مرات أسبوعياً أكثر من 60 دقيقة",
+  "treatmentSaving": "جاري الحفظ...",
+  "treatmentEntryNumber": "إدخال {n}",
+  "@treatmentEntryNumber": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingLevelShort": "م.",
+  "onboardingDayStreak": "سلسلة {count} يوم",
+  "@onboardingDayStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingHudHealthPower": "قوة الصحة",
+  "onboardingQuest1Complete": "اكتملت المهمة 1!",
+  "onboardingQuest2Complete": "اكتملت المهمة 2!",
+  "onboardingBonusComplete": "اكتملت المهمة الإضافية!",
+  "featurePrivateSecure": "خاص وآمن",
+  "loginHeroLine1": "صحتك،",
+  "loginHeroLine2": "بذكاء",
+  "loginHeroLine3": "مُتتبَّعة.",
+  "loginHeroBody": "راقب مؤشراتك واحصل على رؤى بالذكاء الاصطناعي.",
+  "loginTrustedBy": "موثوق به من قبل المهتمين بالصحة حول العالم.",
+  "loginSignUpSubtitle": "ابدأ تتبع صحتك اليوم — مجاناً للأبد.",
+  "loginSignInSubtitle": "سجّل الدخول للوصول إلى لوحة صحتك.",
+  "loginFullName": "الاسم الكامل",
+  "loginNamePlaceholder": "أحمد محمد",
+  "loginEmailLabel": "البريد الإلكتروني",
+  "loginEmailPlaceholder": "you@example.com",
+  "loginPasswordHintSignUp": "8 أحرف على الأقل",
+  "loginPasswordHintSignIn": "••••••••",
+  "legalAgreePrefix": "قرأت وأوافق على ",
+  "creatingAccount": "جاري إنشاء الحساب…",
+  "signingIn": "جاري تسجيل الدخول…",
+  "loginLegalFooter": "بالمتابعة، فإنك توافق على شروطنا. التطبيق يقدم إرشادات صحية وليس تشخيصاً طبياً.",
+  "onboardingErrorAge": "أدخل عمرك للحصول على شارة Foundation.",
+  "onboardingErrorGender": "اختر جنسك.",
+  "onboardingErrorHeightImperial": "أدخل الطول (قدم 1–8، بوصة 0–11).",
+  "onboardingErrorHeightMetric": "أدخل الطول بين 50–250 سم.",
+  "onboardingErrorWeightImperial": "أدخل الوزن بين 44–660 رطل.",
+  "onboardingErrorWeightMetric": "أدخل الوزن بين 20–300 كغ.",
+  "onboardingErrorQuest2First": "أكمل المهمة 2 أولاً.",
+  "onboardingTrailUnits": "وحدات",
+  "onboardingTrailBasics": "أساسيات",
+  "onboardingTrailBoost": "تعزيز",
+  "onboardingAgeHint": "مثال 32",
+  "onboardingFtIn": "قدم وبوصة",
+  "onboardingHeightHintMetric": "مثال 175",
+  "onboardingWeightHintImperial": "مثال 165",
+  "onboardingWeightHintMetric": "مثال 70",
+  "vitalsBpBothOrNone": "أدخل كلا قيمتي الضغط أو اتركهما فارغين.",
+  "vitalsDailyPrompt": "سجّل الضغط والسكر مرة يومياً. يمكنك التخطي والتسجيل لاحقاً.",
+  "vitalsPromptTurnOff": "إيقاف",
+  "vitalsPromptTurnOffHint": "تخطّي تذكيرات الضغط/السكر اليومية.",
+  "vitalsPromptEvery5Days": "اسأل مرة كل 5 أيام",
+  "vitalsPromptEvery5DaysHint": "تذكير كل 5 أيام وليس يومياً.",
+  "vitalsBpLabel": "ضغط الدم (mmHg)",
+  "vitalsGlucoseLabel": "سكر الدم ({unit})",
+  "@vitalsGlucoseLabel": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "vitalsGlucoseHintImperial": "مثال 95",
+  "vitalsGlucoseHintMetric": "مثال 5.3",
+  "notNow": "ليس الآن",
+  "enterValidPositiveNumber": "أدخل رقماً موجباً صالحاً.",
+  "logHealthMetric": "تسجيل مؤشر صحي",
+  "metricSaved": "تم حفظ المؤشر!",
+  "metricType": "نوع المؤشر",
+  "metricValueLabel": "القيمة ({unit})",
+  "@metricValueLabel": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "metricNotesOptional": "ملاحظات (اختياري)",
+  "metricNotesPlaceholder": "أي ملاحظات إضافية...",
+  "saveMetric": "حفظ المؤشر",
+  "logMetricHintSteps": "مثال 8000",
+  "logMetricHintCalories": "مثال 350",
+  "logMetricHintDistanceImperial": "مثال 3.2",
+  "logMetricHintDistanceMetric": "مثال 5.2",
+  "logMetricHintActiveTime": "مثال 45",
+  "logMetricHintWeightImperial": "مثال 165",
+  "logMetricHintWeightMetric": "مثال 72.5",
+  "logMetricHintWater": "مثال 2000",
+  "upgradeTrialTitle": "افتح جميع ميزات PHA Plus+",
+  "upgradeTrialBody1": "تحكم كامل بصحتك! افتح جميع خيارات PHA Plus+ المميزة.",
+  "upgradeTrialBody2": "ابقَ على اطلاع بالمخاطر وعدّل نمط حياتك.",
+  "upgradeTagline": "صحتك. سيطرتك. دائماً.",
+  "upgradeTitle": "افتح جميع الميزات",
+  "upgradeSubtitle": "احصل على القوة الكاملة لمساعدك الصحي",
+  "upgradeHpBanner": "لديك {hp} HP! استبدلها بخصم {percent}%.",
+  "@upgradeHpBanner": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "upgradeTableFeature": "الميزة",
+  "upgradeTableFree": "مجاني",
+  "upgradeTablePlus": "PLUS+",
+  "upgradeFeatAnalysisUploads": "رفع التحاليل",
+  "upgradeFeatMealCalories": "فحص سعرات الوجبات",
+  "upgradeFeatPagesPerFile": "صفحات لكل ملف",
+  "upgradeFeatPsychoTest": "PsychoTest",
+  "upgradeFeatTreatment": "جدول العلاج",
+  "upgradeFeatBadHabits": "فحص العادات السيئة",
+  "upgradeFeatActivity": "النشاط البدني",
+  "upgradeFeatAiConsult": "استشارة الذكاء الاصطناعي",
+  "upgradeFeatWellness": "فحص العافية",
+  "upgradeVal2Files": "2 ملفات",
+  "upgradeVal2PerDay": "2 / 24س",
+  "upgradeVal2Pages": "2 صفحة",
+  "upgradeValUnlimited": "غير محدود",
+  "upgradeValLocked": "مقفل",
+  "upgradeValFullAccess": "وصول كامل",
+  "upgradeValIncluded": "مشمول",
+  "planMonthly": "شهري",
+  "planBilledMonthly": "يُفوتر شهرياً.",
+  "planSemiannual": "6 أشهر",
+  "planAnnual": "سنوي",
+  "planHpDiscountNote": "تم تطبيق خصم 20% HP.",
+  "planSave17": "وفر ~17%.",
+  "planSave42": "وفر ~42%.",
+  "planPerMonth": "/شهر",
+  "planPer6Mo": "/6ش",
+  "planPerYear": "/سنة",
+  "planBestBadge": "الأفضل",
+  "psychoTestPromoBody": "تقييم ذاتي متعمق لمستويات التوتر والأنماط جسدية النفسية.",
+  "psychoQuestionOfBlock": "س{current} من {total}",
+  "@psychoQuestionOfBlock": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "psychoStressLevelTitle": "مستوى التوتر: {label}",
+  "@psychoStressLevelTitle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisNoData": "لم يتم العثور على بيانات صحية. سجّل بعض المؤشرات أولاً.",
+  "analysisAllSolid": "جميع عوامل مؤشر الصحة جيدة. استمر في تسجيل البيانات.",
+  "syncPlatformOnly": "مزامنة النشاط متاحة فقط على iOS و Android.",
+  "syncPermissionDenied": "لم يُمنح إذن النشاط.",
+  "syncReadFailed": "تعذر قراءة بيانات النشاط. فعّل الخطوات والمسافة في إعدادات الصحة.",
+  "aiDocNoOnboardingData": "لم أجد بيانات الإعداد بعد. أكمل الإعداد أولاً.",
+  "activityYourProgramFallback": "برنامجك",
+  "trialSevenDayFree": "تجربة مجانية 7 أيام",
+  "uploadImageFormats": "JPG, PNG, GIF",
+  "mealSaveFailed": "تعذر الحفظ: {error}",
+  "@mealSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "mealCaloriesShort": "{n} سعرة",
+  "@mealCaloriesShort": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "treatmentDosesDaily": "{n}× يومياً · {times}",
+  "@treatmentDosesDaily": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "times": {
+        "type": "String"
+      }
+    }
+  },
+  "notifMorningFallback": "صباح الخير! سجّل مؤشراتك اليوم.",
+  "notifEveningFallback": "تسجيل مسائي: كيف سارت أهدافك اليوم؟",
+  "notifChannelName": "نصائح صحية يومية",
+  "notifChannelDesc": "تذكيرات صباحية ومسائية",
+  "notifMedicationTitle": "دواء: {name}",
+  "@notifMedicationTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notifMedicationBody": "خذ {name}",
+  "@notifMedicationBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notifActivityTitle": "تسجيل النشاط البدني",
+  "notifActivityBody": "هل أكملت {label} اليوم؟",
+  "@notifActivityBody": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "notifIncompleteAssessmentsTitle": "أكمل فحوصات صحتك",
+  "notifIncompleteAssessmentsBody": "يرجى إكمال: {items}. هذا يحسّن تقييم مؤشر صحتك.",
+  "@notifIncompleteAssessmentsBody": {
+    "placeholders": {
+      "items": {
+        "type": "String"
+      }
+    }
+  },
+  "notifActivitySaved": "تم الحفظ: {answer} — تم تحديث المؤشر",
+  "@notifActivitySaved": {
+    "placeholders": {
+      "answer": {
+        "type": "String"
+      }
+    }
+  },
+  "notifDoseLabel": "جرعة {current} من {total} — ",
+  "@notifDoseLabel": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "validationBpCheck": "تحقق من قيم الضغط.",
+  "validationBpRange": "تحقق من الضغط ({sysMin}–{sysMax} / {diaMin}–{diaMax} mmHg).",
+  "@validationBpRange": {
+    "placeholders": {
+      "sysMin": {
+        "type": "int"
+      },
+      "sysMax": {
+        "type": "int"
+      },
+      "diaMin": {
+        "type": "int"
+      },
+      "diaMax": {
+        "type": "int"
+      }
+    }
+  },
+  "validationBpDiaLower": "الانبساطي يجب أن يكون أقل من الانقباضي.",
+  "validationGlucoseEnter": "أدخل قيمة السكر.",
+  "validationGlucoseRangeMgdl": "السكر {min}–{max} mg/dL.",
+  "@validationGlucoseRangeMgdl": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "validationGlucoseRangeMmol": "السكر {min}–{max} mmol/L.",
+  "@validationGlucoseRangeMmol": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "validationWeightEnter": "أدخل وزناً صالحاً.",
+  "validationWeightRange": "الوزن {min}–{max} كغ.",
+  "@validationWeightRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "validationHeightEnter": "أدخل طولاً صالحاً.",
+  "validationHeightRange": "الطول {min}–{max} سم.",
+  "@validationHeightRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "validationAgeEnter": "أدخل عمراً صالحاً.",
+  "validationAgeRange": "العمر {min}–{max}.",
+  "@validationAgeRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "psychoQ1": "كم مرة شعرت بالإرهاق أو عدم القدرة على التحكم في أمور مهمة؟",
+  "psychoQ2": "كم مرة تعاني من أعراض جسدية بسبب التوتر؟",
+  "psychoQ3": "كم مرة تواجه مشاكل في النوم؟",
+  "psychoQ4": "كم مرة تشعر بالقلق أو التوتر؟",
+  "psychoQ5": "كم مرة يصعب عليك الاسترخاء؟",
+  "psychoQ6": "هل غالباً لديك:",
+  "psychoQ7": "هل تتفاقم أعراضك بعد التوتر؟",
+  "psychoQ8": "هل لديك:",
+  "psychoQ9": "هل لديك مشاكل في الجهاز الهضمي:",
+  "psychoQ10": "هل تشعر بضيق في التنفس؟",
+  "psychoQ11": "هل لديك إرهاق مزمن؟",
+  "psychoQ12": "هل لديك توتر عضلات؟",
+  "psychoQ13": "هل تتفاقم أعراضك أثناء النزاعات أو القلق؟",
+  "psychoQ14": "هل تميل إلى:",
+  "psychoQ15": "هل غالباً:",
+  "psychoQ16": "هل يصعب عليك قول \"لا\"؟",
+  "psychoQ17": "هل لديك خوف من فقدان السيطرة؟",
+  "psychoQ18": "هل تشعر بتوتر داخلي مستمر حتى في هدوء؟",
+  "psychoQ19": "هل تشعر بالوحدة رغم التواصل؟",
+  "psychoQ20": "هل غالباً \"تحتفظ بكل شيء بداخلك\"؟",
+  "psychoSubHeadaches": "صداع",
+  "psychoSubMuscleSpasms": "تشنجات عضلية",
+  "psychoSubNeckPain": "ألم الرقبة",
+  "psychoSubChestPressure": "ضغط في الصدر",
+  "psychoSubStomachHeaviness": "ثقل في المعدة",
+  "psychoSubTachycardia": "تسرع القلب",
+  "psychoSubBpSurges": "ارتفاعات ضغط الدم",
+  "psychoSubSweating": "تعرق",
+  "psychoSubTrembling": "ارتجاف",
+  "psychoSubBloating": "انتفاخ",
+  "psychoSubHeartburn": "حرقة",
+  "psychoSubSpasms": "تشنجات",
+  "psychoSubDiarrheaConstipation": "إسهال / إمساك",
+  "psychoSubKeepControl": "السيطرة على كل شيء",
+  "psychoSubAvoidConflicts": "تجنب النزاعات",
+  "psychoSubAccumulateEmotions": "تجميع المشاعر",
+  "psychoSubTakeResponsibility": "تحمل مسؤولية الجميع",
+  "psychoSubWorkOvertime": "العمل لساعات إضافية",
+  "psychoSubDontRest": "عدم الراحة",
+  "psychoSubFeelGuilty": "الشعور بالذنب",
+  "clinicalCategoryHealthyWeight": "نطاق الوزن الصحي",
+  "clinicalCategoryMetabolic": "الصحة الأيضية",
+  "clinicalCategoryCombinedRisk": "مخاطر القلب والسكر",
+  "clinicalCategoryWhatMeans": "ماذا يعني هذا",
+  "clinicalCategoryForAge": "لعمرك",
+  "clinicalIdealWeightNote": "هذا تقدير تقريبي فقط للوزن الصحي. أفضل نطاق يعتمد على العضلات وشكل الجسم وشعورك — وليس معادلة واحدة.",
+  "clinicalAroundKg": "حوالي {kg} كغ",
+  "@clinicalAroundKg": {
+    "placeholders": {
+      "kg": {
+        "type": "int"
+      }
+    }
+  },
+  "clinicalBpHighNormalMsg": "قراءتك مرتفعة قليلاً. قلل الملح وابقَ نشطاً.",
+  "clinicalWarningSigns": "{n} علامات تحذير",
+  "@clinicalWarningSigns": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "clinicalLookingOkay": "يبدو جيداً",
+  "clinicalRiskVeryHigh": "مرتفع — تصرف الآن",
+  "clinicalRiskElevated": "مرتفع",
+  "clinicalRiskModerate": "متوسط",
+  "clinicalRiskLow": "منخفض",
+  "clinicalGlucoseTooLow": "منخفض جداً",
+  "clinicalGlucoseNormal": "طبيعي",
+  "clinicalGlucosePrediabetes": "مرحلة ما قبل السكري",
+  "clinicalGlucoseDiabetes": "نطاق السكري",
+  "clinicalBpVeryHigh": "مرتفع جداً — اطلب رعاية",
+  "clinicalBpHighGrade2": "مرتفع (درجة 2)",
+  "clinicalBpHigh": "مرتفع",
+  "clinicalBpALittleHigh": "مرتفع قليلاً",
+  "clinicalBpLow": "منخفض",
+  "clinicalBmiActionOver": " ركّز على حصص أصغر والمزيد من الخضار والمشي اليومي. خسارة 5–7٪ تساعد القلب والسكر.",
+  "clinicalBmiActionNormal": " عادات يومية صغيرة (خطوات + بروتين في الوجبات) تساعد على عدم زيادة الوزن.",
+  "clinicalBmiActionUnder": " كل وجبات غنية بالبروتين أكثر واستشر الطبيب إن لم تكن تنوي إنقاص الوزن.",
+  "activityCheckinSavedHint": "تم حفظ إجابتك في سجل صحتك.",
+  "notifMorningFallbackDetailed": "افتح PHA: خطوات الأمس وسعرات الوجبات ونصيحة غذائية لليوم.",
+  "notifEveningOpenApp": "افتح PHA لتسجيل المساء — قارن اليوم بالأمس.",
+  "notifEveningStepsToday": "سجلت {today} خطوة اليوم. واصل العادة — افتح PHA للتسجيل الكامل.",
+  "@notifEveningStepsToday": {
+    "placeholders": {
+      "today": {
+        "type": "int"
+      }
+    }
+  },
+  "notifEveningStepsUp": "اليوم {today} خطوة، أكثر من أمس ({yesterday}). تقدم رائع!",
+  "@notifEveningStepsUp": {
+    "placeholders": {
+      "today": {
+        "type": "int"
+      },
+      "yesterday": {
+        "type": "int"
+      }
+    }
+  },
+  "notifEveningStepsDown": "اليوم {today} خطوة، أقل من أمس ({yesterday}). غداً نعود للحركة — حتى مشي قصير يساعد.",
+  "@notifEveningStepsDown": {
+    "placeholders": {
+      "today": {
+        "type": "int"
+      },
+      "yesterday": {
+        "type": "int"
+      }
+    }
+  },
+  "notifActivityChannelDesc": "تذكير يومي لتسجيل إتمام التمرين",
+  "indexSummaryExcellent": "ممتاز — واصل عاداتك الصحية.",
+  "indexSummaryGood": "أنت بخير.",
+  "indexSummaryFair": "بعض المجالات تحتاج اهتماماً — تغييرات يومية صغيرة تساعد.",
+  "indexSummaryPoor": "مؤشر صحتك يحتاج تركيزاً — راجع المؤشرات والعادات.",
+  "validationGlucoseOutOfRange": "الجلوكوز خارج النطاق المسموح.",
+  "validationWeightOutOfRange": "الوزن خارج النطاق المسموح.",
+  "validationStepsUnrealistic": "عدد الخطوات يبدو غير واقعي.",
+  "validationCaloriesUnrealistic": "السعرات تبدو غير واقعية.",
+  "validationWaterUnrealistic": "استهلاك الماء يبدو غير واقعي.",
+  "validationActiveTimeRange": "الوقت النشط يجب أن يكون 0–1440 دقيقة.",
+  "validationDistanceUnrealistic": "المسافة تبدو غير واقعية.",
+  "mealQualityNoMeals": "لا وجبات مسجلة",
+  "mealQualityHeavyDay": "يوم ثقيل",
+  "mealQualityGoodChoices": "اختيارات جيدة",
+  "mealQualityOverTarget": "فوق الهدف",
+  "mealQualityUnderTarget": "تحت الهدف",
+  "mealQualityBalanced": "متوازن",
+  "mealQualityHeavyOverKcal": "حوالي {over} سعرة فوق هدف ~{target} سعرة.",
+  "@mealQualityHeavyOverKcal": {
+    "placeholders": {
+      "over": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealQualityHeavyHighCal": "عدة خيارات عالية السعرات اليوم — خفّف الوجبات القادمة.",
+  "mealQualityGoodUnderKcal": "يوم جيد — ~{under} سعرة تحت ~{target} سعرة.",
+  "@mealQualityGoodUnderKcal": {
+    "placeholders": {
+      "under": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealQualityGoodOnTrack": "على المسار مع هدف ~{target} سعرة.",
+  "@mealQualityGoodOnTrack": {
+    "placeholders": {
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealQualityOverKcal": "حوالي {over} سعرة فوق ~{target} — اختر خيارات أخف.",
+  "@mealQualityOverKcal": {
+    "placeholders": {
+      "over": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealQualityUnderKcal": "~{under} سعرة تحت الهدف — تأكد من تسجيل جميع الوجبات.",
+  "@mealQualityUnderKcal": {
+    "placeholders": {
+      "under": {
+        "type": "int"
+      }
+    }
+  },
+  "mealQualityBalancedHint": "الاستهلاك ~{total} سعرة مقابل هدف ~{target} سعرة اليوم.",
+  "@mealQualityBalancedHint": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealQualityTargetLine": "{label} · هدف ~{target} سعرة",
+  "@mealQualityTargetLine": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealCategoryExcellent": "ممتاز",
+  "mealCategorySatisfactory": "مرضٍ",
+  "mealCategoryAttention": "انتباه",
+  "mealFallbackName": "وجبة",
+  "mealOneServing": "حصة واحدة",
+  "adviceProtectWhatWorks": "احمِ ما ينجح: حافظ على نشاطك ووجباتك اليوم وراجع ضغط الدم/الجلوكوز بانتظام.",
+  "adviceBloodPressure1": "ضغط الدم: قِس في نفس الوقت جالساً ومستريحاً. قلل الملح وزد المشي.",
+  "adviceBloodPressure2": "إذا بقي ≥140/90 في القياسات المتكررة، راجع الطبيب مع سجلك المنزلي.",
+  "adviceSmoking": "التدخين: حدد يوم إقلاع، أخبر شخصاً، أبعد السجائر. حدّث العادات السيئة في Plus+.",
+  "adviceGlucose1": "الجلوكوز: ماء بدل المشروبات السكرية، ألياف وبروتين في الفطور، مشي 10–15 دقيقة بعد الوجبة الرئيسية.",
+  "adviceGlucose2": "إذا بقي الجلوكوز صائم مرتفعاً، اطلب تحليل HbA1c.",
+  "adviceBmi1": "الوزن: تغييرات أسبوعية لطيفة — بروتين وخضار وخطوات.",
+  "adviceBmi2": "سجّل الوجبات في Calorie Check لتطابق النصائح مع ما تأكله.",
+  "adviceActivity": "النشاط: موعدان ثابتان للمشي. أجب على تسجيل النشاط البدني.",
+  "adviceAlcohol": "الكحول: أيام بلا كحول أولاً ثم حصص أصغر — يحسّن النوم وضغط الدم.",
+  "adviceNutrition": "التغذية: حسّن وجبة واحدة — نباتات وبروتين أكثر.",
+  "adviceWellness": "العافية: نافذة نوم ثابتة واستراحة قصيرة. أعد Wellness Check لاحقاً.",
+  "advicePsychotest": "PsychoTest: قلل مصادر الضغط واستخدم تمارين هدوء. أعد الاختبار عند الهدوء.",
+  "adviceScreenTime": "وقت الشاشة: حد مسائي صارم واستبدل التمرير بالحركة.",
+  "adviceHeartRate1": "معدل القلب: افتح معدل وإيقاع القلب بعد ارتداء Apple Watch. أمسيات هادئة ونوم منتظم غالبًا يحسّنان معدل الراحة.",
+  "adviceHeartRate2": "إذا بقي معدل الراحة مرتفعًا لأيام أو استمرت تنبيهات الإيقاع غير المنتظم، ناقش ذلك مع طبيب وسجّل شعورك.",
+  "adviceStress": "نبض مرتفع مع نشاط قليل غالبًا يشير إلى توتر أو تعافٍ ضعيف — ركّز على النوم والمشي القصير وأعد فحص العافية.",
+  "errorWithMessage": "خطأ: {message}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "aiOfflineSleep1": "النوم الكافي crucial لصحتك. استهدف 7–9 ساعات وروتيناً ثابتاً.",
+  "aiOfflineSleep2": "النوم يؤثر على المناعة والمزاج. قلل الشاشات والكafeine مساءً.",
+  "aiOfflineExercise1": "النشاط المنتظم أساسي. 150 دقيقة معتدلة أسبوعياً.",
+  "aiOfflineExercise2": "التم exercise يحسّن القلب والمزاج. ابدأ بما تستمتع به.",
+  "aiOfflineStress1": "إدارة الضغط مهمة. جرب التأml أو التنفس العميق.",
+  "aiOfflineStress2": "الضغط العالي يؤثر على الصحة. تحدث مع شخص تثق به.",
+  "aiOfflineNutrition1": "نظام متوازن مع فواكه وخضار. اشرب ماءً وقلل المعالج.",
+  "aiOfflineNutrition2": "التغذية الجيدة تعطي طاقة. استشر أخصائي تغذية.",
+  "aiOfflineWeight1": "الوزن الصحي يحتاج توازناً. التغييرات الصغيرة أفضل.",
+  "aiOfflineWeight2": "الوزn جانب واحد. ركز على شعورك وعاداتك.",
+  "aiOfflineDefault1": "سؤال رائع! التغذية والرياضة والنوم وإدارة الضغط أساس العافية.",
+  "aiOfflineDefault2": "اعتن بصحتك الجسدية والنفسية. استشر المتخصصين.",
+  "clinicalBmiValue": "مؤشر كتلة الجسم {bmi}",
+  "clinicalRecMetabolicCluster": "عدة علامات تحذير معاً (الوزن أو الضغط أو السكر). اخسر قليلاً من الوزن إن أمكن، أكثر من النباتات وأقل من الملح، امشِ معظم الأيام واطلب من طبيبك فحوصات الكوليسترول والسكر.",
+  "clinicalRecCombinedHigh": "أكثر من خطر واحد مرتفع. احجز فحصاً قريباً ليراجع الطبيب ضغط الدم وسكر الدم والكوليسترول.",
+  "clinicalRecWeightLoss5to7": "استهدف خسارة لطيفة 5–7٪ خلال أشهر — ذلك وحده غالباً يحسّن الضغط والسكر.",
+  "clinicalRecPrediabetes": "سكرك في نطاق ما قبل السكري. قلل المشروبات السكرية، امشِ بعد الوجبات وأعد فحص السكر الصائم أو HbA1c مع طبيبك.",
+  "clinicalRecHighBp": "ضغط دمك مرتفع. قلل الملح وكن نشيطاً وقِس الضغط في المنزل لعدة أيام وشارك المتوسطات مع طبيبك.",
+  "clinicalMetabolicInsufficient": "لا توجد بيانات كافية بعد. سجّل الضغط والسكر والوزن (والخصر إن أمكن) لاكتشاف علامات الأيض.",
+  "clinicalMetabolicPresent": "عدة عوامل خطر معاً (الوزن أو الضغط أو السكر). هذا يرفع خطر القلب والسكري — راجع الطبيب لفحوصات الكوليسترول والسكر وحسّن النظام والنشاط.",
+  "clinicalMetabolicPartial": "هناك علامتان تحذيريتان. حسّن النظام وامشِ أكثر وراقب الوزن — التغييرات الصغيرة تساعد كثيراً.",
+  "clinicalMetabolicOk": "حسب البيانات المتوفرة، تبدو علامات الأيض تحت السيطرة.",
+  "clinicalRiskMsgHigh": "عدة مخاطر مرتفعة معاً. إشارة قوية لتحسين الطعام والنشاط ومراجعة الطبيب.",
+  "clinicalRiskMsgModerate": "خطر القلب والسكر الإجمالي أعلى من المثالي. تغييرات يومية — مشي وأقل ملح وسكر — تحدث فرقاً.",
+  "clinicalRiskMsgLow": "خطر القلب والسكر الإجمالي يبدو منخفضاً نسبياً حسب الوزن والضغط والسكر.",
+  "clinicalFlagExtraWeightTitle": "وزن زائد",
+  "clinicalFlagExtraWeightBody": "الوزن الزائد يرفع فرصة ارتفاع السكر ومشاكل القلب. حصص أصغر وخضار أكثر ومشي يومي يساعد.",
+  "clinicalFlagTripleTitle": "وزن + ضغط + سكر",
+  "clinicalFlagTripleBody": "وزن زائد وضغط أعلى وسكر أعلى معاً يرفعون كثيراً خطر السكري والقلب. ركّز على الطعام والمشي وزيارة الطبيب.",
+  "clinicalFlagLowWeightBpTitle": "وزن منخفض + ضغط منخفض",
+  "clinicalFlagLowWeightBpBody": "انخفاض الوزن مع انخفاض الضغط في العمر المتقدم قد يعني هشاشة. كل ما يكفي من البروتين واسأل الطبيب قبل تقليل السعرات.",
+  "clinicalFlagLeanDiabetesTitle": "سكر مرتفع دون وزن زائد كبير",
+  "clinicalFlagLeanDiabetesBody": "السكر مرتفع حتى دون وزن زائد كبير. يجب أن يتحقق الطبيب من نوع السكري المحتمل.",
+  "clinicalFlagYoungHtnTitle": "ضغط مرتفع قبل سن 40",
+  "clinicalFlagYoungHtnBody": "ارتفاع الضغط في سن مبكرة يجب تأكيده بقياسات متكررة. اسأل الطبيب إن كانت هناك أسباب أخرى.",
+  "clinicalAgePediatric": "تحت سن 18 تُستخدم النسب المئوية للأطفال — حدود البالغين لـ BMI/الضغط/السكر لا تُستخدم هنا.",
+  "clinicalAge45WeightSugar": "بعد سن 45، الوزن الزائد مع ارتفاع السكر يرفعان خطر السكري. اسأل طبيبك عن فحص السكر كل 1–3 سنوات.",
+  "clinicalAge60Systolic": "بعد سن 60، الرقم العلوي للضغط غالباً يرتفع أولاً. سجّل المتوسطات المنزلية وشاركها مع طبيبك.",
+  "clinicalAge65Target": "بعد سن 65، كثيرون يستهدفون ضغطاً أقل من 140/90 إن شعروا جيداً. قد يحدد طبيبك هدفاً مختلفاً إن كنت هشاً.",
+  "clinicalAgeYoungDiabetesLean": "تحت 40 مع سكر مرتفع ووزن طبيعي — راجع الطبيب لمعرفة نوع السكري المحتمل.",
+  "clinicalBpOlderAdultSuffix": "عند كبار السن، الرقم العلوي غالباً يرتفع أولاً — ركّز على هذا الاتجاه وشارك المتوسطات المنزلية مع طبيبك.",
+  "@clinicalBmiValue": {
+    "placeholders": {
+      "bmi": {
+        "type": "String"
+      }
+    }
+  },
+  "notifMorningShort": "أمس: {steps} خطوة (الهدف {goal})، الوجبات {kcal} سعرة. مؤشر الصحة {score}/100 — {status}.",
+  "notifEveningShort": "اليوم {today} خطوة مقابل {yesterday} أمس. مؤشر الصحة {score}/100 — {status}.",
+  "notifOpenHealthInsights": "فتح تحليلات الصحة",
+  "mealIntakeChartTitle": "سعرات الوجبات",
+  "mealZoneDeficit": "≤{max} سعرة — عجز (فقدان وزن)",
+  "mealZoneModerate": "{min}–{max} سعرة — منطقة متوسطة",
+  "mealZoneSurplus": ">{max} سعرة — فائض (خطر زيادة الوزن)",
+  "aiDocUploadedAnalysis": "حمّلت تحليلي: {fileName}",
+  "uploadDicom": "DICOM (تصوير طبي)",
+  "fileTypeDicom": "DICOM (.dcm) — مراجعة معمقة للأمراض بالذكاء الاصطناعي",
+  "uploadAnalyzingDicom": "تحليل DICOM مع Ai Doc — مراجعة شاملة للأمراض…",
+
+  "actionHeartRate": "معدل وإيقاع القلب",
+  "actionHeartRateDesc": "فحص القلب عبر الساعة الذكية",
+  "unitBpm": "نبضة/د",
+  "unitMs": "مللي ث",
+  "hrEvents": "أحداث",
+  "hrCurrent": "معدل القلب",
+  "hrResting": "عند الراحة",
+  "hrWalking": "أثناء المشي",
+  "hrHrv": "تغير معدل القلب",
+  "hrAvg": "متوسط معدل القلب",
+  "hrStatus": "الحالة",
+  "hrStatusNormal": "طبيعي",
+  "hrStatusAttention": "انتباه",
+  "hrStatusRisk": "خطر",
+  "hrNormRange": "نطاق الراحة",
+  "hrNormRangeShort": "{low}–{high} نبضة/د",
+  "hrReading": "جارٍ قراءة بيانات القلب…",
+  "hrReadingHint": "مزامنة معدل وإيقاع القلب من Apple Watch عبر Apple صحتي.",
+  "hrLive": "مباشر",
+  "hrStale": "آخر قراءة",
+  "hrUpdatedJustNow": "قراءة الآن",
+  "hrUpdatedSecondsAgo": "قراءة قبل {seconds} ث",
+  "hrUpdatedMinutesAgo": "قراءة قبل {minutes} د",
+  "hrRefreshSame": "لا توجد قراءة أحدث في Apple صحتي بعد",
+  "hrRefreshOk": "تم تحميل أحدث قراءة من Apple صحتي",
+  "hrStaleHint": "لا توجد بيانات نبض من جهازك. ارتدِ الساعة أو سوار اللياقة.",
+  "hrNoDeviceData": "لا توجد بيانات نبض من جهازك. ارتدِ الساعة أو سوار اللياقة.",
+  "hrNeedPermission": "يلزم الوصول إلى Apple صحتي",
+  "hrNeedPermissionBody": "اسمح لـ PHA بقراءة معدل القلب ومعدل الراحة وتغيّر المعدل والإيقاع غير المنتظم من Apple صحتي.",
+  "hrGrantAccess": "منح الوصول",
+  "hrNoData": "لا توجد بيانات قلب بعد. ارتدِ Apple Watch ثم اضغط تحديث، وتأكد من تفعيل معدل القلب في Apple صحتي.",
+  "hrRefresh": "تحديث",
+  "hrExport": "تصدير",
+  "hrExportTitle": "ملخص PHA: معدل وإيقاع القلب",
+  "hrExportCopied": "تم نسخ الملخص",
+  "hrDisclaimer": "هذا ليس جهازًا طبيًا. بيانات الساعة لا تغني عن استشارة الطبيب. راجع مختصًا عند الشعور بتوعك.",
+  "hrChartTitle": "اتجاه معدل القلب",
+  "hrRange24h": "24س",
+  "hrRange7d": "7ي",
+  "hrRange30d": "30ي",
+  "hrNoChartData": "لا بيانات لهذه الفترة",
+  "hrWhatItMeans": "ماذا يعني هذا؟",
+  "hrWhatItMeansBody": "معدل القلب عند الراحة وتغيّر المعدل يعكسان التوتر والتعافي واللياقة. القفزات أو عدة أيام مرتفعة تستحق الانتباه.",
+  "hrEcgTitle": "تخطيط قلب حديث (Apple Watch)",
+  "hrEcgSinusRhythm": "إيقاع جيبي",
+  "hrEcgAtrialFibrillation": "رجفان أذيني",
+  "hrEcgLowOrHighHr": "معدل قلب منخفض أو مرتفع",
+  "hrEcgInconclusive": "غير حاسم",
+  "hrEcgNotSet": "بلا تصنيف",
+  "hrIrregularRhythm": "تنبيهات إيقاع غير منتظم",
+  "hrTrendImproving": "تحسّن",
+  "hrTrendWorsening": "تدهور",
+  "hrTrendStable": "مستقر",
+  "hrTrendUnknown": "الاتجاه",
+  "hrExplainNormal": "معدل قلبك عند الراحة ضمن نطاق صحي.",
+  "hrExplainHighResting": "معدل الراحة {bpm} نبضة/د — أعلى من الحد المعتاد {max}. قد يرفعه التوتر أو المرض أو الكافيين أو ضعف التعافي.",
+  "hrExplainLowResting": "معدل الراحة {bpm} نبضة/د — أقل من الحد المعتاد {min}. الرياضيون غالبًا أقل؛ راجع الطبيب عند الدوخة أو الضعف.",
+  "hrExplainLowHrv": "تغيّر معدل القلب منخفض. قد يعني توترًا أو تعافيًا ناقصًا — ركّز على النوم والراحة.",
+  "hrExplainElevatedStreak": "معدل الراحة بقي ضمن 80–95 نبضة/د لعدة أيام. راقب التوتر أو الإفراط في التمرين أو بداية مرض.",
+  "hrExplainSpike": "ارتفع معدل الراحة بشكل ملحوظ من يوم لآخر. سجّل شعورك وأعد الفحص غدًا.",
+  "hrExplainIrregular": "أبلغت Apple Watch عن إيقاع غير منتظم. هذا ليس تشخيصًا — ناقش الأمر مع طبيب إذا استمرت التنبيهات أو شعرت بتوعك.",
+  "hrAlertRiskTitle": "إنذار معدل القلب",
+  "hrAlertAttentionTitle": "معدل راحة مرتفع",
+  "hrAlertGenericBody": "معدل الراحة ثابت بين 80–95 نبضة/د أو يرتفع يومًا بعد يوم. افتح معدل وإيقاع القلب للتفاصيل.",
+  "hrRestingChartTitle": "معدل القلب عند الراحة",
+  "hrAvgResting": "متوسط {bpm} نبضة/د",
+  "hrZoneNormal": "أخضر — {low}–{high} نبضة/د (طبيعي)",
+  "hrZoneAttention": "أصفر — انحراف خفيف",
+  "hrZoneRisk": "أحمر — انحراف كبير / خطر"
+}

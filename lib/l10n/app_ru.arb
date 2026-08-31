@@ -1,0 +1,1468 @@
+{
+  "@@locale": "ru",
+  "appTitle": "PHA — Персональный помощник здоровья",
+  "appNameShort": "PHA",
+  "personalHealthAssistant": "Персональный помощник здоровья",
+  "tagline": "Ваше здоровье — наш приоритет",
+  "taglineBody": "Отслеживайте, анализируйте и улучшайте здоровье с PHA. Ваши данные остаются конфиденциальными.",
+  "startingPha": "Запуск PHA…",
+  "loading": "Загрузка…",
+  "startupFailed": "Ошибка запуска",
+  "noContent": "Нет содержимого",
+  "retry": "Повторить",
+  "cancel": "Отмена",
+  "close": "Закрыть",
+  "done": "Готово",
+  "save": "Сохранить",
+  "continueAction": "Продолжить",
+  "back": "Назад",
+  "next": "Далее",
+  "yes": "Да",
+  "no": "Нет",
+  "ok": "OK",
+  "delete": "Удалить",
+  "edit": "Изменить",
+  "add": "Добавить",
+  "noDataYet": "Пока нет данных",
+  "noData": "Нет данных",
+  "comingSoon": "Скоро",
+  "navHome": "Главная",
+  "navHistory": "История",
+  "navInsights": "Аналитика",
+  "navProfile": "Профиль",
+  "quickActions": "Быстрые действия",
+  "healthIndex": "Индекс здоровья",
+  "healthMetrics": "Показатели здоровья",
+  "steps": "Шаги",
+  "calories": "Калории",
+  "distance": "Дистанция",
+  "activeTime": "Активное время",
+  "weight": "Вес",
+  "height": "Рост",
+  "water": "Вода",
+  "bloodGlucose": "Глюкоза крови",
+  "bloodPressure": "Артериальное давление",
+  "bpSystolic": "АД систолическое",
+  "bpDiastolic": "АД диастолическое",
+  "language": "Язык",
+  "chooseLanguage": "Выберите язык",
+  "chooseLanguageSubtitle": "Позже можно изменить в профиле.",
+  "languageEnglish": "English",
+  "languageSpanish": "Español",
+  "languageRussian": "Русский",
+  "languageChinese": "普通话",
+  "languageArabic": "العربية",
+  "theme": "Тема",
+  "themeLight": "Светлая",
+  "themeDark": "Тёмная",
+  "appearance": "Оформление",
+  "goodMorning": "Доброе утро",
+  "goodAfternoon": "Добрый день",
+  "goodEvening": "Добрый вечер",
+  "welcomeBack": "С возвращением",
+  "createYourAccount": "Создайте аккаунт",
+  "signIn": "Войти",
+  "signUp": "Регистрация",
+  "createAccount": "Создать аккаунт",
+  "signUpForFree": "Зарегистрироваться бесплатно",
+  "alreadyHaveAccount": "Уже есть аккаунт? Войти",
+  "dontHaveAccount": "Нет аккаунта? Зарегистрироваться",
+  "email": "Email",
+  "password": "Пароль",
+  "displayName": "Отображаемое имя",
+  "yourName": "Ваше имя",
+  "signOut": "Выйти",
+  "account": "Аккаунт",
+  "agreement": "Соглашение",
+  "privacyPolicy": "Политика конфиденциальности",
+  "acceptAgreement": "Я принимаю Соглашение",
+  "acceptPrivacy": "Я принимаю Политику конфиденциальности",
+  "pleaseAcceptLegal": "Прочитайте и примите Соглашение и Политику конфиденциальности, чтобы продолжить.",
+  "passwordTooShort": "Пароль должен быть не короче 8 символов.",
+  "featureTrackVitals": "Показатели и глюкоза",
+  "featureAiInsights": "ИИ-аналитика здоровья",
+  "featureSmartAnalysis": "Умный анализ",
+  "profileTitle": "Профиль",
+  "profileSubtitle": "Управление настройками аккаунта",
+  "age": "Возраст",
+  "heightCm": "Рост (см)",
+  "weightKg": "Вес (кг)",
+  "saveChanges": "Сохранить изменения",
+  "profileSaved": "Профиль сохранён",
+  "historyTitle": "История здоровья",
+  "historySubtitle": "Записанные показатели здоровья за время",
+  "stepsChartTitle": "Шаги",
+  "stepsAvgPerDay": "Средн. {avg}/день",
+  "days7": "7 дней",
+  "days30": "30 дней",
+  "days90": "90 дней",
+  "allFilter": "Все",
+  "recordsCount": "{count} записей",
+  "recordCountOne": "1 запись",
+  "noMetricsYet": "Пока нет записанных показателей",
+  "noMetricsHint": "Используйте кнопку «Записать» на главной, чтобы начать отслеживание.",
+  "insightsTitle": "Аналитика здоровья",
+  "insightsSubtitle": "Тренды и закономерности по вашим данным",
+  "avgHealthIndex": "Средний индекс здоровья",
+  "avgWellnessScore": "Средний балл самочувствия",
+  "stepTrend": "Тренд шагов",
+  "healthIndexHistory": "История индекса здоровья",
+  "wellnessCheckHistory": "История проверок самочувствия",
+  "stepActivity": "Активность по шагам",
+  "lastNDays": "Последние {count} дн.",
+  "minLabel": "Мин: {value}",
+  "avgLabel": "Средн: {value}",
+  "maxLabel": "Макс: {value}",
+  "noInsightsYet": "Пока нет аналитики",
+  "noInsightsHint": "Начните записывать показатели и проходить проверки самочувствия, чтобы увидеть аналитику.",
+  "noHealthIndexYet": "Пока нет данных индекса здоровья",
+  "noWellnessYet": "Пока нет проверок самочувствия. Попробуйте «Проверку самочувствия» на главной.",
+  "healthAnalysis": "Анализ здоровья",
+  "healthAnalysisSubtitle": "Тот же балл, что на главной",
+  "analyze": "Анализировать",
+  "reAnalyze": "Повторить анализ",
+  "analyzing": "Анализ…",
+  "noAnalysisYet": "Анализа пока нет. Нажмите «Анализировать», чтобы получить персональный вывод по вашим данным.",
+  "metricFindings": "Выводы по показателям",
+  "recommendations": "Рекомендации",
+  "lastAnalyzed": "Последний анализ: {when}",
+  "statusExcellent": "Отлично",
+  "statusGood": "Хорошо",
+  "statusFair": "Удовлетворительно",
+  "statusNeedsAttention": "Требует внимания",
+  "actionUploadAnalysis": "Загрузить анализ",
+  "actionUploadAnalysisDesc": "Анализ PDF или фото",
+  "actionAiConsultation": "ИИ-консультация",
+  "actionAiConsultationDesc": "Чат с Ai Doc",
+  "actionWellnessCheck": "Проверка самочувствия",
+  "actionWellnessCheckDesc": "Оцените своё самочувствие",
+  "actionBadHabits": "Проверка вредных привычек",
+  "actionBadHabitsDesc": "Курение, алкоголь и экранное время",
+  "actionPhysicalActivity": "Начать физ. активность",
+  "actionPhysicalActivityDesc": "Выберите ежедневную программу тренировок",
+  "actionMealCalories": "Калории еды",
+  "actionMealCaloriesDesc": "Фото → калории и советы по питанию",
+  "actionPsychoTest": "PsychoTest",
+  "actionPsychoTestDesc": "Оценка стресса и психосоматики",
+  "actionTreatmentSchedule": "Расписание лечения",
+  "actionTreatmentScheduleDesc": "Напоминания о лекарствах и добавках",
+  "actionFamilyHealth": "Здоровье семьи",
+  "actionFamilyHealthDesc": "Добавьте семью для отслеживания здоровья",
+  "logMetric": "Записать",
+  "todayVitals": "Показатели сегодня",
+  "onboardingQuest1TitleBefore": "Квест 1: Выберите свой мир",
+  "onboardingQuest1TitleAfter": "Выберите единицы измерения",
+  "onboardingQuest1BodyBefore": "Начните путь к здоровью — 3 коротких квеста, затем регистрация.",
+  "onboardingQuest1BodyAfter": "Настройте графики и подсказки под ваш регион.",
+  "onboardingQuest1CardTitle": "Квест 1 · Система измерений",
+  "onboardingQuest1CardSubtitle": "Откройте графики на своём языке",
+  "imperial": "Имперская",
+  "imperialUnits": "фт · фунты · мг/дл",
+  "metric": "Метрическая",
+  "metricUnits": "см · кг · ммоль/л",
+  "startQuest1": "Начать квест 1 →",
+  "onboardingQuest2Title": "Квест 2: О вас",
+  "onboardingQuest3Title": "Квест 3: Ваши показатели",
+  "onboardingVictoryTitle": "Всё готово!",
+  "onboardingVictoryBody": "Ваш путь к здоровью начинается сейчас.",
+  "activityYourPlan": "Ваш план активности",
+  "activityCurrentPlan": "Текущий план",
+  "activityWhatsIncluded": "Что входит",
+  "activityChangePlan": "Сменить план",
+  "activityStartTitle": "Начать физ. активность",
+  "activityChangeTitle": "Сменить план",
+  "activityChooseProgram": "Выберите программу. Начните ежедневную физ. активность.",
+  "activityChangeHint": "Выберите новую программу. Вечерняя проверка будет по новому плану.",
+  "activityKeepCurrent": "Оставить текущий план",
+  "activityProgramStarted": "Программа запущена",
+  "activityProgramSaved": "Ежедневный план активности сохранён. Каждый вечер мы спросим, выполнили ли вы его.",
+  "activityStartThis": "Начать эту программу",
+  "activitySwitchToThis": "Перейти на этот план",
+  "activityChooseAnother": "Выбрать другую",
+  "activityCurrentBadge": "Текущий",
+  "activityStarter": "Старт",
+  "activityStarterSubtitle": "Начните ежедневную физ. активность",
+  "activityAdvanced": "Продвинутый",
+  "activityAdvancedSubtitle": "Набирайте регулярность со структурированными подходами",
+  "activityProfessional": "Профессиональный",
+  "activityProfessionalSubtitle": "Высокообъёмные ежедневные тренировки с собственным весом",
+  "activitySuperman": "Супермен",
+  "activitySupermanSubtitle": "Интенсивные тренировки в зале",
+  "partially": "Частично",
+  "notifications": "Уведомления",
+  "phaPlus": "PHA Plus+",
+  "upgrade": "Улучшить",
+  "trialExpired": "Пробный период истёк",
+  "unitSteps": "шагов",
+  "unitKcal": "ккал",
+  "unitMin": "мин",
+  "unitMl": "мл",
+  "unitMmhg": "мм рт. ст.",
+  "healthOverviewToday": "Ваш обзор здоровья на сегодня.",
+  "unitYears": "лет",
+  "unitKg": "кг",
+  "unitCm": "см",
+  "unitLbs": "фунт",
+  "unitMmol": "ммоль/л",
+  "unitMgdl": "мг/дл",
+  "unitKm": "км",
+  "unitMiles": "миль",
+  "healthIndexAvgScore": "Средн. {score}/100",
+  "@healthIndexAvgScore": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "indexCardExcellent": "Отлично — так держать.",
+  "indexCardGood": "У вас всё хорошо.",
+  "indexCardFair": "Есть области, требующие внимания.",
+  "indexCardNeedsAttention": "Нужно сосредоточиться — пересмотрите привычки.",
+  "stepsMsgSedentary": "Низкая активность сегодня. Начните с 15-минутной прогулки — регулярность важнее интенсивности для здоровья сердца.",
+  "stepsMsgBuilding": "Вы формируете привычку ходить. Стремитесь к {goal}+ шагов для лучшего кардиометаболического эффекта.",
+  "@stepsMsgBuilding": {
+    "placeholders": {
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "stepsMsgBaseline": "Хорошая базовая активность. Ещё несколько коротких прогулок помогут достичь диапазона {goal}+ шагов.",
+  "@stepsMsgBaseline": {
+    "placeholders": {
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "stepsMsgStrong": "Высокий уровень активности — значительно выше малоподвижного. Сохраняйте ритм; {goal} шагов — бонусная цель, а не обязательство.",
+  "@stepsMsgStrong": {
+    "placeholders": {
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "stepsMsgGoal": "Отличный уровень активности — вы достигаете классической цели в {goal} шагов.",
+  "@stepsMsgGoal": {
+    "placeholders": {
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "stepsRangeSedentary": "0–{max} шагов",
+  "@stepsRangeSedentary": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "stepsRangeBuilding": "{min}–{max} шагов",
+  "@stepsRangeBuilding": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "stepsRangeBaseline": "{min}–{max} шагов",
+  "@stepsRangeBaseline": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "stepsRangeStrong": "{min}–{max} шагов",
+  "@stepsRangeStrong": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "stepsRangeGoal": "{min}+ шагов",
+  "@stepsRangeGoal": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "todaysNotifications": "Уведомления на сегодня",
+  "morningNotificationTitle": "Доброе утро — ваш обзор здоровья",
+  "noNotificationsToday": "Уведомлений на сегодня пока нет.",
+  "notificationsAppearHere": "Уведомления, полученные сегодня, отображаются здесь.",
+  "phaPlusUnlockedTitle": "Вы на PHA Plus+!",
+  "phaPlusUnlockedBody": "Все функции разблокированы. Наслаждайтесь неограниченными загрузками, PsychoTest и расписанием лечения.",
+  "onboardingQuest2BuildAvatar": "Квест 2: Создайте аватар",
+  "onboardingQuest2FillFields": "Заполните все 3 поля — получите +{hp} HP за завершение.",
+  "@onboardingQuest2FillFields": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      }
+    }
+  },
+  "rewardedStats": "Награждаемые показатели",
+  "yourGender": "Ваш пол",
+  "male": "Мужской",
+  "female": "Женский",
+  "unitYearsLong": "лет",
+  "completeQuest2": "Завершить квест 2 (+{hp} HP)",
+  "@completeQuest2": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      }
+    }
+  },
+  "backToQuest2": "Назад к квесту 2",
+  "onboardingQuest3PowerUp": "Квест 3: Усиление (бонус)",
+  "onboardingQuest3BpDone": "Вы уже записали АД и глюкозу сегодня. Возвращайтесь завтра для следующего измерения.",
+  "onboardingQuest3Optional": "Дополнительные показатели — +{bpHp} HP за АД, +{glucoseHp} HP за глюкозу. Раз в день.",
+  "@onboardingQuest3Optional": {
+    "placeholders": {
+      "bpHp": {
+        "type": "int"
+      },
+      "glucoseHp": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingAllQuestsComplete": "Все квесты завершены!",
+  "onboardingEarnedHp": "Вы заработали {hp} HP · Уровень {level} {title}",
+  "@onboardingEarnedHp": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      },
+      "level": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingBonusVitals": "Бонусные показатели открыли дополнительные insights!",
+  "healthPower": "Сила здоровья",
+  "onboardingCreateAccount": "Создать аккаунт и стать здоровее →",
+  "onboardingEnterDashboard": "На главную →",
+  "badgeUnitPro": "Unit Pro",
+  "badgeFoundation": "Foundation",
+  "badgeHeartTrack": "Пульс",
+  "badgeSugarSense": "Sugar Sense",
+  "badgeChampion": "Champion",
+  "levelHealthRookie": "Health Rookie",
+  "levelProfileBuilder": "Создатель профиля",
+  "levelVitalsPro": "Vitals Pro",
+  "picked": "ВЫБРАНО",
+  "saving": "Сохранение…",
+  "claimBonusFinish": "Получить бонус и завершить 🏆",
+  "skipBonusQuest": "Пропустить бонусный квест",
+  "calculatingRewards": "Подсчёт наград…",
+  "categoryBloodPressure": "Артериальное давление",
+  "categoryBloodGlucose": "Глюкоза крови",
+  "categoryWeight": "Вес",
+  "categoryWeightBmi": "Вес / ИМТ",
+  "categoryDailyActivity": "Ежедневная активность",
+  "categoryCalorieBurn": "Расход калорий",
+  "categoryMentalWellness": "Ментальное благополучие",
+  "categorySmoking": "Курение",
+  "categoryAlcohol": "Алкоголь",
+  "categoryScreenTime": "Экранное время",
+  "categoryNutrition": "Питание",
+  "categoryPsychoTest": "PsychoTest",
+  "categoryActivity": "Активность",
+  "categoryHeartRate": "ЧСС и ритм",
+  "categoryAge": "Возраст",
+  "categoryStress": "Стресс (повышенный пульс)",
+  "analysisSummaryExcellent": "Ваш индекс здоровья отличный.",
+  "analysisSummaryGood": "Ваш индекс здоровья в целом хороший.",
+  "analysisSummaryFair": "Индекс здоровья удовлетворительный — несколько изменений его улучшат.",
+  "analysisSummaryNeedsAttention": "Индекс здоровья требует внимания — сосредоточьтесь на главных пробелах ниже.",
+  "analysisSummaryDefault": "Вот ваш обзор здоровья.",
+  "analysisScoreMatches": "Балл {score}/100 совпадает с индексом на главной.",
+  "@analysisScoreMatches": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "analysisStrengths": "Сильные стороны: {names}.",
+  "@analysisStrengths": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisBiggestDrag": "Главные факторы снижения индекса: {names}.",
+  "@analysisBiggestDrag": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "glucoseMsgHypoglycemia": "Глюкоза крови низкая (гипогликемия). Съешьте что-то с быстрыми углеводами и обратитесь к врачу.",
+  "glucoseMsgNormal": "Глюкоза натощак в норме. Хорошее метаболическое здоровье.",
+  "glucoseMsgPrediabetes": "Глюкоза в диапазоне преддиабета. Откажитесь от сладких напитков, добавьте клетчатку и гуляйте 10–15 минут после еды.",
+  "glucoseMsgDiabetes": "Глюкоза в диабетическом диапазоне. Обратитесь к врачу для обследования и плана лечения.",
+  "bmiMsgWeightOnly": "Вес записан. Добавьте рост в профиле, чтобы мы могли рассчитать ИМТ в индексе здоровья.",
+  "bmiMsgUnderweight": "Вес немного ниже нормы для вашего роста. Ешьте белковую пищу чаще; обратитесь к врачу, если не планировали худеть.",
+  "bmiMsgHealthy": "Ваш вес здоровый для вашего роста. Отлично!",
+  "bmiMsgOverweight": "Вес немного выше нормы. Стремитесь к плавному снижению, сохраняйте белок и ежедневные шаги.",
+  "bmiMsgObeseI": "Вес значительно выше нормы. Это может повышать давление и сахар. Лучшее питание, больше ходьбы и план с врачом помогут.",
+  "bmiMsgObeseII": "Вес значительно выше нормы. Обратитесь к врачу для безопасного плана защиты сердца и обмена веществ.",
+  "stepsLabel": "{count} шагов",
+  "@stepsLabel": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "calorieBurnGood": "Расход калорий соответствует шагам. Сочетайте с сбалансированным питанием для восстановления.",
+  "calorieBurnInfo": "Вы сожгли {calories} ккал активностью. Записывайте еду, чтобы сопоставить потребление с целями.",
+  "@calorieBurnInfo": {
+    "placeholders": {
+      "calories": {
+        "type": "int"
+      }
+    }
+  },
+  "wellnessMsgExcellent": "Отличный балл самочувствия — низкий стресс и хорошая ментальная устойчивость.",
+  "wellnessMsgGood": "Хорошее самочувствие. Небольшие улучшения сна или восстановления выведут на отличный уровень.",
+  "wellnessMsgModerate": "Умеренное самочувствие. Попробуйте 5 минут дыхания, прогулку на свежем воздухе или ранний отход ко сну.",
+  "wellnessMsgNeedsAttention": "Балл самочувствия указывает на повышенный стресс. Защитите сон, сократите кофеин вечером и пообщайтесь с близкими.",
+  "wellnessMsgCritical": "Высокая нагрузка стресса. Повторите проверку самочувствия и обратитесь к специалисту, если это сохраняется.",
+  "smokingGood": "Курение не отмечено — один из сильнейших защитных факторов для сердца и лёгких.",
+  "smokingLessPack": "<1 пачки/день",
+  "smokingOnePack": "~1 пачка/день",
+  "smokingMorePack": ">1 пачки/день",
+  "smokingActive": "Курит",
+  "smokingNonSmoker": "Не курит",
+  "smokingWarning": "Курение — главный фактор риска индекса. Назначьте дату отказа, уберите триггеры и отслеживайте прогресс в Plus+ → Проверка вредных привычек.",
+  "alcoholNone": "Нет",
+  "alcoholGood": "Алкоголь не употребляется — полезно для давления, сна и печени.",
+  "alcoholOccasional": "Иногда",
+  "alcoholOccasionalTip": "Оставьте алкоголь редким и большинство дней без алкоголя.",
+  "alcoholRegular": "Регулярно",
+  "alcoholRegularTip": "Сократите дни с алкоголем; он повышает давление и калории.",
+  "alcoholHeavy": "Много",
+  "alcoholHeavyTip": "Частое употребление сильно снижает индекс — обратитесь за поддержкой для безопасного сокращения.",
+  "alcoholDefault": "Употребляет алкоголь",
+  "alcoholDefaultTip": "Отслеживайте частоту на этой неделе и стремитесь к нескольким дням без алкоголя.",
+  "screenRarely": "Редко",
+  "screenRarelyTip": "Низкая нагрузка от соцсетей — хорошо для сна и концентрации.",
+  "screenUnderHour": "<1 ч/день",
+  "screenUnderHourTip": "Разумная привычка. Держите телефон вне спальни, если страдает сон.",
+  "screenOneTwoHours": "1–2 ч/день",
+  "screenOneTwoTip": "Умеренное использование. Попробуйте отключение за 30 минут до сна.",
+  "screenConstant": "Постоянно",
+  "screenConstantTip": "Много экранного времени вытесняет движение и сон. Установите лимиты и замените прокрутку прогулкой.",
+  "screenDefaultTip": "Пересмотрите экранные привычки — вечерние лимиты часто помогают самочувствию.",
+  "nutritionRecentMeals": "{count} недавних приёмов пищи",
+  "@nutritionRecentMeals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "nutritionWarning": "Несколько недавних блюд требуют внимания. Больше овощей и белка, меньше переработанных перекусов.",
+  "nutritionGood": "Качество недавних блюд хорошее. Сохраняйте этот паттерн — он поддерживает глюкозу и вес.",
+  "nutritionInfo": "Смешанное качество блюд. Стремитесь к одному улучшению в день (больше клетчатки или белка, меньше сладких напитков).",
+  "psychoLoad": "Нагрузка {total} · {label}",
+  "@psychoLoad": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "psychoLow": "Низкая",
+  "psychoModerate": "Умеренная",
+  "psychoHigh": "Высокая",
+  "psychoLowMsg": "Психосоматические показатели в здоровом диапазоне. Продолжайте поддерживать привычки.",
+  "psychoModerateMsg": "Умеренная психосоматическая нагрузка. Уделите внимание отдыху, расслаблению и границам.",
+  "psychoHighMsg": "Значительный стресс и психосоматическое напряжение. Обратитесь к специалисту и снизьте нагрузку.",
+  "priorityHigh": "Высокий",
+  "priorityMedium": "Средний",
+  "priorityLow": "Низкий",
+  "profileUpdatedSuccess": "Профиль успешно обновлён!",
+  "termsOfService": "Условия использования и отказ от ответственности",
+  "howWeHandleData": "Как мы обрабатываем ваши данные",
+  "sameScoreHint": "Тот же балл, что на главной",
+  "eveningNotificationTitle": "Вечерняя проверка",
+  "bpMsgLow": "Артериальное давление ниже обычного диапазона (гипотония). Пейте достаточно воды и обратитесь к врачу при головокружении.",
+  "bpMsgOptimal": "Артериальное давление оптимальное (<120/<80). Продолжайте здоровый образ жизни.",
+  "bpMsgNormal": "Артериальное давление в нормальном диапазоне (около 120/80). Это здоровая цель для большинства взрослых.",
+  "bpMsgHighNormal": "Артериальное давление немного повышено (ещё не гипертония). Контролируйте регулярно, сократите соль и будьте активны.",
+  "bpMsgGrade1": "Артериальное давление повышено. Сначала изменения образа жизни — меньше соли, больше ходьбы. Обратитесь к врачу, если сохраняется.",
+  "bpMsgGrade2": "Артериальное давление значительно повышено. Обратитесь к врачу в ближайшее время.",
+  "bpMsgGrade3": "Артериальное давление очень высокое. Немедленно обратитесь за медицинской помощью.",
+  "bpMsgDiabetes": "Артериальное давление очень высокое. Немедленно обратитесь за медицинской помощью.",
+  "uploadAnalysisTitle": "Загрузить анализ",
+  "uploadFileType": "Тип файла",
+  "uploadPdf": "PDF-документ",
+  "uploadPhoto": "Фото / изображение",
+  "uploadSelectFile": "Выберите файл",
+  "uploadClickToSelect": "Нажмите, чтобы выбрать файл",
+  "uploadClickToChange": "{size} КБ — нажмите, чтобы изменить",
+  "@uploadClickToChange": {
+    "placeholders": {
+      "size": {
+        "type": "int"
+      }
+    }
+  },
+  "uploadLimitReached": "Лимит достигнут",
+  "uploadUpgradeMore": "Улучшите план, чтобы загружать больше",
+  "uploadFile": "Загрузить файл",
+  "uploadAnalyzing": "Анализ…",
+  "uploadAnalyzingAiDoc": "Анализ файла с Ai Doc…",
+  "uploadFailed": "Ошибка загрузки. Попробуйте снова.",
+  "uploadCouldNotRead": "Не удалось прочитать файл. Выберите его снова.",
+  "uploadLimitMessage": "Лимит загрузок исчерпан. Перейдите на PHA Plus+ для безлимитных загрузок.",
+  "uploadFreePlan": "Бесплатный план: {count}/2 загрузок. Макс. 2 страницы на файл.",
+  "@uploadFreePlan": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mealTakePhoto": "Сделайте или загрузите фото еды",
+  "mealAfterAnalysis": "После анализа нажмите ✓ только если вы съели это блюдо — оно добавится к калориям за сегодня.",
+  "mealCamera": "Камера",
+  "mealGallery": "Галерея",
+  "mealAnalyze": "Анализировать еду",
+  "mealAnalyzing": "Анализ…",
+  "mealFailed": "Ошибка анализа. Попробуйте снова.",
+  "mealFreeLimit": "Лимит исчерпан (2 приёма за 24 ч). Перейдите на PHA Plus+ для безлимитных проверок.",
+  "mealFreePlan": "Бесплатный план: {count}/{limit} приёмов за последние 24 часа.",
+  "@mealFreePlan": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "mealLogged": "Приём пищи записан — учтён в суточном потреблении и индексе здоровья.",
+  "mealTapConfirm": "Нажмите ✓, чтобы подтвердить, что вы съели это — добавится к суточному потреблению.",
+  "mealDiscard": "Отменить",
+  "mealTotalIntake": "Суточное потребление",
+  "mealCarb": "Углеводы",
+  "mealProteins": "Белки",
+  "mealFat": "Жиры",
+  "mealNoMealsToday": "Сегодня ещё нет подтверждённых приёмов пищи.",
+  "mealNoMealsLogged": "Нет записей · цель ~{target} ккал",
+  "@mealNoMealsLogged": {
+    "placeholders": {
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealConfirmHint": "Подтверждайте приёмы после анализа для отслеживания.",
+  "aiDocTitle": "Ai Doc — ассистент",
+  "aiDocWelcome": "Здравствуйте! Я ваш ассистент Ai Doc. Хотите использовать данные, указанные при регистрации? После этого опишите проблему подробно — или отправьте фото еды, анализа или чего-то связанного со здоровьем.",
+  "aiDocOffline": "Ai Doc недоступен — API-ключ не настроен.",
+  "aiDocFreeLimit": "Лимит бесплатных консультаций исчерпан.",
+  "aiDocFreeRemaining": "Осталось {remaining} из 3 бесплатных консультаций.",
+  "@aiDocFreeRemaining": {
+    "placeholders": {
+      "remaining": {
+        "type": "int"
+      }
+    }
+  },
+  "aiDocAnalyzingHealth": "Анализ ваших данных о здоровье…",
+  "aiDocLooking": "Смотрю…",
+  "aiDocAskPlaceholder": "Спросите о симптомах или добавьте фото",
+  "aiDocUpgradeChat": "Улучшите план, чтобы продолжить чат…",
+  "aiDocNoProblem": "Хорошо! Когда будете готовы, опишите симптомы или проблемы со здоровьем — или отправьте фото.",
+  "aiDocPhoto": "Фото",
+  "wellnessResults": "Результаты самочувствия",
+  "wellnessQuestion": "Вопрос {current} из {total}",
+  "@wellnessQuestion": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "percentComplete": "{percent}% завершено",
+  "@percentComplete": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "questionUnavailable": "Вопрос недоступен",
+  "wellnessVeryPoor": "Очень плохо",
+  "wellnessPoor": "Плохо",
+  "wellnessModerate": "Умеренно",
+  "wellnessGood": "Хорошо",
+  "wellnessExcellent": "Отлично",
+  "badHabitsSummaryTitle": "Итог: вредные привычки",
+  "badHabitsSaved": "Сохранено в истории здоровья. Честное отслеживание — первый шаг к изменениям.",
+  "badHabitsSocialMediaLabel": "Соцсети",
+  "badHabitsStep": "Шаг {step} из {total}",
+  "@badHabitsStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "badHabitsDoYouSmoke": "Вы курите?",
+  "badHabitsHowMuchSmoke": "Сколько вы курите?",
+  "badHabitsDoYouDrink": "Вы употребляете алкоголь?",
+  "badHabitsHowMuchDrink": "Как часто и сколько вы пьёте?",
+  "badHabitsSocialMedia": "Сколько времени вы бесполезно проводите в соцсетях?",
+  "treatmentYourSchedule": "Ваше расписание",
+  "treatmentAddMedicine": "Добавить лекарство или добавку",
+  "treatmentNewEntry": "Новая запись",
+  "treatmentMedicineName": "Название лекарства или БАД",
+  "treatmentMedicinePlaceholder": "напр. Витамин D, Метформин",
+  "treatmentHowManyTimes": "Сколько раз в день",
+  "treatmentDoseTime": "Приём {n}",
+  "@treatmentDoseTime": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "treatmentAddAnother": "Добавить ещё",
+  "treatmentSaveSchedule": "Сохранить расписание",
+  "treatmentSaved": "Расписание сохранено — напоминания о таблетках включены",
+  "treatmentEnterName": "Введите хотя бы одно название лекарства или добавки.",
+  "treatmentSaveFailed": "Не удалось сохранить. Попробуйте снова.",
+  "treatmentNotifOff": "Расписание сохранено, но уведомления отключены. Включите их в настройках.",
+  "psychoTestSubtitle": "Оценка стресса и психосоматики",
+  "psychoTestIntro": "Тест содержит 3 блока и 20 вопросов. Отвечайте честно — нет правильных или неправильных ответов. Результаты сохраняются в профиле.",
+  "psychoBlock1Title": "БЛОК 1",
+  "psychoBlock1Subtitle": "Осознанность стресса",
+  "psychoBlock2Title": "БЛОК 2",
+  "psychoBlock2Subtitle": "Физические симптомы",
+  "psychoBlock3Title": "БЛОК 3",
+  "psychoBlock3Subtitle": "Поведенческий профиль",
+  "psychoAnswerHint": "У каждого вопроса 3 варианта: Никогда · Иногда · Часто",
+  "psychoStartAssessment": "Начать тест",
+  "psychoYourResult": "ВАШ РЕЗУЛЬТАТ",
+  "psychoRetake": "Пройти снова",
+  "psychoNever": "Никогда",
+  "psychoSometimes": "Иногда",
+  "psychoOften": "Часто",
+  "psychoQuestionsCount": "{count} вопросов",
+  "@psychoQuestionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingBackToQuest2": "Назад к квесту 2",
+  "onboardingBpGlucose": "АД / +{hp} HP",
+  "@onboardingBpGlucose": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingGlucoseHp": "Глюкоза / +{hp} HP",
+  "@onboardingGlucoseHp": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingSys": "Сист.",
+  "onboardingDia": "Диаст.",
+  "onboardingReadyForPha": "{percent}% — готов к PHA",
+  "@onboardingReadyForPha": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingRedeemHp": "Обменяйте {hp} HP на скидку {percent}% на первую 6-месячную или годовую подписку PHA Plus+.",
+  "@onboardingRedeemHp": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "activityCurrentPlanSubtitle": "Ваш текущий план активности",
+  "activityCustomPlanHint": "План активен. Выполняйте тренировку и отвечайте на вечернюю проверку.",
+  "activityRestNote": "Отдых не более 2 минут между подходами.",
+  "dailyLabel": "Ежедневно",
+  "fileTypePdf": "PDF до 2 страниц (бесплатный план)",
+  "upgradeToPhaPlus": "Перейти на PHA Plus+",
+  "healthAnalysisSubtitleShort": "Тот же балл, что на главной",
+  "wellnessQ1": "Насколько вы сейчас чувствуете стресс?",
+  "wellnessQ2": "Как вы спали прошлой ночью?",
+  "wellnessQ3": "Какой у вас уровень энергии сегодня?",
+  "wellnessQ4": "Как бы вы оценили своё настроение?",
+  "wellnessQ5": "Как ваше общее самочувствие?",
+  "badHabitsSmokeLessPack": "Меньше одной пачки в день",
+  "badHabitsSmokeOnePack": "1 пачка в день",
+  "badHabitsSmokeMorePack": "Больше одной пачки в день",
+  "badHabitsAlcoholOccasionally": "Иногда — менее 100 г крепкого алкоголя, 1–2 бокала вина или до 2 банок пива в неделю",
+  "badHabitsAlcoholRegularly": "Регулярно — 200–300 г крепкого алкоголя, 1–2 бутылки вина или более 2 л пива в неделю",
+  "badHabitsAlcoholHeavy": "Пьянею 1–2 раза в неделю до потери памяти",
+  "badHabitsSocialRarely": "Редко или никогда",
+  "badHabitsSocialUnderHour": "Менее 1 часа в день",
+  "badHabitsSocialOneTwoHours": "Около 1–2 часов в день",
+  "badHabitsSocialConstantly": "Постоянно листаю ленту в свободное время",
+  "activitySwitchHint": "Переключиться на эту программу:",
+  "activityStartHint": "Начните ежедневную физ. активность с этой программой:",
+  "activityStarterEx1": "Сделаю 15 отжиманий в течение дня",
+  "activityStarterEx2": "20 приседаний в день",
+  "activityStarterEx3": "20 скручиваний",
+  "activityStarterEx4": "15 отжиманий от дивана или другого предмета за спиной",
+  "activityAdvancedEx1": "45 отжиманий в день. Рекомендуется: 20, 15, 10",
+  "activityAdvancedEx2": "50 приседаний в день, 2 подхода по 25",
+  "activityAdvancedEx3": "30 скручиваний, 20 подъёмов корпуса и 10 подъёмов ног с согнутыми коленями",
+  "activityAdvancedEx4": "25 отжиманий от дивана за спиной: 15 и 10",
+  "activityProEx1": "Более 100 отжиманий в день",
+  "activityProEx2": "Более 100 приседаний в течение дня",
+  "activityProEx3": "Более 70 упражнений на пресс в день",
+  "activityProEx4": "Более 60 отжиманий за спиной в течение дня",
+  "activitySupermanEx1": "Тренируюсь в зале 3+ раза в неделю более 60 минут интенсивно",
+  "treatmentSaving": "Сохранение...",
+  "treatmentEntryNumber": "Запись {n}",
+  "@treatmentEntryNumber": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingLevelShort": "Ур.",
+  "onboardingDayStreak": "Серия {count} дн.",
+  "@onboardingDayStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingHudHealthPower": "Сила здоровья",
+  "onboardingQuest1Complete": "Квест 1 завершён!",
+  "onboardingQuest2Complete": "Квест 2 пройден!",
+  "onboardingBonusComplete": "Бонусный квест выполнен!",
+  "featurePrivateSecure": "Конфиденциально и безопасно",
+  "loginHeroLine1": "Ваше здоровье,",
+  "loginHeroLine2": "умно",
+  "loginHeroLine3": "отслеживается.",
+  "loginHeroBody": "Отслеживайте показатели, получайте ИИ-аналитику и управляйте своим здоровьем.",
+  "loginTrustedBy": "Нам доверяют заботящиеся о здоровье по всему миру.",
+  "loginSignUpSubtitle": "Начните отслеживать здоровье сегодня — бесплатно навсегда.",
+  "loginSignInSubtitle": "Войдите, чтобы открыть панель здоровья.",
+  "loginFullName": "Полное имя",
+  "loginNamePlaceholder": "Иван Иванов",
+  "loginEmailLabel": "Адрес эл. почты",
+  "loginEmailPlaceholder": "you@example.com",
+  "loginPasswordHintSignUp": "Минимум 8 символов",
+  "loginPasswordHintSignIn": "••••••••",
+  "legalAgreePrefix": "Я прочитал(а) и согласен(на) с ",
+  "creatingAccount": "Создание аккаунта…",
+  "signingIn": "Вход…",
+  "loginLegalFooter": "Продолжая, вы соглашаетесь с условиями. Приложение даёт рекомендации по здоровью, а не медицинский диагноз.",
+  "onboardingErrorAge": "Введите возраст, чтобы получить значок Foundation.",
+  "onboardingErrorGender": "Выберите пол.",
+  "onboardingErrorHeightImperial": "Введите рост (футы 1–8, дюймы 0–11).",
+  "onboardingErrorHeightMetric": "Введите рост от 50 до 250 см.",
+  "onboardingErrorWeightImperial": "Введите вес от 44 до 660 фунтов.",
+  "onboardingErrorWeightMetric": "Введите вес от 20 до 300 кг.",
+  "onboardingErrorQuest2First": "Сначала завершите Квест 2.",
+  "onboardingTrailUnits": "Единицы",
+  "onboardingTrailBasics": "Основы",
+  "onboardingTrailBoost": "Бонус",
+  "onboardingAgeHint": "напр. 32",
+  "onboardingFtIn": "фут и дюйм",
+  "onboardingHeightHintMetric": "напр. 175",
+  "onboardingWeightHintImperial": "напр. 165",
+  "onboardingWeightHintMetric": "напр. 70",
+  "vitalsBpBothOrNone": "Введите оба значения АД или оставьте оба пустыми.",
+  "vitalsDailyPrompt": "Записывайте АД и глюкозу раз в день. Можно пропустить и записать позже.",
+  "vitalsPromptTurnOff": "Отключить",
+  "vitalsPromptTurnOffHint": "Не спрашивать АД/глюкозу каждый день.",
+  "vitalsPromptEvery5Days": "Спрашивать раз в 5 дней",
+  "vitalsPromptEvery5DaysHint": "Напоминать каждые 5 дней, не ежедневно.",
+  "vitalsBpLabel": "Артериальное давление (мм рт. ст.)",
+  "vitalsGlucoseLabel": "Глюкоза крови ({unit})",
+  "@vitalsGlucoseLabel": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "vitalsGlucoseHintImperial": "напр. 95",
+  "vitalsGlucoseHintMetric": "напр. 5.3",
+  "notNow": "Не сейчас",
+  "enterValidPositiveNumber": "Введите корректное положительное число.",
+  "logHealthMetric": "Записать показатель",
+  "metricSaved": "Показатель сохранён!",
+  "metricType": "Тип показателя",
+  "metricValueLabel": "Значение ({unit})",
+  "@metricValueLabel": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "metricNotesOptional": "Заметки (необязательно)",
+  "metricNotesPlaceholder": "Дополнительные заметки...",
+  "saveMetric": "Сохранить показатель",
+  "logMetricHintSteps": "напр. 8000",
+  "logMetricHintCalories": "напр. 350",
+  "logMetricHintDistanceImperial": "напр. 3.2",
+  "logMetricHintDistanceMetric": "напр. 5.2",
+  "logMetricHintActiveTime": "напр. 45",
+  "logMetricHintWeightImperial": "напр. 165",
+  "logMetricHintWeightMetric": "напр. 72.5",
+  "logMetricHintWater": "напр. 2000",
+  "upgradeTrialTitle": "Разблокируйте все функции PHA Plus+",
+  "upgradeTrialBody1": "Полный контроль над здоровьем! Разблокируйте все премиум-функции PHA Plus+ и отслеживайте здоровье, активность, питание и медицинские показатели в реальном времени.",
+  "upgradeTrialBody2": "Будьте в курсе рисков и корректируйте образ жизни. Считайте калории без ограничений и получайте персональные рекомендации на основе ваших данных.",
+  "upgradeTagline": "Ваше здоровье. Ваш контроль. Всегда.",
+  "upgradeTitle": "Разблокировать все функции",
+  "upgradeSubtitle": "Полная мощь вашего персонального помощника здоровья",
+  "upgradeHpBanner": "У вас {hp} HP! Обменяйте на скидку {percent}% на 6-месячный или годовой план.",
+  "@upgradeHpBanner": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "upgradeTableFeature": "ФУНКЦИЯ",
+  "upgradeTableFree": "БЕСПЛ.",
+  "upgradeTablePlus": "PLUS+",
+  "upgradeFeatAnalysisUploads": "Загрузка анализов",
+  "upgradeFeatMealCalories": "Проверка калорий еды",
+  "upgradeFeatPagesPerFile": "Страниц в файле",
+  "upgradeFeatPsychoTest": "PsychoTest",
+  "upgradeFeatTreatment": "График лечения",
+  "upgradeFeatBadHabits": "Проверка вредных привычек",
+  "upgradeFeatActivity": "Физ. активность",
+  "upgradeFeatAiConsult": "ИИ-консультация",
+  "upgradeFeatWellness": "Проверка самочувствия",
+  "upgradeVal2Files": "2 файла",
+  "upgradeVal2PerDay": "2 / 24ч",
+  "upgradeVal2Pages": "2 стр.",
+  "upgradeValUnlimited": "Безлимит",
+  "upgradeValLocked": "Заблок.",
+  "upgradeValFullAccess": "Полный доступ",
+  "upgradeValIncluded": "Включено",
+  "planMonthly": "Ежемесячно",
+  "planBilledMonthly": "Оплата ежемесячно.",
+  "planSemiannual": "6 месяцев",
+  "planAnnual": "Годовой",
+  "planHpDiscountNote": "Скидка 20% HP применена.",
+  "planSave17": "Экономия ~17%.",
+  "planSave42": "Экономия ~42%.",
+  "planPerMonth": "/мес",
+  "planPer6Mo": "/6мес",
+  "planPerYear": "/год",
+  "planBestBadge": "ЛУЧШ.",
+  "psychoTestPromoBody": "Углублённая самооценка уровня стресса, психосоматических паттернов и показателей ментального здоровья.",
+  "psychoQuestionOfBlock": "В{current} из {total}",
+  "@psychoQuestionOfBlock": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "psychoStressLevelTitle": "Уровень стресса: {label}",
+  "@psychoStressLevelTitle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisNoData": "Данные о здоровье не найдены. Сначала запишите показатели.",
+  "analysisAllSolid": "Все факторы Индекса здоровья в порядке. Продолжайте записывать показатели, еду и активность.",
+  "syncPlatformOnly": "Синхронизация активности доступна только на iOS и Android.",
+  "syncPermissionDenied": "Разрешение на активность не предоставлено.",
+  "syncReadFailed": "Не удалось прочитать данные активности. Включите Шаги и Дистанцию в настройках Здоровья.",
+  "aiDocNoOnboardingData": "Данные онбординга не найдены. Сначала завершите настройку профиля.",
+  "activityYourProgramFallback": "ваша программа",
+  "trialSevenDayFree": "7 дней бесплатно",
+  "uploadImageFormats": "JPG, PNG, GIF",
+  "mealSaveFailed": "Не удалось сохранить: {error}",
+  "@mealSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "mealCaloriesShort": "{n} ккал",
+  "@mealCaloriesShort": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "treatmentDosesDaily": "{n}× в день · {times}",
+  "@treatmentDosesDaily": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "times": {
+        "type": "String"
+      }
+    }
+  },
+  "notifMorningFallback": "Доброе утро! Запишите показатели и проверьте Индекс здоровья.",
+  "notifEveningFallback": "Вечерняя проверка: как прошли ваши цели сегодня?",
+  "notifChannelName": "Ежедневные советы",
+  "notifChannelDesc": "Утренние и вечерние напоминания",
+  "notifMedicationTitle": "Лекарство: {name}",
+  "@notifMedicationTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notifMedicationBody": "Примите {name}",
+  "@notifMedicationBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notifActivityTitle": "Проверка физ. активности",
+  "notifActivityBody": "Выполнили ли вы {label} сегодня?",
+  "@notifActivityBody": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "notifIncompleteAssessmentsTitle": "Пройдите проверки здоровья",
+  "notifIncompleteAssessmentsBody": "Пожалуйста, пройдите: {items}. Это улучшит оценку вашего индекса здоровья.",
+  "@notifIncompleteAssessmentsBody": {
+    "placeholders": {
+      "items": {
+        "type": "String"
+      }
+    }
+  },
+  "notifActivitySaved": "Сохранено: {answer} — Индекс здоровья обновлён",
+  "@notifActivitySaved": {
+    "placeholders": {
+      "answer": {
+        "type": "String"
+      }
+    }
+  },
+  "notifDoseLabel": "Доза {current} из {total} — ",
+  "@notifDoseLabel": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "validationBpCheck": "Проверьте значения АД.",
+  "validationBpRange": "Проверьте АД ({sysMin}–{sysMax} / {diaMin}–{diaMax} мм рт. ст.).",
+  "@validationBpRange": {
+    "placeholders": {
+      "sysMin": {
+        "type": "int"
+      },
+      "sysMax": {
+        "type": "int"
+      },
+      "diaMin": {
+        "type": "int"
+      },
+      "diaMax": {
+        "type": "int"
+      }
+    }
+  },
+  "validationBpDiaLower": "Диастолическое должно быть ниже систолического.",
+  "validationGlucoseEnter": "Введите значение глюкозы.",
+  "validationGlucoseRangeMgdl": "Глюкоза {min}–{max} мг/дл.",
+  "@validationGlucoseRangeMgdl": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "validationGlucoseRangeMmol": "Глюкоза {min}–{max} ммоль/л.",
+  "@validationGlucoseRangeMmol": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "validationWeightEnter": "Введите корректный вес.",
+  "validationWeightRange": "Вес {min}–{max} кг.",
+  "@validationWeightRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "validationHeightEnter": "Введите корректный рост.",
+  "validationHeightRange": "Рост {min}–{max} см.",
+  "@validationHeightRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "validationAgeEnter": "Введите корректный возраст.",
+  "validationAgeRange": "Возраст {min}–{max}.",
+  "@validationAgeRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "psychoQ1": "Как часто вы чувствовали себя перегруженным или не могли контролировать важные вещи?",
+  "psychoQ2": "Как часто у вас физические симптомы (головная боль, напряжение, усталость) из-за стресса?",
+  "psychoQ3": "Как часто у вас бывают проблемы со сном?",
+  "psychoQ4": "Как часто вы чувствуете тревогу или беспокойство?",
+  "psychoQ5": "Как часто вам трудно расслабиться?",
+  "psychoQ6": "У вас часто бывает:",
+  "psychoQ7": "Усиливаются ли симптомы после стресса?",
+  "psychoQ8": "У вас бывает:",
+  "psychoQ9": "Есть ли проблемы с ЖКТ:",
+  "psychoQ10": "Бывает ли одышка?",
+  "psychoQ11": "Есть ли хроническая усталость?",
+  "psychoQ12": "Есть ли мышечное напряжение?",
+  "psychoQ13": "Усиливаются ли симптомы при конфликтах или тревоге?",
+  "psychoQ14": "Вы склонны:",
+  "psychoQ15": "Вы часто:",
+  "psychoQ16": "Вам трудно сказать «нет»?",
+  "psychoQ17": "Есть ли страх потерять контроль?",
+  "psychoQ18": "Чувствуете ли постоянное внутреннее напряжение даже в спокойной обстановке?",
+  "psychoQ19": "Чувствуете ли одиночество несмотря на общение?",
+  "psychoQ20": "Часто ли «держите всё в себе»?",
+  "psychoSubHeadaches": "Головные боли",
+  "psychoSubMuscleSpasms": "Мышечные спазмы",
+  "psychoSubNeckPain": "Боль в шее",
+  "psychoSubChestPressure": "Давление в груди",
+  "psychoSubStomachHeaviness": "Тяжесть в желудке",
+  "psychoSubTachycardia": "Тахикардия",
+  "psychoSubBpSurges": "Скачки давления",
+  "psychoSubSweating": "Потливость",
+  "psychoSubTrembling": "Дрожь",
+  "psychoSubBloating": "Вздутие",
+  "psychoSubHeartburn": "Изжога",
+  "psychoSubSpasms": "Спазмы",
+  "psychoSubDiarrheaConstipation": "Диарея / запор",
+  "psychoSubKeepControl": "Держать всё под контролем",
+  "psychoSubAvoidConflicts": "Избегать конфликтов",
+  "psychoSubAccumulateEmotions": "Копить эмоции",
+  "psychoSubTakeResponsibility": "Брать ответственность за всех",
+  "psychoSubWorkOvertime": "Работать сверхурочно",
+  "psychoSubDontRest": "Не отдыхать",
+  "psychoSubFeelGuilty": "Чувствовать вину",
+  "clinicalCategoryHealthyWeight": "Здоровый диапазон веса",
+  "clinicalCategoryMetabolic": "Метаболическое здоровье",
+  "clinicalCategoryCombinedRisk": "Общий сердечно-сахарный риск",
+  "clinicalCategoryWhatMeans": "Что это значит",
+  "clinicalCategoryForAge": "Для вашего возраста",
+  "clinicalIdealWeightNote": "Это лишь примерная оценка здорового веса. Лучший диапазон зависит от мышц, телосложения и самочувствия.",
+  "clinicalAroundKg": "Около {kg} кг",
+  "@clinicalAroundKg": {
+    "placeholders": {
+      "kg": {
+        "type": "int"
+      }
+    }
+  },
+  "clinicalBpHighNormalMsg": "Показатель чуть выше нормы. Уменьшите соль, будьте активны и измерьте АД в другой день.",
+  "clinicalWarningSigns": "{n} тревожных признаков",
+  "@clinicalWarningSigns": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "clinicalLookingOkay": "Выглядит нормально",
+  "clinicalRiskVeryHigh": "Высокий — действуйте",
+  "clinicalRiskElevated": "Повышенный",
+  "clinicalRiskModerate": "Умеренный",
+  "clinicalRiskLow": "Низкий",
+  "clinicalGlucoseTooLow": "Слишком низко",
+  "clinicalGlucoseNormal": "Норма",
+  "clinicalGlucosePrediabetes": "Преддиабет",
+  "clinicalGlucoseDiabetes": "Диабетический диапазон",
+  "clinicalBpVeryHigh": "Очень высокое — обратитесь к врачу",
+  "clinicalBpHighGrade2": "Высокое (2 ст.)",
+  "clinicalBpHigh": "Высокое",
+  "clinicalBpALittleHigh": "Чуть выше нормы",
+  "clinicalBpLow": "Низкое",
+  "clinicalBmiActionOver": " Уменьшите порции, ешьте больше овощей, гуляйте. Снижение веса на 5–7% уже помогает сердцу и сахару.",
+  "clinicalBmiActionNormal": " Небольшие привычки (шаги + белок) помогают не набирать вес.",
+  "clinicalBmiActionUnder": " Ешьте больше белка и обратитесь к врачу, если похудение не планировалось.",
+  "activityCheckinSavedHint": "Ваш ответ сохранён в истории здоровья.",
+  "notifMorningFallbackDetailed": "Откройте PHA: шаги за вчера, калории приёмов пищи и совет по питанию на сегодня.",
+  "notifEveningOpenApp": "Откройте PHA для вечернего чек-ина — сравните сегодня с вчера.",
+  "notifEveningStepsToday": "Сегодня вы записали {today} шагов. Продолжайте привычку — откройте PHA для полного чек-ина.",
+  "@notifEveningStepsToday": {
+    "placeholders": {
+      "today": {
+        "type": "int"
+      }
+    }
+  },
+  "notifEveningStepsUp": "Сегодня {today} шагов — больше, чем вчера ({yesterday}). Отличный прогресс!",
+  "@notifEveningStepsUp": {
+    "placeholders": {
+      "today": {
+        "type": "int"
+      },
+      "yesterday": {
+        "type": "int"
+      }
+    }
+  },
+  "notifEveningStepsDown": "Сегодня {today} шагов — меньше, чем вчера ({yesterday}). Завтра снова в движение — даже короткая прогулка поможет.",
+  "@notifEveningStepsDown": {
+    "placeholders": {
+      "today": {
+        "type": "int"
+      },
+      "yesterday": {
+        "type": "int"
+      }
+    }
+  },
+  "notifActivityChannelDesc": "Ежедневное напоминание отметить выполнение тренировки",
+  "indexSummaryExcellent": "Отлично — продолжайте здоровые привычки.",
+  "indexSummaryGood": "У вас всё хорошо.",
+  "indexSummaryFair": "Есть зоны для внимания — небольшие ежедневные изменения помогают.",
+  "indexSummaryPoor": "Индекс здоровья требует внимания — проверьте показатели и привычки.",
+  "validationGlucoseOutOfRange": "Глюкоза вне допустимого диапазона.",
+  "validationWeightOutOfRange": "Вес вне допустимого диапазона.",
+  "validationStepsUnrealistic": "Количество шагов выглядит нереалистично.",
+  "validationCaloriesUnrealistic": "Калории выглядят нереалистично.",
+  "validationWaterUnrealistic": "Потребление воды выглядит нереалистично.",
+  "validationActiveTimeRange": "Активное время должно быть 0–1440 минут.",
+  "validationDistanceUnrealistic": "Дистанция выглядит нереалистично.",
+  "mealQualityNoMeals": "Приёмы пищи не записаны",
+  "mealQualityHeavyDay": "Тяжёлый день",
+  "mealQualityGoodChoices": "Хороший выбор",
+  "mealQualityOverTarget": "Выше цели",
+  "mealQualityUnderTarget": "Ниже цели",
+  "mealQualityBalanced": "Сбалансировано",
+  "mealQualityHeavyOverKcal": "Примерно на {over} ккал больше цели ~{target} ккал.",
+  "@mealQualityHeavyOverKcal": {
+    "placeholders": {
+      "over": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealQualityHeavyHighCal": "Несколько высококалорийных блюд сегодня — облегчите следующие приёмы пищи.",
+  "mealQualityGoodUnderKcal": "Хороший день — ~{under} ккал ниже цели ~{target} ккал.",
+  "@mealQualityGoodUnderKcal": {
+    "placeholders": {
+      "under": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealQualityGoodOnTrack": "В пределах цели ~{target} ккал.",
+  "@mealQualityGoodOnTrack": {
+    "placeholders": {
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealQualityOverKcal": "Примерно на {over} ккал больше ~{target} ккал — выбирайте более лёгкие блюда.",
+  "@mealQualityOverKcal": {
+    "placeholders": {
+      "over": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealQualityUnderKcal": "~{under} ккал ниже цели — убедитесь, что все приёмы пищи записаны.",
+  "@mealQualityUnderKcal": {
+    "placeholders": {
+      "under": {
+        "type": "int"
+      }
+    }
+  },
+  "mealQualityBalancedHint": "Потребление ~{total} ккал при цели ~{target} ккал сегодня.",
+  "@mealQualityBalancedHint": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealQualityTargetLine": "{label} · цель ~{target} ккал",
+  "@mealQualityTargetLine": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealCategoryExcellent": "Отлично",
+  "mealCategorySatisfactory": "Удовлетворительно",
+  "mealCategoryAttention": "Внимание",
+  "mealFallbackName": "Блюдо",
+  "mealOneServing": "одна порция",
+  "adviceProtectWhatWorks": "Сохраняйте то, что работает: активность и питание сегодня, регулярно проверяйте АД и глюкозу.",
+  "adviceBloodPressure1": "Давление: измеряйте в одно время, сидя и в покое. Меньше соли, больше ходьбы — образ жизни важнее таблеток.",
+  "adviceBloodPressure2": "Если при повторных измерениях ≥140/90 — обратитесь к врачу с домашним журналом.",
+  "adviceSmoking": "Курение: назначьте день отказа, расскажите близким, уберите сигареты. Обновите «Вредные привычки» в Plus+ после сокращения.",
+  "adviceGlucose1": "Глюкоза: вода вместо сладких напитков, клетчатка и белок на завтрак, 10–15 минут ходьбы после основного приёма пищи.",
+  "adviceGlucose2": "Если натощак глюкоза высокая — попросите анализы (HbA1c), а не полагайтесь на одно измерение.",
+  "adviceBmi1": "Вес: мягкие еженедельные изменения, не жёсткие диеты — белок, овощи и шаги из «Аналитики».",
+  "adviceBmi2": "Записывайте приёмы пищи в «Калории», чтобы советы соответствовали реальному рациону.",
+  "adviceActivity": "Активность: два фиксированных слота для ходьбы (после обеда и вечером). Отмечайте вечерний чек-ин активности.",
+  "adviceAlcohol": "Алкоголь: сначала дни без алкоголя, затем меньше порций — это улучшает сон и давление на следующий день.",
+  "adviceNutrition": "Питание: улучшите один приём пищи — больше овощей и белка, меньше переработанных перекусов.",
+  "adviceWellness": "Самочувствие: стабильный сон и короткий блок восстановления (дыхание, растяжка, свет). Повторите Wellness Check через несколько дней.",
+  "advicePsychotest": "PsychoTest: снижайте стрессоры и используйте короткие успокаивающие практики. Повторите тест, когда станет спокойнее.",
+  "adviceScreenTime": "Экран: жёсткий вечерний лимит и замена прокрутки движением — это помогает активности и самочувствию.",
+  "adviceHeartRate1": "ЧСС: откройте «ЧСС и ритм» после ношения Apple Watch. Спокойные вечера и регулярный сон часто улучшают пульс в покое.",
+  "adviceHeartRate2": "Если пульс в покое несколько дней повышен или продолжаются оповещения о нерегулярном ритме — обсудите это с врачом и отмечайте самочувствие.",
+  "adviceStress": "Повышенный пульс без заметной активности чаще говорит о стрессе или плохом восстановлении — сон, короткие прогулки и повторная проверка самочувствия помогут.",
+  "errorWithMessage": "Ошибка: {message}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "aiOfflineSleep1": "Достаточный сон важен для здоровья. Стремитесь к 7–9 часам. Поддерживайте режим и расслабляющий ритуал перед сном.",
+  "aiOfflineSleep2": "Сон влияет на иммунитет, настроение и обмен веществ. Ограничьте экран перед сном и кофеин вечером.",
+  "aiOfflineExercise1": "Регулярная активность — основа здоровья. Стремитесь к 150 минутам умеренных нагрузок в неделю.",
+  "aiOfflineExercise2": "Движение улучшает сердце, настроение и энергию. Начните с приятных занятий и постепенно увеличивайте нагрузку.",
+  "aiOfflineStress1": "Управление стрессом важно. Попробуйте медитацию, дыхание или расслабляющие занятия.",
+  "aiOfflineStress2": "Высокий стресс влияет на тело и психику. Поговорите с близким или обратитесь за поддержкой.",
+  "aiOfflineNutrition1": "Сбалансированное питание с овощами и цельными продуктами поддерживает здоровье. Пейте воду, меньше переработанной еды.",
+  "aiOfflineNutrition2": "Хорошее питание даёт энергию. При необходимости проконсультируйтесь с диетологом.",
+  "aiOfflineWeight1": "Здоровый вес — баланс питания и движения. Малые устойчивые изменения эффективнее резких диет.",
+  "aiOfflineWeight2": "Вес — лишь один показатель. Сосредоточьтесь на самочувствии и привычках, а не только на цифрах.",
+  "aiOfflineDefault1": "Отличный вопрос! Баланс питания, движение, сон и управление стрессом — основа здоровья.",
+  "aiOfflineDefault2": "Заботьтесь о теле и психике. Не стесняйтесь обращаться к врачам за персональными советами.",
+  "clinicalBmiValue": "ИМТ {bmi}",
+  "@clinicalBmiValue": {
+    "placeholders": {
+      "bmi": {
+        "type": "String"
+      }
+    }
+  },
+  "clinicalRecMetabolicCluster": "Несколько тревожных признаков вместе (вес, давление или сахар). Снизьте вес по возможности, больше овощей и меньше соли, гуляйте почти каждый день и попросите врача проверить холестерин и сахар.",
+  "clinicalRecCombinedHigh": "Повышено больше одного риска. Запишитесь на осмотр — врач проверит давление, сахар и холестерин.",
+  "clinicalRecWeightLoss5to7": "Стремитесь к мягкому снижению веса на 5–7% за несколько месяцев — это часто улучшает давление и сахар.",
+  "clinicalRecPrediabetes": "Сахар в диапазоне преддиабета. Откажитесь от сладких напитков, гуляйте после еды и перепроверьте глюкозу натощак или HbA1c у врача.",
+  "clinicalRecHighBp": "Давление повышено. Меньше соли, больше движения, измеряйте АД дома несколько дней и покажите средние значения врачу.",
+  "clinicalMetabolicInsufficient": "Пока мало данных. Запишите давление, сахар и вес (и талию, если можете), чтобы увидеть метаболические риски.",
+  "clinicalMetabolicPresent": "Несколько факторов риска вместе (вес, давление или сахар). Это повышает риск сердца и диабета — обратитесь к врачу за анализами и улучшите питание и активность.",
+  "clinicalMetabolicPartial": "Есть несколько тревожных признаков. Улучшите питание, больше ходите и следите за весом — небольшие изменения очень помогают.",
+  "clinicalMetabolicOk": "По имеющимся данным метаболические риски под контролем.",
+  "clinicalRiskMsgHigh": "Несколько рисков повышены вместе. Это сильный сигнал улучшить питание и активность и пройти осмотр у врача.",
+  "clinicalRiskMsgModerate": "Общий риск для сердца и сахара выше идеала. Ежедневные шаги, меньше соли и сахара реально помогают.",
+  "clinicalRiskMsgLow": "Общий риск для сердца и сахара относительно низкий по весу, давлению и глюкозе.",
+  "clinicalFlagExtraWeightTitle": "Лишний вес",
+  "clinicalFlagExtraWeightBody": "Лишний вес повышает риск высокого сахара и проблем с сердцем. Меньше порции, больше овощей и ежедневные прогулки помогают.",
+  "clinicalFlagTripleTitle": "Вес + АД + сахар",
+  "clinicalFlagTripleBody": "Лишний вес, повышенное давление и сахар вместе сильно повышают риск диабета и сердца. Питание, ходьба и визит к врачу.",
+  "clinicalFlagLowWeightBpTitle": "Низкий вес + низкое АД",
+  "clinicalFlagLowWeightBpBody": "Низкий вес с низким давлением в старшем возрасте может означать хрупкость. Ешьте достаточно белка и спросите врача перед ограничением калорий.",
+  "clinicalFlagLeanDiabetesTitle": "Высокий сахар без лишнего веса",
+  "clinicalFlagLeanDiabetesBody": "Сахар высокий даже без заметного лишнего веса. Врач должен уточнить тип возможного диабета.",
+  "clinicalFlagYoungHtnTitle": "Высокое АД до 40",
+  "clinicalFlagYoungHtnBody": "Высокое давление в молодом возрасте нужно подтвердить повторными измерениями. Спросите врача, нет ли другой причины.",
+  "clinicalAgePediatric": "До 18 лет применяются детские процентили — взрослые пороги ИМТ/АД/глюкозы здесь не используются.",
+  "clinicalAge45WeightSugar": "После 45 лет лишний вес и повышенный сахар повышают риск диабета. Спросите врача о проверке сахара раз в 1–3 года.",
+  "clinicalAge60Systolic": "После 60 верхнее давление часто растёт первым. Ведите домашние средние и показывайте их врачу.",
+  "clinicalAge65Target": "После 65 многие стремятся к давлению ниже 140/90, если чувствуют себя хорошо. Врач может задать другую цель при хрупкости.",
+  "clinicalAgeYoungDiabetesLean": "До 40 лет при высоком сахаре и нормальном весе — обратитесь к врачу, чтобы уточнить тип диабета.",
+  "clinicalBpOlderAdultSuffix": "У пожилых верхнее число часто растёт первым — следите за этим трендом и делитесь домашними средними с врачом.",
+  "notifMorningShort": "Вчера: {steps} шагов (цель {goal}), приёмы пищи {kcal} ккал. Индекс здоровья {score}/100 — {status}.",
+  "notifEveningShort": "Сегодня {today} шагов, вчера {yesterday}. Индекс здоровья {score}/100 — {status}.",
+  "notifOpenHealthInsights": "Открыть Аналитику здоровья",
+  "mealIntakeChartTitle": "Калории из еды",
+  "mealZoneDeficit": "≤{max} ккал — дефицит (похудение)",
+  "mealZoneModerate": "{min}–{max} ккал — средняя зона",
+  "mealZoneSurplus": ">{max} ккал — профицит (риск набора веса)",
+  "aiDocUploadedAnalysis": "Загружен файл анализа: {fileName}",
+  "uploadDicom": "DICOM (медицинские снимки)",
+  "fileTypeDicom": "DICOM (.dcm) — углублённый ИИ-разбор на патологии",
+  "uploadAnalyzingDicom": "Анализ DICOM с Ai Doc — тщательная проверка патологий…",
+
+  "actionHeartRate": "ЧСС и ритм",
+  "actionHeartRateDesc": "Проверка сердца с умных часов",
+  "unitBpm": "уд/мин",
+  "unitMs": "мс",
+  "hrEvents": "событий",
+  "hrCurrent": "Пульс",
+  "hrResting": "В покое",
+  "hrWalking": "При ходьбе",
+  "hrHrv": "ВСР",
+  "hrAvg": "Средний пульс",
+  "hrStatus": "Статус",
+  "hrStatusNormal": "Норма",
+  "hrStatusAttention": "Внимание",
+  "hrStatusRisk": "Риск",
+  "hrNormRange": "Диапазон в покое",
+  "hrNormRangeShort": "{low}–{high} уд/мин",
+  "hrReading": "Считывание данных сердца…",
+  "hrReadingHint": "Синхронизация ЧСС и ритма с Apple Watch через Apple Здоровье.",
+  "hrLive": "Сейчас",
+  "hrStale": "Последнее",
+  "hrUpdatedJustNow": "Запись только что",
+  "hrUpdatedSecondsAgo": "Запись {seconds} с назад",
+  "hrUpdatedMinutesAgo": "Запись {minutes} мин назад",
+  "hrRefreshSame": "В Apple Здоровье ещё нет более новой записи",
+  "hrRefreshOk": "Загружена последняя запись из Apple Здоровье",
+  "hrStaleHint": "Нет данных о пульсе с устройства. Наденьте часы или фитнес-браслет.",
+  "hrNoDeviceData": "Нет данных о пульсе с устройства. Наденьте часы или фитнес-браслет.",
+  "hrNeedPermission": "Нужен доступ к Apple Здоровье",
+  "hrNeedPermissionBody": "Разрешите PHA читать ЧСС, ЧСС в покое, ВСР и нерегулярный ритм из Apple Здоровье.",
+  "hrGrantAccess": "Разрешить доступ",
+  "hrNoData": "Пока нет данных о сердце. Носите Apple Watch и нажмите «Обновить». Убедитесь, что ЧСС включена в Apple Здоровье.",
+  "hrRefresh": "Обновить",
+  "hrExport": "Экспорт",
+  "hrExportTitle": "Сводка PHA: ЧСС и ритм",
+  "hrExportCopied": "Сводка скопирована",
+  "hrDisclaimer": "Это не медицинское изделие. Данные с умных часов не заменяют консультацию врача. При ухудшении самочувствия обратитесь к специалисту.",
+  "hrChartTitle": "Динамика пульса",
+  "hrRange24h": "24ч",
+  "hrRange7d": "7д",
+  "hrRange30d": "30д",
+  "hrNoChartData": "Нет данных за этот период",
+  "hrWhatItMeans": "Что это значит?",
+  "hrWhatItMeansBody": "ЧСС в покое и ВСР отражают стресс, восстановление и форму. Резкие скачки или несколько дней подряд с высоким пульсом требуют внимания.",
+  "hrEcgTitle": "Недавние ЭКГ (Apple Watch)",
+  "hrEcgSinusRhythm": "Синусовый ритм",
+  "hrEcgAtrialFibrillation": "Фибрилляция предсердий",
+  "hrEcgLowOrHighHr": "Низкая или высокая ЧСС",
+  "hrEcgInconclusive": "Неопределённо",
+  "hrEcgNotSet": "Без классификации",
+  "hrIrregularRhythm": "Оповещения о нерегулярном ритме",
+  "hrTrendImproving": "Улучшение",
+  "hrTrendWorsening": "Ухудшение",
+  "hrTrendStable": "Стабильно",
+  "hrTrendUnknown": "Тренд",
+  "hrExplainNormal": "Ваша ЧСС в покое в здоровом диапазоне.",
+  "hrExplainHighResting": "ЧСС в покое {bpm} уд/мин — выше обычного диапазона до {max}. Стресс, болезнь, кофеин или недосып могут повышать её.",
+  "hrExplainLowResting": "ЧСС в покое {bpm} уд/мин — ниже обычного минимума {min}. У спортсменов часто ниже; обратитесь к врачу при головокружении или слабости.",
+  "hrExplainLowHrv": "Вариабельность ритма низкая. Это может означать стресс или недостаточное восстановление — уделите внимание сну и отдыху.",
+  "hrExplainElevatedStreak": "ЧСС в покое несколько дней в диапазоне 80–95 уд/мин. Возможны стресс, перетренированность или начало болезни.",
+  "hrExplainSpike": "ЧСС в покое заметно выросла изо дня в день. Отметьте самочувствие и проверьте завтра.",
+  "hrExplainIrregular": "Apple Watch сообщила о нерегулярном ритме. Это не диагноз — обсудите с врачом, если уведомления продолжаются или вы плохо себя чувствуете.",
+  "hrAlertRiskTitle": "Тревога по пульсу",
+  "hrAlertAttentionTitle": "Повышенная ЧСС в покое",
+  "hrAlertGenericBody": "ЧСС в покое стабильно в диапазоне 80–95 уд/мин или растёт изо дня в день. Откройте «ЧСС и ритм» для подробностей.",
+  "hrRestingChartTitle": "ЧСС в покое",
+  "hrAvgResting": "Ср. {bpm} уд/мин",
+  "hrZoneNormal": "Зелёный — {low}–{high} уд/мин (норма)",
+  "hrZoneAttention": "Жёлтый — лёгкое отклонение",
+  "hrZoneRisk": "Красный — значительное отклонение / риск"
+}

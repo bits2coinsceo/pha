@@ -10,6 +10,8 @@ import flutter_local_notifications
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+    // Must register BG tasks before launch returns (Apple requirement).
+    MorningPushPrep.registerBackgroundTask()
     // Do NOT register plugins or set UNUserNotificationCenter.delegate here.
     // With FlutterImplicitEngine / UIScene, the engine may not be ready yet when
     // iOS delivers a cold-start notification tap — doing that too early can crash.
@@ -22,6 +24,12 @@ import flutter_local_notifications
       GeneratedPluginRegistrant.register(with: registry)
     }
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    LiveHeartRatePlugin.register(
+      with: engineBridge.applicationRegistrar.messenger()
+    )
+    MorningPushPrep.register(
+      with: engineBridge.applicationRegistrar.messenger()
+    )
     if #available(iOS 10.0, *) {
       UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
     }

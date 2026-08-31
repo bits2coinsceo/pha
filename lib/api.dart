@@ -275,6 +275,9 @@ class ApiClient {
         return MediaType('image', 'heif');
       case '.pdf':
         return MediaType('application', 'pdf');
+      case '.dcm':
+      case '.dicom':
+        return MediaType('application', 'dicom');
       default:
         // Meal photos from image_picker are almost always JPEG even when
         // the temp path has an unusual suffix.

@@ -18,6 +18,8 @@ import '../theme.dart';
 import '../theme_mode.dart';
 import '../units.dart';
 import '../widgets.dart';
+import '../widgets/language_picker.dart';
+import '../l10n/l10n_ext.dart';
 import 'onboarding_widgets.dart';
 
 const _uuid = Uuid();
@@ -89,14 +91,14 @@ class _OnboardingPageState extends State<OnboardingPage>
 
   int get _level => hp < hpUnitsReward ? 1 : (hp < hpUnitsReward + hpBasicReward ? 2 : 3);
 
-  String get _levelTitle {
+  String _levelTitle(AppLocalizations l10n) {
     switch (_level) {
       case 1:
-        return 'Health Rookie';
+        return l10n.levelHealthRookie;
       case 2:
-        return 'Profile Builder';
+        return l10n.levelProfileBuilder;
       default:
-        return 'Vitals Pro';
+        return l10n.levelVitalsPro;
     }
   }
 
@@ -389,7 +391,7 @@ class _OnboardingPageState extends State<OnboardingPage>
 
   double? _parseWeightKg() {
     if (_weight.text.trim().isEmpty) return null;
-    final w = double.tryParse(_weight.text.trim());
+    final w = parseUserNumber(_weight.text);
     if (w == null) return null;
     if (isImperial) {
       if (w < 44 || w > 660) return null;
@@ -411,7 +413,7 @@ class _OnboardingPageState extends State<OnboardingPage>
       quest1Done = true;
       step = 2;
     });
-    _grantHp(hpUnitsReward, toast: 'Quest 1 complete!', badgeKey: 'units');
+    _grantHp(hpUnitsReward, toast: context.l10n.onboardingQuest1Complete, badgeKey: 'units');
   }
 
   Future<void> _submitGeneral() async {
@@ -421,23 +423,23 @@ class _OnboardingPageState extends State<OnboardingPage>
     final weightKg = _parseWeightKg();
 
     if (ageVal == null) {
-      setState(() => error = 'Enter your age to earn the Foundation badge.');
+      setState(() => error = context.l10n.onboardingErrorAge);
       return;
     }
     if (gender == null) {
-      setState(() => error = 'Select your gender.');
+      setState(() => error = context.l10n.onboardingErrorGender);
       return;
     }
     if (heightCm == null) {
       setState(() => error = isImperial
-          ? 'Enter height (ft 1–8, in 0–11).'
-          : 'Enter height between 50–250 cm.');
+          ? context.l10n.onboardingErrorHeightImperial
+          : context.l10n.onboardingErrorHeightMetric);
       return;
     }
     if (weightKg == null) {
       setState(() => error = isImperial
-          ? 'Enter weight between 44–660 lbs.'
-          : 'Enter weight between 20–300 kg.');
+          ? context.l10n.onboardingErrorWeightImperial
+          : context.l10n.onboardingErrorWeightMetric);
       return;
     }
 
@@ -474,7 +476,7 @@ class _OnboardingPageState extends State<OnboardingPage>
         step = 3;
         error = '';
       });
-      _grantHp(hpBasicReward, toast: 'Quest 2 crushed!', badgeKey: 'foundation');
+      _grantHp(hpBasicReward, toast: context.l10n.onboardingQuest2Complete, badgeKey: 'foundation');
     }
   }
 
@@ -489,14 +491,14 @@ class _OnboardingPageState extends State<OnboardingPage>
           (_systolic.text.trim().isNotEmpty || _diastolic.text.trim().isNotEmpty)) {
         if (_systolic.text.trim().isEmpty || _diastolic.text.trim().isEmpty) {
           setState(() {
-            error = 'Enter both BP values, or leave both empty.';
+            error = context.l10n.vitalsBpBothOrNone;
             saving = false;
           });
           return;
         }
         final sys = double.tryParse(_systolic.text.trim());
         final dia = double.tryParse(_diastolic.text.trim());
-        final bpErr = VitalValidation.bloodPressure(sys, dia);
+        final bpErr = VitalValidation.bloodPressure(sys, dia, context.l10n);
         if (bpErr != null) {
           setState(() {
             error = bpErr;
@@ -512,11 +514,12 @@ class _OnboardingPageState extends State<OnboardingPage>
       }
 
       if (_needGlucoseToday && _glucose.text.trim().isNotEmpty) {
-        final g = double.tryParse(_glucose.text.trim());
+        final g = parseUserNumber(_glucose.text);
         double? glucoseMgdl;
         final gErr = VitalValidation.glucoseUserInput(
           g,
           isImperial ? 'imperial' : 'metric',
+          context.l10n,
           onValid: (mgdl) => glucoseMgdl = mgdl,
         );
         if (gErr != null) {
@@ -536,7 +539,7 @@ class _OnboardingPageState extends State<OnboardingPage>
 
     if (beforeSignUp) {
       if (_pendingAge == null || _pendingHeightCm == null || _pendingWeightKg == null) {
-        setState(() { error = 'Complete Quest 2 first.'; saving = false; });
+        setState(() { error = context.l10n.onboardingErrorQuest2First; saving = false; });
         return;
       }
       await OnboardingPrefs.complete(
@@ -571,7 +574,7 @@ class _OnboardingPageState extends State<OnboardingPage>
         step = 4;
       });
       if (bonusHp > 0) {
-        _grantHp(bonusHp, toast: 'Bonus quest done!');
+        _grantHp(bonusHp, toast: context.l10n.onboardingBonusComplete);
       }
       setState(() => _badges['champion'] = true);
     }
@@ -581,6 +584,7 @@ class _OnboardingPageState extends State<OnboardingPage>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: C.gray50,
       body: Stack(
@@ -601,7 +605,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                       OnboardingGameHud(
                         hp: hp,
                         level: _level,
-                        levelTitle: _levelTitle,
+                        levelTitle: _levelTitle(l10n),
                         power: _power,
                       ),
                       SizedBox(height: 8),
@@ -633,6 +637,7 @@ class _OnboardingPageState extends State<OnboardingPage>
   }
 
   Widget _questHeader() {
+    final l10n = context.l10n;
     return Column(
       children: [
         OnboardingQuestTrail(
@@ -644,11 +649,11 @@ class _OnboardingPageState extends State<OnboardingPage>
         SizedBox(height: 14),
         OnboardingBadgeStrip(
           badges: [
-            (emoji: '🎯', label: 'Unit Pro', unlocked: _badges['units']!),
-            (emoji: '🏗', label: 'Foundation', unlocked: _badges['foundation']!),
-            (emoji: '♥', label: 'Heart Track', unlocked: _badges['heart']!),
-            (emoji: '💧', label: 'Sugar Sense', unlocked: _badges['glucose']!),
-            (emoji: '🏆', label: 'Champion', unlocked: _badges['champion']!),
+            (emoji: '🎯', label: l10n.badgeUnitPro, unlocked: _badges['units']!),
+            (emoji: '🏗', label: l10n.badgeFoundation, unlocked: _badges['foundation']!),
+            (emoji: '♥', label: l10n.badgeHeartTrack, unlocked: _badges['heart']!),
+            (emoji: '💧', label: l10n.badgeSugarSense, unlocked: _badges['glucose']!),
+            (emoji: '🏆', label: l10n.badgeChampion, unlocked: _badges['champion']!),
           ],
         ),
       ],
@@ -662,35 +667,39 @@ class _OnboardingPageState extends State<OnboardingPage>
         _questHeader(),
         SizedBox(height: 12),
         Text(
-          beforeSignUp ? 'Quest 1: Choose your world' : 'Pick your units',
+          beforeSignUp
+              ? context.l10n.onboardingQuest1TitleBefore
+              : context.l10n.onboardingQuest1TitleAfter,
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: C.gray900),
         ),
         SizedBox(height: 6),
         Text(
           beforeSignUp
-              ? 'Start your health journey — 3 quick quests, then sign up.'
-              : 'Tailor charts and tips to your region.',
+              ? context.l10n.onboardingQuest1BodyBefore
+              : context.l10n.onboardingQuest1BodyAfter,
           textAlign: TextAlign.center,
           style: TextStyle(color: C.gray500, fontSize: 14, height: 1.4),
         ),
         SizedBox(height: 16),
         OnboardingQuestCard(
-          title: 'Quest 1 · Measurement realm',
-          subtitle: 'Unlock charts in your language',
+          title: context.l10n.onboardingQuest1CardTitle,
+          subtitle: context.l10n.onboardingQuest1CardSubtitle,
           reward: '+$hpUnitsReward HP',
           icon: Icons.public,
           accent: C.blue500,
         ),
         SizedBox(height: 16),
-        _unitOption('imperial', Icons.flag_outlined, 'Imperial', 'ft · lbs · mg/dL', C.neonCyan),
+        _unitOption('imperial', Icons.flag_outlined, context.l10n.imperial, context.l10n.imperialUnits, C.neonCyan),
         SizedBox(height: 10),
-        _unitOption('metric', Icons.public, 'Metric', 'cm · kg · mmol/L', C.neonMint),
+        _unitOption('metric', Icons.public, context.l10n.metric, context.l10n.metricUnits, C.neonMint),
         SizedBox(height: 16),
+        LanguagePicker(expanded: true),
+        SizedBox(height: 12),
         _themeToggle(),
         SizedBox(height: 12),
         PrimaryButton(
-          label: 'Start Quest 1 →',
+          label: context.l10n.startQuest1,
           cosmicGradient: true,
           icon: Icon(Icons.play_arrow_rounded, size: 20, color: C.white),
           onPressed: _completeQuest1,
@@ -717,7 +726,7 @@ class _OnboardingPageState extends State<OnboardingPage>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Theme',
+                  context.l10n.theme,
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -725,7 +734,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                   ),
                 ),
                 Text(
-                  themeMode.isDark ? 'Dark' : 'Light',
+                  themeMode.isDark ? context.l10n.themeDark : context.l10n.themeLight,
                   style: TextStyle(fontSize: 12, color: C.gray500),
                 ),
               ],
@@ -781,7 +790,7 @@ class _OnboardingPageState extends State<OnboardingPage>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(color: accent, borderRadius: BorderRadius.circular(8)),
-                child: Text('PICKED',
+                child: Text(context.l10n.picked,
                     style: TextStyle(
                         color: C.white, fontSize: 10, fontWeight: FontWeight.w800)),
               ),
@@ -792,6 +801,7 @@ class _OnboardingPageState extends State<OnboardingPage>
   }
 
   Widget _stepGeneral() {
+    final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -800,13 +810,13 @@ class _OnboardingPageState extends State<OnboardingPage>
         _backChip(),
         SizedBox(height: 4),
         Text(
-          'Quest 2: Build your avatar',
+          l10n.onboardingQuest2BuildAvatar,
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: C.gray900),
         ),
         SizedBox(height: 4),
         Text(
-          'Fill all 3 fields — earn +$hpBasicReward HP on complete.',
+          l10n.onboardingQuest2FillFields(hpBasicReward),
           textAlign: TextAlign.center,
           style: TextStyle(color: C.gray500, fontSize: 12),
         ),
@@ -822,7 +832,7 @@ class _OnboardingPageState extends State<OnboardingPage>
             Icon(Icons.stars_rounded, size: 15, color: C.amber500),
             SizedBox(width: 5),
             Text(
-              'Rewarded stats',
+              l10n.rewardedStats,
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
@@ -832,13 +842,13 @@ class _OnboardingPageState extends State<OnboardingPage>
           ],
         ),
         SizedBox(height: 6),
-        _gameField(Icons.cake_outlined, C.orange50, C.orange500, 'Age', 'years', true,
+        _gameField(Icons.cake_outlined, C.orange50, C.orange500, l10n.age, l10n.unitYearsLong, true,
             TextField(
               controller: _age,
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
               onChanged: (_) {},
-              decoration: appInput('e.g. 32'),
+              decoration: appInput(context.l10n.onboardingAgeHint),
             ),
             compact: true),
         SizedBox(height: 8),
@@ -846,8 +856,8 @@ class _OnboardingPageState extends State<OnboardingPage>
           Icons.straighten,
           C.sky50,
           C.sky500,
-          'Height',
-          isImperial ? 'ft & in' : 'cm',
+          l10n.height,
+          isImperial ? 'ft & in' : l10n.unitCm,
           true,
           isImperial
               ? Row(children: [
@@ -876,7 +886,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,
                   onChanged: (_) {},
-                  decoration: appInput('e.g. 175'),
+                  decoration: appInput(context.l10n.onboardingHeightHintMetric),
                 ),
           compact: true,
         ),
@@ -885,21 +895,21 @@ class _OnboardingPageState extends State<OnboardingPage>
           Icons.monitor_weight_outlined,
           C.blue50,
           C.blue500,
-          'Weight',
-          isImperial ? 'lbs' : 'kg',
+          l10n.weight,
+          isImperial ? l10n.unitLbs : l10n.unitKg,
           true,
           TextField(
             controller: _weight,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             textAlign: TextAlign.center,
             onChanged: (_) {},
-            decoration: appInput(isImperial ? 'e.g. 165' : 'e.g. 70'),
+            decoration: appInput(isImperial ? context.l10n.onboardingWeightHintImperial : context.l10n.onboardingWeightHintMetric),
           ),
           compact: true,
         ),
         SizedBox(height: 12),
         PrimaryButton(
-          label: saving ? 'Saving…' : 'Complete Quest 2 (+$hpBasicReward HP)',
+          label: saving ? l10n.saving : l10n.completeQuest2(hpBasicReward),
           color: C.teal600,
           icon: Icon(Icons.military_tech, size: 18, color: C.white),
           onPressed: saving ? null : _submitGeneral,
@@ -909,6 +919,7 @@ class _OnboardingPageState extends State<OnboardingPage>
   }
 
   Widget _stepAdvanced() {
+    final l10n = context.l10n;
     final hasBp = _systolic.text.trim().isNotEmpty || _diastolic.text.trim().isNotEmpty;
     final hasGlucose = _glucose.text.trim().isNotEmpty;
     final showBp = _needBpToday;
@@ -926,21 +937,21 @@ class _OnboardingPageState extends State<OnboardingPage>
             children: [
               Icon(Icons.arrow_back, size: 16, color: C.gray400),
               SizedBox(width: 4),
-              Text('Back to Quest 2', style: TextStyle(fontSize: 12, color: C.gray400)),
+              Text(l10n.onboardingBackToQuest2, style: TextStyle(fontSize: 12, color: C.gray400)),
             ],
           ),
         ),
         SizedBox(height: 8),
         Text(
-          'Quest 3: Power-up (bonus)',
+          l10n.onboardingQuest3PowerUp,
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: C.gray900),
         ),
         SizedBox(height: 6),
         Text(
           allLoggedToday
-              ? 'You already logged BP and glucose today. Come back tomorrow for your next reading.'
-              : 'Optional vitals — +$hpBpReward HP for BP, +$hpGlucoseReward HP for glucose. Once per day.',
+              ? l10n.onboardingQuest3BpDone
+              : l10n.onboardingQuest3Optional(hpBpReward, hpGlucoseReward),
           textAlign: TextAlign.center,
           style: TextStyle(color: C.gray500, fontSize: 13),
         ),
@@ -969,7 +980,7 @@ class _OnboardingPageState extends State<OnboardingPage>
           SizedBox(height: 12),
         ],
         if (showBp) ...[
-          _gameField(Icons.monitor_heart_outlined, C.red50, C.red500, 'Blood pressure', 'mmHg', false,
+          _gameField(Icons.monitor_heart_outlined, C.red50, C.red500, l10n.bloodPressure, 'mmHg', false,
               Row(children: [
                 Expanded(
                   child: TextField(
@@ -977,7 +988,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                     keyboardType: TextInputType.number,
                     textAlign: TextAlign.center,
                     onChanged: (_) => setState(() {}),
-                    decoration: appInput('Sys'),
+                    decoration: appInput(l10n.onboardingSys),
                   ),
                 ),
                 SizedBox(width: 10),
@@ -987,26 +998,26 @@ class _OnboardingPageState extends State<OnboardingPage>
                     keyboardType: TextInputType.number,
                     textAlign: TextAlign.center,
                     onChanged: (_) => setState(() {}),
-                    decoration: appInput('Dia'),
+                    decoration: appInput(l10n.onboardingDia),
                   ),
                 ),
               ])),
           SizedBox(height: 14),
         ],
         if (showGlucose)
-          _gameField(Icons.water_drop_outlined, C.teal50, C.teal500, 'Blood glucose',
+          _gameField(Icons.water_drop_outlined, C.teal50, C.teal500, l10n.bloodGlucose,
               isImperial ? 'mg/dL' : 'mmol/L', false,
               TextField(
                 controller: _glucose,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 textAlign: TextAlign.center,
                 onChanged: (_) => setState(() {}),
-                decoration: appInput(isImperial ? 'e.g. 95' : 'e.g. 5.3'),
+                decoration: appInput(isImperial ? context.l10n.vitalsGlucoseHintImperial : context.l10n.vitalsGlucoseHintMetric),
               )),
         SizedBox(height: 20),
         if (!allLoggedToday)
           PrimaryButton(
-            label: saving ? 'Calculating rewards…' : 'Claim bonus & finish 🏆',
+            label: saving ? l10n.calculatingRewards : l10n.claimBonusFinish,
             color: C.amber600,
             icon: Icon(Icons.emoji_events, size: 18, color: C.white),
             onPressed: saving ? null : () => _finish(includeAdvanced: true),
@@ -1015,7 +1026,7 @@ class _OnboardingPageState extends State<OnboardingPage>
         TextButton(
           onPressed: saving ? null : () => _finish(includeAdvanced: false),
           child: Text(
-            'Skip bonus quest',
+            l10n.skipBonusQuest,
             style: TextStyle(color: C.gray600, fontWeight: FontWeight.w700, fontSize: 13),
           ),
         ),
@@ -1046,44 +1057,45 @@ class _OnboardingPageState extends State<OnboardingPage>
   }
 
   Widget _stepVictory() {
+    final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text('🎊', textAlign: TextAlign.center, style: TextStyle(fontSize: 56)),
         SizedBox(height: 8),
         Text(
-          'All quests complete!',
+          l10n.onboardingAllQuestsComplete,
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 26, fontWeight: FontWeight.w900, color: C.gray900),
         ),
         SizedBox(height: 8),
         Text(
-          'You earned $hp HP · Level $_level $_levelTitle',
+          l10n.onboardingEarnedHp(hp, _level, _levelTitle(l10n)),
           textAlign: TextAlign.center,
           style: TextStyle(color: C.teal400, fontWeight: FontWeight.w700, fontSize: 15),
         ),
         if (hp >= maxOnboardingHp) ...[
           SizedBox(height: 8),
           Text(
-            'Redeem your $maxOnboardingHp HP for $hpFirstPurchaseDiscountPercent% off your first 6-month or annual PHA Plus+ subscription.',
+            l10n.onboardingRedeemHp(maxOnboardingHp, hpFirstPurchaseDiscountPercent),
             textAlign: TextAlign.center,
             style: TextStyle(color: C.amber700, fontWeight: FontWeight.w600, fontSize: 13),
           ),
         ],
         if (vitalsBonus) ...[
           SizedBox(height: 6),
-          Text('Bonus vitals unlocked extra insights!',
+          Text(l10n.onboardingBonusVitals,
               textAlign: TextAlign.center,
               style: TextStyle(color: C.gray500, fontSize: 13)),
         ],
         SizedBox(height: 16),
         OnboardingBadgeStrip(
           badges: [
-            (emoji: '🎯', label: 'Unit Pro', unlocked: _badges['units']!),
-            (emoji: '🏗', label: 'Foundation', unlocked: _badges['foundation']!),
-            (emoji: '♥', label: 'Heart Track', unlocked: _badges['heart']!),
-            (emoji: '💧', label: 'Sugar Sense', unlocked: _badges['glucose']!),
-            (emoji: '🏆', label: 'Champion', unlocked: _badges['champion']!),
+            (emoji: '🎯', label: l10n.badgeUnitPro, unlocked: _badges['units']!),
+            (emoji: '🏗', label: l10n.badgeFoundation, unlocked: _badges['foundation']!),
+            (emoji: '♥', label: l10n.badgeHeartTrack, unlocked: _badges['heart']!),
+            (emoji: '💧', label: l10n.badgeSugarSense, unlocked: _badges['glucose']!),
+            (emoji: '🏆', label: l10n.badgeChampion, unlocked: _badges['champion']!),
           ],
         ),
         SizedBox(height: 20),
@@ -1095,7 +1107,7 @@ class _OnboardingPageState extends State<OnboardingPage>
           ),
           child: Column(
             children: [
-              Text('Health Power',
+              Text(l10n.healthPower,
                   style: TextStyle(color: C.white, fontWeight: FontWeight.w600)),
               SizedBox(height: 8),
               ClipRRect(
@@ -1108,14 +1120,14 @@ class _OnboardingPageState extends State<OnboardingPage>
                 ),
               ),
               SizedBox(height: 6),
-              Text('${(_power * 100).round()}% — ready for PHA',
+              Text(l10n.onboardingReadyForPha((_power * 100).round()),
                   style: TextStyle(color: C.white.withValues(alpha: 0.9), fontSize: 12)),
             ],
           ),
         ),
         SizedBox(height: 24),
         PrimaryButton(
-          label: beforeSignUp ? 'Create account and become healthy →' : 'Enter dashboard →',
+          label: beforeSignUp ? l10n.onboardingCreateAccount : l10n.onboardingEnterDashboard,
           color: C.teal600,
           icon: Icon(Icons.rocket_launch, size: 20, color: C.white),
           onPressed: _finishJourney,
@@ -1131,7 +1143,7 @@ class _OnboardingPageState extends State<OnboardingPage>
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.chevron_left, size: 18, color: C.gray400),
-          Text(isImperial ? 'Imperial' : 'Metric',
+          Text(isImperial ? context.l10n.imperial : context.l10n.metric,
               style: TextStyle(fontSize: 12, color: C.gray400, fontWeight: FontWeight.w600)),
         ],
       ),
@@ -1139,6 +1151,7 @@ class _OnboardingPageState extends State<OnboardingPage>
   }
 
   Widget _genderSelector() {
+    final l10n = context.l10n;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
@@ -1150,15 +1163,15 @@ class _OnboardingPageState extends State<OnboardingPage>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Your gender',
+            l10n.yourGender,
             style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: C.gray700),
           ),
           SizedBox(height: 8),
           Row(
             children: [
-              Expanded(child: _genderOption('male', 'Male', Icons.male)),
+              Expanded(child: _genderOption('male', l10n.male, Icons.male)),
               SizedBox(width: 8),
-              Expanded(child: _genderOption('female', 'Female', Icons.female)),
+              Expanded(child: _genderOption('female', l10n.female, Icons.female)),
             ],
           ),
         ],

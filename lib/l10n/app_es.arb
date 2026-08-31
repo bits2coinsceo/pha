@@ -1,0 +1,1468 @@
+{
+  "@@locale": "es",
+  "appTitle": "PHA — Asistente Personal de Salud",
+  "appNameShort": "PHA",
+  "personalHealthAssistant": "Asistente Personal de Salud",
+  "tagline": "Tu salud, nuestra prioridad",
+  "taglineBody": "Registra, analiza y mejora tu salud con PHA. Tus datos permanecen privados y seguros.",
+  "startingPha": "Iniciando PHA…",
+  "loading": "Cargando…",
+  "startupFailed": "Error al iniciar",
+  "noContent": "Sin contenido",
+  "retry": "Reintentar",
+  "cancel": "Cancelar",
+  "close": "Cerrar",
+  "done": "Listo",
+  "save": "Guardar",
+  "continueAction": "Continuar",
+  "back": "Atrás",
+  "next": "Siguiente",
+  "yes": "Sí",
+  "no": "No",
+  "ok": "OK",
+  "delete": "Eliminar",
+  "edit": "Editar",
+  "add": "Añadir",
+  "noDataYet": "Aún no hay datos",
+  "noData": "Sin datos",
+  "comingSoon": "Próximamente",
+  "navHome": "Inicio",
+  "navHistory": "Historial",
+  "navInsights": "Análisis",
+  "navProfile": "Perfil",
+  "quickActions": "Acciones rápidas",
+  "healthIndex": "Índice de salud",
+  "healthMetrics": "Métricas de salud",
+  "steps": "Pasos",
+  "calories": "Calorías",
+  "distance": "Distancia",
+  "activeTime": "Tiempo activo",
+  "weight": "Peso",
+  "height": "Altura",
+  "water": "Agua",
+  "bloodGlucose": "Glucosa en sangre",
+  "bloodPressure": "Presión arterial",
+  "bpSystolic": "PA sistólica",
+  "bpDiastolic": "PA diastólica",
+  "language": "Idioma",
+  "chooseLanguage": "Elige tu idioma",
+  "chooseLanguageSubtitle": "Puedes cambiarlo más tarde en Perfil.",
+  "languageEnglish": "English",
+  "languageSpanish": "Español",
+  "languageRussian": "Русский",
+  "languageChinese": "普通话",
+  "languageArabic": "العربية",
+  "theme": "Tema",
+  "themeLight": "Claro",
+  "themeDark": "Oscuro",
+  "appearance": "Apariencia",
+  "goodMorning": "Buenos días",
+  "goodAfternoon": "Buenas tardes",
+  "goodEvening": "Buenas noches",
+  "welcomeBack": "Bienvenido de nuevo",
+  "createYourAccount": "Crea tu cuenta",
+  "signIn": "Iniciar sesión",
+  "signUp": "Registrarse",
+  "createAccount": "Crear cuenta",
+  "signUpForFree": "Regístrate gratis",
+  "alreadyHaveAccount": "¿Ya tienes cuenta? Inicia sesión",
+  "dontHaveAccount": "¿No tienes cuenta? Regístrate",
+  "email": "Correo",
+  "password": "Contraseña",
+  "displayName": "Nombre visible",
+  "yourName": "Tu nombre",
+  "signOut": "Cerrar sesión",
+  "account": "Cuenta",
+  "agreement": "Acuerdo",
+  "privacyPolicy": "Política de privacidad",
+  "acceptAgreement": "Acepto el Acuerdo",
+  "acceptPrivacy": "Acepto la Política de privacidad",
+  "pleaseAcceptLegal": "Lee y acepta el Acuerdo y la Política de privacidad para continuar.",
+  "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
+  "featureTrackVitals": "Controla signos vitales y glucosa",
+  "featureAiInsights": "Análisis de salud con IA",
+  "featureSmartAnalysis": "Análisis inteligente",
+  "profileTitle": "Perfil",
+  "profileSubtitle": "Administra la configuración de tu cuenta",
+  "age": "Edad",
+  "heightCm": "Altura (cm)",
+  "weightKg": "Peso (kg)",
+  "saveChanges": "Guardar cambios",
+  "profileSaved": "Perfil guardado",
+  "historyTitle": "Historial de salud",
+  "historySubtitle": "Tus métricas de salud registradas a lo largo del tiempo",
+  "stepsChartTitle": "Pasos",
+  "stepsAvgPerDay": "Prom. {avg}/día",
+  "days7": "7 días",
+  "days30": "30 días",
+  "days90": "90 días",
+  "allFilter": "Todo",
+  "recordsCount": "{count} registros",
+  "recordCountOne": "1 registro",
+  "noMetricsYet": "Aún no hay métricas registradas",
+  "noMetricsHint": "Usa el botón Registrar en el panel para empezar a seguir tu salud.",
+  "insightsTitle": "Análisis de salud",
+  "insightsSubtitle": "Tendencias y patrones de tus datos de salud",
+  "avgHealthIndex": "Índice de salud promedio",
+  "avgWellnessScore": "Puntuación de bienestar promedio",
+  "stepTrend": "Tendencia de pasos",
+  "healthIndexHistory": "Historial del índice de salud",
+  "wellnessCheckHistory": "Historial de bienestar",
+  "stepActivity": "Actividad de pasos",
+  "lastNDays": "Últimos {count} días",
+  "minLabel": "Mín: {value}",
+  "avgLabel": "Prom: {value}",
+  "maxLabel": "Máx: {value}",
+  "noInsightsYet": "Aún no hay análisis",
+  "noInsightsHint": "Empieza a registrar métricas y completar chequeos de bienestar para ver análisis aquí.",
+  "noHealthIndexYet": "Aún no hay datos del índice de salud",
+  "noWellnessYet": "Aún no hay chequeos de bienestar. Prueba el Chequeo de bienestar en la pantalla de inicio.",
+  "healthAnalysis": "Análisis de salud",
+  "healthAnalysisSubtitle": "Misma puntuación que el Índice de salud, con hallazgos y consejos",
+  "analyze": "Analizar",
+  "reAnalyze": "Reanalizar",
+  "analyzing": "Analizando…",
+  "noAnalysisYet": "Aún no hay análisis. Pulsa Analizar para obtener una conclusión personalizada según tus métricas.",
+  "metricFindings": "Hallazgos de métricas",
+  "recommendations": "Recomendaciones",
+  "lastAnalyzed": "Último análisis: {when}",
+  "statusExcellent": "Excelente",
+  "statusGood": "Bueno",
+  "statusFair": "Regular",
+  "statusNeedsAttention": "Requiere atención",
+  "actionUploadAnalysis": "Subir análisis",
+  "actionUploadAnalysisDesc": "Analiza PDF o fotos",
+  "actionAiConsultation": "Consulta IA",
+  "actionAiConsultationDesc": "Chatea con Ai Doc",
+  "actionWellnessCheck": "Chequeo de bienestar",
+  "actionWellnessCheckDesc": "Evalúa tu bienestar",
+  "actionBadHabits": "Revisa tus malos hábitos",
+  "actionBadHabitsDesc": "Tabaco, alcohol y pantallas",
+  "actionPhysicalActivity": "Empezar actividad física",
+  "actionPhysicalActivityDesc": "Elige tu programa diario de ejercicio",
+  "actionMealCalories": "Calorías de la comida",
+  "actionMealCaloriesDesc": "Foto → calorías y consejos nutricionales",
+  "actionPsychoTest": "PsychoTest",
+  "actionPsychoTestDesc": "Evaluación de estrés y psicosomática",
+  "actionTreatmentSchedule": "Horario de tratamiento",
+  "actionTreatmentScheduleDesc": "Recordatorios de medicamentos y suplementos",
+  "actionFamilyHealth": "Salud familiar",
+  "actionFamilyHealthDesc": "Añade a tu familia para seguir su salud",
+  "logMetric": "Registrar",
+  "todayVitals": "Signos vitales de hoy",
+  "onboardingQuest1TitleBefore": "Misión 1: Elige tu mundo",
+  "onboardingQuest1TitleAfter": "Elige tus unidades",
+  "onboardingQuest1BodyBefore": "Empieza tu viaje de salud — 3 misiones rápidas y luego regístrate.",
+  "onboardingQuest1BodyAfter": "Adapta gráficos y consejos a tu región.",
+  "onboardingQuest1CardTitle": "Misión 1 · Sistema de medidas",
+  "onboardingQuest1CardSubtitle": "Desbloquea gráficos en tu idioma",
+  "imperial": "Imperial",
+  "imperialUnits": "ft · lbs · mg/dL",
+  "metric": "Métrico",
+  "metricUnits": "cm · kg · mmol/L",
+  "startQuest1": "Empezar misión 1 →",
+  "onboardingQuest2Title": "Misión 2: Sobre ti",
+  "onboardingQuest3Title": "Misión 3: Tus signos vitales",
+  "onboardingVictoryTitle": "¡Todo listo!",
+  "onboardingVictoryBody": "Tu viaje de salud comienza ahora.",
+  "activityYourPlan": "Tu plan de actividad",
+  "activityCurrentPlan": "Plan actual",
+  "activityWhatsIncluded": "Qué incluye",
+  "activityChangePlan": "Cambiar plan",
+  "activityStartTitle": "Empezar actividad física",
+  "activityChangeTitle": "Cambiar plan",
+  "activityChooseProgram": "Elige tu programa. Empieza tu actividad física diaria.",
+  "activityChangeHint": "Elige un nuevo programa. El recordatorio nocturno seguirá el nuevo plan.",
+  "activityKeepCurrent": "Mantener plan actual",
+  "activityProgramStarted": "Programa iniciado",
+  "activityProgramSaved": "Tu plan diario de actividad física está guardado. Cada noche te preguntaremos si lo completaste.",
+  "activityStartThis": "Empezar este programa",
+  "activitySwitchToThis": "Cambiar a este plan",
+  "activityChooseAnother": "Elegir otro",
+  "activityCurrentBadge": "Actual",
+  "activityStarter": "Principiante",
+  "activityStarterSubtitle": "Empieza tu actividad física diaria",
+  "activityAdvanced": "Avanzado",
+  "activityAdvancedSubtitle": "Gana constancia con series estructuradas",
+  "activityProfessional": "Profesional",
+  "activityProfessionalSubtitle": "Entrenamiento diario de alto volumen con peso corporal",
+  "activitySuperman": "Superman",
+  "activitySupermanSubtitle": "Entrenamiento vigoroso en el gimnasio",
+  "partially": "Parcialmente",
+  "notifications": "Notificaciones",
+  "phaPlus": "PHA Plus+",
+  "upgrade": "Mejorar",
+  "trialExpired": "Prueba caducada",
+  "unitSteps": "pasos",
+  "unitKcal": "kcal",
+  "unitMin": "min",
+  "unitMl": "ml",
+  "unitMmhg": "mmHg",
+  "healthOverviewToday": "Aquí tienes tu resumen de salud de hoy.",
+  "unitYears": "años",
+  "unitKg": "kg",
+  "unitCm": "cm",
+  "unitLbs": "lbs",
+  "unitMmol": "mmol/L",
+  "unitMgdl": "mg/dL",
+  "unitKm": "km",
+  "unitMiles": "miles",
+  "healthIndexAvgScore": "Prom. {score}/100",
+  "@healthIndexAvgScore": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "indexCardExcellent": "Excelente — sigue así.",
+  "indexCardGood": "Lo estás haciendo bien.",
+  "indexCardFair": "Algunas áreas necesitan atención.",
+  "indexCardNeedsAttention": "Necesita enfoque — revisa tus hábitos.",
+  "stepsMsgSedentary": "Poca actividad hoy. Empieza con 15 minutos de caminata: la constancia supera la intensidad.",
+  "stepsMsgBuilding": "Estás construyendo el hábito de caminar. Apunta a {goal}+ pasos para más beneficio cardiometabólico.",
+  "@stepsMsgBuilding": {
+    "placeholders": {
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "stepsMsgBaseline": "Actividad base sólida. Unos paseos más pueden alcanzar el rango {goal}+ que muchas guías consideran beneficioso.",
+  "@stepsMsgBaseline": {
+    "placeholders": {
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "stepsMsgStrong": "Nivel de actividad fuerte — bien por encima del sedentarismo. Mantén el ritmo; {goal} pasos es un bonus, no un deber.",
+  "@stepsMsgStrong": {
+    "placeholders": {
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "stepsMsgGoal": "Excelente actividad — estás cumpliendo el día clásico de {goal} pasos.",
+  "@stepsMsgGoal": {
+    "placeholders": {
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "stepsRangeSedentary": "0–{max} steps",
+  "@stepsRangeSedentary": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "stepsRangeBuilding": "{min}–{max} steps",
+  "@stepsRangeBuilding": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "stepsRangeBaseline": "{min}–{max} steps",
+  "@stepsRangeBaseline": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "stepsRangeStrong": "{min}–{max} steps",
+  "@stepsRangeStrong": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "stepsRangeGoal": "{min}+ steps",
+  "@stepsRangeGoal": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "todaysNotifications": "Notificaciones de hoy",
+  "morningNotificationTitle": "Buenos días — tu resumen de salud",
+  "noNotificationsToday": "No notifications for today yet.",
+  "notificationsAppearHere": "Notifications that already arrived today appear here.",
+  "phaPlusUnlockedTitle": "¡Estás en PHA Plus+!",
+  "phaPlusUnlockedBody": "Todas las funciones están desbloqueadas. Disfruta de cargas ilimitadas, PsychoTest y el horario de tratamiento.",
+  "onboardingQuest2BuildAvatar": "Quest 2: Build your avatar",
+  "onboardingQuest2FillFields": "Fill all 3 fields — earn +{hp} HP on complete.",
+  "@onboardingQuest2FillFields": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      }
+    }
+  },
+  "rewardedStats": "Rewarded stats",
+  "yourGender": "Tu género",
+  "male": "Masculino",
+  "female": "Femenino",
+  "unitYearsLong": "years",
+  "completeQuest2": "Complete Quest 2 (+{hp} HP)",
+  "@completeQuest2": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      }
+    }
+  },
+  "backToQuest2": "Back to Quest 2",
+  "onboardingQuest3PowerUp": "Quest 3: Power-up (bonus)",
+  "onboardingQuest3BpDone": "You already logged BP and glucose today. Come back tomorrow for your next reading.",
+  "onboardingQuest3Optional": "Optional vitals — +{bpHp} HP for BP, +{glucoseHp} HP for glucose. Once per day.",
+  "@onboardingQuest3Optional": {
+    "placeholders": {
+      "bpHp": {
+        "type": "int"
+      },
+      "glucoseHp": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingAllQuestsComplete": "All quests complete!",
+  "onboardingEarnedHp": "You earned {hp} HP · Level {level} {title}",
+  "@onboardingEarnedHp": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      },
+      "level": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingBonusVitals": "Bonus vitals unlocked extra insights!",
+  "healthPower": "Health Power",
+  "onboardingCreateAccount": "Create account and become healthy →",
+  "onboardingEnterDashboard": "Enter dashboard →",
+  "badgeUnitPro": "Unit Pro",
+  "badgeFoundation": "Foundation",
+  "badgeHeartTrack": "Ritmo cardíaco",
+  "badgeSugarSense": "Sugar Sense",
+  "badgeChampion": "Champion",
+  "levelHealthRookie": "Health Rookie",
+  "levelProfileBuilder": "Profile Builder",
+  "levelVitalsPro": "Vitals Pro",
+  "picked": "PICKED",
+  "saving": "Saving…",
+  "claimBonusFinish": "Claim bonus & finish 🏆",
+  "skipBonusQuest": "Skip bonus quest",
+  "calculatingRewards": "Calculating rewards…",
+  "categoryBloodPressure": "Presión arterial",
+  "categoryBloodGlucose": "Glucosa en sangre",
+  "categoryWeight": "Weight",
+  "categoryWeightBmi": "Peso / IMC",
+  "categoryDailyActivity": "Actividad diaria",
+  "categoryCalorieBurn": "Quema de calorías",
+  "categoryMentalWellness": "Bienestar mental",
+  "categorySmoking": "Tabaco",
+  "categoryAlcohol": "Alcohol",
+  "categoryScreenTime": "Tiempo de pantalla",
+  "categoryNutrition": "Nutrición",
+  "categoryPsychoTest": "PsychoTest",
+  "categoryActivity": "Actividad",
+  "categoryHeartRate": "Frecuencia y ritmo",
+  "categoryAge": "Edad",
+  "categoryStress": "Estrés (pulso elevado)",
+  "analysisSummaryExcellent": "Tu índice de salud es excelente.",
+  "analysisSummaryGood": "Tu índice de salud se ve bien en general.",
+  "analysisSummaryFair": "Tu índice de salud es regular — unos cambios lo subirán.",
+  "analysisSummaryNeedsAttention": "Tu índice de salud necesita atención — céntrate en las brechas más importantes.",
+  "analysisSummaryDefault": "Aquí está tu resumen de salud.",
+  "analysisScoreMatches": "La puntuación {score}/100 coincide con el índice de la pantalla Inicio.",
+  "@analysisScoreMatches": {
+    "placeholders": {
+      "score": {
+        "type": "int"
+      }
+    }
+  },
+  "analysisStrengths": "Fortalezas: {names}.",
+  "@analysisStrengths": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisBiggestDrag": "Lo que más baja el índice ahora: {names}.",
+  "@analysisBiggestDrag": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "glucoseMsgHypoglycemia": "La glucosa está baja (hipoglucemia). Come algo con carbohidratos de acción rápida y consulta a tu médico.",
+  "glucoseMsgNormal": "La glucosa en ayunas está en rango normal. Buena salud metabólica.",
+  "glucoseMsgPrediabetes": "La glucosa está en rango de prediabetes. Evita bebidas azucaradas, añade fibra en cada comida y camina 10–15 minutos después de comer.",
+  "glucoseMsgDiabetes": "La glucosa está en rango de diabetes. Consulta a un profesional de salud.",
+  "bmiMsgWeightOnly": "El peso está registrado. Añade tu altura en Perfil para calcular el IMC en el índice de salud.",
+  "bmiMsgUnderweight": "Tu peso es un poco bajo para tu altura. Come más proteínas; consulta al médico si no planeabas adelgazar.",
+  "bmiMsgHealthy": "Tu peso se ve saludable para tu altura. ¡Bien hecho!",
+  "bmiMsgOverweight": "Tu peso está un poco por encima del rango saludable. Busca una pérdida suave semanal, mantén la proteína y tus pasos diarios.",
+  "bmiMsgObeseI": "Tu peso está claramente por encima del rango saludable. Esto puede elevar la presión y el azúcar. Mejor alimentación, más caminatas y un plan con el médico ayudan mucho.",
+  "bmiMsgObeseII": "Tu peso está muy por encima del rango saludable. Consulta a un médico para un plan seguro que proteja tu corazón y metabolismo.",
+  "stepsLabel": "{count} steps",
+  "@stepsLabel": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "calorieBurnGood": "El gasto calórico parece coherente con tus pasos. Combínalo con comidas equilibradas para recuperarte.",
+  "calorieBurnInfo": "Quemaste {calories} kcal con actividad. Usa el registro de comidas para alinear la ingesta con tus metas.",
+  "@calorieBurnInfo": {
+    "placeholders": {
+      "calories": {
+        "type": "int"
+      }
+    }
+  },
+  "wellnessMsgExcellent": "Puntuación de bienestar excelente — poca carga de estrés y buena resiliencia mental.",
+  "wellnessMsgGood": "Buen bienestar. Pequeñas mejoras en sueño o recuperación pueden llevarte a excelente.",
+  "wellnessMsgModerate": "Bienestar moderado. Prueba 5 minutos de respiración, un paseo o apagar luces antes.",
+  "wellnessMsgNeedsAttention": "El bienestar sugiere estrés elevado. Protege el sueño, reduce cafeína tardía y reconecta socialmente.",
+  "wellnessMsgCritical": "Alta carga de estrés. Repite el Wellness Check y habla con un profesional si persiste.",
+  "smokingGood": "No fumas — uno de los factores protectores más fuertes para corazón y pulmones.",
+  "smokingLessPack": "<1 pack/day",
+  "smokingOnePack": "~1 pack/day",
+  "smokingMorePack": ">1 pack/day",
+  "smokingActive": "Active smoker",
+  "smokingNonSmoker": "Non-smoker",
+  "smokingWarning": "Fumar es un factor de riesgo clave del Índice de Salud. Fija una fecha para dejarlo, elimina desencadenantes y usa Plus+ → Malos hábitos para seguir el progreso.",
+  "alcoholNone": "Ninguno",
+  "alcoholGood": "Sin alcohol reportado — útil para PA, sueño e hígado.",
+  "alcoholOccasional": "Ocasional",
+  "alcoholOccasionalTip": "Mantén el alcohol ocasional y la mayoría de días sin alcohol.",
+  "alcoholRegular": "Regular",
+  "alcoholRegularTip": "Reduce los días de consumo; el alcohol eleva la PA y las calorías.",
+  "alcoholHeavy": "Alto",
+  "alcoholHeavyTip": "El consumo alto daña fuerte tu Índice — busca apoyo para bajar con seguridad.",
+  "alcoholDefault": "Consume alcohol",
+  "alcoholDefaultTip": "Registra la frecuencia esta semana y apunta a varios días sin alcohol.",
+  "screenRarely": "Rara vez",
+  "screenRarelyTip": "Poca carga de redes — bueno para sueño y concentración.",
+  "screenUnderHour": "<1 h/día",
+  "screenUnderHourTip": "Hábito razonable. Mantén el teléfono fuera del dormitorio si el sueño falla.",
+  "screenOneTwoHours": "1–2 h/día",
+  "screenOneTwoTip": "Uso moderado. Prueba un corte nocturno de 30 minutos.",
+  "screenConstant": "Constante",
+  "screenConstantTip": "Mucho tiempo de pantalla resta movimiento y sueño. Pon límites y cambia un scroll por un paseo.",
+  "screenDefaultTip": "Revisa hábitos de pantalla — límites nocturnos suelen ayudar al bienestar.",
+  "nutritionRecentMeals": "{count} recent meals",
+  "@nutritionRecentMeals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "nutritionWarning": "Varias comidas recientes necesitan atención. Prioriza verduras, proteína y menos ultraprocesados; registra la próxima comida para feedback.",
+  "nutritionGood": "La calidad reciente de las comidas se ve fuerte. Mantén el patrón: apoya glucosa y peso en tu Índice.",
+  "nutritionInfo": "Calidad de comidas mixta últimamente. Apunta a una mejora al día (más fibra o proteína, menos bebidas azucaradas).",
+  "psychoLoad": "Load {total} · {label}",
+  "@psychoLoad": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "psychoLow": "Bajo",
+  "psychoModerate": "Moderado",
+  "psychoHigh": "Alto",
+  "psychoLowMsg": "Indicadores psicosomáticos en rango saludable. Mantén tus hábitos de bienestar.",
+  "psychoModerateMsg": "Carga psicosomática moderada. Atiende descanso, relajación y límites saludables.",
+  "psychoHighMsg": "Estrés y tensión psicosomática importantes. Considera hablar con un especialista y reducir la carga.",
+  "priorityHigh": "High",
+  "priorityMedium": "Medium",
+  "priorityLow": "Low",
+  "profileUpdatedSuccess": "Profile updated successfully!",
+  "termsOfService": "Terms of Service & Disclaimer",
+  "howWeHandleData": "How we handle your data",
+  "sameScoreHint": "Same score as on Home",
+  "eveningNotificationTitle": "Control vespertino",
+  "bpMsgLow": "La presión arterial está por debajo del rango habitual (hipotensión). Mantente hidratado y habla con un médico si te mareas.",
+  "bpMsgOptimal": "La presión arterial es óptima (<120/<80). Mantén el estilo de vida saludable.",
+  "bpMsgNormal": "La presión arterial está en el rango normal del adulto (alrededor de 120/80). Es un objetivo saludable para la mayoría.",
+  "bpMsgHighNormal": "La presión está un poco alta (aún no es hipertensión). Monitorea con regularidad; reduce la sal, mantente activo y observa las tendencias.",
+  "bpMsgGrade1": "La presión arterial está alta. Primero cambios de estilo de vida: menos sal, más caminatas. Vuelve a medir y consulta si se mantiene.",
+  "bpMsgGrade2": "La presión arterial está claramente alta. Consulta a un médico pronto.",
+  "bpMsgGrade3": "La presión arterial está muy alta. Busca atención médica sin demora.",
+  "uploadAnalysisTitle": "Subir análisis",
+  "uploadFileType": "File Type",
+  "uploadPdf": "PDF Document",
+  "uploadPhoto": "Photo / Image",
+  "uploadSelectFile": "Select File",
+  "uploadClickToSelect": "Click to select a file",
+  "uploadClickToChange": "{size} KB — click to change",
+  "@uploadClickToChange": {
+    "placeholders": {
+      "size": {
+        "type": "int"
+      }
+    }
+  },
+  "uploadLimitReached": "Limit reached",
+  "uploadUpgradeMore": "Upgrade to upload more",
+  "uploadFile": "Upload File",
+  "uploadAnalyzing": "Analyzing...",
+  "uploadAnalyzingAiDoc": "Analyzing your file with Ai Doc…",
+  "uploadFailed": "Upload failed. Please try again.",
+  "uploadCouldNotRead": "Could not read the selected file. Please pick it again.",
+  "uploadLimitMessage": "Upload limit reached. Upgrade to PHA Plus+ for unlimited uploads.",
+  "uploadFreePlan": "Free plan: {count}/2 uploads used. Max 2 pages per file.",
+  "@uploadFreePlan": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mealTakePhoto": "Toma o sube una foto de tu comida",
+  "mealAfterAnalysis": "After analysis, tap ✓ only if you ate this dish — it adds to today's calories.",
+  "mealCamera": "Camera",
+  "mealGallery": "Gallery",
+  "mealAnalyze": "Analyze Meal",
+  "mealAnalyzing": "Analyzing…",
+  "mealFailed": "Analysis failed. Please try again.",
+  "mealFreeLimit": "Free limit reached (2 meals per 24h). Upgrade to PHA Plus+ for unlimited meal checks.",
+  "mealFreePlan": "Free plan: {count}/{limit} meals logged in the last 24 hours.",
+  "@mealFreePlan": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "mealLogged": "Meal logged — counted in today's intake & Health Index.",
+  "mealTapConfirm": "Tap ✓ to confirm you ate this — adds to today's intake.",
+  "mealDiscard": "Discard",
+  "mealTotalIntake": "Total Intake",
+  "mealCarb": "Carb",
+  "mealProteins": "Proteins",
+  "mealFat": "Fat",
+  "mealNoMealsToday": "No meals confirmed today yet.",
+  "mealNoMealsLogged": "No meals logged · target ~{target} kcal",
+  "@mealNoMealsLogged": {
+    "placeholders": {
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealConfirmHint": "Confirm meals after analysis to track intake.",
+  "aiDocTitle": "Asistente Ai Doc",
+  "aiDocWelcome": "Hello! I'm your Ai Doc Assistant. Would you like us to use the data you provided during onboarding? After that, you can describe your problem in detail — or share a photo of a meal, lab result, or anything health-related.",
+  "aiDocOffline": "Ai Doc is offline — API key not set.",
+  "aiDocFreeLimit": "Free consultation limit reached.",
+  "aiDocFreeRemaining": "{remaining} of 3 free consultations remaining.",
+  "@aiDocFreeRemaining": {
+    "placeholders": {
+      "remaining": {
+        "type": "int"
+      }
+    }
+  },
+  "aiDocAnalyzingHealth": "Analyzing your health data…",
+  "aiDocLooking": "Looking at that…",
+  "aiDocAskPlaceholder": "Ask about symptoms, or add a photo note",
+  "aiDocUpgradeChat": "Upgrade to continue chatting…",
+  "aiDocNoProblem": "No problem! Whenever you're ready, describe your symptoms or health concerns in detail — or share a photo.",
+  "aiDocPhoto": "Photo",
+  "wellnessResults": "Wellness Results",
+  "wellnessQuestion": "Question {current} of {total}",
+  "@wellnessQuestion": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "percentComplete": "{percent}% complete",
+  "@percentComplete": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "questionUnavailable": "Question unavailable",
+  "wellnessVeryPoor": "Very poor",
+  "wellnessPoor": "Poor",
+  "wellnessModerate": "Moderate",
+  "wellnessGood": "Good",
+  "wellnessExcellent": "Excellent",
+  "badHabitsSummaryTitle": "Bad Habits Summary",
+  "badHabitsSaved": "Saved to your health history. Honest tracking is the first step toward change.",
+  "badHabitsSocialMediaLabel": "Social media",
+  "badHabitsStep": "Step {step} of {total}",
+  "@badHabitsStep": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "badHabitsDoYouSmoke": "¿Fumas?",
+  "badHabitsHowMuchSmoke": "How much do you smoke?",
+  "badHabitsDoYouDrink": "Do you drink alcohol?",
+  "badHabitsHowMuchDrink": "How often and how much do you drink?",
+  "badHabitsSocialMedia": "How much time do you spend uselessly on social media?",
+  "treatmentYourSchedule": "Tu horario",
+  "treatmentAddMedicine": "Add medicine or supplement",
+  "treatmentNewEntry": "New entry",
+  "treatmentMedicineName": "Name of medicine or dietary supplement",
+  "treatmentMedicinePlaceholder": "e.g. Vitamin D, Metformin",
+  "treatmentHowManyTimes": "How many times a day",
+  "treatmentDoseTime": "Dose {n} time",
+  "@treatmentDoseTime": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "treatmentAddAnother": "Add another",
+  "treatmentSaveSchedule": "Guardar horario",
+  "treatmentSaved": "Treatment schedule saved — pill reminders are on",
+  "treatmentEnterName": "Enter at least one medicine or supplement name.",
+  "treatmentSaveFailed": "Could not save. Please try again.",
+  "treatmentNotifOff": "Schedule saved, but notifications are off. Enable alerts in Settings to get pill reminders.",
+  "psychoTestSubtitle": "Stress & Psychosomatic Self-Assessment",
+  "psychoTestIntro": "This assessment contains 3 blocks with a total of 20 questions. Answer honestly — there are no right or wrong answers. Results are saved to your profile.",
+  "psychoBlock1Title": "BLOCK 1",
+  "psychoBlock1Subtitle": "Stress Awareness",
+  "psychoBlock2Title": "BLOCK 2",
+  "psychoBlock2Subtitle": "Physical Symptoms",
+  "psychoBlock3Title": "BLOCK 3",
+  "psychoBlock3Subtitle": "Behavioral Profile",
+  "psychoAnswerHint": "Each question has 3 answer options: Never · Sometimes · Often",
+  "psychoStartAssessment": "Iniciar evaluación",
+  "psychoYourResult": "YOUR RESULT",
+  "psychoRetake": "Retake",
+  "psychoNever": "Never",
+  "psychoSometimes": "Sometimes",
+  "psychoOften": "Often",
+  "psychoQuestionsCount": "{count} questions",
+  "@psychoQuestionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingBackToQuest2": "Back to Quest 3",
+  "onboardingBpGlucose": "BP / +{hp} HP",
+  "@onboardingBpGlucose": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingGlucoseHp": "Glucose / +{hp} HP",
+  "@onboardingGlucoseHp": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingSys": "Sys",
+  "onboardingDia": "Dia",
+  "onboardingReadyForPha": "{percent}% — ready for PHA",
+  "@onboardingReadyForPha": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingRedeemHp": "Redeem your {hp} HP for {percent}% off your first 6-month or annual PHA Plus+ subscription.",
+  "@onboardingRedeemHp": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "activityCurrentPlanSubtitle": "Tu plan actual de actividad física",
+  "activityCustomPlanHint": "Tu plan está activo. Completa el entrenamiento diario y responde al check-in nocturno.",
+  "activityRestNote": "Rest no more than 2 minutes between sets.",
+  "dailyLabel": "Daily",
+  "fileTypePdf": "PDF up to 2 pages (free plan)",
+  "upgradeToPhaPlus": "Upgrade to PHA Plus+",
+  "healthAnalysisSubtitleShort": "Same score as Home Health Index",
+  "wellnessQ1": "¿Qué tan estresado te sientes ahora?",
+  "wellnessQ2": "¿Qué tal dormiste anoche?",
+  "wellnessQ3": "¿Cómo está tu nivel de energía hoy?",
+  "wellnessQ4": "¿Cómo calificarías tu estado de ánimo?",
+  "wellnessQ5": "¿Cómo está tu bienestar general?",
+  "badHabitsSmokeLessPack": "Menos de un paquete al día",
+  "badHabitsSmokeOnePack": "1 paquete al día",
+  "badHabitsSmokeMorePack": "Más de un paquete al día",
+  "badHabitsAlcoholOccasionally": "Ocasionalmente — menos de 100 g de alcohol fuerte, 1–2 copas de vino o hasta 2 latas de cerveza por semana",
+  "badHabitsAlcoholRegularly": "Regularmente — 200–300 g de alcohol fuerte, 1–2 botellas de vino o más de 2 L de cerveza por semana",
+  "badHabitsAlcoholHeavy": "Me emborracho 1–2 veces por semana hasta perder la memoria",
+  "badHabitsSocialRarely": "Rara vez o nunca",
+  "badHabitsSocialUnderHour": "Menos de 1 hora al día",
+  "badHabitsSocialOneTwoHours": "Unas 1–2 horas al día",
+  "badHabitsSocialConstantly": "Navego constantemente en mi tiempo libre",
+  "activitySwitchHint": "Cambiar a este programa:",
+  "activityStartHint": "Comienza tu actividad física diaria con este programa:",
+  "activityStarterEx1": "Haré 15 flexiones a lo largo del día",
+  "activityStarterEx2": "20 sentadillas al día",
+  "activityStarterEx3": "20 abdominales",
+  "activityStarterEx4": "15 flexiones desde un sofá u otro objeto detrás de la espalda",
+  "activityAdvancedEx1": "45 flexiones al día. Recomendado: 20, 15, 10",
+  "activityAdvancedEx2": "50 sentadillas al día, 2 series de 25",
+  "activityAdvancedEx3": "30 abdominales, 20 elevaciones frontales y 10 elevaciones de piernas con rodillas flexionadas",
+  "activityAdvancedEx4": "25 flexiones desde un sofá detrás de la espalda: 15 y 10",
+  "activityProEx1": "Más de 100 flexiones al día",
+  "activityProEx2": "Más de 100 sentadillas a lo largo del día",
+  "activityProEx3": "Más de 70 ejercicios abdominales al día",
+  "activityProEx4": "Más de 60 flexiones detrás de la espalda a lo largo del día",
+  "activitySupermanEx1": "Entreno en el gimnasio 3 o más veces por semana más de 60 minutos vigorosamente",
+  "treatmentSaving": "Guardando...",
+  "treatmentEntryNumber": "Entrada {n}",
+  "@treatmentEntryNumber": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingLevelShort": "Nv",
+  "onboardingDayStreak": "Racha de {count} días",
+  "@onboardingDayStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onboardingHudHealthPower": "Poder de salud",
+  "onboardingQuest1Complete": "¡Misión 1 completada!",
+  "onboardingQuest2Complete": "¡Misión 2 completada!",
+  "onboardingBonusComplete": "¡Misión bonus completada!",
+  "featurePrivateSecure": "Privado y seguro",
+  "loginHeroLine1": "Tu salud,",
+  "loginHeroLine2": "inteligentemente",
+  "loginHeroLine3": "monitoreada.",
+  "loginHeroBody": "Monitorea tus métricas, obtén insights con IA y controla tu bienestar.",
+  "loginTrustedBy": "Confiado por personas conscientes de la salud en todo el mundo.",
+  "loginSignUpSubtitle": "Empieza a rastrear tu salud hoy — gratis para siempre.",
+  "loginSignInSubtitle": "Inicia sesión para acceder a tu panel de salud.",
+  "loginFullName": "Nombre completo",
+  "loginNamePlaceholder": "María García",
+  "loginEmailLabel": "Correo electrónico",
+  "loginEmailPlaceholder": "tu@ejemplo.com",
+  "loginPasswordHintSignUp": "Al menos 8 caracteres",
+  "loginPasswordHintSignIn": "••••••••",
+  "legalAgreePrefix": "He leído y acepto el ",
+  "creatingAccount": "Creando cuenta…",
+  "signingIn": "Iniciando sesión…",
+  "loginLegalFooter": "Al continuar, aceptas nuestros términos. Esta app ofrece orientación de bienestar, no diagnóstico médico.",
+  "onboardingErrorAge": "Ingresa tu edad para ganar la insignia Foundation.",
+  "onboardingErrorGender": "Selecciona tu género.",
+  "onboardingErrorHeightImperial": "Ingresa altura (pies 1–8, pulgadas 0–11).",
+  "onboardingErrorHeightMetric": "Ingresa altura entre 50–250 cm.",
+  "onboardingErrorWeightImperial": "Ingresa peso entre 44–660 lbs.",
+  "onboardingErrorWeightMetric": "Ingresa peso entre 20–300 kg.",
+  "onboardingErrorQuest2First": "Completa la Misión 2 primero.",
+  "onboardingTrailUnits": "Unidades",
+  "onboardingTrailBasics": "Básicos",
+  "onboardingTrailBoost": "Impulso",
+  "onboardingAgeHint": "ej. 32",
+  "onboardingFtIn": "pies y pulg",
+  "onboardingHeightHintMetric": "ej. 175",
+  "onboardingWeightHintImperial": "ej. 165",
+  "onboardingWeightHintMetric": "ej. 70",
+  "vitalsBpBothOrNone": "Ingresa ambos valores de presión o déjalos vacíos.",
+  "vitalsDailyPrompt": "Registra presión y glucosa una vez al día. Puedes omitir y registrar después.",
+  "vitalsPromptTurnOff": "Desactivar",
+  "vitalsPromptTurnOffHint": "Omitir recordatorios diarios de PA/glucosa.",
+  "vitalsPromptEvery5Days": "Preguntar cada 5 días",
+  "vitalsPromptEvery5DaysHint": "Recordar cada 5 días, no diariamente.",
+  "vitalsBpLabel": "Presión arterial (mmHg)",
+  "vitalsGlucoseLabel": "Glucosa en sangre ({unit})",
+  "@vitalsGlucoseLabel": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "vitalsGlucoseHintImperial": "ej. 95",
+  "vitalsGlucoseHintMetric": "ej. 5.3",
+  "notNow": "Ahora no",
+  "enterValidPositiveNumber": "Ingresa un número positivo válido.",
+  "logHealthMetric": "Registrar métrica de salud",
+  "metricSaved": "¡Métrica guardada!",
+  "metricType": "Tipo de métrica",
+  "metricValueLabel": "Valor ({unit})",
+  "@metricValueLabel": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "metricNotesOptional": "Notas (opcional)",
+  "metricNotesPlaceholder": "Notas adicionales...",
+  "saveMetric": "Guardar métrica",
+  "logMetricHintSteps": "ej. 8000",
+  "logMetricHintCalories": "ej. 350",
+  "logMetricHintDistanceImperial": "ej. 3.2",
+  "logMetricHintDistanceMetric": "ej. 5.2",
+  "logMetricHintActiveTime": "ej. 45",
+  "logMetricHintWeightImperial": "ej. 165",
+  "logMetricHintWeightMetric": "ej. 72.5",
+  "logMetricHintWater": "ej. 2000",
+  "upgradeTrialTitle": "Desbloquea todas las funciones de PHA Plus+",
+  "upgradeTrialBody1": "¡Control total de tu salud! Desbloquea todas las opciones premium de PHA Plus+.",
+  "upgradeTrialBody2": "Mantente informado sobre riesgos y ajusta tu estilo de vida. Cuenta calorías sin límites.",
+  "upgradeTagline": "Tu salud. Tu control. Siempre.",
+  "upgradeTitle": "Desbloquear todo",
+  "upgradeSubtitle": "Obtén todo el poder de tu Asistente de Salud Personal",
+  "upgradeHpBanner": "¡Tienes {hp} HP! Canjea por {percent}% de descuento en planes de 6 meses o anuales.",
+  "@upgradeHpBanner": {
+    "placeholders": {
+      "hp": {
+        "type": "int"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "upgradeTableFeature": "FUNCIÓN",
+  "upgradeTableFree": "GRATIS",
+  "upgradeTablePlus": "PLUS+",
+  "upgradeFeatAnalysisUploads": "Subida de análisis",
+  "upgradeFeatMealCalories": "Control calórico de comidas",
+  "upgradeFeatPagesPerFile": "Páginas por archivo",
+  "upgradeFeatPsychoTest": "PsychoTest",
+  "upgradeFeatTreatment": "Horario de tratamiento",
+  "upgradeFeatBadHabits": "Revisa tus malos hábitos",
+  "upgradeFeatActivity": "Actividad física",
+  "upgradeFeatAiConsult": "Consulta con IA",
+  "upgradeFeatWellness": "Chequeo de bienestar",
+  "upgradeVal2Files": "2 archivos",
+  "upgradeVal2PerDay": "2 / 24h",
+  "upgradeVal2Pages": "2 páginas",
+  "upgradeValUnlimited": "Ilimitado",
+  "upgradeValLocked": "Bloq.",
+  "upgradeValFullAccess": "Acceso completo",
+  "upgradeValIncluded": "Incluido",
+  "planMonthly": "Mensual",
+  "planBilledMonthly": "Facturación mensual.",
+  "planSemiannual": "6 meses",
+  "planAnnual": "Anual",
+  "planHpDiscountNote": "Descuento 20% HP aplicado.",
+  "planSave17": "Ahorra ~17%.",
+  "planSave42": "Ahorra ~42%.",
+  "planPerMonth": "/mes",
+  "planPer6Mo": "/6mes",
+  "planPerYear": "/año",
+  "planBestBadge": "MEJOR",
+  "psychoTestPromoBody": "Autoevaluación profunda de estrés, patrones psicosomáticos e indicadores de bienestar mental.",
+  "psychoQuestionOfBlock": "P{current} de {total}",
+  "@psychoQuestionOfBlock": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "psychoStressLevelTitle": "Nivel de estrés: {label}",
+  "@psychoStressLevelTitle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "analysisNoData": "No se encontraron datos de salud. Registra métricas primero.",
+  "analysisAllSolid": "Todos los factores del Índice de Salud se ven bien. Sigue registrando datos.",
+  "syncPlatformOnly": "La sincronización de actividad solo está en iOS y Android.",
+  "syncPermissionDenied": "Permiso de actividad no concedido.",
+  "syncReadFailed": "No se pudieron leer datos de actividad. Activa Pasos y Distancia en Ajustes de Salud.",
+  "aiDocNoOnboardingData": "No encontré tus datos de onboarding. Completa la configuración primero.",
+  "activityYourProgramFallback": "tu programa",
+  "trialSevenDayFree": "Prueba gratis 7 días",
+  "uploadImageFormats": "JPG, PNG, GIF",
+  "mealSaveFailed": "No se pudo guardar: {error}",
+  "@mealSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "mealCaloriesShort": "{n} cal",
+  "@mealCaloriesShort": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "treatmentDosesDaily": "{n}× al día · {times}",
+  "@treatmentDosesDaily": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "times": {
+        "type": "String"
+      }
+    }
+  },
+  "notifMorningFallback": "¡Buenos días! Registra tus signos vitales hoy.",
+  "notifEveningFallback": "Check-in nocturno: ¿cómo fueron tus metas hoy?",
+  "notifChannelName": "Consejos diarios de salud",
+  "notifChannelDesc": "Recordatorios matutinos y nocturnos",
+  "notifMedicationTitle": "Medicamento: {name}",
+  "@notifMedicationTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notifMedicationBody": "Toma {name}",
+  "@notifMedicationBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notifActivityTitle": "Check-in de actividad física",
+  "notifActivityBody": "¿Completaste {label} hoy?",
+  "@notifActivityBody": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "notifIncompleteAssessmentsTitle": "Completa tus chequeos de salud",
+  "notifIncompleteAssessmentsBody": "Por favor completa: {items}. Así mejora la evaluación de tu Índice de Salud.",
+  "@notifIncompleteAssessmentsBody": {
+    "placeholders": {
+      "items": {
+        "type": "String"
+      }
+    }
+  },
+  "notifActivitySaved": "Guardado: {answer} — Índice actualizado",
+  "@notifActivitySaved": {
+    "placeholders": {
+      "answer": {
+        "type": "String"
+      }
+    }
+  },
+  "notifDoseLabel": "Dosis {current} de {total} — ",
+  "@notifDoseLabel": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "validationBpCheck": "Verifica los valores de presión.",
+  "validationBpRange": "Verifica presión ({sysMin}–{sysMax} / {diaMin}–{diaMax} mmHg).",
+  "@validationBpRange": {
+    "placeholders": {
+      "sysMin": {
+        "type": "int"
+      },
+      "sysMax": {
+        "type": "int"
+      },
+      "diaMin": {
+        "type": "int"
+      },
+      "diaMax": {
+        "type": "int"
+      }
+    }
+  },
+  "validationBpDiaLower": "La diastólica debe ser menor que la sistólica.",
+  "validationGlucoseEnter": "Ingresa un valor de glucosa.",
+  "validationGlucoseRangeMgdl": "Glucosa {min}–{max} mg/dL.",
+  "@validationGlucoseRangeMgdl": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "validationGlucoseRangeMmol": "Glucosa {min}–{max} mmol/L.",
+  "@validationGlucoseRangeMmol": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "validationWeightEnter": "Ingresa un peso válido.",
+  "validationWeightRange": "Peso {min}–{max} kg.",
+  "@validationWeightRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "validationHeightEnter": "Ingresa una altura válida.",
+  "validationHeightRange": "Altura {min}–{max} cm.",
+  "@validationHeightRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "validationAgeEnter": "Ingresa una edad válida.",
+  "validationAgeRange": "Edad {min}–{max}.",
+  "@validationAgeRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "psychoQ1": "¿Con qué frecuencia te has sentido abrumado o incapaz de controlar cosas importantes?",
+  "psychoQ2": "¿Con qué frecuencia tienes síntomas físicos por estrés?",
+  "psychoQ3": "¿Con qué frecuencia tienes problemas para dormir?",
+  "psychoQ4": "¿Con qué frecuencia te sientes ansioso o preocupado?",
+  "psychoQ5": "¿Con qué frecuencia te cuesta relajarte?",
+  "psychoQ6": "¿A menudo tienes:",
+  "psychoQ7": "¿Empeoran tus síntomas después del estrés?",
+  "psychoQ8": "¿Tienes:",
+  "psychoQ9": "¿Tienes problemas gastrointestinales:",
+  "psychoQ10": "¿Sientes falta de aire?",
+  "psychoQ11": "¿Tienes fatiga crónica?",
+  "psychoQ12": "¿Tienes tensión muscular?",
+  "psychoQ13": "¿Empeoran durante conflictos o ansiedad?",
+  "psychoQ14": "¿Tiendes a:",
+  "psychoQ15": "¿A menudo:",
+  "psychoQ16": "¿Te cuesta decir \"no\"?",
+  "psychoQ17": "¿Tienes miedo de perder el control?",
+  "psychoQ18": "¿Sientes tensión interna constante incluso en calma?",
+  "psychoQ19": "¿Te sientes solo a pesar de comunicarte?",
+  "psychoQ20": "¿A menudo \"guardas todo dentro\"?",
+  "psychoSubHeadaches": "Dolores de cabeza",
+  "psychoSubMuscleSpasms": "Espasmos musculares",
+  "psychoSubNeckPain": "Dolor de cuello",
+  "psychoSubChestPressure": "Presión en el pecho",
+  "psychoSubStomachHeaviness": "Pesadez estomacal",
+  "psychoSubTachycardia": "Taquicardia",
+  "psychoSubBpSurges": "Subidas de presión",
+  "psychoSubSweating": "Sudoración",
+  "psychoSubTrembling": "Temblor",
+  "psychoSubBloating": "Hinchazón",
+  "psychoSubHeartburn": "Acidez",
+  "psychoSubSpasms": "Espasmos",
+  "psychoSubDiarrheaConstipation": "Diarrea / estreñimiento",
+  "psychoSubKeepControl": "Mantener todo bajo control",
+  "psychoSubAvoidConflicts": "Evitar conflictos",
+  "psychoSubAccumulateEmotions": "Acumular emociones",
+  "psychoSubTakeResponsibility": "Asumir responsabilidad por todos",
+  "psychoSubWorkOvertime": "Trabajar horas extra",
+  "psychoSubDontRest": "No descansar",
+  "psychoSubFeelGuilty": "Sentir culpa",
+  "clinicalCategoryHealthyWeight": "Rango de peso saludable",
+  "clinicalCategoryMetabolic": "Salud metabólica",
+  "clinicalCategoryCombinedRisk": "Riesgo cardíaco y glucémico",
+  "clinicalCategoryWhatMeans": "Qué significa esto",
+  "clinicalCategoryForAge": "Para tu edad",
+  "clinicalIdealWeightNote": "Esto es solo una estimación aproximada del peso saludable. Tu mejor rango depende del músculo, la forma corporal y cómo te sientes — no de una sola fórmula.",
+  "clinicalAroundKg": "Alrededor de {kg} kg",
+  "@clinicalAroundKg": {
+    "placeholders": {
+      "kg": {
+        "type": "int"
+      }
+    }
+  },
+  "clinicalBpHighNormalMsg": "Tu lectura parece algo alta-normal. Reduce sal y mantente activo.",
+  "clinicalWarningSigns": "{n} señales de alerta",
+  "@clinicalWarningSigns": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "clinicalLookingOkay": "Se ve bien",
+  "clinicalRiskVeryHigh": "Alto — actúa ahora",
+  "clinicalRiskElevated": "Elevado",
+  "clinicalRiskModerate": "Moderado",
+  "clinicalRiskLow": "Bajo",
+  "clinicalGlucoseTooLow": "Muy bajo",
+  "clinicalGlucoseNormal": "Normal",
+  "clinicalGlucosePrediabetes": "Rango de prediabetes",
+  "clinicalGlucoseDiabetes": "Rango de diabetes",
+  "clinicalBpVeryHigh": "Muy alto — busca atención",
+  "clinicalBpHighGrade2": "Alto (grado 2)",
+  "clinicalBpHigh": "Alto",
+  "clinicalBpALittleHigh": "Un poco alto",
+  "clinicalBpLow": "Bajo",
+  "clinicalBmiActionOver": " Enfócate en porciones más pequeñas, más verduras y caminatas diarias. Una pérdida del 5–7% ya ayuda al corazón y al azúcar.",
+  "clinicalBmiActionNormal": " Pequeños hábitos diarios (pasos + proteína en las comidas) ayudan a que el peso no suba.",
+  "clinicalBmiActionUnder": " Come comidas ricas en proteína con más frecuencia y consulta al médico si no planeabas perder peso.",
+  "activityCheckinSavedHint": "Tu respuesta se guardó en tu historial de salud.",
+  "notifMorningFallbackDetailed": "Abre PHA: pasos de ayer, calorías de comidas y un consejo nutricional para hoy.",
+  "notifEveningOpenApp": "Abre PHA para tu check-in nocturno — compara hoy con ayer.",
+  "notifEveningStepsToday": "Hoy registraste {today} pasos. Sigue construyendo el hábito — abre PHA para el check-in completo.",
+  "@notifEveningStepsToday": {
+    "placeholders": {
+      "today": {
+        "type": "int"
+      }
+    }
+  },
+  "notifEveningStepsUp": "Hoy {today} pasos, más que ayer ({yesterday}). ¡Buen progreso!",
+  "@notifEveningStepsUp": {
+    "placeholders": {
+      "today": {
+        "type": "int"
+      },
+      "yesterday": {
+        "type": "int"
+      }
+    }
+  },
+  "notifEveningStepsDown": "Hoy {today} pasos, menos que ayer ({yesterday}). Mañana volvemos a movernos — incluso un paseo corto ayuda.",
+  "@notifEveningStepsDown": {
+    "placeholders": {
+      "today": {
+        "type": "int"
+      },
+      "yesterday": {
+        "type": "int"
+      }
+    }
+  },
+  "notifActivityChannelDesc": "Recordatorio diario para registrar si completaste tu entrenamiento",
+  "indexSummaryExcellent": "Excelente — mantén tus hábitos saludables.",
+  "indexSummaryGood": "Lo estás haciendo bien.",
+  "indexSummaryFair": "Algunas áreas necesitan atención — pequeños cambios diarios ayudan.",
+  "indexSummaryPoor": "Tu índice de salud necesita enfoque — revisa signos vitales y hábitos.",
+  "validationGlucoseOutOfRange": "Glucosa fuera del rango permitido.",
+  "validationWeightOutOfRange": "Peso fuera del rango permitido.",
+  "validationStepsUnrealistic": "Los pasos parecen poco realistas.",
+  "validationCaloriesUnrealistic": "Las calorías parecen poco realistas.",
+  "validationWaterUnrealistic": "La ingesta de agua parece poco realista.",
+  "validationActiveTimeRange": "El tiempo activo debe ser 0–1440 minutos.",
+  "validationDistanceUnrealistic": "La distancia parece poco realista.",
+  "mealQualityNoMeals": "Sin comidas registradas",
+  "mealQualityHeavyDay": "Día pesado",
+  "mealQualityGoodChoices": "Buenas elecciones",
+  "mealQualityOverTarget": "Sobre la meta",
+  "mealQualityUnderTarget": "Bajo la meta",
+  "mealQualityBalanced": "Equilibrado",
+  "mealQualityHeavyOverKcal": "Unas {over} kcal por encima de tu meta ~{target} kcal.",
+  "@mealQualityHeavyOverKcal": {
+    "placeholders": {
+      "over": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealQualityHeavyHighCal": "Varias opciones altas en calorías hoy — aligera las próximas comidas.",
+  "mealQualityGoodUnderKcal": "Buen día — ~{under} kcal por debajo de ~{target} kcal.",
+  "@mealQualityGoodUnderKcal": {
+    "placeholders": {
+      "under": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealQualityGoodOnTrack": "En camino con tu meta ~{target} kcal.",
+  "@mealQualityGoodOnTrack": {
+    "placeholders": {
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealQualityOverKcal": "Unas {over} kcal por encima de ~{target} kcal — elige opciones más ligeras.",
+  "@mealQualityOverKcal": {
+    "placeholders": {
+      "over": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealQualityUnderKcal": "~{under} kcal bajo la meta — asegúrate de registrar todas las comidas.",
+  "@mealQualityUnderKcal": {
+    "placeholders": {
+      "under": {
+        "type": "int"
+      }
+    }
+  },
+  "mealQualityBalancedHint": "Ingesta ~{total} kcal vs meta ~{target} kcal hoy.",
+  "@mealQualityBalancedHint": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealQualityTargetLine": "{label} · meta ~{target} kcal",
+  "@mealQualityTargetLine": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "mealCategoryExcellent": "Excelente",
+  "mealCategorySatisfactory": "Satisfactorio",
+  "mealCategoryAttention": "Atención",
+  "mealFallbackName": "Comida",
+  "mealOneServing": "una porción",
+  "adviceProtectWhatWorks": "Protege lo que funciona: mantén la actividad y comidas de hoy y revisa PA/glucosa con regularidad.",
+  "adviceBloodPressure1": "Presión arterial: mide a la misma hora, sentado y en reposo. Menos sal, más caminatas.",
+  "adviceBloodPressure2": "Si las lecturas se mantienen ≥140/90, consulta a un médico con tu registro.",
+  "adviceSmoking": "Fumar: elige un día para dejarlo, cuéntaselo a alguien y quita los cigarrillos. Actualiza Malos hábitos en Plus+.",
+  "adviceGlucose1": "Glucosa: agua en lugar de bebidas azucaradas, fibra y proteína en el desayuno, camina 10–15 min después de la comida principal.",
+  "adviceGlucose2": "Si la glucosa en ayunas sigue alta, pide análisis (HbA1c) al médico.",
+  "adviceBmi1": "Peso: cambios suaves semanales, no dietas extremas — proteína, verduras y pasos.",
+  "adviceBmi2": "Registra comidas con Calorie Check para consejos acordes a lo que comes.",
+  "adviceActivity": "Actividad: dos paseos fijos (después del almuerzo y por la noche). Responde al check-in de actividad física.",
+  "adviceAlcohol": "Alcohol: primero días sin alcohol, luego porciones más pequeñas — mejora el sueño y la PA.",
+  "adviceNutrition": "Nutrición: mejora una comida hoy — más plantas y proteína, menos ultraprocesados.",
+  "adviceWellness": "Bienestar: ventana de sueño constante y un bloque corto de recuperación. Repite Wellness Check en unos días.",
+  "advicePsychotest": "PsychoTest: reduce estresores y usa rutinas calmantes breves. Repite cuando la vida esté más tranquila.",
+  "adviceScreenTime": "Pantalla: límite nocturno estricto y reemplaza scroll por movimiento.",
+  "adviceHeartRate1": "Frecuencia: abre Frecuencia y ritmo tras usar el Apple Watch. Veladas tranquilas y sueño regular suelen mejorar la FC en reposo.",
+  "adviceHeartRate2": "Si la FC en reposo sigue alta varios días o continúan alertas de ritmo irregular, coméntalo con un médico y anota cómo te sientes.",
+  "adviceStress": "Un pulso alto sin mucha actividad suele indicar estrés o mala recuperación: prioriza sueño, caminatas cortas y vuelve a hacer el Wellness Check.",
+  "errorWithMessage": "Error: {message}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "aiOfflineSleep1": "Dormir lo suficiente es crucial. Apunta a 7–9 horas y mantén un horario regular.",
+  "aiOfflineSleep2": "El sueño afecta inmunidad, ánimo y metabolismo. Limita pantallas y cafeína por la noche.",
+  "aiOfflineExercise1": "La actividad regular es clave. Apunta a 150 minutos moderados por semana.",
+  "aiOfflineExercise2": "El ejercicio mejora corazón, ánimo y energía. Empieza con actividades que disfrutes.",
+  "aiOfflineStress1": "Gestiona el estrés con meditación, respiración o actividades relajantes.",
+  "aiOfflineStress2": "El estrés alto afecta salud física y mental. Habla con alguien de confianza.",
+  "aiOfflineNutrition1": "Dieta equilibrada con frutas, verduras y granos integrales. Hidrátate y limita procesados.",
+  "aiOfflineNutrition2": "Buena nutrición da energía. Consulta a un nutricionista si lo necesitas.",
+  "aiOfflineWeight1": "Peso saludable requiere dieta y ejercicio. Cambios pequeños y sostenibles funcionan mejor.",
+  "aiOfflineWeight2": "El peso es solo un aspecto. Enfócate en cómo te sientes y en hábitos saludables.",
+  "aiOfflineDefault1": "¡Buena pregunta! Nutrición, ejercicio, sueño y manejo del estrés son la base del bienestar.",
+  "aiOfflineDefault2": "Cuida tu salud física y mental. Consulta profesionales para consejos personalizados.",
+  "clinicalBmiValue": "IMC {bmi}",
+  "clinicalRecMetabolicCluster": "Hay varios signos de alerta juntos (peso, presión o azúcar). Pierde un poco de peso si puedes, come más vegetales y menos sal, camina casi todos los días y pide al médico análisis de colesterol y azúcar.",
+  "clinicalRecCombinedHigh": "Hay más de un riesgo elevado. Reserva una revisión pronto para que el médico revise presión, azúcar y colesterol.",
+  "clinicalRecWeightLoss5to7": "Apunta a una pérdida suave del 5–7% en unos meses: eso solo suele mejorar la presión y el azúcar.",
+  "clinicalRecPrediabetes": "Tu azúcar está en rango de prediabetes. Evita bebidas azucaradas, camina después de las comidas y vuelve a medir glucosa en ayunas o HbA1c con tu médico.",
+  "clinicalRecHighBp": "Tu presión está alta. Reduce la sal, mantente activo, mide la PA en casa unos días y comparte los promedios con tu médico.",
+  "clinicalMetabolicInsufficient": "Aún no hay datos suficientes. Registra presión, azúcar y peso (y cintura si puedes) para detectar señales metabólicas.",
+  "clinicalMetabolicPresent": "Hay varios factores de riesgo juntos (peso, presión o azúcar). Esto eleva el riesgo cardíaco y de diabetes: consulta al médico para análisis y mejora la dieta y la actividad.",
+  "clinicalMetabolicPartial": "Hay un par de señales de alerta. Mejora la dieta, camina más y cuida el peso: los cambios pequeños ayudan mucho.",
+  "clinicalMetabolicOk": "Con los datos disponibles, las señales metabólicas parecen bajo control.",
+  "clinicalRiskMsgHigh": "Varios riesgos están elevados juntos. Es una señal fuerte para mejorar la alimentación y la actividad y acudir al médico.",
+  "clinicalRiskMsgModerate": "Tu riesgo general de corazón y azúcar es mayor de lo ideal. Cambios diarios — caminatas, menos sal y azúcar — marcan diferencia.",
+  "clinicalRiskMsgLow": "Tu riesgo general de corazón y azúcar parece relativamente bajo según peso, presión y glucosa.",
+  "clinicalFlagExtraWeightTitle": "Peso extra",
+  "clinicalFlagExtraWeightBody": "El peso extra eleva la chance de azúcar alto y problemas cardíacos. Porciones más pequeñas, más verduras y caminatas diarias ayudan.",
+  "clinicalFlagTripleTitle": "Peso + PA + azúcar",
+  "clinicalFlagTripleBody": "Peso extra, presión alta y azúcar alto juntos elevan mucho el riesgo de diabetes y corazón. Enfócate en comida, caminatas y una visita al médico.",
+  "clinicalFlagLowWeightBpTitle": "Bajo peso + PA baja",
+  "clinicalFlagLowWeightBpBody": "Bajo peso con presión baja en la edad avanzada puede indicar fragilidad. Come suficiente proteína y pregunta al médico antes de cortar calorías.",
+  "clinicalFlagLeanDiabetesTitle": "Azúcar alto, poco peso",
+  "clinicalFlagLeanDiabetesBody": "El azúcar está alto incluso sin mucho peso extra. Un médico debe revisar qué tipo de diabetes podría ser.",
+  "clinicalFlagYoungHtnTitle": "PA alta antes de 40",
+  "clinicalFlagYoungHtnBody": "La presión alta a edad temprana debe confirmarse con mediciones repetidas. Pregunta al médico si hay otra causa.",
+  "clinicalAgePediatric": "Antes de los 18 se usan percentiles pediátricos: los cortes adultos de IMC/PA/glucosa no se aplican aquí.",
+  "clinicalAge45WeightSugar": "Después de los 45, el peso extra más el azúcar alto elevan el riesgo de diabetes. Pregunta al médico por un control de azúcar cada 1–3 años.",
+  "clinicalAge60Systolic": "Después de los 60, el número superior de la presión suele subir primero. Registra promedios en casa y compártelos con tu médico.",
+  "clinicalAge65Target": "Después de los 65, muchos buscan presión bajo 140/90 si se sienten bien. Tu médico puede fijar otro objetivo si eres frágil.",
+  "clinicalAgeYoungDiabetesLean": "Antes de 40 con azúcar alto y peso normal: consulta al médico para saber qué tipo de diabetes podría ser.",
+  "clinicalBpOlderAdultSuffix": "En adultos mayores, el número superior suele subir primero: enfócate en esa tendencia y comparte promedios domésticos con tu médico.",
+  "@clinicalBmiValue": {
+    "placeholders": {
+      "bmi": {
+        "type": "String"
+      }
+    }
+  },
+  "bpMsgDiabetes": "La presión arterial está muy alta. Busca atención médica sin demora.",
+  "notifMorningShort": "Ayer: {steps} pasos (meta {goal}), comidas {kcal} kcal. Índice de salud {score}/100 — {status}.",
+  "notifEveningShort": "Hoy {today} pasos frente a {yesterday} ayer. Índice de salud {score}/100 — {status}.",
+  "notifOpenHealthInsights": "Abrir Análisis de salud",
+  "mealIntakeChartTitle": "Calorías de las comidas",
+  "mealZoneDeficit": "≤{max} kcal — déficit (pérdida de peso)",
+  "mealZoneModerate": "{min}–{max} kcal — zona media",
+  "mealZoneSurplus": ">{max} kcal — superávit (riesgo de ganar peso)",
+  "aiDocUploadedAnalysis": "Subí mi análisis: {fileName}",
+  "uploadDicom": "DICOM (imagen médica)",
+  "fileTypeDicom": "DICOM (.dcm) — revisión profunda de patologías con IA",
+  "uploadAnalyzingDicom": "Analizando DICOM con Ai Doc — revisión exhaustiva…",
+
+  "actionHeartRate": "Frecuencia y ritmo",
+  "actionHeartRateDesc": "Chequeo cardíaco con smartwatch",
+  "unitBpm": "lpm",
+  "unitMs": "ms",
+  "hrEvents": "eventos",
+  "hrCurrent": "Frecuencia cardíaca",
+  "hrResting": "En reposo",
+  "hrWalking": "Al caminar",
+  "hrHrv": "VFC",
+  "hrAvg": "FC media",
+  "hrStatus": "Estado",
+  "hrStatusNormal": "Normal",
+  "hrStatusAttention": "Atención",
+  "hrStatusRisk": "Riesgo",
+  "hrNormRange": "Rango en reposo",
+  "hrNormRangeShort": "{low}–{high} lpm",
+  "hrReading": "Leyendo datos del corazón…",
+  "hrReadingHint": "Sincronizando frecuencia y ritmo desde tu Apple Watch vía Apple Salud.",
+  "hrLive": "En vivo",
+  "hrStale": "Última lectura",
+  "hrUpdatedJustNow": "Muestra hace un momento",
+  "hrUpdatedSecondsAgo": "Muestra hace {seconds}s",
+  "hrUpdatedMinutesAgo": "Muestra hace {minutes} min",
+  "hrRefreshSame": "Aún no hay una muestra más nueva en Apple Salud",
+  "hrRefreshOk": "Se cargó la última muestra de Apple Salud",
+  "hrStaleHint": "No hay frecuencia cardíaca de tu dispositivo. Ponte el Apple Watch o una pulsera fitness.",
+  "hrNoDeviceData": "No hay frecuencia cardíaca de tu dispositivo. Ponte el Apple Watch o una pulsera fitness.",
+  "hrNeedPermission": "Se necesita acceso a Apple Salud",
+  "hrNeedPermissionBody": "Permite que PHA lea frecuencia cardíaca, en reposo, VFC y ritmo irregular de Apple Salud.",
+  "hrGrantAccess": "Conceder acceso",
+  "hrNoData": "Aún no hay datos cardíacos. Usa el Apple Watch y toca Actualizar. Activa la frecuencia cardíaca en Apple Salud.",
+  "hrRefresh": "Actualizar",
+  "hrExport": "Exportar",
+  "hrExportTitle": "Resumen PHA: frecuencia y ritmo",
+  "hrExportCopied": "Resumen copiado al portapapeles",
+  "hrDisclaimer": "Esto no es un dispositivo médico. Los datos del reloj no sustituyen al médico. Busca atención si te sientes mal.",
+  "hrChartTitle": "Tendencia de la frecuencia",
+  "hrRange24h": "24h",
+  "hrRange7d": "7d",
+  "hrRange30d": "30d",
+  "hrNoChartData": "Sin datos para este periodo",
+  "hrWhatItMeans": "Qué significa",
+  "hrWhatItMeansBody": "La FC en reposo y la VFC reflejan estrés, recuperación y forma. Los saltos bruscos o varios días altos merecen atención.",
+  "hrEcgTitle": "ECG recientes (Apple Watch)",
+  "hrEcgSinusRhythm": "Ritmo sinusal",
+  "hrEcgAtrialFibrillation": "Fibrilación auricular",
+  "hrEcgLowOrHighHr": "FC baja o alta",
+  "hrEcgInconclusive": "No concluyente",
+  "hrEcgNotSet": "Sin clasificar",
+  "hrIrregularRhythm": "Alertas de ritmo irregular",
+  "hrTrendImproving": "Mejorando",
+  "hrTrendWorsening": "Empeorando",
+  "hrTrendStable": "Estable",
+  "hrTrendUnknown": "Tendencia",
+  "hrExplainNormal": "Tu frecuencia en reposo está en un rango saludable.",
+  "hrExplainHighResting": "FC en reposo {bpm} lpm — por encima del rango habitual hasta {max}. Estrés, enfermedad, cafeína o poca recuperación pueden elevarla.",
+  "hrExplainLowResting": "FC en reposo {bpm} lpm — por debajo del mínimo habitual {min}. Los deportistas suelen tenerla más baja; consulta si hay mareo o debilidad.",
+  "hrExplainLowHrv": "La variabilidad parece baja. Puede indicar estrés o recuperación incompleta: prioriza sueño y descanso.",
+  "hrExplainElevatedStreak": "La FC en reposo se mantiene entre 80 y 95 lpm varios días. Vigila estrés, sobreentrenamiento o inicio de enfermedad.",
+  "hrExplainSpike": "La FC en reposo subió de forma notable de un día a otro. Anota cómo te sientes y revisa mañana.",
+  "hrExplainIrregular": "Apple Watch notificó ritmo irregular. No es un diagnóstico: habla con un médico si continúan las alertas o te sientes mal.",
+  "hrAlertRiskTitle": "Alarma de frecuencia cardíaca",
+  "hrAlertAttentionTitle": "FC en reposo elevada",
+  "hrAlertGenericBody": "Tu FC en reposo está de forma estable en 80–95 lpm o sube día a día. Abre Frecuencia y ritmo para más detalles.",
+  "hrRestingChartTitle": "FC en reposo",
+  "hrAvgResting": "Prom. {bpm} lpm",
+  "hrZoneNormal": "Verde — {low}–{high} lpm (normal)",
+  "hrZoneAttention": "Amarillo — desviación leve",
+  "hrZoneRisk": "Rojo — desviación significativa / riesgo"
+}

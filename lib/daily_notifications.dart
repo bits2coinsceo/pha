@@ -1,21 +1,26 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'locale_controller.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
-import 'api.dart';
 import 'core/app_logger.dart';
 import 'db.dart';
+import 'health_index.dart';
 import 'health_telemetry.dart';
 import 'medical_guidelines.dart';
 import 'physical_activity.dart';
 import 'services.dart';
+import 'l10n/l10n_ext.dart';
+import 'l10n/medical_l10n.dart';
 import 'theme.dart';
 import 'widgets.dart';
 
@@ -50,11 +55,13 @@ class DailyNotificationItem {
 
   bool get isPast => !DateTime.now().isBefore(scheduledAt);
 
-  String get timeLabel {
-    final h = hour % 12 == 0 ? 12 : hour % 12;
-    final m = minute.toString().padLeft(2, '0');
-    final suffix = hour < 12 ? 'AM' : 'PM';
-    return '$h:$m $suffix';
+  /// Locale-aware clock label (e.g. 20:00 in ru, 8:00 PM in en).
+  String localizedTimeLabel(BuildContext context) {
+    final localizations = MaterialLocalizations.of(context);
+    return localizations.formatTimeOfDay(
+      TimeOfDay(hour: hour, minute: minute),
+      alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
+    );
   }
 
   Map<String, dynamic> toJson() => {
@@ -75,18 +82,22 @@ class DailyNotificationItem {
       );
 }
 
-/// Twice-daily local notifications (10:30 AM & 8:00 PM) with Gemini-generated tips.
+/// Twice-daily local notifications (10:30 AM & 8:00 PM) with short localized tips.
 class DailyNotificationService {
   DailyNotificationService._();
 
   static const _morningId = 1001;
   static const _eveningId = 1002;
+  /// Fires ~20 min before the morning push so we can sync HealthKit and
+  /// rewrite the 10:30 banner with finalized yesterday steps.
+  static const _morningPrepId = 1000;
   static const _morningHour = 10;
   static const _morningMinute = 30;
   static const _eveningHour = 20;
   static const _eveningMinute = 0;
-  static const _morningTitle = 'Good morning — your health recap';
-  static const _eveningTitle = 'Evening check-in';
+  /// Short in-app bodies — details live on Health Insights.
+  static const _inAppBodyMax = 280;
+  static const _osPushBodyMax = 180;
 
   static final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
@@ -101,6 +112,30 @@ class DailyNotificationService {
   static bool get isInitialized => _initialized;
 
   static FlutterLocalNotificationsPlugin get plugin => _plugin;
+
+  static const _heartAlertInboxPrefix = 'heart_rate_alert_inbox_';
+
+  static Future<void> saveHeartRateAlert({
+    required String userId,
+    required String title,
+    required String body,
+    required int hour,
+    required int minute,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final now = DateTime.now();
+    await prefs.setString(
+      '$_heartAlertInboxPrefix$userId',
+      jsonEncode({
+        'id': 'heart-rate-alert',
+        'title': title,
+        'body': body,
+        'hour': hour,
+        'minute': minute,
+        'date': _dateLabel(now),
+      }),
+    );
+  }
 
   static Future<bool> ensureReady() async {
     if (kIsWeb) return false;
@@ -274,47 +309,60 @@ class DailyNotificationService {
     return false;
   }
 
-  /// Syncs device activity, builds fresh tip text, and schedules the next
-  /// morning/evening one-shot notifications (not a repeating template).
+  /// Builds short localized tip text and schedules next morning/evening pushes.
   ///
-  /// Evening body is regenerated whenever today's steps change before 20:00,
-  /// so the push uses current HealthKit data — not a morning snapshot.
+  /// Bodies are deterministic templates (no AI) so they stay translated, short,
+  /// and load instantly. Evening text refreshes when steps move before 20:00.
+  /// Morning OS push body is computed for the **delivery calendar day** so
+  /// "Yesterday" matches the day before the notification fires (not the day
+  /// the schedule was created).
+  ///
+  /// Before baking the morning banner, yesterday's steps are pulled from
+  /// HealthKit / Health Connect. On iOS a background refresh ~20 minutes
+  /// before 10:30 rewrites the pending banner with the finalized total.
   static Future<void> scheduleForUser(String userId) async {
     if (!_initialized) await init();
     if (!await hasPermission()) return;
 
-    await _syncDeviceQuietly(userId);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('daily_notif_active_user_id', userId);
 
+    await _syncDeviceQuietly(userId);
+    await _refreshBodiesAndSchedule(userId);
+  }
+
+  /// Fast path used by the in-app notifications panel (no HealthKit wait).
+  static Future<void> ensureTodayContent(String userId) async {
+    await _refreshBodiesAndSchedule(userId);
+  }
+
+  static Future<void> _refreshBodiesAndSchedule(String userId) async {
+    final l10n = await LocaleController.loadLocalizations();
     final prefs = await SharedPreferences.getInstance();
     final todayKey = _dateLabel(DateTime.now());
     final lastKey = prefs.getString('daily_notif_date_$userId');
+    final cachedLocale = prefs.getString('daily_notif_locale_$userId');
+    final currentLocale = l10n.localeName;
+    final localeChanged = cachedLocale != currentLocale;
     final now = DateTime.now();
     final eveningPassed = now.hour > _eveningHour ||
         (now.hour == _eveningHour && now.minute >= _eveningMinute);
 
-    if (lastKey != todayKey) {
-      await prefs.remove('daily_notif_evening_ai_$userId');
+    if (lastKey != todayKey || localeChanged) {
       await prefs.remove('daily_notif_evening_final_$userId');
       await prefs.remove('daily_notif_evening_steps_$userId');
+      await prefs.remove('daily_notif_evening_$userId');
+      await prefs.remove('daily_notif_morning_$userId');
+      await prefs.remove('daily_notif_log_$userId');
+      await prefs.setString('daily_notif_locale_$userId', currentLocale);
     }
 
-    String morningBody;
-    String eveningBody;
-
-    final morningCached = lastKey == todayKey &&
-        prefs.containsKey('daily_notif_morning_$userId');
-    if (morningCached) {
-      morningBody = prefs.getString('daily_notif_morning_$userId')!;
-    } else {
-      try {
-        morningBody = await _generateMorningAdvice(userId);
-      } catch (_) {
-        morningBody =
-            'Check PHA: yesterday\'s steps, meal calories, and a nutrition tip for today.';
-      }
-      morningBody = _clip(morningBody, 200);
-      await prefs.setString('daily_notif_morning_$userId', morningBody);
-    }
+    // In-app inbox: "yesterday" relative to now (when the user is looking).
+    final morningBody = _clip(
+      await _localizedMorningBody(userId, l10n),
+      _inAppBodyMax,
+    );
+    await prefs.setString('daily_notif_morning_$userId', morningBody);
 
     final todaySteps = await _todaySteps(userId);
     final yesterdaySteps = await _stepsOnDay(
@@ -323,68 +371,73 @@ class DailyNotificationService {
     );
     final cachedEveningSteps =
         prefs.getInt('daily_notif_evening_steps_$userId');
-    final eveningCached = lastKey == todayKey &&
-        prefs.containsKey('daily_notif_evening_$userId');
-    // Finalize step-based copy only in the evening window (from 18:00), so we
-    // don't lock in a morning "0 steps" body for the 20:00 push.
     final inEveningWindow = now.hour >= _eveningHour - 2;
     final eveningFinalized =
         prefs.getBool('daily_notif_evening_final_$userId') == true;
     final stepsMoved = cachedEveningSteps == null ||
         (todaySteps - cachedEveningSteps).abs() >= 100;
+    final cachedEveningBody =
+        prefs.getString('daily_notif_evening_$userId') ?? '';
+    final needsNewFormat = _looksLikeLegacyBody(cachedEveningBody) ||
+        localeChanged ||
+        lastKey != todayKey;
 
-    var refreshEvening = false;
-    if (!eveningPassed) {
-      if (!inEveningWindow) {
-        refreshEvening = !eveningCached;
-      } else {
-        refreshEvening = !eveningFinalized || stepsMoved;
-      }
-    } else if (!eveningCached) {
-      refreshEvening = true;
-    }
+    late final String eveningBody;
+    final refreshEvening = needsNewFormat ||
+        !prefs.containsKey('daily_notif_evening_$userId') ||
+        (!eveningPassed && inEveningWindow && (!eveningFinalized || stepsMoved));
 
     if (refreshEvening) {
       if (!inEveningWindow && !eveningPassed) {
-        eveningBody =
-            'Open PHA for your evening check-in — see how today compared to yesterday.';
+        eveningBody = l10n.notifEveningOpenApp;
         await prefs.setBool('daily_notif_evening_final_$userId', false);
       } else {
-        final alreadyAi =
-            prefs.getBool('daily_notif_evening_ai_$userId') == true;
-        final shouldCallAi = !alreadyAi ||
-            (cachedEveningSteps != null &&
-                cachedEveningSteps == 0 &&
-                todaySteps >= 100);
-        if (shouldCallAi) {
-          try {
-            eveningBody = await _generateEveningAdvice(userId);
-            await prefs.setBool('daily_notif_evening_ai_$userId', true);
-          } catch (_) {
-            eveningBody =
-                _deterministicEvening(todaySteps, yesterdaySteps);
-          }
-        } else {
-          eveningBody = _deterministicEvening(todaySteps, yesterdaySteps);
-        }
+        eveningBody = await _localizedEveningBody(
+          userId,
+          l10n,
+          todaySteps: todaySteps,
+          yesterdaySteps: yesterdaySteps,
+        );
         await prefs.setBool('daily_notif_evening_final_$userId', true);
       }
-      eveningBody = _clip(eveningBody, 200);
-      await prefs.setString('daily_notif_evening_$userId', eveningBody);
+      final clipped = _clip(eveningBody, _inAppBodyMax);
+      await prefs.setString('daily_notif_evening_$userId', clipped);
       await prefs.setInt('daily_notif_evening_steps_$userId', todaySteps);
-    } else {
-      eveningBody = prefs.getString('daily_notif_evening_$userId')!;
+      await prefs.setString('daily_notif_date_$userId', todayKey);
+      await _persistTodayLog(userId, morningBody, clipped);
+      await _scheduleOsPushes(
+        userId: userId,
+        l10n: l10n,
+        eveningBody: clipped,
+        eveningPassed: eveningPassed,
+      );
+      return;
     }
 
     await prefs.setString('daily_notif_date_$userId', todayKey);
-    await _persistTodayLog(userId, morningBody, eveningBody);
+    await _persistTodayLog(userId, morningBody, cachedEveningBody);
+    await _scheduleOsPushes(
+      userId: userId,
+      l10n: l10n,
+      eveningBody: cachedEveningBody,
+      eveningPassed: eveningPassed,
+    );
+  }
 
-    const details = NotificationDetails(
+  static Future<void> _scheduleOsPushes({
+    required String userId,
+    required AppLocalizations l10n,
+    required String eveningBody,
+    required bool eveningPassed,
+  }) async {
+    if (!_initialized) return;
+
+    final details = NotificationDetails(
       iOS: DarwinNotificationDetails(presentAlert: true, presentSound: true),
       android: AndroidNotificationDetails(
         'pha_daily',
-        'Daily health tips',
-        channelDescription: 'Morning and evening health advice from Ai Doc',
+        l10n.notifChannelName,
+        channelDescription: l10n.notifChannelDesc,
         importance: Importance.high,
         priority: Priority.high,
       ),
@@ -393,27 +446,49 @@ class DailyNotificationService {
     try {
       await _plugin.cancel(_morningId);
       await _plugin.cancel(_eveningId);
+      await _plugin.cancel(_morningPrepId);
 
-      // One-shot next fire only — body is refreshed on each scheduleForUser /
-      // sync, so we never keep a stale repeating template.
+      final morningAt = _nextTime(_morningHour, _morningMinute);
+      final deliveryDay = DateTime(morningAt.year, morningAt.month, morningAt.day);
+      final yesterday = deliveryDay.subtract(const Duration(days: 1));
+
+      // Finalize yesterday from the device before baking the banner.
+      await _syncDayForMorningPush(userId, yesterday);
+
+      final osMorningBody = _clip(
+        await _localizedMorningBody(
+          userId,
+          l10n,
+          forDeliveryDay: deliveryDay,
+          avoidZeroBanner: true,
+        ),
+        _osPushBodyMax,
+      );
+
       await _plugin.zonedSchedule(
         _morningId,
-        _morningTitle,
-        morningBody,
-        _nextTime(_morningHour, _morningMinute),
+        l10n.morningNotificationTitle,
+        osMorningBody,
+        morningAt,
         details,
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
       );
 
-      // Only schedule tonight's evening push while it still lies ahead.
-      // After 20:00, tomorrow's body is filled on the next day's schedule run.
+      await _scheduleNativeMorningPrep(
+        fireAt: morningAt,
+        title: l10n.morningNotificationTitle,
+        userId: userId,
+        l10n: l10n,
+        deliveryDay: deliveryDay,
+      );
+
       if (!eveningPassed) {
         await _plugin.zonedSchedule(
           _eveningId,
-          _eveningTitle,
-          eveningBody,
+          l10n.eveningNotificationTitle,
+          _clip(eveningBody, _osPushBodyMax),
           _nextTime(_eveningHour, _eveningMinute),
           details,
           androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -426,21 +501,95 @@ class DailyNotificationService {
     }
   }
 
-  /// Call after HealthKit sync so tonight's tip tracks real step counts.
+  /// Sentinel step count used only to build a replaceable OS body template.
+  static const _stepsTemplateSentinel = 912837465;
+
+  static Future<void> _scheduleNativeMorningPrep({
+    required tz.TZDateTime fireAt,
+    required String title,
+    required String userId,
+    required AppLocalizations l10n,
+    required DateTime deliveryDay,
+  }) async {
+    if (kIsWeb || !Platform.isIOS) return;
+    try {
+      final yesterday = deliveryDay.subtract(const Duration(days: 1));
+      final kcal = await _mealKcalOnDay(userId, yesterday);
+      final index = await _indexSnapshot(userId, l10n);
+      final withSentinel = l10n.notifMorningShort(
+        _stepsTemplateSentinel,
+        MedicalGuidelines.stepsGoal,
+        kcal,
+        index.score,
+        index.status,
+      );
+      final template = withSentinel.replaceAll(
+        '$_stepsTemplateSentinel',
+        '__STEPS__',
+      );
+      const channel = MethodChannel('pha.morning_push_prep/methods');
+      await channel.invokeMethod<void>('schedule', {
+        'fireAtMs': fireAt.millisecondsSinceEpoch,
+        'title': title,
+        'bodyTemplate': _clip(template, _osPushBodyMax),
+      });
+    } catch (e, st) {
+      debugPrint('Morning push prep schedule failed: $e\n$st');
+    }
+  }
+
+  /// Old AI / markdown bodies — force rewrite to short localized templates.
+  static bool _looksLikeLegacyBody(String body) {
+    if (body.isEmpty) return true;
+    if (body.contains('**') || body.contains('* ')) return true;
+    if (body.length > _inAppBodyMax) return true;
+    final lower = body.toLowerCase();
+    return lower.contains('good job logging') ||
+        (lower.contains('health index') && lower.contains('currently')) ||
+        lower.contains('what looks good') ||
+        lower.contains('what requires attention');
+  }
+
+  /// Call after HealthKit sync so morning/evening tips track real step counts.
+  /// Does not sync again — caller already pulled from the device.
   static Future<void> refreshEveningAfterActivitySync(String userId) async {
     if (!await hasPermission()) return;
-    final now = DateTime.now();
-    final eveningPassed = now.hour > _eveningHour ||
-        (now.hour == _eveningHour && now.minute >= _eveningMinute);
-    if (eveningPassed) return;
-    await scheduleForUser(userId);
+    if (!_initialized) await init();
+    await _refreshBodiesAndSchedule(userId);
+  }
+
+  static Future<void> _syncDayForMorningPush(
+    String userId,
+    DateTime day,
+  ) async {
+    try {
+      if (!HealthTelemetryService.isSupported) return;
+      if (!await HealthTelemetryService.hasPermission()) return;
+      await HealthConnectService.syncDayFromDevice(userId, day)
+          .timeout(const Duration(seconds: 10));
+    } catch (_) {
+      // Non-fatal — fall back to SQLite / open-app tip.
+    }
   }
 
   static Future<void> _syncDeviceQuietly(String userId) async {
     try {
       if (!HealthTelemetryService.isSupported) return;
       if (!await HealthTelemetryService.hasPermission()) return;
-      await HealthConnectService.syncFromDevice(userId);
+      final morningAt = _nextTime(_morningHour, _morningMinute);
+      final deliveryDay =
+          DateTime(morningAt.year, morningAt.month, morningAt.day);
+      final yesterday = deliveryDay.subtract(const Duration(days: 1));
+      // Morning banner needs yesterday; live dashboard needs today.
+      await Future.wait([
+        _syncDayForMorningPush(userId, yesterday),
+        () async {
+          try {
+            await HealthConnectService.syncFromDevice(userId)
+                .timeout(const Duration(seconds: 8));
+          } catch (_) {}
+        }(),
+      ]);
     } catch (_) {
       // Non-fatal — tips fall back to whatever is already in SQLite.
     }
@@ -469,18 +618,81 @@ class DailyNotificationService {
     return maxSteps;
   }
 
-  static String _deterministicEvening(int todaySteps, int yesterdaySteps) {
-    if (todaySteps <= 0) {
-      return 'Open PHA for your evening check-in — see how today compared to yesterday.';
+  static Future<({int score, String status})> _indexSnapshot(
+    String userId,
+    AppLocalizations l10n,
+  ) async {
+    try {
+      final latest = await HealthIndexService.latest(userId);
+      if (latest != null) {
+        return (score: latest.score, status: l10n.statusLabel(latest.status));
+      }
+    } catch (_) {}
+    return (score: 0, status: l10n.statusLabel('fair'));
+  }
+
+  /// Morning recap for [forDeliveryDay] (defaults to today).
+  /// "Yesterday" = calendar day before the delivery day.
+  ///
+  /// When [avoidZeroBanner] is true (OS push), a zero/empty yesterday falls
+  /// back to a short “open PHA” tip so the lock-screen banner is not frozen
+  /// with “0 steps” before HealthKit has synced.
+  static Future<String> _localizedMorningBody(
+    String userId,
+    AppLocalizations l10n, {
+    DateTime? forDeliveryDay,
+    bool avoidZeroBanner = false,
+  }) async {
+    final delivery = forDeliveryDay ?? DateTime.now();
+    final day = DateTime(delivery.year, delivery.month, delivery.day);
+    final yesterday = day.subtract(const Duration(days: 1));
+    final steps = await _stepsOnDay(userId, yesterday);
+    final kcal = await _mealKcalOnDay(userId, yesterday);
+    final index = await _indexSnapshot(userId, l10n);
+    if (avoidZeroBanner && steps <= 0 && kcal <= 0) {
+      return l10n.notifMorningFallbackDetailed;
     }
-    if (yesterdaySteps <= 0) {
-      return 'Today you logged $todaySteps steps. Keep building the habit — open PHA for your full check-in.';
+    return l10n.notifMorningShort(
+      steps,
+      MedicalGuidelines.stepsGoal,
+      kcal,
+      index.score,
+      index.status,
+    );
+  }
+
+  static Future<String> _localizedEveningBody(
+    String userId,
+    AppLocalizations l10n, {
+    required int todaySteps,
+    required int yesterdaySteps,
+  }) async {
+    final index = await _indexSnapshot(userId, l10n);
+    return l10n.notifEveningShort(
+      todaySteps,
+      yesterdaySteps,
+      index.score,
+      index.status,
+    );
+  }
+
+  static Future<int> _mealKcalOnDay(String userId, DateTime day) async {
+    if (!Db.instance.isReady) return 0;
+    final start = DateTime(day.year, day.month, day.day);
+    final end = start.add(const Duration(days: 1));
+    final meals = await Db.instance.raw.query(
+      'meal_calorie_checks',
+      where: 'user_id = ? AND confirmed = 1',
+      whereArgs: [userId],
+      orderBy: 'checked_at DESC',
+    );
+    var total = 0;
+    for (final m in meals) {
+      final at = DateTime.parse(m['checked_at'] as String).toLocal();
+      if (at.isBefore(start) || !at.isBefore(end)) continue;
+      total += (m['calories'] as num?)?.toInt() ?? 0;
     }
-    if (todaySteps >= yesterdaySteps) {
-      return 'Today you logged $todaySteps steps, up from yesterday\'s $yesterdaySteps. Nice progress — keep it going.';
-    }
-    return 'You slipped today with $todaySteps steps, down from yesterday\'s $yesterdaySteps. '
-        'Let\'s get moving again tomorrow; even a short walk helps.';
+    return total;
   }
 
   static tz.TZDateTime _nextTime(int hour, int minute) {
@@ -505,128 +717,17 @@ class DailyNotificationService {
     return '${t.substring(0, max - 1)}…';
   }
 
-  static Future<String> _generateMorningAdvice(String userId) async {
-    final yesterday = DateTime.now().subtract(const Duration(days: 1));
-    final dayData = await _dayHealthReport(userId, yesterday);
-    final profile = await AiConsultationService.buildFullPatientContext(userId);
-
-    final prompt =
-        'You are Ai Doc in the PHA app. Write the body of a SHORT morning push '
-        'notification (max 40 words, 2 short sentences). '
-        'MUST mention: (1) yesterday\'s steps vs ${MedicalGuidelines.stepsGoal} goal, '
-        '(2) yesterday\'s TOTAL meal calories eaten (number), '
-        '(3) one concrete nutrition tip for TODAY. '
-        'No greeting, no quotes.\n\n'
-        'Patient context:\n$profile\n\n'
-        'Yesterday (${_dateLabel(yesterday)}):\n$dayData';
-
-    return ApiClient.chat(userId: userId, message: prompt, complexity: 'simple');
-  }
-
-  static Future<String> _generateEveningAdvice(String userId) async {
-    final today = DateTime.now();
-    final yesterday = today.subtract(const Duration(days: 1));
-    final todayData = await _dayHealthReport(userId, today);
-    final yesterdayData = await _dayHealthReport(userId, yesterday);
-    final profile = await AiConsultationService.buildFullPatientContext(userId);
-
-    final prompt =
-        'You are Ai Doc in the PHA app. Write the body of a SHORT evening push '
-        'notification (max 35 words, 1–2 sentences). '
-        'Compare TODAY vs YESTERDAY: steps, meals, activity. '
-        'Did the patient improve or slip? One encouraging or corrective tip. '
-        'No greeting, no quotes.\n\n'
-        'Patient context:\n$profile\n\n'
-        'Today (${_dateLabel(today)}):\n$todayData\n\n'
-        'Yesterday (${_dateLabel(yesterday)}):\n$yesterdayData';
-
-    return ApiClient.chat(userId: userId, message: prompt, complexity: 'simple');
-  }
-
   static String _dateLabel(DateTime d) =>
       '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
-
-  static Future<String> _dayHealthReport(String userId, DateTime day) async {
-    final db = Db.instance.raw;
-    final localStart = DateTime(day.year, day.month, day.day);
-    final localEnd = localStart.add(const Duration(days: 1));
-
-    final metrics = await db.query(
-      'health_metrics',
-      where: 'user_id = ?',
-      whereArgs: [userId],
-      orderBy: 'recorded_at DESC',
-    );
-
-    final dayMetrics = <String, double>{};
-    for (final m in metrics) {
-      final recorded = DateTime.parse(m['recorded_at'] as String).toLocal();
-      if (recorded.isBefore(localStart) || !recorded.isBefore(localEnd)) continue;
-      final type = m['metric_type'] as String;
-      final value = (m['value'] as num).toDouble();
-      // Steps/distance/calories: keep the peak reading for the day (syncs climb).
-      if (type == 'steps' || type == 'distance' || type == 'calories') {
-        final prev = dayMetrics[type];
-        if (prev == null || value > prev) dayMetrics[type] = value;
-      } else {
-        dayMetrics.putIfAbsent(type, () => value);
-      }
-    }
-
-    final meals = await db.query(
-      'meal_calorie_checks',
-      where: 'user_id = ? AND confirmed = 1',
-      whereArgs: [userId],
-      orderBy: 'checked_at DESC',
-    );
-    final dayMeals = <String>[];
-    var mealKcalTotal = 0;
-    for (final m in meals) {
-      final at = DateTime.parse(m['checked_at'] as String).toLocal();
-      if (at.isBefore(localStart) || !at.isBefore(localEnd)) continue;
-      final kcal = (m['calories'] as num?)?.toInt();
-      if (kcal != null) mealKcalTotal += kcal;
-      final cat = m['category_label'] ?? m['category'];
-      final name = (m['meal_name'] as String?)?.trim();
-      final label = (name != null && name.isNotEmpty)
-          ? name
-          : _clip(m['analysis'] as String, 80);
-      dayMeals.add(
-        '$label — $cat${kcal != null ? ', $kcal kcal' : ''}',
-      );
-    }
-
-    final buf = StringBuffer();
-    if (dayMetrics.isEmpty) {
-      buf.writeln('- No activity metrics logged this day.');
-    } else {
-      for (final e in dayMetrics.entries) {
-        buf.writeln('- ${e.key}: ${e.value}');
-      }
-    }
-    if (dayMeals.isEmpty) {
-      buf.writeln('- Meals eaten: none confirmed.');
-      buf.writeln('- Total meal calories eaten: 0 kcal');
-    } else {
-      buf.writeln('- Meals eaten (${dayMeals.length}), total: $mealKcalTotal kcal');
-      for (final meal in dayMeals) {
-        buf.writeln('  · $meal');
-      }
-    }
-    return buf.toString();
-  }
-
-  static Future<void> ensureTodayContent(String userId) async {
-    // Only ensure OS schedules exist; inbox shows delivered items only.
-    await scheduleForUser(userId);
-  }
 
   /// Notifications that already fired today (not future / scheduled ones).
   static Future<List<DailyNotificationItem>> todayForUser(String userId) async {
     final tips = await _aiTipsForUser(userId);
     final treatment = await _treatmentReminders(userId);
     final activity = await _activityCheckinReminder(userId);
-    final all = [...tips, ...treatment, ...activity]
+    final incomplete = await _incompleteAssessmentsReminder(userId);
+    final heart = await _heartRateAlertReminder(userId);
+    final all = [...heart, ...incomplete, ...tips, ...treatment, ...activity]
         .where((n) => n.isPast)
         .toList();
     all.sort((a, b) => b.scheduledAt.compareTo(a.scheduledAt));
@@ -649,10 +750,12 @@ class DailyNotificationService {
     final morning = prefs.getString('daily_notif_morning_$userId');
     final evening = prefs.getString('daily_notif_evening_$userId');
     if (morning == null || evening == null) return [];
-    return _itemsFromBodies(morning, evening);
+    final l10n = await LocaleController.loadLocalizations();
+    return _itemsFromBodies(morning, evening, l10n);
   }
 
   static Future<List<DailyNotificationItem>> _treatmentReminders(String userId) async {
+    final l10n = await LocaleController.loadLocalizations();
     if (!Db.instance.isReady) return [];
     final rows = await Db.instance.raw.query(
       'treatment_schedule',
@@ -671,11 +774,11 @@ class DailyNotificationService {
         final parts = times[i].split(':');
         final hour = int.parse(parts[0]);
         final minute = int.parse(parts[1]);
-        final doseLabel = doses > 1 ? 'Dose ${i + 1} of $doses — ' : '';
+        final doseLabel = doses > 1 ? l10n.notifDoseLabel(i + 1, doses) : '';
         reminders.add(DailyNotificationItem(
           id: 'treatment-$itemId-$i',
-          title: 'Medication: $name',
-          body: '${doseLabel}Take $name',
+          title: l10n.notifMedicationTitle(name),
+          body: '$doseLabel${l10n.notifMedicationBody(name)}',
           hour: hour,
           minute: minute,
         ));
@@ -686,6 +789,7 @@ class DailyNotificationService {
 
   static Future<List<DailyNotificationItem>> _activityCheckinReminder(
       String userId) async {
+    final l10n = await LocaleController.loadLocalizations();
     if (!Db.instance.isReady) return [];
     final rows = await Db.instance.raw.query(
       'physical_activity_programs',
@@ -695,16 +799,81 @@ class DailyNotificationService {
       limit: 1,
     );
     if (rows.isEmpty) return [];
-    final label = rows.first['program_label'] as String? ?? 'your program';
+    final label = rows.first['program_label'] as String? ?? l10n.activityYourProgramFallback;
     return [
       DailyNotificationItem(
         id: 'activity-checkin',
-        title: 'Physical activity check-in',
-        body: 'Did you complete $label today?',
+        title: l10n.notifActivityTitle,
+        body: l10n.notifActivityBody(label),
         hour: 20,
         minute: 0,
       ),
     ];
+  }
+
+  /// Reminders to complete habits / wellness / PsychoTest for a fuller Health Index.
+  static Future<List<DailyNotificationItem>> _incompleteAssessmentsReminder(
+    String userId,
+  ) async {
+    if (!Db.instance.isReady) return [];
+    final l10n = await LocaleController.loadLocalizations();
+    final db = Db.instance.raw;
+    final missing = <String>[];
+
+    Future<bool> hasRow(String table) async {
+      final rows = await db.query(
+        table,
+        columns: ['id'],
+        where: 'user_id = ?',
+        whereArgs: [userId],
+        limit: 1,
+      );
+      return rows.isNotEmpty;
+    }
+
+    if (!await hasRow('bad_habit_checks')) {
+      missing.add(l10n.actionBadHabits);
+    }
+    if (!await hasRow('stress_tests')) {
+      missing.add(l10n.actionWellnessCheck);
+    }
+    if (!await hasRow('psychotest_results')) {
+      missing.add(l10n.actionPsychoTest);
+    }
+    if (missing.isEmpty) return [];
+
+    return [
+      DailyNotificationItem(
+        id: 'incomplete-assessments',
+        title: l10n.notifIncompleteAssessmentsTitle,
+        body: l10n.notifIncompleteAssessmentsBody(missing.join(', ')),
+        hour: 0,
+        minute: 0,
+      ),
+    ];
+  }
+
+  static Future<List<DailyNotificationItem>> _heartRateAlertReminder(
+    String userId,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString('$_heartAlertInboxPrefix$userId');
+    if (raw == null || raw.isEmpty) return [];
+    try {
+      final map = jsonDecode(raw) as Map<String, dynamic>;
+      if (map['date'] != _dateLabel(DateTime.now())) return [];
+      return [
+        DailyNotificationItem(
+          id: map['id'] as String? ?? 'heart-rate-alert',
+          title: map['title'] as String? ?? '',
+          body: map['body'] as String? ?? '',
+          hour: (map['hour'] as num?)?.toInt() ?? 0,
+          minute: (map['minute'] as num?)?.toInt() ?? 0,
+        ),
+      ];
+    } catch (_) {
+      return [];
+    }
   }
 
   static Future<int> unreadCount(String userId) async {
@@ -731,7 +900,8 @@ class DailyNotificationService {
     String eveningBody,
   ) async {
     final prefs = await SharedPreferences.getInstance();
-    final items = _itemsFromBodies(morningBody, eveningBody);
+    final l10n = await LocaleController.loadLocalizations();
+    final items = _itemsFromBodies(morningBody, eveningBody, l10n);
     await prefs.setString(
       'daily_notif_log_$userId',
       jsonEncode(items.map((e) => e.toJson()).toList()),
@@ -741,18 +911,19 @@ class DailyNotificationService {
   static List<DailyNotificationItem> _itemsFromBodies(
     String morningBody,
     String eveningBody,
+    AppLocalizations l10n,
   ) =>
       [
         DailyNotificationItem(
           id: 'morning',
-          title: _morningTitle,
+          title: l10n.morningNotificationTitle,
           body: morningBody,
           hour: _morningHour,
           minute: _morningMinute,
         ),
         DailyNotificationItem(
           id: 'evening',
-          title: _eveningTitle,
+          title: l10n.eveningNotificationTitle,
           body: eveningBody,
           hour: _eveningHour,
           minute: _eveningMinute,
@@ -817,23 +988,35 @@ class _TodayNotificationsPanelState extends State<TodayNotificationsPanel> {
     }
   }
 
-  String _answerLabel(String status) {
+  String _answerLabel(String status, AppLocalizations l10n) {
     switch (status) {
       case 'yes':
-        return 'Yes';
+        return l10n.yes;
       case 'no':
-        return 'No';
+        return l10n.no;
       case 'partially':
-        return 'Partial';
+        return l10n.partially;
       default:
         return status;
     }
   }
 
+  String _localizedTitle(BuildContext context, DailyNotificationItem item) {
+    final l10n = context.l10n;
+    return switch (item.id) {
+      'morning' => l10n.morningNotificationTitle,
+      'evening' => l10n.eveningNotificationTitle,
+      'incomplete-assessments' => l10n.notifIncompleteAssessmentsTitle,
+      'heart-rate-alert' => l10n.hrAlertRiskTitle,
+      _ => item.title,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return AppModal(
-      title: "Today's notifications",
+      title: l10n.todaysNotifications,
       onClose: () => Navigator.pop(context, savedAnything),
       child: loading
           ? const Padding(
@@ -848,13 +1031,13 @@ class _TodayNotificationsPanelState extends State<TodayNotificationsPanel> {
                       Icon(Icons.notifications_none, size: 40, color: C.gray400),
                       const SizedBox(height: 12),
                       Text(
-                        'No notifications for today yet.',
+                        l10n.noNotificationsToday,
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 14, color: C.gray500),
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Notifications that already arrived today appear here.',
+                        l10n.notificationsAppearHere,
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 12, color: C.gray400, height: 1.4),
                       ),
@@ -873,29 +1056,44 @@ class _TodayNotificationsPanelState extends State<TodayNotificationsPanel> {
   }
 
   Widget _notificationCard(DailyNotificationItem item) {
+    final l10n = context.l10n;
     final isTreatment = item.id.startsWith('treatment-');
     final isActivity = item.id == 'activity-checkin';
-    final icon = isActivity
-        ? Icons.fitness_center_outlined
-        : isTreatment
-            ? Icons.medication_outlined
-            : item.id == 'morning'
-                ? Icons.wb_sunny_outlined
-                : Icons.nights_stay_outlined;
-    final iconColor = isActivity
-        ? C.emerald600
-        : isTreatment
-            ? C.teal700
-            : item.id == 'morning'
-                ? C.amber700
-                : C.blue600;
-    final iconBg = isActivity
-        ? C.emerald50
-        : isTreatment
-            ? C.teal50
-            : item.id == 'morning'
-                ? C.amber50
-                : C.blue50;
+    final isIncomplete = item.id == 'incomplete-assessments';
+    final isHeart = item.id == 'heart-rate-alert';
+    final icon = isHeart
+        ? Icons.monitor_heart_outlined
+        : isIncomplete
+            ? Icons.assignment_late_outlined
+            : isActivity
+                ? Icons.fitness_center_outlined
+                : isTreatment
+                    ? Icons.medication_outlined
+                    : item.id == 'morning'
+                        ? Icons.wb_sunny_outlined
+                        : Icons.nights_stay_outlined;
+    final iconColor = isHeart
+        ? C.red600
+        : isIncomplete
+            ? C.amber700
+            : isActivity
+                ? C.emerald600
+                : isTreatment
+                    ? C.teal700
+                    : item.id == 'morning'
+                        ? C.amber700
+                        : C.blue600;
+    final iconBg = isHeart
+        ? C.red50
+        : isIncomplete
+            ? C.amber50
+            : isActivity
+                ? C.emerald50
+                : isTreatment
+                    ? C.teal50
+                    : item.id == 'morning'
+                        ? C.amber50
+                        : C.blue50;
 
     return Container(
       width: double.infinity,
@@ -918,7 +1116,7 @@ class _TodayNotificationsPanelState extends State<TodayNotificationsPanel> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item.title,
+                      _localizedTitle(context, item),
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 15,
@@ -927,7 +1125,9 @@ class _TodayNotificationsPanelState extends State<TodayNotificationsPanel> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      isActivity ? 'Daily' : item.timeLabel,
+                      isActivity
+                          ? l10n.dailyLabel
+                          : item.localizedTimeLabel(context),
                       style: TextStyle(fontSize: 12, color: C.gray400),
                     ),
                   ],
@@ -940,6 +1140,29 @@ class _TodayNotificationsPanelState extends State<TodayNotificationsPanel> {
             item.body,
             style: TextStyle(fontSize: 14, color: C.gray700, height: 1.45),
           ),
+          if (item.id == 'morning' || item.id == 'evening') ...[
+            const SizedBox(height: 10),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: () => Navigator.pop(context, 'insights'),
+                style: TextButton.styleFrom(
+                  foregroundColor: C.blue600,
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                icon: const Icon(Icons.insights_outlined, size: 16),
+                label: Text(
+                  l10n.notifOpenHealthInsights,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
           if (isActivity) ...[
             const SizedBox(height: 14),
             if (activityAnswer != null)
@@ -952,7 +1175,7 @@ class _TodayNotificationsPanelState extends State<TodayNotificationsPanel> {
                   border: Border.all(color: C.emerald600.withValues(alpha: 0.25)),
                 ),
                 child: Text(
-                  'Saved: ${_answerLabel(activityAnswer!)} — Health Index updated',
+                  l10n.notifActivitySaved(_answerLabel(activityAnswer!, l10n)),
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -976,7 +1199,7 @@ class _TodayNotificationsPanelState extends State<TodayNotificationsPanel> {
                 children: [
                   Expanded(
                     child: _ActivityAnswerChip(
-                      label: 'Yes',
+                      label: l10n.yes,
                       color: C.teal600,
                       onTap: () => _answerActivity('yes'),
                     ),
@@ -984,7 +1207,7 @@ class _TodayNotificationsPanelState extends State<TodayNotificationsPanel> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: _ActivityAnswerChip(
-                      label: 'No',
+                      label: l10n.no,
                       color: C.gray700,
                       outlined: true,
                       onTap: () => _answerActivity('no'),
@@ -993,7 +1216,7 @@ class _TodayNotificationsPanelState extends State<TodayNotificationsPanel> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: _ActivityAnswerChip(
-                      label: 'Partial',
+                      label: l10n.partially,
                       color: C.blue600,
                       onTap: () => _answerActivity('partially'),
                     ),

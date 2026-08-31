@@ -5,6 +5,7 @@ import '../auth.dart';
 import '../theme.dart';
 import '../treatment_notifications.dart';
 import '../treatment_schedule.dart';
+import '../l10n/l10n_ext.dart';
 import '../widgets.dart';
 
 class _DraftEntry {
@@ -107,7 +108,7 @@ class _TreatmentScheduleModalState extends State<TreatmentScheduleModal> {
     final userId = context.read<AuthProvider>().user!.id;
     final toSave = _drafts.where((d) => d.name.text.trim().isNotEmpty).toList();
     if (toSave.isEmpty) {
-      setState(() => _error = 'Enter at least one medicine or supplement name.');
+      setState(() => _error = context.l10n.treatmentEnterName);
       return;
     }
     setState(() {
@@ -132,11 +133,12 @@ class _TreatmentScheduleModalState extends State<TreatmentScheduleModal> {
         ..add(_DraftEntry());
       await _load();
       if (mounted) {
+        final l10n = context.l10n;
         if (!permitted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                  'Schedule saved, but notifications are off. Enable alerts in Settings to get pill reminders with sound.'),
+                  l10n.treatmentNotifOff),
               backgroundColor: C.amber700,
               behavior: SnackBarBehavior.floating,
             ),
@@ -144,7 +146,7 @@ class _TreatmentScheduleModalState extends State<TreatmentScheduleModal> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Treatment schedule saved — pill reminders are on'),
+              content: Text(l10n.treatmentSaved),
               backgroundColor: C.statusGood,
               behavior: SnackBarBehavior.floating,
             ),
@@ -152,7 +154,7 @@ class _TreatmentScheduleModalState extends State<TreatmentScheduleModal> {
         }
       }
     } catch (_) {
-      if (mounted) setState(() => _error = 'Could not save. Please try again.');
+      if (mounted) setState(() => _error = context.l10n.treatmentSaveFailed);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -165,8 +167,9 @@ class _TreatmentScheduleModalState extends State<TreatmentScheduleModal> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return AppModal(
-      title: 'Treatment Schedule',
+      title: l10n.actionTreatmentSchedule,
       onClose: () => Navigator.pop(context),
       child: _loading
           ? Padding(
@@ -187,7 +190,7 @@ class _TreatmentScheduleModalState extends State<TreatmentScheduleModal> {
                   SizedBox(height: 16),
                 ],
                 if (_saved.isNotEmpty) ...[
-                  Text('Your schedule',
+                  Text(l10n.treatmentYourSchedule,
                       style: TextStyle(
                           fontSize: 14, fontWeight: FontWeight.w600, color: C.gray700)),
                   SizedBox(height: 10),
@@ -196,7 +199,7 @@ class _TreatmentScheduleModalState extends State<TreatmentScheduleModal> {
                   Divider(color: C.gray200),
                   SizedBox(height: 20),
                 ],
-                Text('Add medicine or supplement',
+                Text(l10n.treatmentAddMedicine,
                     style: TextStyle(
                         fontSize: 14, fontWeight: FontWeight.w600, color: C.gray700)),
                 SizedBox(height: 12),
@@ -205,7 +208,7 @@ class _TreatmentScheduleModalState extends State<TreatmentScheduleModal> {
                 OutlinedButton.icon(
                   onPressed: _addDraft,
                   icon: Icon(Icons.add, size: 18, color: C.accentPrimary),
-                  label: Text('Add another',
+                  label: Text(l10n.treatmentAddAnother,
                       style: TextStyle(color: C.accentPrimary, fontWeight: FontWeight.w600)),
                   style: OutlinedButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: 12),
@@ -215,7 +218,7 @@ class _TreatmentScheduleModalState extends State<TreatmentScheduleModal> {
                 ),
                 SizedBox(height: 20),
                 PrimaryButton(
-                  label: _saving ? 'Saving...' : 'Save schedule',
+                  label: _saving ? l10n.treatmentSaving : l10n.treatmentSaveSchedule,
                   color: C.teal600,
                   onPressed: _saving ? null : _save,
                 ),
@@ -264,6 +267,7 @@ class _TreatmentScheduleModalState extends State<TreatmentScheduleModal> {
 
   Widget _draftCard(int index) {
     if (index < 0 || index >= _drafts.length) return const SizedBox.shrink();
+    final l10n = context.l10n;
     final draft = _drafts[index];
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -276,7 +280,7 @@ class _TreatmentScheduleModalState extends State<TreatmentScheduleModal> {
             children: [
               Expanded(
                 child: Text(
-                  _drafts.length > 1 ? 'Entry ${index + 1}' : 'New entry',
+                  _drafts.length > 1 ? l10n.treatmentEntryNumber(index + 1) : l10n.treatmentNewEntry,
                   style: TextStyle(
                       fontSize: 13, fontWeight: FontWeight.w600, color: C.gray500),
                 ),
@@ -291,16 +295,16 @@ class _TreatmentScheduleModalState extends State<TreatmentScheduleModal> {
             ],
           ),
           SizedBox(height: 10),
-          Text('Name of medicine or dietary supplement',
+          Text(l10n.treatmentMedicineName,
               style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: C.gray700)),
           SizedBox(height: 8),
           TextField(
             controller: draft.name,
             textCapitalization: TextCapitalization.sentences,
-            decoration: appInput('e.g. Vitamin D, Metformin'),
+            decoration: appInput(l10n.treatmentMedicinePlaceholder),
           ),
           SizedBox(height: 16),
-          Text('How many times a day',
+          Text(l10n.treatmentHowManyTimes,
               style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: C.gray700)),
           SizedBox(height: 8),
           Row(
@@ -346,7 +350,7 @@ class _TreatmentScheduleModalState extends State<TreatmentScheduleModal> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Dose ${i + 1} time',
+                  Text(l10n.treatmentDoseTime(i + 1),
                       style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: C.gray700)),
                   SizedBox(height: 8),
                   InkWell(

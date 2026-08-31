@@ -8,6 +8,8 @@ import '../db.dart';
 import '../health_index.dart';
 import '../medical_guidelines.dart';
 import '../theme.dart';
+import '../l10n/l10n_ext.dart';
+import '../l10n/medical_l10n.dart';
 import '../widgets.dart';
 
 const _uuid = Uuid();
@@ -51,36 +53,34 @@ class _Block {
   dot: C.teal500
 );
 
-List<_Block> get _blocks => [
-  _Block('Block 1', 'Stress Awareness', _blue, [
-    _Question('How often have you felt overwhelmed or unable to control important things in your life?'),
-    _Question('How often do you experience physical symptoms like headaches, muscle tension, or fatigue due to stress?'),
-    _Question('How well have you been sleeping?'),
-    _Question('How often do you feel anxious, worried, or on edge?'),
-    _Question('How satisfied are you with your ability to relax and unwind?'),
+List<_Block> _blocksFor(AppLocalizations l10n) => [
+  _Block(l10n.psychoBlock1Title, l10n.psychoBlock1Subtitle, _blue, [
+    _Question(l10n.psychoQ1),
+    _Question(l10n.psychoQ2),
+    _Question(l10n.psychoQ3),
+    _Question(l10n.psychoQ4),
+    _Question(l10n.psychoQ5),
   ]),
-  _Block('Block 2', 'Physical Symptoms', _orange, [
-    _Question('Do you often have:', ['Headaches', 'Muscle spasms', 'Neck pain', 'Chest pressure', 'Heaviness in the stomach']),
-    _Question('Do your symptoms get worse after stress?'),
-    _Question('Do you have:', ['Tachycardia', 'Blood pressure surges', 'Sweating', 'Trembling']),
-    _Question('Do you have any gastrointestinal problems:', ['Bloating', 'Heartburn', 'Spasms', 'Diarrhea / constipation']),
-    _Question('Do you feel short of breath?'),
-    _Question('Do you have chronic fatigue?'),
-    _Question('Do you have muscle tension?'),
-    _Question('Do your symptoms get worse during conflicts or anxiety?'),
+  _Block(l10n.psychoBlock2Title, l10n.psychoBlock2Subtitle, _orange, [
+    _Question(l10n.psychoQ6, [l10n.psychoSubHeadaches, l10n.psychoSubMuscleSpasms, l10n.psychoSubNeckPain, l10n.psychoSubChestPressure, l10n.psychoSubStomachHeaviness]),
+    _Question(l10n.psychoQ7),
+    _Question(l10n.psychoQ8, [l10n.psychoSubTachycardia, l10n.psychoSubBpSurges, l10n.psychoSubSweating, l10n.psychoSubTrembling]),
+    _Question(l10n.psychoQ9, [l10n.psychoSubBloating, l10n.psychoSubHeartburn, l10n.psychoSubSpasms, l10n.psychoSubDiarrheaConstipation]),
+    _Question(l10n.psychoQ10),
+    _Question(l10n.psychoQ11),
+    _Question(l10n.psychoQ12),
+    _Question(l10n.psychoQ13),
   ]),
-  _Block('Block 3', 'Behavioral Profile', _teal, [
-    _Question('Do you tend to:', ['Keep everything under control', 'Avoid conflicts', 'Accumulate emotions', 'Take responsibility for everyone']),
-    _Question('Do you often:', ['Work overtime', "Don't rest", 'Feel guilty']),
-    _Question('Is it difficult for you to say "no"?'),
-    _Question('Do you have a fear of losing control?'),
-    _Question('Do you experience constant internal tension even in a calm environment?'),
-    _Question('Do you feel loneliness despite communication?'),
-    _Question('Do you often "keep everything inside"?'),
+  _Block(l10n.psychoBlock3Title, l10n.psychoBlock3Subtitle, _teal, [
+    _Question(l10n.psychoQ14, [l10n.psychoSubKeepControl, l10n.psychoSubAvoidConflicts, l10n.psychoSubAccumulateEmotions, l10n.psychoSubTakeResponsibility]),
+    _Question(l10n.psychoQ15, [l10n.psychoSubWorkOvertime, l10n.psychoSubDontRest, l10n.psychoSubFeelGuilty]),
+    _Question(l10n.psychoQ16),
+    _Question(l10n.psychoQ17),
+    _Question(l10n.psychoQ18),
+    _Question(l10n.psychoQ19),
+    _Question(l10n.psychoQ20),
   ]),
 ];
-
-const _answerOptions = [('Never', 0), ('Sometimes', 1), ('Often', 2)];
 
 int _scorePercent(List<int> answers, int questionCount) {
   if (answers.isEmpty) return 0;
@@ -88,32 +88,32 @@ int _scorePercent(List<int> answers, int questionCount) {
   return ((sum / (questionCount * 2)) * 100).round();
 }
 
-({String label, Color color, Color bg, Color border, String desc}) _level(int score) {
+({String label, Color color, Color bg, Color border, String desc}) _level(int score, AppLocalizations l10n) {
   final c = PsychoGuidelines.classifyLoad(score);
   switch (c.band) {
     case 'high':
       return (
-        label: c.label,
+        label: l10n.psychoHigh,
         color: C.red600,
         bg: C.red50,
         border: C.red200,
-        desc: c.message,
+        desc: l10n.psychoHighMsg,
       );
     case 'moderate':
       return (
-        label: c.label,
+        label: l10n.psychoModerate,
         color: C.amber600,
         bg: C.amber50,
         border: C.amber200,
-        desc: c.message,
+        desc: l10n.psychoModerateMsg,
       );
     default:
       return (
-        label: c.label,
+        label: l10n.psychoLow,
         color: C.emerald600,
         bg: C.emerald50,
         border: C.emerald200,
-        desc: c.message,
+        desc: l10n.psychoLowMsg,
       );
   }
 }
@@ -132,6 +132,8 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
   final answers = <List<int>>[[], [], []];
   bool saving = false;
   ({int b1, int b2, int b3, int total})? result;
+
+  List<_Block> get _blocks => _blocksFor(context.l10n);
 
   int get _totalQuestions => _blocks.fold(0, (a, b) => a + b.questions.length);
 
@@ -166,7 +168,7 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
       'block2_score': b2,
       'block3_score': b3,
       'total_score': total,
-      'level': _level(total).label,
+      'level': _level(total, context.l10n).label,
       'answers': jsonEncode(answers),
       'created_at': DateTime.now().toUtc().toIso8601String(),
     });
@@ -204,6 +206,7 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
   }
 
   Widget _intro() {
+    final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -220,10 +223,10 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('PsychoTest',
+                Text(l10n.actionPsychoTest,
                     style: TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold, color: C.gray900)),
-                Text('Stress & Psychosomatic Self-Assessment',
+                Text(l10n.psychoTestSubtitle,
                     style: TextStyle(fontSize: 14, color: C.gray500)),
               ],
             ),
@@ -231,7 +234,7 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
         ),
         SizedBox(height: 20),
         Text(
-          'This assessment contains 3 blocks with a total of $_totalQuestions questions. Answer honestly — there are no right or wrong answers. Results are saved to your profile.',
+          l10n.psychoTestIntro,
           style: TextStyle(fontSize: 14, color: C.gray600, height: 1.5),
         ),
         SizedBox(height: 16),
@@ -268,7 +271,7 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
                       ],
                     ),
                     Spacer(),
-                    Text('${b.questions.length} questions',
+                    Text(l10n.psychoQuestionsCount(b.questions.length),
                         style: TextStyle(fontSize: 12, color: C.gray400)),
                   ],
                 ),
@@ -282,13 +285,13 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: C.gray100),
           ),
-          child: Text('Each question has 3 answer options: Never · Sometimes · Often',
+          child: Text(l10n.psychoAnswerHint,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 12, color: C.gray500)),
         ),
         SizedBox(height: 16),
         PrimaryButton(
-          label: 'Start Assessment',
+          label: l10n.psychoStartAssessment,
           color: C.teal500,
           icon: Icon(Icons.chevron_right, size: 16, color: C.white),
           onPressed: () => setState(() => phase = 'block'),
@@ -298,6 +301,12 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
   }
 
   Widget _question() {
+    final l10n = context.l10n;
+    final answerOptions = [
+      (l10n.psychoNever, 0),
+      (l10n.psychoSometimes, 1),
+      (l10n.psychoOften, 2),
+    ];
     if (blockIndex < 0 || blockIndex >= _blocks.length) {
       return const SizedBox.shrink();
     }
@@ -346,7 +355,7 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
                       color: block.color.pillText)),
             ),
             SizedBox(width: 8),
-            Text('Q${questionIndex + 1} of ${block.questions.length}',
+            Text(context.l10n.psychoQuestionOfBlock(questionIndex + 1, block.questions.length),
                 style: TextStyle(fontSize: 12, color: C.gray400)),
           ],
         ),
@@ -386,7 +395,7 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
           ),
         ),
         SizedBox(height: 16),
-        ..._answerOptions.map((opt) => Padding(
+        ...answerOptions.map((opt) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: InkWell(
                 onTap: saving ? null : () => _answer(opt.$2),
@@ -416,18 +425,19 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
   }
 
   Widget _result() {
+    final l10n = context.l10n;
     final r = result!;
-    final lvl = _level(r.total);
+    final lvl = _level(r.total, l10n);
     final blockScores = [
-      ('Stress Awareness', r.b1, _blue.dot),
-      ('Physical Symptoms', r.b2, _orange.dot),
-      ('Behavioral Profile', r.b3, _teal.dot),
+      (l10n.psychoBlock1Subtitle, r.b1, _blue.dot),
+      (l10n.psychoBlock2Subtitle, r.b2, _orange.dot),
+      (l10n.psychoBlock3Subtitle, r.b3, _teal.dot),
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Center(
-          child: Text('YOUR RESULT',
+          child: Text(l10n.psychoYourResult,
               style: TextStyle(
                   fontSize: 11, color: C.gray400, letterSpacing: 2)),
         ),
@@ -454,7 +464,7 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
         ),
         SizedBox(height: 12),
         Center(
-          child: Text('${lvl.label} Stress Level',
+          child: Text(l10n.psychoStressLevelTitle(lvl.label),
               style: TextStyle(
                   fontSize: 20, fontWeight: FontWeight.bold, color: lvl.color)),
         ),
@@ -512,7 +522,7 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
                   children: [
                     Icon(Icons.refresh, size: 14),
                     SizedBox(width: 6),
-                    Text('Retake', style: TextStyle(fontWeight: FontWeight.w500)),
+                    Text(l10n.psychoRetake, style: TextStyle(fontWeight: FontWeight.w500)),
                   ],
                 ),
               ),
@@ -520,7 +530,7 @@ class _PsychoTestModalState extends State<PsychoTestModal> {
             SizedBox(width: 8),
             Expanded(
               child: PrimaryButton(
-                label: 'Done',
+                label: l10n.done,
                 color: C.teal500,
                 onPressed: () => Navigator.pop(context),
               ),

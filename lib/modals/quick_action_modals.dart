@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -21,6 +22,8 @@ import '../services.dart';
 import '../theme.dart';
 import '../units.dart';
 import '../widgets.dart';
+import '../l10n/l10n_ext.dart';
+import '../l10n/medical_l10n.dart';
 
 const _uuid = Uuid();
 
@@ -65,17 +68,37 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
   bool get atLimit => uploadCount != null && uploadCount! >= 2;
 
   Future<void> _pickFile() async {
-    final result = await FilePicker.pickFiles(
-      type: fileType == 'pdf' ? FileType.custom : FileType.image,
-      allowedExtensions: fileType == 'pdf' ? ['pdf'] : null,
-    );
+    late final FilePickerResult? result;
+    switch (fileType) {
+      case 'pdf':
+        result = await FilePicker.pickFiles(
+          type: FileType.custom,
+          allowedExtensions: const ['pdf'],
+        );
+      case 'dicom':
+        result = await FilePicker.pickFiles(
+          type: FileType.custom,
+          allowedExtensions: const ['dcm', 'dicom'],
+        );
+      default:
+        result = await FilePicker.pickFiles(type: FileType.image);
+    }
     if (result != null && result.files.isNotEmpty) {
       setState(() {
-        fileName = result.files.first.name;
+        fileName = result!.files.first.name;
         filePath = result.files.first.path;
         fileSize = result.files.first.size;
       });
     }
+  }
+
+  String? _filePickerHint(AppLocalizations l10n, AuthProvider auth) {
+    if (atLimit) return l10n.uploadUpgradeMore;
+    return switch (fileType) {
+      'pdf' => auth.isPlus ? null : l10n.fileTypePdf,
+      'dicom' => l10n.fileTypeDicom,
+      _ => l10n.uploadImageFormats,
+    };
   }
 
   Future<void> _upload() async {
@@ -90,7 +113,7 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
       return;
     }
     if (filePath == null) {
-      setState(() => error = 'Could not read the selected file. Please pick it again.');
+      setState(() => error = context.l10n.uploadCouldNotRead);
       return;
     }
     setState(() {
@@ -98,22 +121,28 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
       error = '';
     });
     final uploadedName = fileName!;
+    final l10nUpload = context.l10n;
     try {
       final textLogs =
-          await AiConsultationService.buildFullPatientContext(auth.user!.id);
-      final uploadPath = fileType == 'pdf'
-          ? filePath!
-          : await compressImageForUpload(
+          await AiConsultationService.buildAnalysisUploadPrompt(auth.user!.id);
+      final uploadPath = fileType == 'photo'
+          ? await compressImageForUpload(
               filePath!,
               quality: 60,
               maxWidth: 800,
               maxHeight: 800,
+            )
+          : filePath!;
+      final analysis = fileType == 'dicom'
+          ? await AiConsultationService.analyzeDicomUpload(
+              userId: auth.user!.id,
+              filePath: uploadPath,
+            )
+          : await ApiClient.analyze(
+              userId: auth.user!.id,
+              filePath: uploadPath,
+              textLogs: textLogs,
             );
-      final analysis = await ApiClient.analyze(
-        userId: auth.user!.id,
-        filePath: uploadPath,
-        textLogs: textLogs,
-      );
       await Db.instance.raw.insert('analysis_uploads', {
         'id': _uuid.v4(),
         'user_id': auth.user!.id,
@@ -127,8 +156,10 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
         auth.user!.id,
         fileName: uploadedName,
         analysis: analysis,
+        userMessage: l10nUpload.aiDocUploadedAnalysis(uploadedName),
       );
-      await auth.syncPatientHistory();
+      // Don't block opening Ai Doc chat on network sync.
+      unawaited(auth.syncPatientHistory());
       if (!auth.isPlus && uploadCount != null) {
         uploadCount = uploadCount! + 1;
       }
@@ -137,7 +168,7 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
     } on ApiException catch (e) {
       setState(() => error = e.userFacingMessage);
     } catch (e) {
-      setState(() => error = 'Upload failed. Please try again.');
+      setState(() => error = context.l10n.uploadFailed);
     } finally {
       if (mounted) setState(() => uploading = false);
     }
@@ -146,8 +177,9 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final l10n = context.l10n;
     return AppModal(
-      title: 'Upload Analysis',
+      title: l10n.uploadAnalysisTitle,
       onClose: () => Navigator.pop(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -155,8 +187,8 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
           if (!auth.isPlus && uploadCount != null) ...[
             AppBanner(
               text: atLimit
-                  ? 'Upload limit reached. Upgrade to PHA Plus+ for unlimited uploads.'
-                  : 'Free plan: $uploadCount/2 uploads used. Max 2 pages per file.',
+                  ? l10n.uploadLimitMessage
+                  : l10n.uploadFreePlan(uploadCount!),
               bg: atLimit ? C.amber50 : C.blue50,
               border: atLimit ? C.amber200 : C.blue100,
               fg: atLimit ? C.amber700 : C.blue700,
@@ -169,27 +201,37 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
           ],
           if (uploading) ...[
             AppBanner(
-              text: 'Analyzing your file with Ai Doc…',
+              text: fileType == 'dicom'
+                  ? l10n.uploadAnalyzingDicom
+                  : l10n.uploadAnalyzingAiDoc,
               bg: C.blue50,
               border: C.blue100,
               fg: C.blue700,
             ),
             SizedBox(height: 16),
           ],
-          Text('File Type',
+          Text(l10n.uploadFileType,
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: C.gray700)),
           SizedBox(height: 8),
           DropdownButtonFormField<String>(
             initialValue: fileType,
             decoration: appInput(''),
-            items: const [
-              DropdownMenuItem(value: 'pdf', child: Text('PDF Document')),
-              DropdownMenuItem(value: 'photo', child: Text('Photo / Image')),
+            items: [
+              DropdownMenuItem(value: 'pdf', child: Text(l10n.uploadPdf)),
+              DropdownMenuItem(value: 'photo', child: Text(l10n.uploadPhoto)),
+              DropdownMenuItem(value: 'dicom', child: Text(l10n.uploadDicom)),
             ],
-            onChanged: atLimit ? null : (v) => setState(() => fileType = v!),
+            onChanged: atLimit
+                ? null
+                : (v) => setState(() {
+                      fileType = v!;
+                      fileName = null;
+                      filePath = null;
+                      fileSize = null;
+                    }),
           ),
           SizedBox(height: 16),
-          Text('Select File',
+          Text(l10n.uploadSelectFile,
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: C.gray700)),
           SizedBox(height: 8),
           GestureDetector(
@@ -209,21 +251,20 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
                     Text(fileName!,
                         style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w500, color: C.gray900)),
-                    Text('${((fileSize ?? 0) / 1024).round()} KB — click to change',
+                    Text(l10n.uploadClickToChange(((fileSize ?? 0) / 1024).round()),
                         style: TextStyle(fontSize: 12, color: C.gray400)),
                   ] else ...[
-                    Text(atLimit ? 'Limit reached' : 'Click to select a file',
+                    Text(atLimit ? l10n.uploadLimitReached : l10n.uploadClickToSelect,
                         style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                             color: atLimit ? C.gray400 : C.gray600)),
-                    Text(
-                        atLimit
-                            ? 'Upgrade to upload more'
-                            : (fileType == 'pdf'
-                                ? 'PDF up to 2 pages (free plan)'
-                                : 'JPG, PNG, or GIF'),
-                        style: TextStyle(fontSize: 12, color: C.gray400)),
+                    if (_filePickerHint(l10n, auth) case final hint?) ...[
+                      Text(
+                        hint,
+                        style: TextStyle(fontSize: 12, color: C.gray400),
+                      ),
+                    ],
                   ],
                 ],
               ),
@@ -232,13 +273,13 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
           SizedBox(height: 16),
           atLimit
               ? PrimaryButton(
-                  label: 'Upgrade to PHA Plus+',
+                  label: l10n.upgradeToPhaPlus,
                   color: C.amber500,
                   icon: Icon(Icons.auto_awesome, size: 16, color: C.white),
                   onPressed: widget.onNeedUpgrade,
                 )
               : PrimaryButton(
-                  label: uploading ? 'Analyzing...' : 'Upload File',
+                  label: uploading ? l10n.uploadAnalyzing : l10n.uploadFile,
                   onPressed: (fileName == null || uploading) ? null : _upload,
                 ),
         ],
@@ -344,7 +385,7 @@ class _CheckMealCaloriesModalState extends State<CheckMealCaloriesModal> {
     } on ApiException catch (e) {
       setState(() => error = e.userFacingMessage);
     } catch (e) {
-      setState(() => error = 'Analysis failed. Please try again.');
+      setState(() => error = context.l10n.mealFailed);
     } finally {
       if (mounted) setState(() => analyzing = false);
     }
@@ -407,11 +448,12 @@ class _CheckMealCaloriesModalState extends State<CheckMealCaloriesModal> {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final l10n = context.l10n;
     final atLimit = _isAtLimit(auth);
     final pending = pendingResult;
 
     return AppModal(
-      title: 'Check Meal Calories',
+      title: l10n.actionMealCalories,
       onClose: () => Navigator.pop(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -419,8 +461,8 @@ class _CheckMealCaloriesModalState extends State<CheckMealCaloriesModal> {
           if (!auth.isPlus && checksLast24h != null) ...[
             AppBanner(
               text: atLimit
-                  ? 'Free limit reached (2 meals per 24h). Upgrade to PHA Plus+ for unlimited meal checks.'
-                  : 'Free plan: $checksLast24h/${MealCalorieService.freeDailyLimit} meals logged in the last 24 hours.',
+                  ? l10n.mealFreeLimit
+                  : l10n.mealFreePlan(checksLast24h!, MealCalorieService.freeDailyLimit),
               bg: atLimit ? C.amber50 : C.blue50,
               border: atLimit ? C.amber200 : C.blue100,
               fg: atLimit ? C.amber700 : C.blue700,
@@ -439,7 +481,7 @@ class _CheckMealCaloriesModalState extends State<CheckMealCaloriesModal> {
           ],
           if (savedToast) ...[
             AppBanner(
-              text: 'Meal logged — counted in today’s intake & Health Index.',
+              text: l10n.mealLogged,
               bg: C.green50,
               border: C.green200,
               fg: C.teal700,
@@ -449,7 +491,7 @@ class _CheckMealCaloriesModalState extends State<CheckMealCaloriesModal> {
           ],
           if (analyzing) ...[
             AppBanner(
-              text: 'Analyzing your meal…',
+              text: l10n.mealAnalyzing,
               bg: C.blue50,
               border: C.blue100,
               fg: C.blue700,
@@ -473,7 +515,7 @@ class _CheckMealCaloriesModalState extends State<CheckMealCaloriesModal> {
           // Capture controls (hidden while pending confirm)
           if (pending == null) ...[
             Text(
-              'Take or upload a photo of your meal',
+              l10n.mealTakePhoto,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -482,7 +524,7 @@ class _CheckMealCaloriesModalState extends State<CheckMealCaloriesModal> {
             ),
             const SizedBox(height: 8),
             Text(
-              'After analysis, tap ✓ only if you ate this dish — it adds to today’s calories.',
+              l10n.mealAfterAnalysis,
               style: TextStyle(fontSize: 12, color: C.gray500, height: 1.4),
             ),
             const SizedBox(height: 16),
@@ -493,7 +535,7 @@ class _CheckMealCaloriesModalState extends State<CheckMealCaloriesModal> {
                     onPressed:
                         analyzing || atLimit ? null : () => _pickImage(ImageSource.camera),
                     icon: Icon(Icons.camera_alt_outlined, color: C.gray600),
-                    label: Text('Camera', style: TextStyle(color: C.gray700)),
+                    label: Text(l10n.mealCamera, style: TextStyle(color: C.gray700)),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -502,7 +544,7 @@ class _CheckMealCaloriesModalState extends State<CheckMealCaloriesModal> {
                     onPressed:
                         analyzing || atLimit ? null : () => _pickImage(ImageSource.gallery),
                     icon: Icon(Icons.photo_library_outlined, color: C.gray600),
-                    label: Text('Gallery', style: TextStyle(color: C.gray700)),
+                    label: Text(l10n.mealGallery, style: TextStyle(color: C.gray700)),
                   ),
                 ),
               ],
@@ -518,13 +560,13 @@ class _CheckMealCaloriesModalState extends State<CheckMealCaloriesModal> {
             const SizedBox(height: 16),
             atLimit
                 ? PrimaryButton(
-                    label: 'Upgrade to PHA Plus+',
+                    label: l10n.upgradeToPhaPlus,
                     color: C.amber500,
                     icon: Icon(Icons.auto_awesome, size: 16, color: C.white),
                     onPressed: widget.onNeedUpgrade,
                   )
                 : PrimaryButton(
-                    label: analyzing ? 'Analyzing…' : 'Analyze Meal',
+                    label: analyzing ? l10n.mealAnalyzing : l10n.mealAnalyze,
                     onPressed: (filePath == null || analyzing) ? null : _analyze,
                   ),
             const SizedBox(height: 24),
@@ -559,6 +601,7 @@ class _MealResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: cardDecoration(radius: 16),
@@ -683,14 +726,14 @@ class _MealResultCard extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            'Tap ✓ to confirm you ate this — adds to today’s intake.',
+            l10n.mealTapConfirm,
             style: TextStyle(fontSize: 12, color: C.gray500, height: 1.35),
           ),
           const SizedBox(height: 8),
           TextButton(
             onPressed: confirming ? null : onDiscard,
             child: Text(
-              'Discard',
+              l10n.mealDiscard,
               style: TextStyle(fontSize: 13, color: C.gray500),
             ),
           ),
@@ -706,11 +749,12 @@ class _TodayIntakeSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Total Intake',
+          l10n.mealTotalIntake,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 13,
@@ -731,7 +775,7 @@ class _TodayIntakeSection extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          '${summary.qualityLabel} · target ~${summary.targetCalories} kcal',
+          l10n.mealQualityTargetLine(summary.qualityLabel, summary.targetCalories),
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 12, color: C.gray500),
         ),
@@ -749,7 +793,7 @@ class _TodayIntakeSection extends StatelessWidget {
             children: [
               Expanded(
                 child: _MacroChip(
-                  label: 'Carb',
+                  label: l10n.mealCarb,
                   value: '${summary.carbsG.toStringAsFixed(0)}g',
                   color: C.amber500,
                 ),
@@ -757,7 +801,7 @@ class _TodayIntakeSection extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: _MacroChip(
-                  label: 'Proteins',
+                  label: l10n.mealProteins,
                   value: '${summary.proteinG.toStringAsFixed(0)}g',
                   color: C.teal600,
                 ),
@@ -765,7 +809,7 @@ class _TodayIntakeSection extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: _MacroChip(
-                  label: 'Fat',
+                  label: l10n.mealFat,
                   value: '${summary.fatG.toStringAsFixed(0)}g',
                   color: C.orange500,
                 ),
@@ -778,7 +822,7 @@ class _TodayIntakeSection extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Text(
-              'No meals confirmed today yet.',
+              l10n.mealNoMealsToday,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 13, color: C.gray400),
             ),
@@ -925,10 +969,7 @@ class AIChatModal extends StatefulWidget {
 }
 
 class _AIChatModalState extends State<AIChatModal> {
-  final _messages = <_Msg>[
-    _Msg(false,
-        "Hello! I'm your Ai Doc Assistant. Would you like us to use the data you provided during onboarding? After that, you can describe your problem in detail — or share a photo of a meal, lab result, or anything health-related."),
-  ];
+  final _messages = <_Msg>[];
   final _input = TextEditingController();
   final _scroll = ScrollController();
   final _picker = ImagePicker();
@@ -957,6 +998,7 @@ class _AIChatModalState extends State<AIChatModal> {
       limit: 50,
     );
     if (!mounted) return;
+    final l10n = context.l10n;
     setState(() {
       for (final r in rows) {
         _messages.add(_Msg(true, r['message'] as String));
@@ -965,8 +1007,14 @@ class _AIChatModalState extends State<AIChatModal> {
       final seeds = widget.seedMessages;
       if (seeds != null) {
         for (final m in seeds) {
-          _messages.add(_Msg(m.isUser, m.text));
+          // Avoid duplicating the exchange already saved via recordAnalysisInChat.
+          final exists = _messages.any(
+            (x) => x.isUser == m.isUser && x.text == m.text,
+          );
+          if (!exists) _messages.add(_Msg(m.isUser, m.text));
         }
+      } else if (rows.isEmpty && _messages.isEmpty) {
+        _messages.add(_Msg(false, l10n.aiDocWelcome));
       }
     });
     if (rows.isNotEmpty || widget.seedMessages != null) {
@@ -1047,7 +1095,7 @@ class _AIChatModalState extends State<AIChatModal> {
         );
       } else if (declinedOnboarding) {
         reply =
-            "No problem! Whenever you're ready, describe your symptoms or health concerns in detail — or share a photo.";
+            context.l10n.aiDocNoProblem;
       } else if (useOnboardingData) {
         reply = await AiConsultationService.diagnoseFromOnboarding(auth.user!.id);
       } else {
@@ -1080,6 +1128,7 @@ class _AIChatModalState extends State<AIChatModal> {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: C.gray50,
       appBar: AppBar(
@@ -1092,7 +1141,7 @@ class _AIChatModalState extends State<AIChatModal> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Ai Doc Assistant',
+          l10n.aiDocTitle,
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -1115,7 +1164,7 @@ class _AIChatModalState extends State<AIChatModal> {
               if (ApiConfig.apiKey.isEmpty) ...[
                 AppBanner(
                   text:
-                      'Ai Doc is offline — API key not set. Copy dart_define.example.json to dart_define.json, add PHA_API_KEY, then run just reinstall.',
+                      l10n.aiDocOffline,
                   bg: C.amber50,
                   border: C.amber200,
                   fg: C.amber700,
@@ -1126,8 +1175,8 @@ class _AIChatModalState extends State<AIChatModal> {
               if (!auth.isPlus && consultCount != null) ...[
                 AppBanner(
                   text: atLimit
-                      ? 'Free consultation limit reached.'
-                      : '${3 - consultCount!} of 3 free consultations remaining.',
+                      ? l10n.aiDocFreeLimit
+                      : l10n.aiDocFreeRemaining(3 - consultCount!),
                   bg: atLimit ? C.amber50 : C.blue50,
                   border: atLimit ? C.amber200 : C.blue100,
                   fg: atLimit ? C.amber700 : C.blue600,
@@ -1146,8 +1195,8 @@ class _AIChatModalState extends State<AIChatModal> {
                           false,
                           loading
                               ? (_analyzingOnboarding
-                                  ? 'Analyzing your health data…'
-                                  : 'Looking at that…')
+                                  ? l10n.aiDocAnalyzingHealth
+                                  : l10n.aiDocLooking)
                               : '…',
                         ),
                       );
@@ -1163,7 +1212,7 @@ class _AIChatModalState extends State<AIChatModal> {
               Row(
                 children: [
                   IconButton(
-                    tooltip: 'Camera',
+                    tooltip: l10n.mealCamera,
                     onPressed: (loading || atLimit)
                         ? null
                         : () => _pickPhoto(ImageSource.camera),
@@ -1171,7 +1220,7 @@ class _AIChatModalState extends State<AIChatModal> {
                         color: (loading || atLimit) ? C.gray300 : C.blue600),
                   ),
                   IconButton(
-                    tooltip: 'Gallery',
+                    tooltip: l10n.mealGallery,
                     onPressed: (loading || atLimit)
                         ? null
                         : () => _pickPhoto(ImageSource.gallery),
@@ -1184,8 +1233,8 @@ class _AIChatModalState extends State<AIChatModal> {
                       enabled: !loading && !atLimit,
                       onSubmitted: (_) => _send(),
                       decoration: appInput(atLimit
-                              ? 'Upgrade to continue chatting…'
-                              : 'Ask about symptoms, or add a photo note')
+                              ? l10n.aiDocUpgradeChat
+                              : l10n.aiDocAskPlaceholder)
                           .copyWith(fillColor: C.gray50),
                     ),
                   ),
@@ -1212,6 +1261,7 @@ class _AIChatModalState extends State<AIChatModal> {
   }
 
   Widget _bubble(_Msg m) {
+    final l10n = context.l10n;
     final avatar = Container(
       width: 28,
       height: 28,
@@ -1240,7 +1290,7 @@ class _AIChatModalState extends State<AIChatModal> {
                   width: 220,
                   fit: BoxFit.cover,
                   errorBuilder: (_, error, stackTrace) => Text(
-                    'Photo',
+                    l10n.aiDocPhoto,
                     style: TextStyle(
                       color: m.isUser ? C.white : C.gray600,
                       fontSize: 13,
@@ -1283,14 +1333,21 @@ class StressTestModal extends StatefulWidget {
 }
 
 class _StressTestModalState extends State<StressTestModal> {
-  static const _questions = [
-    ('How stressed do you feel right now?', true),
-    ('How well did you sleep last night?', false),
-    ('How is your energy level today?', false),
-    ('How would you rate your mood?', false),
-    ('How is your overall wellbeing?', false),
+  List<(String, bool)> _questions(AppLocalizations l10n) => [
+    (l10n.wellnessQ1, true),
+    (l10n.wellnessQ2, false),
+    (l10n.wellnessQ3, false),
+    (l10n.wellnessQ4, false),
+    (l10n.wellnessQ5, false),
   ];
-  static const _labels = ['Very poor', 'Poor', 'Moderate', 'Good', 'Excellent'];
+
+  List<String> _labels(AppLocalizations l10n) => [
+    l10n.wellnessVeryPoor,
+    l10n.wellnessPoor,
+    l10n.wellnessModerate,
+    l10n.wellnessGood,
+    l10n.wellnessExcellent,
+  ];
 
   int current = 0;
   final answers = <int>[];
@@ -1298,11 +1355,12 @@ class _StressTestModalState extends State<StressTestModal> {
   bool saving = false;
 
   Future<void> _answer(int raw) async {
-    if (current < 0 || current >= _questions.length) return;
-    final reverse = _questions[current].$2;
+    final questions = _questions(context.l10n);
+    if (current < 0 || current >= questions.length) return;
+    final reverse = questions[current].$2;
     final score = reverse ? (6 - raw) * 20 : raw * 20;
     answers.add(score);
-    if (current < _questions.length - 1) {
+    if (current < questions.length - 1) {
       setState(() => current++);
     } else {
       setState(() => saving = true);
@@ -1326,10 +1384,13 @@ class _StressTestModalState extends State<StressTestModal> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final questions = _questions(l10n);
+    final labels = _labels(l10n);
     if (showResult) {
       final avg = (answers.fold<int>(0, (a, b) => a + b) / answers.length).round();
       final med = WellnessGuidelines.classify(avg);
-      final result = WellnessGuidelines.resultLabel(avg);
+      final result = l10n.statusLabel(med.band == 'moderate' ? 'fair' : med.band);
       final color = switch (med.status) {
         'good' => C.green500,
         'info' => C.blue500,
@@ -1348,9 +1409,9 @@ class _StressTestModalState extends State<StressTestModal> {
         'warning' => C.yellow200,
         _ => C.red200,
       };
-      final descText = WellnessGuidelines.resultDescription(avg);
+      final descText = l10n.wellnessMessage(med.band);
       return AppModal(
-        title: 'Wellness Results',
+        title: l10n.wellnessResults,
         onClose: () => Navigator.pop(context),
         child: Column(
           children: [
@@ -1381,15 +1442,15 @@ class _StressTestModalState extends State<StressTestModal> {
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, color: C.gray500)),
             SizedBox(height: 20),
-            PrimaryButton(label: 'Done', onPressed: () => Navigator.pop(context)),
+            PrimaryButton(label: context.l10n.done, onPressed: () => Navigator.pop(context)),
           ],
         ),
       );
     }
 
-    final progress = current / _questions.length;
+    final progress = current / questions.length;
     return AppModal(
-      title: 'Wellness Check',
+      title: l10n.actionWellnessCheck,
       onClose: () => Navigator.pop(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1397,9 +1458,9 @@ class _StressTestModalState extends State<StressTestModal> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Question ${current + 1} of ${_questions.length}',
+              Text(l10n.wellnessQuestion(current + 1, questions.length),
                   style: TextStyle(fontSize: 12, color: C.gray500)),
-              Text('${(progress * 100).round()}% complete',
+              Text(l10n.percentComplete((progress * 100).round()),
                   style: TextStyle(fontSize: 12, color: C.gray500)),
             ],
           ),
@@ -1415,14 +1476,14 @@ class _StressTestModalState extends State<StressTestModal> {
           ),
           SizedBox(height: 24),
           Text(
-              (current >= 0 && current < _questions.length)
-                  ? _questions[current].$1
-                  : 'Question unavailable',
+              (current >= 0 && current < questions.length)
+                  ? questions[current].$1
+                  : l10n.questionUnavailable,
               style: TextStyle(
                   fontSize: 16, fontWeight: FontWeight.w600, color: C.gray900)),
           SizedBox(height: 24),
           ...List.generate(5, (i) {
-            if (i < 0 || i >= _labels.length) return const SizedBox.shrink();
+            if (i < 0 || i >= labels.length) return const SizedBox.shrink();
             final score = i + 1;
             return Padding(
               padding: const EdgeInsets.only(bottom: 8),
@@ -1438,7 +1499,7 @@ class _StressTestModalState extends State<StressTestModal> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(_labels[i],
+                      Text(labels[i],
                           style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -1466,32 +1527,23 @@ class BadHabitsModal extends StatefulWidget {
 }
 
 class _BadHabitsModalState extends State<BadHabitsModal> {
-  static const _smokingLevels = [
-    ('less_than_one_pack', 'Less than one pack a day'),
-    ('one_pack', '1 pack a day'),
-    ('more_than_one_pack', 'More than one pack a day'),
+  List<(String, String)> _smokingLevels(AppLocalizations l10n) => [
+    ('less_than_one_pack', l10n.badHabitsSmokeLessPack),
+    ('one_pack', l10n.badHabitsSmokeOnePack),
+    ('more_than_one_pack', l10n.badHabitsSmokeMorePack),
   ];
 
-  static const _alcoholLevels = [
-    (
-      'occasionally',
-      'Occasionally — less than 100 g strong alcohol, 1–2 glasses of wine, or up to 2 cans of beer per week',
-    ),
-    (
-      'regularly',
-      'Regularly — 200–300 g strong alcohol, 1–2 bottles of wine, or more than 2 L beer per week',
-    ),
-    (
-      'heavy',
-      'I get drunk 1–2 times a week to the point of memory loss',
-    ),
+  List<(String, String)> _alcoholLevels(AppLocalizations l10n) => [
+    ('occasionally', l10n.badHabitsAlcoholOccasionally),
+    ('regularly', l10n.badHabitsAlcoholRegularly),
+    ('heavy', l10n.badHabitsAlcoholHeavy),
   ];
 
-  static const _socialMediaLevels = [
-    ('rarely', 'Rarely or never'),
-    ('under_hour', 'Less than 1 hour a day'),
-    ('one_to_two_hours', 'About 1–2 hours a day'),
-    ('constantly', 'I constantly surf in my free time'),
+  List<(String, String)> _socialMediaLevels(AppLocalizations l10n) => [
+    ('rarely', l10n.badHabitsSocialRarely),
+    ('under_hour', l10n.badHabitsSocialUnderHour),
+    ('one_to_two_hours', l10n.badHabitsSocialOneTwoHours),
+    ('constantly', l10n.badHabitsSocialConstantly),
   ];
 
   _BadHabitsStep step = _BadHabitsStep.smoking;
@@ -1598,45 +1650,46 @@ class _BadHabitsModalState extends State<BadHabitsModal> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     if (step == _BadHabitsStep.done) {
       return AppModal(
-        title: 'Bad Habits Summary',
+        title: l10n.badHabitsSummaryTitle,
         onClose: () => Navigator.pop(context),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _summaryRow(
-              'Smoking',
+              l10n.categorySmoking,
               smokes!
-                  ? _labelFor(smokingLevel, _smokingLevels)
-                  : 'No',
+                  ? _labelFor(smokingLevel, _smokingLevels(l10n))
+                  : l10n.no,
             ),
             const SizedBox(height: 12),
             _summaryRow(
-              'Alcohol',
+              l10n.categoryAlcohol,
               drinksAlcohol!
-                  ? _labelFor(alcoholLevel, _alcoholLevels)
-                  : 'No',
+                  ? _labelFor(alcoholLevel, _alcoholLevels(l10n))
+                  : l10n.no,
             ),
             const SizedBox(height: 12),
             _summaryRow(
-              'Social media',
-              _labelFor(socialMediaLevel, _socialMediaLevels),
+              l10n.badHabitsSocialMediaLabel,
+              _labelFor(socialMediaLevel, _socialMediaLevels(l10n)),
             ),
             const SizedBox(height: 20),
             Text(
-              'Saved to your health history. Honest tracking is the first step toward change.',
+              l10n.badHabitsSaved,
               style: TextStyle(fontSize: 13, color: C.gray500, height: 1.4),
             ),
             const SizedBox(height: 20),
-            PrimaryButton(label: 'Done', onPressed: () => Navigator.pop(context)),
+            PrimaryButton(label: l10n.done, onPressed: () => Navigator.pop(context)),
           ],
         ),
       );
     }
 
     return AppModal(
-      title: 'Check Your Bad Habits',
+      title: l10n.actionBadHabits,
       onClose: () => Navigator.pop(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1644,9 +1697,9 @@ class _BadHabitsModalState extends State<BadHabitsModal> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Step ${_stepIndex + 1} of $_totalSteps',
+              Text(l10n.badHabitsStep(_stepIndex + 1, _totalSteps),
                   style: TextStyle(fontSize: 12, color: C.gray500)),
-              Text('${(_progress * 100).round()}% complete',
+              Text(l10n.percentComplete((_progress * 100).round()),
                   style: TextStyle(fontSize: 12, color: C.gray500)),
             ],
           ),
@@ -1662,32 +1715,32 @@ class _BadHabitsModalState extends State<BadHabitsModal> {
           ),
           const SizedBox(height: 24),
           if (step == _BadHabitsStep.smoking) ...[
-            Text('Do you smoke?',
+            Text(l10n.badHabitsDoYouSmoke,
                 style: TextStyle(
                     fontSize: 16, fontWeight: FontWeight.w600, color: C.gray900)),
             const SizedBox(height: 16),
             _yesNoRow(onYes: () => _selectSmoking(true), onNo: () => _selectSmoking(false)),
           ] else if (step == _BadHabitsStep.smokingLevel) ...[
-            Text('How much do you smoke?',
+            Text(l10n.badHabitsHowMuchSmoke,
                 style: TextStyle(
                     fontSize: 16, fontWeight: FontWeight.w600, color: C.gray900)),
             const SizedBox(height: 16),
-            ..._smokingLevels.map((o) => _optionTile(o.$2, () => _selectSmokingLevel(o.$1))),
+            ..._smokingLevels(l10n).map((o) => _optionTile(o.$2, () => _selectSmokingLevel(o.$1))),
           ] else if (step == _BadHabitsStep.alcohol) ...[
-            Text('Do you drink alcohol?',
+            Text(l10n.badHabitsDoYouDrink,
                 style: TextStyle(
                     fontSize: 16, fontWeight: FontWeight.w600, color: C.gray900)),
             const SizedBox(height: 16),
             _yesNoRow(
                 onYes: () => _selectAlcohol(true), onNo: () => _selectAlcohol(false)),
           ] else if (step == _BadHabitsStep.alcoholLevel) ...[
-            Text('How often and how much do you drink?',
+            Text(l10n.badHabitsHowMuchDrink,
                 style: TextStyle(
                     fontSize: 16, fontWeight: FontWeight.w600, color: C.gray900)),
             const SizedBox(height: 16),
-            ..._alcoholLevels.map((o) => _optionTile(o.$2, () => _selectAlcoholLevel(o.$1))),
+            ..._alcoholLevels(l10n).map((o) => _optionTile(o.$2, () => _selectAlcoholLevel(o.$1))),
           ] else if (step == _BadHabitsStep.socialMedia) ...[
-            Text('How much time do you spend uselessly on social media?',
+            Text(l10n.badHabitsSocialMedia,
                 style: TextStyle(
                     fontSize: 16, fontWeight: FontWeight.w600, color: C.gray900)),
             const SizedBox(height: 16),
@@ -1697,7 +1750,7 @@ class _BadHabitsModalState extends State<BadHabitsModal> {
                 child: Center(child: CircularProgressIndicator()),
               )
             else
-              ..._socialMediaLevels
+              ..._socialMediaLevels(l10n)
                   .map((o) => _optionTile(o.$2, () => _selectSocialMedia(o.$1))),
           ],
         ],
@@ -1727,10 +1780,11 @@ class _BadHabitsModalState extends State<BadHabitsModal> {
   }
 
   Widget _yesNoRow({required VoidCallback onYes, required VoidCallback onNo}) {
+    final l10n = context.l10n;
     return Row(
       children: [
         Expanded(
-          child: PrimaryButton(label: 'Yes', color: C.blue600, onPressed: onYes),
+          child: PrimaryButton(label: l10n.yes, color: C.blue600, onPressed: onYes),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -1741,7 +1795,7 @@ class _BadHabitsModalState extends State<BadHabitsModal> {
               side: BorderSide(color: C.cardBorder),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: Text('No', style: TextStyle(fontWeight: FontWeight.w600, color: C.gray700)),
+            child: Text(l10n.no, style: TextStyle(fontWeight: FontWeight.w600, color: C.gray700)),
           ),
         ),
       ],
@@ -1842,6 +1896,63 @@ class _PhysicalActivityModalState extends State<PhysicalActivityModal> {
     ),
   ];
 
+  _ActivityProgram _localizedProgram(_ActivityProgram p, AppLocalizations l10n) {
+    switch (p.id) {
+      case 'starter':
+        return _ActivityProgram(
+          id: p.id,
+          label: l10n.activityStarter,
+          subtitle: l10n.activityStarterSubtitle,
+          exercises: [
+            l10n.activityStarterEx1,
+            l10n.activityStarterEx2,
+            l10n.activityStarterEx3,
+            l10n.activityStarterEx4,
+          ],
+        );
+      case 'advanced':
+        return _ActivityProgram(
+          id: p.id,
+          label: l10n.activityAdvanced,
+          subtitle: l10n.activityAdvancedSubtitle,
+          exercises: [
+            l10n.activityAdvancedEx1,
+            l10n.activityAdvancedEx2,
+            l10n.activityAdvancedEx3,
+            l10n.activityAdvancedEx4,
+          ],
+          note: l10n.activityRestNote,
+        );
+      case 'professional':
+        return _ActivityProgram(
+          id: p.id,
+          label: l10n.activityProfessional,
+          subtitle: l10n.activityProfessionalSubtitle,
+          exercises: [
+            l10n.activityProEx1,
+            l10n.activityProEx2,
+            l10n.activityProEx3,
+            l10n.activityProEx4,
+          ],
+          note: l10n.activityRestNote,
+        );
+      case 'superman':
+        return _ActivityProgram(
+          id: p.id,
+          label: l10n.activitySuperman,
+          subtitle: l10n.activitySupermanSubtitle,
+          exercises: [l10n.activitySupermanEx1],
+        );
+      default:
+        return _ActivityProgram(
+          id: p.id,
+          label: p.label,
+          subtitle: l10n.activityCurrentPlanSubtitle,
+          exercises: [l10n.activityCustomPlanHint],
+        );
+    }
+  }
+
   _ActivityProgram? selected;
   _ActivityProgram? active;
   bool loading = true;
@@ -1867,18 +1978,17 @@ class _PhysicalActivityModalState extends State<PhysicalActivityModal> {
     final userId = context.read<AuthProvider>().user!.id;
     final row = await PhysicalActivityService.activeProgram(userId);
     if (!mounted) return;
+    final l10n = context.l10n;
     setState(() {
       active = _byId(row?['program_id'] as String?);
       // Fallback if DB has a label we don't recognize by id.
       if (active == null && row != null) {
-        final label = row['program_label'] as String? ?? 'Your plan';
+        final label = row['program_label'] as String? ?? l10n.activityYourPlan;
         active = _ActivityProgram(
           id: row['program_id'] as String? ?? 'custom',
           label: label,
-          subtitle: 'Your current physical activity plan',
-          exercises: const [
-            'Your plan is active. Complete your daily workout and answer the evening check-in.',
-          ],
+          subtitle: l10n.activityCurrentPlanSubtitle,
+          exercises: [l10n.activityCustomPlanHint],
         );
       }
       loading = false;
@@ -1969,7 +2079,7 @@ class _PhysicalActivityModalState extends State<PhysicalActivityModal> {
 
   Widget _activePlanView(_ActivityProgram p) {
     return AppModal(
-      title: 'Your activity plan',
+      title: context.l10n.activityYourPlan,
       onClose: () => Navigator.pop(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1990,7 +2100,7 @@ class _PhysicalActivityModalState extends State<PhysicalActivityModal> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Current plan',
+                        context.l10n.activityCurrentPlan,
                         style: TextStyle(fontSize: 12, color: C.teal700),
                       ),
                       Text(
@@ -2014,7 +2124,7 @@ class _PhysicalActivityModalState extends State<PhysicalActivityModal> {
           ),
           const SizedBox(height: 16),
           Text(
-            "What's included",
+            context.l10n.activityWhatsIncluded,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w700,
@@ -2025,7 +2135,7 @@ class _PhysicalActivityModalState extends State<PhysicalActivityModal> {
           _exerciseList(p, checkmarks: true),
           const SizedBox(height: 20),
           PrimaryButton(
-            label: 'Change plan',
+            label: context.l10n.activityChangePlan,
             color: C.blue600,
             onPressed: () => setState(() {
               changingPlan = true;
@@ -2042,7 +2152,7 @@ class _PhysicalActivityModalState extends State<PhysicalActivityModal> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             child: Text(
-              'Close',
+              context.l10n.close,
               style: TextStyle(fontWeight: FontWeight.w600, color: C.gray700),
             ),
           ),
@@ -2053,9 +2163,10 @@ class _PhysicalActivityModalState extends State<PhysicalActivityModal> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     if (loading) {
       return AppModal(
-        title: 'Physical activity',
+        title: l10n.activityStartTitle,
         onClose: () => Navigator.pop(context),
         child: const Padding(
           padding: EdgeInsets.symmetric(vertical: 40),
@@ -2066,13 +2177,13 @@ class _PhysicalActivityModalState extends State<PhysicalActivityModal> {
 
     // Already on a plan — show details unless user asked to change.
     if (active != null && !changingPlan && !saved) {
-      return _activePlanView(active!);
+      return _activePlanView(_localizedProgram(active!, context.l10n));
     }
 
     if (saved && selected != null) {
       final p = selected!;
       return AppModal(
-        title: 'Program started',
+        title: context.l10n.activityProgramStarted,
         onClose: () => Navigator.pop(context),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2087,13 +2198,13 @@ class _PhysicalActivityModalState extends State<PhysicalActivityModal> {
             ),
             const SizedBox(height: 6),
             Text(
-              'Your daily physical activity plan is saved. Every evening we will ask if you completed it.',
+              l10n.activityProgramSaved,
               style: TextStyle(fontSize: 13, color: C.gray500, height: 1.4),
             ),
             const SizedBox(height: 16),
             _exerciseList(p, checkmarks: true),
             const SizedBox(height: 20),
-            PrimaryButton(label: 'Done', onPressed: () => Navigator.pop(context)),
+            PrimaryButton(label: l10n.done, onPressed: () => Navigator.pop(context)),
           ],
         ),
       );
@@ -2108,9 +2219,7 @@ class _PhysicalActivityModalState extends State<PhysicalActivityModal> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              changingPlan
-                  ? 'Switch to this program:'
-                  : 'Start your daily physical activity with this program:',
+              changingPlan ? l10n.activitySwitchHint : l10n.activityStartHint,
               style: TextStyle(fontSize: 14, color: C.gray600, height: 1.4),
             ),
             const SizedBox(height: 16),
@@ -2123,7 +2232,7 @@ class _PhysicalActivityModalState extends State<PhysicalActivityModal> {
               )
             else ...[
               PrimaryButton(
-                label: changingPlan ? 'Switch to this plan' : 'Start this program',
+                label: changingPlan ? context.l10n.activitySwitchToThis : context.l10n.activityStartThis,
                 color: C.teal600,
                 onPressed: () => _save(p),
               ),
@@ -2136,7 +2245,7 @@ class _PhysicalActivityModalState extends State<PhysicalActivityModal> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 child: Text(
-                  'Choose another',
+                  context.l10n.activityChooseAnother,
                   style: TextStyle(fontWeight: FontWeight.w600, color: C.gray700),
                 ),
               ),
@@ -2147,19 +2256,20 @@ class _PhysicalActivityModalState extends State<PhysicalActivityModal> {
     }
 
     return AppModal(
-      title: changingPlan ? 'Change plan' : 'Start physical activity',
+      title: changingPlan ? context.l10n.activityChangeTitle : context.l10n.activityStartTitle,
       onClose: () => Navigator.pop(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
             changingPlan
-                ? 'Pick a new program. Your evening check-in will follow the new plan.'
-                : 'Choose your program. Start your daily physical activity.',
+                ? context.l10n.activityChangeHint
+                : context.l10n.activityChooseProgram,
             style: TextStyle(fontSize: 14, color: C.gray600, height: 1.4),
           ),
           const SizedBox(height: 16),
-          ..._programs.map((p) {
+          ..._programs.map((raw) {
+            final p = _localizedProgram(raw, context.l10n);
             final isCurrent = active?.id == p.id;
             return Padding(
               padding: const EdgeInsets.only(bottom: 10),
@@ -2205,7 +2315,7 @@ class _PhysicalActivityModalState extends State<PhysicalActivityModal> {
                                       borderRadius: BorderRadius.circular(99),
                                     ),
                                     child: Text(
-                                      'Current',
+                                      context.l10n.activityCurrentBadge,
                                       style: TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w700,
@@ -2241,7 +2351,7 @@ class _PhysicalActivityModalState extends State<PhysicalActivityModal> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               child: Text(
-                'Keep current plan',
+                context.l10n.activityKeepCurrent,
                 style: TextStyle(fontWeight: FontWeight.w600, color: C.gray700),
               ),
             ),
@@ -2297,12 +2407,12 @@ class _DailyVitalsDialogState extends State<DailyVitalsDialog> {
         // BP optional if glucose still needed
       } else {
         if (_systolic.text.trim().isEmpty || _diastolic.text.trim().isEmpty) {
-          setState(() => error = 'Enter both blood pressure values, or leave both empty.');
+          setState(() => error = context.l10n.vitalsBpBothOrNone);
           return;
         }
         final sys = double.tryParse(_systolic.text.trim());
         final dia = double.tryParse(_diastolic.text.trim());
-        final bpErr = VitalValidation.bloodPressure(sys, dia);
+        final bpErr = VitalValidation.bloodPressure(sys, dia, context.l10n);
         if (bpErr != null) {
           setState(() => error = bpErr);
           return;
@@ -2329,11 +2439,12 @@ class _DailyVitalsDialogState extends State<DailyVitalsDialog> {
     }
 
     if (widget.needGlucose && _glucose.text.trim().isNotEmpty) {
-      final g = double.tryParse(_glucose.text.trim());
+      final g = parseUserNumber(_glucose.text);
       double? glucoseMgdl;
       final gErr = VitalValidation.glucoseUserInput(
         g,
         isImperial ? 'imperial' : 'metric',
+        context.l10n,
         onValid: (mgdl) => glucoseMgdl = mgdl,
       );
       if (gErr != null) {
@@ -2377,15 +2488,16 @@ class _DailyVitalsDialogState extends State<DailyVitalsDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return AlertDialog(
-      title: Text('Today\'s vitals', style: TextStyle(color: C.gray900, fontWeight: FontWeight.bold)),
+      title: Text(l10n.todayVitals, style: TextStyle(color: C.gray900, fontWeight: FontWeight.bold)),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              'Log blood pressure and glucose once per day. You can skip and log later.',
+              l10n.vitalsDailyPrompt,
               style: TextStyle(fontSize: 13, color: C.gray500, height: 1.4),
             ),
             SizedBox(height: 14),
@@ -2417,7 +2529,7 @@ class _DailyVitalsDialogState extends State<DailyVitalsDialog> {
                           ),
                         ),
                         child: Text(
-                          'Turn Off',
+                          l10n.vitalsPromptTurnOff,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
@@ -2429,7 +2541,7 @@ class _DailyVitalsDialogState extends State<DailyVitalsDialog> {
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
-                          'Skip daily BP/glucose prompts.',
+                          l10n.vitalsPromptTurnOffHint,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 10,
@@ -2475,7 +2587,7 @@ class _DailyVitalsDialogState extends State<DailyVitalsDialog> {
                           ),
                         ),
                         child: Text(
-                          'Ask once in 5 days',
+                          l10n.vitalsPromptEvery5Days,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
@@ -2487,7 +2599,7 @@ class _DailyVitalsDialogState extends State<DailyVitalsDialog> {
                       Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
-                          'Remind every 5 days, not daily.',
+                          l10n.vitalsPromptEvery5DaysHint,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 10,
@@ -2507,7 +2619,7 @@ class _DailyVitalsDialogState extends State<DailyVitalsDialog> {
             ],
             if (widget.needBp) ...[
               SizedBox(height: 16),
-              Text('Blood pressure (mmHg)',
+              Text(l10n.vitalsBpLabel,
                   style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: C.gray900)),
               SizedBox(height: 8),
               Row(
@@ -2516,7 +2628,7 @@ class _DailyVitalsDialogState extends State<DailyVitalsDialog> {
                     child: TextField(
                       controller: _systolic,
                       keyboardType: TextInputType.number,
-                      decoration: appInput('Systolic'),
+                      decoration: appInput(l10n.bpSystolic),
                     ),
                   ),
                   SizedBox(width: 8),
@@ -2524,7 +2636,7 @@ class _DailyVitalsDialogState extends State<DailyVitalsDialog> {
                     child: TextField(
                       controller: _diastolic,
                       keyboardType: TextInputType.number,
-                      decoration: appInput('Diastolic'),
+                      decoration: appInput(l10n.bpDiastolic),
                     ),
                   ),
                 ],
@@ -2533,14 +2645,14 @@ class _DailyVitalsDialogState extends State<DailyVitalsDialog> {
             if (widget.needGlucose) ...[
               SizedBox(height: 16),
               Text(
-                'Blood glucose (${isImperial ? 'mg/dL' : 'mmol/L'})',
+                l10n.vitalsGlucoseLabel(isImperial ? 'mg/dL' : 'mmol/L'),
                 style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
               ),
               SizedBox(height: 8),
               TextField(
                 controller: _glucose,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: appInput(isImperial ? 'e.g. 95' : 'e.g. 5.3'),
+                decoration: appInput(isImperial ? l10n.vitalsGlucoseHintImperial : l10n.vitalsGlucoseHintMetric),
               ),
             ],
           ],
@@ -2558,11 +2670,11 @@ class _DailyVitalsDialogState extends State<DailyVitalsDialog> {
                   }
                   if (context.mounted) Navigator.pop(context, false);
                 },
-          child: Text('Not now'),
+          child: Text(l10n.notNow),
         ),
         TextButton(
           onPressed: saving ? null : _save,
-          child: Text(saving ? 'Saving…' : 'Save'),
+          child: Text(saving ? l10n.saving : l10n.save),
         ),
       ],
     );
@@ -2593,25 +2705,26 @@ class _LogMetricModalState extends State<LogMetricModal> {
     super.dispose();
   }
 
-  List<({String value, String label, String unit, String hint})> _metrics(bool imp) => [
-        (value: 'steps', label: 'Steps', unit: 'steps', hint: 'e.g. 8000'),
-        (value: 'calories', label: 'Calories', unit: 'kcal', hint: 'e.g. 350'),
-        (value: 'distance', label: 'Distance', unit: imp ? 'miles' : 'km', hint: imp ? 'e.g. 3.2' : 'e.g. 5.2'),
-        (value: 'active_time', label: 'Active Time', unit: 'min', hint: 'e.g. 45'),
-        (value: 'weight', label: 'Weight', unit: imp ? 'lbs' : 'kg', hint: imp ? 'e.g. 165' : 'e.g. 72.5'),
-        (value: 'glucose', label: 'Blood Glucose', unit: imp ? 'mg/dL' : 'mmol/L', hint: imp ? 'e.g. 95' : 'e.g. 5.3'),
-        (value: 'water', label: 'Water Intake', unit: 'ml', hint: 'e.g. 2000'),
+  List<({String value, String label, String unit, String hint})> _metrics(bool imp, AppLocalizations l10n) => [
+        (value: 'steps', label: l10n.steps, unit: l10n.unitSteps, hint: l10n.logMetricHintSteps),
+        (value: 'calories', label: l10n.calories, unit: l10n.unitKcal, hint: l10n.logMetricHintCalories),
+        (value: 'distance', label: l10n.distance, unit: imp ? l10n.unitMiles : l10n.unitKm, hint: imp ? l10n.logMetricHintDistanceImperial : l10n.logMetricHintDistanceMetric),
+        (value: 'active_time', label: l10n.activeTime, unit: l10n.unitMin, hint: l10n.logMetricHintActiveTime),
+        (value: 'weight', label: l10n.weight, unit: imp ? l10n.unitLbs : l10n.unitKg, hint: imp ? l10n.logMetricHintWeightImperial : l10n.logMetricHintWeightMetric),
+        (value: 'glucose', label: l10n.bloodGlucose, unit: imp ? 'mg/dL' : 'mmol/L', hint: imp ? l10n.vitalsGlucoseHintImperial : l10n.vitalsGlucoseHintMetric),
+        (value: 'water', label: l10n.water, unit: l10n.unitMl, hint: l10n.logMetricHintWater),
       ];
 
   Future<void> _save() async {
     final auth = context.read<AuthProvider>();
-    final num = double.tryParse(_value.text);
+    final num = parseUserNumber(_value.text);
     if (num == null || num < 0) {
-      setState(() => error = 'Please enter a valid positive number.');
+      setState(() => error = context.l10n.enterValidPositiveNumber);
       return;
     }
     final storage = toStorageValue(metricType, num, auth.unitSystem);
-    final rangeErr = VitalValidation.metricStorage(metricType, storage);
+    final l10n = context.l10n;
+    final rangeErr = VitalValidation.metricStorage(metricType, storage, l10n);
     if (rangeErr != null) {
       setState(() => error = rangeErr);
       return;
@@ -2656,11 +2769,12 @@ class _LogMetricModalState extends State<LogMetricModal> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final imp = context.watch<AuthProvider>().unitSystem == 'imperial';
-    final metrics = _metrics(imp);
+    final metrics = _metrics(imp, l10n);
     final selected = metrics.firstWhere((m) => m.value == metricType);
     return AppModal(
-      title: 'Log Health Metric',
+      title: l10n.logHealthMetric,
       onClose: () => Navigator.pop(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2670,10 +2784,10 @@ class _LogMetricModalState extends State<LogMetricModal> {
             SizedBox(height: 16),
           ],
           if (success) ...[
-            AppBanner(text: 'Metric saved!', bg: C.green50, border: C.green200, fg: C.teal700),
+            AppBanner(text: l10n.metricSaved, bg: C.green50, border: C.green200, fg: C.teal700),
             SizedBox(height: 16),
           ],
-          Text('Metric Type',
+          Text(l10n.metricType,
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: C.gray700)),
           SizedBox(height: 8),
           DropdownButtonFormField<String>(
@@ -2688,18 +2802,18 @@ class _LogMetricModalState extends State<LogMetricModal> {
             }),
           ),
           SizedBox(height: 16),
-          Text('Value  (${selected.unit})',
+          Text(l10n.metricValueLabel(selected.unit),
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: C.gray700)),
           SizedBox(height: 8),
           TextField(controller: _value, decoration: appInput(selected.hint)),
           SizedBox(height: 16),
-          Text('Notes  (optional)',
+          Text(l10n.metricNotesOptional,
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: C.gray700)),
           SizedBox(height: 8),
-          TextField(controller: _notes, decoration: appInput('Any additional notes...')),
+          TextField(controller: _notes, decoration: appInput(l10n.metricNotesPlaceholder)),
           SizedBox(height: 16),
           PrimaryButton(
-            label: saving ? 'Saving...' : 'Save Metric',
+            label: saving ? l10n.saving : l10n.saveMetric,
             onPressed: (_value.text.isEmpty || saving) ? null : _save,
           ),
         ],
@@ -2732,8 +2846,21 @@ class _UpgradeModalState extends State<UpgradeModal> {
     if (mounted) Navigator.pop(context);
   }
 
+  List<(String, String, String)> _upgradeFeatures(AppLocalizations l10n) => [
+    (l10n.upgradeFeatAnalysisUploads, l10n.upgradeVal2Files, l10n.upgradeValUnlimited),
+    (l10n.upgradeFeatMealCalories, l10n.upgradeVal2PerDay, l10n.upgradeValUnlimited),
+    (l10n.upgradeFeatPagesPerFile, l10n.upgradeVal2Pages, l10n.upgradeValUnlimited),
+    (l10n.upgradeFeatPsychoTest, l10n.upgradeValLocked, l10n.upgradeValFullAccess),
+    (l10n.upgradeFeatTreatment, l10n.upgradeValLocked, l10n.upgradeValFullAccess),
+    (l10n.upgradeFeatBadHabits, l10n.upgradeValLocked, l10n.upgradeValFullAccess),
+    (l10n.upgradeFeatActivity, l10n.upgradeValLocked, l10n.upgradeValFullAccess),
+    (l10n.upgradeFeatAiConsult, l10n.upgradeValIncluded, l10n.upgradeValIncluded),
+    (l10n.upgradeFeatWellness, l10n.upgradeValIncluded, l10n.upgradeValIncluded),
+  ];
+
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final auth = context.watch<AuthProvider>();
     final isPlus = auth.isPlus;
     final hpDiscount = auth.hpDiscountEligible;
@@ -2751,11 +2878,11 @@ class _UpgradeModalState extends State<UpgradeModal> {
               child: Icon(Icons.check_circle, color: C.amber500, size: 32),
             ),
             SizedBox(height: 16),
-            Text("You're on PHA Plus+!",
+            Text(context.l10n.phaPlusUnlockedTitle,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: C.gray900)),
             SizedBox(height: 8),
             Text(
-                'All features are now unlocked. Enjoy unlimited uploads, PsychoTest, and Treatment Schedule.',
+                context.l10n.phaPlusUnlockedBody,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, color: C.gray500)),
           ],
@@ -2763,17 +2890,7 @@ class _UpgradeModalState extends State<UpgradeModal> {
       );
     }
 
-    const features = [
-      ('Analysis Uploads', '2 files', 'Unlimited'),
-      ('Meal Calorie Checks', '2 / 24h', 'Unlimited'),
-      ('Pages per File', '2 pages', 'Unlimited'),
-      ('PsychoTest', 'Locked', 'Full access'),
-      ('Treatment Schedule', 'Locked', 'Full access'),
-      ('Check Your Bad Habits', 'Locked', 'Full access'),
-      ('Start physical activity', 'Locked', 'Full access'),
-      ('AI Consultation', 'Included', 'Included'),
-      ('Wellness Check', 'Included', 'Included'),
-    ];
+    final features = _upgradeFeatures(l10n);
 
     return AppModal(
       title: '',
@@ -2788,35 +2905,28 @@ class _UpgradeModalState extends State<UpgradeModal> {
               children: [
                 Icon(Icons.auto_awesome, size: 16, color: C.white),
                 SizedBox(width: 8),
-                Text('PHA Plus+',
+                Text(l10n.phaPlus,
                     style: TextStyle(color: C.white, fontWeight: FontWeight.bold, fontSize: 14)),
               ],
             ),
           ),
           SizedBox(height: 16),
           if (trialExpired) ...[
-            Text('Unlock All Features of PHA Plus+',
+            Text(l10n.upgradeTrialTitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: C.gray900)),
             SizedBox(height: 12),
-            Text(
-              'Take full control of your health! Unlock all premium options in PHA Plus+ '
-              'and gain the ability to monitor your health, physical activity, nutrition, '
-              'and medical indicators in real time.',
+            Text(l10n.upgradeTrialBody1,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, height: 1.5, color: C.gray600),
             ),
             SizedBox(height: 10),
-            Text(
-              'Stay informed about potential risks and easily adjust your lifestyle. '
-              'Count calories without any limits, correlate them with your daily activity levels, '
-              'and receive personalized recommendations based on your medical data.',
+            Text(l10n.upgradeTrialBody2,
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 14, height: 1.5, color: C.gray600),
             ),
             SizedBox(height: 10),
-            Text(
-              'Your health. Your control. Always.',
+            Text(l10n.upgradeTagline,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 15,
@@ -2826,17 +2936,16 @@ class _UpgradeModalState extends State<UpgradeModal> {
               ),
             ),
           ] else ...[
-            Text('Unlock All Features',
+            Text(l10n.upgradeTitle,
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: C.gray900)),
             SizedBox(height: 8),
-            Text('Get the full power of your Personal Health Assistant',
+            Text(l10n.upgradeSubtitle,
                 style: TextStyle(fontSize: 14, color: C.gray500)),
           ],
           if (hpDiscount) ...[
             SizedBox(height: 12),
             AppBanner(
-              text:
-                  'You have $maxOnboardingHp HP! Redeem for $hpFirstPurchaseDiscountPercent% off 6-month or annual plans.',
+              text: l10n.upgradeHpBanner(maxOnboardingHp, hpFirstPurchaseDiscountPercent),
               bg: C.amber50,
               border: C.amber200,
               fg: C.amber700,
@@ -2855,10 +2964,10 @@ class _UpgradeModalState extends State<UpgradeModal> {
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   child: Row(
                     children: [
-                      Expanded(flex: 2, child: Text('FEATURE', style: _thStyle)),
-                      Expanded(child: Text('FREE', textAlign: TextAlign.center, style: _thStyle)),
+                      Expanded(flex: 2, child: Text(l10n.upgradeTableFeature, style: _thStyle)),
+                      Expanded(child: Text(l10n.upgradeTableFree, textAlign: TextAlign.center, style: _thStyle)),
                       Expanded(
-                          child: Text('PLUS+',
+                          child: Text(l10n.upgradeTablePlus,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   fontSize: 11,
@@ -2905,10 +3014,10 @@ class _UpgradeModalState extends State<UpgradeModal> {
                 Expanded(
                   child: _planCard(
                     plan: 'monthly',
-                    name: 'Monthly',
+                    name: l10n.planMonthly,
                     price: planListPrice('monthly'),
-                    per: '/mo',
-                    note: 'Billed monthly.',
+                    per: l10n.planPerMonth,
+                    note: l10n.planBilledMonthly,
                     best: false,
                     discounted: false,
                   ),
@@ -2917,10 +3026,10 @@ class _UpgradeModalState extends State<UpgradeModal> {
                 Expanded(
                   child: _planCard(
                     plan: 'semiannual',
-                    name: '6 Months',
+                    name: l10n.planSemiannual,
                     price: hpDiscount ? planDiscountedPrice('semiannual') : planListPrice('semiannual'),
-                    per: '/6mo',
-                    note: hpDiscount ? '20% HP discount applied.' : 'Save ~17%.',
+                    per: l10n.planPer6Mo,
+                    note: hpDiscount ? l10n.planHpDiscountNote : l10n.planSave17,
                     best: false,
                     discounted: hpDiscount,
                     listPrice: planListPrice('semiannual'),
@@ -2930,10 +3039,10 @@ class _UpgradeModalState extends State<UpgradeModal> {
                 Expanded(
                   child: _planCard(
                     plan: 'annual',
-                    name: 'Annual',
+                    name: l10n.planAnnual,
                     price: hpDiscount ? planDiscountedPrice('annual') : planListPrice('annual'),
-                    per: '/yr',
-                    note: hpDiscount ? '20% HP discount applied.' : 'Save ~42%.',
+                    per: l10n.planPerYear,
+                    note: hpDiscount ? l10n.planHpDiscountNote : l10n.planSave42,
                     best: true,
                     discounted: hpDiscount,
                     listPrice: planListPrice('annual'),
@@ -2964,12 +3073,11 @@ class _UpgradeModalState extends State<UpgradeModal> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('PsychoTest — Stress & Psychosomatic Assessment',
+                      Text('${l10n.actionPsychoTest} — ${l10n.psychoTestSubtitle}',
                           style: TextStyle(
                               fontSize: 14, fontWeight: FontWeight.w600, color: C.gray900)),
                       SizedBox(height: 2),
-                      Text(
-                          'In-depth self-assessment for stress levels, psychosomatic patterns, and mental wellness indicators.',
+                      Text(l10n.psychoTestPromoBody,
                           style: TextStyle(fontSize: 12, color: C.gray500)),
                     ],
                   ),
@@ -3013,7 +3121,7 @@ class _UpgradeModalState extends State<UpgradeModal> {
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
                         color: C.amber400, borderRadius: BorderRadius.circular(99)),
-                    child: Text('BEST',
+                    child: Text(context.l10n.planBestBadge,
                         style: TextStyle(
                             fontSize: 9, fontWeight: FontWeight.bold, color: C.white)),
                   )
