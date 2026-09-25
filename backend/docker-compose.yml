@@ -20,6 +20,10 @@ services:
       - PATIENT_DATA_DIR=/data/patients
       - PATIENT_ENCRYPTION_KEY=${PATIENT_ENCRYPTION_KEY:-}
       - GOOGLE_APPLICATION_CREDENTIALS=/secrets/sa.json
+      - TWILIO_EMAIL_API_KEY_SID=${TWILIO_EMAIL_API_KEY_SID:-}
+      - TWILIO_EMAIL_API_SECRET=${TWILIO_EMAIL_API_SECRET:-}
+      - TWILIO_EMAIL_FROM=${TWILIO_EMAIL_FROM:-}
+      - TWILIO_EMAIL_FROM_NAME=${TWILIO_EMAIL_FROM_NAME:-}
     volumes:
       # Ключ сервис-аккаунта монтируется внутрь контейнера только для чтения.
       # Положи файл в backend/secrets/sa.json (он в .gitignore).
