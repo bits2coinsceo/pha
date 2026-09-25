@@ -16,7 +16,12 @@ from fastapi import (
 from pydantic import BaseModel, ConfigDict, Field
 
 from .config import settings
-from . import usage, vertex, patient_store
+from . import usage, vertex, patient_store, otp_store
+from .email_service import (
+    EmailDeliveryError,
+    send_password_reset_code,
+    send_registration_code,
+)
 
 # Уровень сложности → какую модель использовать (см. settings.model_for).
 # Сейчас оба уровня по умолчанию идут на gemini-1.5-flash, потому что более
@@ -107,6 +112,26 @@ class PatientExistsResponse(BaseModel):
     exists: bool
 
 
+class EmailCodeRequest(BaseModel):
+    email: str
+
+
+class VerifyRegistrationRequest(BaseModel):
+    email: str
+    code: str
+
+
+class VerifyPasswordResetRequest(BaseModel):
+    email: str
+    code: str
+    new_sync_token: str
+
+
+class AuthOkResponse(BaseModel):
+    ok: bool = True
+    email: str
+
+
 class PatientHistoryResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
@@ -137,6 +162,95 @@ def require_patient_auth(
             detail="X-Patient-Email and X-Sync-Token headers are required",
         )
     return x_patient_email.strip().lower(), x_sync_token
+
+
+def _normalize_email(email: str) -> str:
+    return email.strip().lower()
+
+
+def _otp_http_error(reason: str) -> HTTPException:
+    if reason == "expired":
+        return HTTPException(status_code=400, detail="code_expired")
+    if reason == "too_many":
+        return HTTPException(status_code=429, detail="too_many_attempts")
+    return HTTPException(status_code=400, detail="invalid_code")
+
+
+@app.post(
+    "/api/auth/register-send-code",
+    response_model=AuthOkResponse,
+    dependencies=[Depends(require_api_key)],
+)
+def register_send_code(body: EmailCodeRequest) -> AuthOkResponse:
+    email = _normalize_email(body.email)
+    if "@" not in email or len(email) < 5:
+        raise HTTPException(status_code=400, detail="invalid_email")
+    if patient_store.patient_exists(email):
+        raise HTTPException(status_code=409, detail="email_already_registered")
+    try:
+        code = otp_store.issue_code(email, otp_store.PURPOSE_REGISTRATION)
+        send_registration_code(email, code)
+    except ValueError as exc:
+        if str(exc) == "resend_too_soon":
+            raise HTTPException(status_code=429, detail="resend_too_soon") from exc
+        raise
+    except EmailDeliveryError as exc:
+        raise HTTPException(status_code=502, detail="email_delivery_failed") from exc
+    return AuthOkResponse(email=email)
+
+
+@app.post(
+    "/api/auth/register-verify",
+    response_model=AuthOkResponse,
+    dependencies=[Depends(require_api_key)],
+)
+def register_verify(body: VerifyRegistrationRequest) -> AuthOkResponse:
+    email = _normalize_email(body.email)
+    reason = otp_store.verify_code(email, otp_store.PURPOSE_REGISTRATION, body.code)
+    if reason:
+        raise _otp_http_error(reason)
+    return AuthOkResponse(email=email)
+
+
+@app.post(
+    "/api/auth/forgot-password-send-code",
+    response_model=AuthOkResponse,
+    dependencies=[Depends(require_api_key)],
+)
+def forgot_password_send_code(body: EmailCodeRequest) -> AuthOkResponse:
+    email = _normalize_email(body.email)
+    if not patient_store.patient_exists(email):
+        raise HTTPException(status_code=404, detail="account_not_found")
+    try:
+        code = otp_store.issue_code(email, otp_store.PURPOSE_PASSWORD_RESET)
+        send_password_reset_code(email, code)
+    except ValueError as exc:
+        if str(exc) == "resend_too_soon":
+            raise HTTPException(status_code=429, detail="resend_too_soon") from exc
+        raise
+    except EmailDeliveryError as exc:
+        raise HTTPException(status_code=502, detail="email_delivery_failed") from exc
+    return AuthOkResponse(email=email)
+
+
+@app.post(
+    "/api/auth/forgot-password-verify",
+    response_model=AuthOkResponse,
+    dependencies=[Depends(require_api_key)],
+)
+def forgot_password_verify(body: VerifyPasswordResetRequest) -> AuthOkResponse:
+    email = _normalize_email(body.email)
+    token = body.new_sync_token.strip()
+    if len(token) < 32:
+        raise HTTPException(status_code=400, detail="invalid_password")
+    reason = otp_store.verify_code(email, otp_store.PURPOSE_PASSWORD_RESET, body.code)
+    if reason:
+        raise _otp_http_error(reason)
+    try:
+        patient_store.rotate_token(email, token)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="account_not_found") from exc
+    return AuthOkResponse(email=email)
 
 
 @app.get("/health")

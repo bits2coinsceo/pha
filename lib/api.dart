@@ -342,4 +342,75 @@ class ApiClient {
     final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
     throw ApiException(res.statusCode, _detail(body));
   }
+
+  static Future<void> _postAuth(String path, Map<String, dynamic> body) async {
+    final uri = Uri.parse('${ApiConfig.baseUrl}$path');
+    AppLogger.i('POST $uri', category: LogCategory.auth);
+    late http.Response res;
+    try {
+      res = await http
+          .post(
+            uri,
+            headers: {..._authHeaders, 'Content-Type': 'application/json'},
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 30));
+    } catch (e, st) {
+      AppLogger.e(
+        'POST $uri failed before a response',
+        error: e,
+        stackTrace: st,
+        category: LogCategory.auth,
+      );
+      rethrow;
+    }
+    final raw = utf8.decode(res.bodyBytes);
+    if (res.statusCode == 200) {
+      AppLogger.i('POST $uri -> ${res.statusCode}', category: LogCategory.auth);
+      return;
+    }
+    AppLogger.e(
+      'POST $uri -> HTTP ${res.statusCode} body=$raw',
+      category: LogCategory.auth,
+    );
+    Map<String, dynamic> decoded = const {};
+    try {
+      final parsed = jsonDecode(raw);
+      if (parsed is Map<String, dynamic>) decoded = parsed;
+    } catch (_) {}
+    throw ApiException(res.statusCode, _detail(decoded));
+  }
+
+  static Future<void> sendRegistrationCode(String email) => _postAuth(
+        '/api/auth/register-send-code',
+        {'email': email.trim().toLowerCase()},
+      );
+
+  static Future<void> verifyRegistrationCode({
+    required String email,
+    required String code,
+  }) =>
+      _postAuth(
+        '/api/auth/register-verify',
+        {'email': email.trim().toLowerCase(), 'code': code.trim()},
+      );
+
+  static Future<void> sendPasswordResetCode(String email) => _postAuth(
+        '/api/auth/forgot-password-send-code',
+        {'email': email.trim().toLowerCase()},
+      );
+
+  static Future<void> verifyPasswordReset({
+    required String email,
+    required String code,
+    required String newSyncToken,
+  }) =>
+      _postAuth(
+        '/api/auth/forgot-password-verify',
+        {
+          'email': email.trim().toLowerCase(),
+          'code': code.trim(),
+          'new_sync_token': newSyncToken,
+        },
+      );
 }

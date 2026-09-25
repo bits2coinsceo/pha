@@ -5,6 +5,26 @@
 """
 import os
 from dataclasses import dataclass
+from pathlib import Path
+
+
+def _load_dotenv() -> None:
+    """Load backend/.env into os.environ without overriding real env vars."""
+    path = Path(__file__).resolve().parent.parent / ".env"
+    if not path.is_file():
+        return
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if key:
+            os.environ.setdefault(key, value)
+
+
+_load_dotenv()
 
 
 @dataclass(frozen=True)
@@ -33,6 +53,16 @@ class Settings:
     patient_data_dir: str = os.environ.get("PATIENT_DATA_DIR", "patient_data")
     # Fernet key (urlsafe base64, 32 bytes). Generate: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
     patient_encryption_key: str | None = os.environ.get("PATIENT_ENCRYPTION_KEY") or None
+
+    # --- Twilio Email (transactional OTP) ---
+    twilio_email_api_key_sid: str = os.environ.get("TWILIO_EMAIL_API_KEY_SID", "")
+    twilio_email_api_secret: str = os.environ.get("TWILIO_EMAIL_API_SECRET", "")
+    twilio_email_from: str = os.environ.get("TWILIO_EMAIL_FROM", "support@pha-app.net")
+    twilio_email_from_name: str = os.environ.get(
+        "TWILIO_EMAIL_FROM_NAME", "PHA - Personal Health Assistant"
+    )
+    otp_db: str = os.environ.get("OTP_DB", "otp.db")
+    otp_ttl_seconds: int = int(os.environ.get("OTP_TTL_SECONDS", "600"))
 
     # Цены за токены, USD за 1M (Vertex AI global, июнь 2026).
     # 2.5-flash: 0.30/2.50; 3.5-flash: 1.50/9.00.

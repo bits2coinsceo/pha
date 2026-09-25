@@ -101,6 +101,10 @@ def save_history(email: str, sync_token: str, payload: dict) -> dict:
         if meta_path.exists():
             _verify_token(email, sync_token)
         else:
+            from . import otp_store
+
+            if not otp_store.is_email_verified(email):
+                raise PermissionError("Email is not verified")
             _register_token(email, sync_token)
 
         encrypted = _fernet().encrypt(
@@ -113,3 +117,16 @@ def save_history(email: str, sync_token: str, payload: dict) -> dict:
         meta_path.write_text(json.dumps(meta), encoding="utf-8")
 
     return payload
+
+
+def rotate_token(email: str, new_sync_token: str) -> None:
+    """Replaces the password-hash sync token without knowing the old one."""
+    email = email.strip().lower()
+    with _lock:
+        meta_path = _meta_path(email)
+        if not meta_path.exists():
+            raise FileNotFoundError("No account for this email")
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        meta["token_hash"] = _token_hash(new_sync_token)
+        meta["updated_at"] = datetime.now(timezone.utc).isoformat()
+        meta_path.write_text(json.dumps(meta), encoding="utf-8")
