@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -9,6 +11,7 @@ import 'db.dart';
 import 'health_index.dart';
 import 'locale_controller.dart';
 import 'l10n/l10n_ext.dart';
+import 'patient_sync.dart';
 import 'theme.dart';
 import 'widgets.dart';
 
@@ -121,6 +124,7 @@ class PhysicalActivityService {
       });
     }
     await HealthIndexService.recalculate(userId);
+    unawaited(PatientSync.pushForUser(userId));
   }
 
   /// Daily repeating reminder at 20:00 Europe/Berlin.

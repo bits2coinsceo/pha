@@ -497,13 +497,13 @@ abstract class AppLocalizations {
   /// No description provided for @alreadyHaveAccount.
   ///
   /// In en, this message translates to:
-  /// **'Already have an account? Sign in'**
+  /// **'Already have an account?'**
   String get alreadyHaveAccount;
 
   /// No description provided for @dontHaveAccount.
   ///
   /// In en, this message translates to:
-  /// **'Don\'t have an account? Sign up'**
+  /// **'Don\'t have an account?'**
   String get dontHaveAccount;
 
   /// No description provided for @email.
@@ -577,6 +577,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password must be at least 8 characters.'**
   String get passwordTooShort;
+
+  /// No description provided for @emailAlreadyRegistered.
+  ///
+  /// In en, this message translates to:
+  /// **'This email is already in use. Please sign in instead.'**
+  String get emailAlreadyRegistered;
+
+  /// No description provided for @invalidEmailOrPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email or password. Please check and try again.'**
+  String get invalidEmailOrPassword;
+
+  /// No description provided for @authNetworkError.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot reach the server. Check your internet connection and try again.'**
+  String get authNetworkError;
+
+  /// No description provided for @authServerSyncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not register this email on the server. Check your connection and try again.'**
+  String get authServerSyncFailed;
+
+  /// No description provided for @authAccountNotOnServer.
+  ///
+  /// In en, this message translates to:
+  /// **'No cloud backup for this email yet. Open the app once on the original device with internet, then try again.'**
+  String get authAccountNotOnServer;
+
+  /// No description provided for @authCodeSent.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent a 6-digit code to your email. It is valid for 10 minutes.'**
+  String get authCodeSent;
+
+  /// No description provided for @authEnterCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmation code'**
+  String get authEnterCode;
+
+  /// No description provided for @authVerifyAndCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm and create account'**
+  String get authVerifyAndCreate;
+
+  /// No description provided for @authResendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code'**
+  String get authResendCode;
+
+  /// No description provided for @authInvalidCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid or expired code.'**
+  String get authInvalidCode;
+
+  /// No description provided for @authResendTooSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Please wait a moment before requesting another code.'**
+  String get authResendTooSoon;
+
+  /// No description provided for @authEmailDeliveryFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not send the email. Try again later.'**
+  String get authEmailDeliveryFailed;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get forgotPassword;
+
+  /// No description provided for @forgotPasswordSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send reset code'**
+  String get forgotPasswordSend;
+
+  /// No description provided for @forgotPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset password'**
+  String get forgotPasswordTitle;
+
+  /// No description provided for @forgotPasswordNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get forgotPasswordNew;
+
+  /// No description provided for @forgotPasswordConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Set new password'**
+  String get forgotPasswordConfirm;
+
+  /// No description provided for @forgotPasswordDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Password updated. Sign in with the new password.'**
+  String get forgotPasswordDone;
+
+  /// No description provided for @authAccountNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No cloud account found for this email.'**
+  String get authAccountNotFound;
 
   /// No description provided for @featureTrackVitals.
   ///
@@ -1481,7 +1595,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingQuest2FillFields.
   ///
   /// In en, this message translates to:
-  /// **'Fill all 3 fields — earn +{hp} HP on complete.'**
+  /// **'Fill all 3 fields to continue.'**
   String onboardingQuest2FillFields(int hp);
 
   /// No description provided for @rewardedStats.
@@ -1517,7 +1631,7 @@ abstract class AppLocalizations {
   /// No description provided for @completeQuest2.
   ///
   /// In en, this message translates to:
-  /// **'Complete Quest 2 (+{hp} HP)'**
+  /// **'Complete Quest 2'**
   String completeQuest2(int hp);
 
   /// No description provided for @backToQuest2.
@@ -1541,7 +1655,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingQuest3Optional.
   ///
   /// In en, this message translates to:
-  /// **'Optional vitals — +{bpHp} HP for BP, +{glucoseHp} HP for glucose. Once per day.'**
+  /// **'Optional vitals — log blood pressure and glucose (once per day).'**
   String onboardingQuest3Optional(int bpHp, int glucoseHp);
 
   /// No description provided for @onboardingAllQuestsComplete.
@@ -1553,7 +1667,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingEarnedHp.
   ///
   /// In en, this message translates to:
-  /// **'You earned {hp} HP · Level {level} {title}'**
+  /// **'Level {level} · {title}'**
   String onboardingEarnedHp(int hp, int level, String title);
 
   /// No description provided for @onboardingBonusVitals.
@@ -1643,19 +1757,19 @@ abstract class AppLocalizations {
   /// No description provided for @claimBonusFinish.
   ///
   /// In en, this message translates to:
-  /// **'Claim bonus & finish 🏆'**
+  /// **'Save & finish 🏆'**
   String get claimBonusFinish;
 
   /// No description provided for @skipBonusQuest.
   ///
   /// In en, this message translates to:
-  /// **'Skip bonus quest'**
+  /// **'Skip'**
   String get skipBonusQuest;
 
   /// No description provided for @calculatingRewards.
   ///
   /// In en, this message translates to:
-  /// **'Calculating rewards…'**
+  /// **'Saving…'**
   String get calculatingRewards;
 
   /// No description provided for @categoryBloodPressure.
@@ -2504,6 +2618,36 @@ abstract class AppLocalizations {
   /// **'Photo'**
   String get aiDocPhoto;
 
+  /// No description provided for @aiDocHoldToSpeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold to speak'**
+  String get aiDocHoldToSpeak;
+
+  /// No description provided for @aiDocListening.
+  ///
+  /// In en, this message translates to:
+  /// **'Listening… release to send'**
+  String get aiDocListening;
+
+  /// No description provided for @aiDocSpeechUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice input is not available on this device.'**
+  String get aiDocSpeechUnavailable;
+
+  /// No description provided for @aiDocSpeechPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone or speech recognition permission is required for voice messages.'**
+  String get aiDocSpeechPermissionDenied;
+
+  /// No description provided for @aiDocSpeechEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No speech detected. Hold the mic and try again.'**
+  String get aiDocSpeechEmpty;
+
   /// No description provided for @wellnessResults.
   ///
   /// In en, this message translates to:
@@ -2795,13 +2939,13 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingBpGlucose.
   ///
   /// In en, this message translates to:
-  /// **'BP / +{hp} HP'**
+  /// **'Blood pressure'**
   String onboardingBpGlucose(int hp);
 
   /// No description provided for @onboardingGlucoseHp.
   ///
   /// In en, this message translates to:
-  /// **'Glucose / +{hp} HP'**
+  /// **'Glucose'**
   String onboardingGlucoseHp(int hp);
 
   /// No description provided for @onboardingSys.
@@ -2825,7 +2969,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingRedeemHp.
   ///
   /// In en, this message translates to:
-  /// **'Redeem your {hp} HP for {percent}% off your first 6-month or annual PHA Plus+ subscription.'**
+  /// **'Get {percent}% off your first 6-month or annual PHA Plus+ subscription.'**
   String onboardingRedeemHp(int hp, int percent);
 
   /// No description provided for @activityCurrentPlanSubtitle.
@@ -3137,7 +3281,7 @@ abstract class AppLocalizations {
   /// No description provided for @loginSignUpSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Start tracking your health today — free forever.'**
+  /// **'Start tracking your health today.'**
   String get loginSignUpSubtitle;
 
   /// No description provided for @loginSignInSubtitle.
@@ -3332,6 +3476,42 @@ abstract class AppLocalizations {
   /// **'Remind every 5 days, not daily.'**
   String get vitalsPromptEvery5DaysHint;
 
+  /// No description provided for @vitalsPromptSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Blood pressure & glucose'**
+  String get vitalsPromptSectionTitle;
+
+  /// No description provided for @vitalsPromptSectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How often should PHA ask you to log BP and blood sugar?'**
+  String get vitalsPromptSectionSubtitle;
+
+  /// No description provided for @vitalsPromptDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Once a day'**
+  String get vitalsPromptDaily;
+
+  /// No description provided for @vitalsPromptDailyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind every day until you log today’s values.'**
+  String get vitalsPromptDailyHint;
+
+  /// No description provided for @vitalsPromptNever.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t ask'**
+  String get vitalsPromptNever;
+
+  /// No description provided for @vitalsPromptNeverHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No automatic BP or glucose prompts.'**
+  String get vitalsPromptNeverHint;
+
   /// No description provided for @vitalsBpLabel.
   ///
   /// In en, this message translates to:
@@ -3464,6 +3644,36 @@ abstract class AppLocalizations {
   /// **'Unlock All Features of PHA Plus+'**
   String get upgradeTrialTitle;
 
+  /// No description provided for @purchaseErrorInvalidCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase setup error: invalid billing credentials. In RevenueCat → Project settings → API keys, copy the Apple public SDK key (appl_…) into dart_define.json as REVENUECAT_IOS_API_KEY, and confirm App Store Connect is linked under Apps & providers.'**
+  String get purchaseErrorInvalidCredentials;
+
+  /// No description provided for @purchaseErrorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Network error while contacting the App Store. Check your connection and try again.'**
+  String get purchaseErrorNetwork;
+
+  /// No description provided for @purchaseErrorStore.
+  ///
+  /// In en, this message translates to:
+  /// **'The App Store could not complete the purchase. Try again later.'**
+  String get purchaseErrorStore;
+
+  /// No description provided for @purchaseErrorNoOfferings.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription plans are not available yet. Check RevenueCat offerings and App Store Connect products.'**
+  String get purchaseErrorNoOfferings;
+
+  /// No description provided for @purchaseErrorNoPackage.
+  ///
+  /// In en, this message translates to:
+  /// **'This plan is not available in the store right now. Try another plan or try again later.'**
+  String get purchaseErrorNoPackage;
+
   /// No description provided for @upgradeTrialBody1.
   ///
   /// In en, this message translates to:
@@ -3497,7 +3707,7 @@ abstract class AppLocalizations {
   /// No description provided for @upgradeHpBanner.
   ///
   /// In en, this message translates to:
-  /// **'You have {hp} HP! Redeem for {percent}% off 6-month or annual plans.'**
+  /// **'{percent}% off 6-month and annual plans.'**
   String upgradeHpBanner(int hp, int percent);
 
   /// No description provided for @upgradeTableFeature.
@@ -3641,7 +3851,7 @@ abstract class AppLocalizations {
   /// No description provided for @planHpDiscountNote.
   ///
   /// In en, this message translates to:
-  /// **'20% HP discount applied.'**
+  /// **'20% discount applied.'**
   String get planHpDiscountNote;
 
   /// No description provided for @planSave17.
@@ -3685,6 +3895,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'In-depth self-assessment for stress levels, psychosomatic patterns, and mental wellness indicators.'**
   String get psychoTestPromoBody;
+
+  /// No description provided for @promoCodeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Promo code'**
+  String get promoCodeLabel;
+
+  /// No description provided for @promoCodeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter promo code'**
+  String get promoCodeHint;
+
+  /// No description provided for @promoCodeApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get promoCodeApply;
+
+  /// No description provided for @promoCodeInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid promo code.'**
+  String get promoCodeInvalid;
+
+  /// No description provided for @promoCodeAlreadyUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'This promo code has already been used on this profile.'**
+  String get promoCodeAlreadyUsed;
 
   /// No description provided for @psychoQuestionOfBlock.
   ///
@@ -3745,6 +3985,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'7-day free trial'**
   String get trialSevenDayFree;
+
+  /// No description provided for @trialNotifChannelName.
+  ///
+  /// In en, this message translates to:
+  /// **'Trial reminders'**
+  String get trialNotifChannelName;
+
+  /// No description provided for @trialNotifChannelDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts before your free trial ends'**
+  String get trialNotifChannelDesc;
+
+  /// No description provided for @trialNotifThreeDaysTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trial ends in 3 days'**
+  String get trialNotifThreeDaysTitle;
+
+  /// No description provided for @trialNotifThreeDaysBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your 7-day free trial ends in 3 days. Subscribe to PHA Plus+ to keep all features.'**
+  String get trialNotifThreeDaysBody;
+
+  /// No description provided for @trialNotifTwentyFourHoursTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trial ends in 24 hours'**
+  String get trialNotifTwentyFourHoursTitle;
+
+  /// No description provided for @trialNotifTwentyFourHoursBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Less than a day left in your free trial. Subscribe now to keep full access to PHA.'**
+  String get trialNotifTwentyFourHoursBody;
 
   /// No description provided for @uploadImageFormats.
   ///
@@ -4970,6 +5246,72 @@ abstract class AppLocalizations {
   /// **'Heart check with Smart Watch'**
   String get actionHeartRateDesc;
 
+  /// No description provided for @actionEcg.
+  ///
+  /// In en, this message translates to:
+  /// **'ECG'**
+  String get actionEcg;
+
+  /// No description provided for @actionEcgDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Read electrode ECG from Apple Watch and compatible sensors'**
+  String get actionEcgDesc;
+
+  /// No description provided for @hrEcgEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No electrode ECG recordings found. Take an ECG on Apple Watch (Series 4+), then tap Read sensors.'**
+  String get hrEcgEmpty;
+
+  /// No description provided for @hrEcgConnectSensors.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow ECG sensor access'**
+  String get hrEcgConnectSensors;
+
+  /// No description provided for @hrEcgReadSensors.
+  ///
+  /// In en, this message translates to:
+  /// **'Read ECG from sensors'**
+  String get hrEcgReadSensors;
+
+  /// No description provided for @hrEcgNeedPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ECG sensor access needed'**
+  String get hrEcgNeedPermissionTitle;
+
+  /// No description provided for @hrEcgNeedPermissionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'PHA reads Electrocardiogram data written by Apple Watch electrodes into Apple Health. Enable ECG in the Health permission sheet.'**
+  String get hrEcgNeedPermissionBody;
+
+  /// No description provided for @hrEcgSensorHow.
+  ///
+  /// In en, this message translates to:
+  /// **'ECG is captured by electrodes on Apple Watch (Digital Crown + crystal). PHA reads those HealthKit recordings — it does not replace a clinical ECG.'**
+  String get hrEcgSensorHow;
+
+  /// No description provided for @hrEcgSensorAndroid.
+  ///
+  /// In en, this message translates to:
+  /// **'Electrode ECG via Health Connect is not available on this Android build yet. On iPhone, use Apple Watch Series 4+ ECG.'**
+  String get hrEcgSensorAndroid;
+
+  /// No description provided for @hrEcgLatestFromSensor.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest electrode reading'**
+  String get hrEcgLatestFromSensor;
+
+  /// No description provided for @hrEcgSensorMeta.
+  ///
+  /// In en, this message translates to:
+  /// **'{source} · {samples} electrode samples · {hz} Hz'**
+  String hrEcgSensorMeta(String source, int samples, int hz);
+
   /// No description provided for @unitBpm.
   ///
   /// In en, this message translates to:
@@ -5219,7 +5561,7 @@ abstract class AppLocalizations {
   /// No description provided for @hrEcgTitle.
   ///
   /// In en, this message translates to:
-  /// **'Recent ECG (Apple Watch)'**
+  /// **'Electrode ECG recordings'**
   String get hrEcgTitle;
 
   /// No description provided for @hrEcgSinusRhythm.
@@ -5251,6 +5593,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not classified'**
   String get hrEcgNotSet;
+
+  /// No description provided for @hrEcgSinusTachycardia.
+  ///
+  /// In en, this message translates to:
+  /// **'Sinus tachycardia'**
+  String get hrEcgSinusTachycardia;
+
+  /// No description provided for @hrEcgSinusBradycardia.
+  ///
+  /// In en, this message translates to:
+  /// **'Sinus bradycardia'**
+  String get hrEcgSinusBradycardia;
+
+  /// No description provided for @hrEcgVentricularTachycardia.
+  ///
+  /// In en, this message translates to:
+  /// **'Ventricular tachycardia'**
+  String get hrEcgVentricularTachycardia;
+
+  /// No description provided for @hrEcgVentricularFibrillation.
+  ///
+  /// In en, this message translates to:
+  /// **'Ventricular fibrillation'**
+  String get hrEcgVentricularFibrillation;
+
+  /// No description provided for @hrEcgAvBlock1.
+  ///
+  /// In en, this message translates to:
+  /// **'First-degree AV block'**
+  String get hrEcgAvBlock1;
+
+  /// No description provided for @hrEcgAvBlock2MobitzI.
+  ///
+  /// In en, this message translates to:
+  /// **'Second-degree AV block (Mobitz I)'**
+  String get hrEcgAvBlock2MobitzI;
+
+  /// No description provided for @hrEcgAvBlock3.
+  ///
+  /// In en, this message translates to:
+  /// **'Third-degree AV block'**
+  String get hrEcgAvBlock3;
+
+  /// No description provided for @hrEcgReferenceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ECG rhythms at a glance'**
+  String get hrEcgReferenceTitle;
+
+  /// No description provided for @hrEcgReferenceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Key teaching features — educational only, not a diagnosis.'**
+  String get hrEcgReferenceSubtitle;
+
+  /// No description provided for @hrEcgFeatNormalSinus.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate 60–100 bpm · regular · each P before QRS · PR 0.12–0.20 s · QRS < 0.12 s'**
+  String get hrEcgFeatNormalSinus;
+
+  /// No description provided for @hrEcgFeatSinusTachy.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate > 100 bpm · regular · each P before QRS · PR 0.12–0.20 s · QRS < 0.12 s'**
+  String get hrEcgFeatSinusTachy;
+
+  /// No description provided for @hrEcgFeatSinusBrady.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate < 60 bpm · regular · each P before QRS · PR 0.12–0.20 s · QRS < 0.12 s'**
+  String get hrEcgFeatSinusBrady;
+
+  /// No description provided for @hrEcgFeatAfib.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate often 100–250 bpm · irregular · no P waves · QRS usually ≤ 0.12 s'**
+  String get hrEcgFeatAfib;
+
+  /// No description provided for @hrEcgFeatVt.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate 100–250 bpm · regular · wide QRS (≥ 0.12 s) · P waves usually absent'**
+  String get hrEcgFeatVt;
+
+  /// No description provided for @hrEcgFeatVf.
+  ///
+  /// In en, this message translates to:
+  /// **'Chaotic baseline · no organized QRS · no P waves — emergency teaching pattern'**
+  String get hrEcgFeatVf;
+
+  /// No description provided for @hrEcgFeatAv1.
+  ///
+  /// In en, this message translates to:
+  /// **'PR > 0.20 s · every P followed by QRS · QRS < 0.12 s'**
+  String get hrEcgFeatAv1;
+
+  /// No description provided for @hrEcgFeatAv2.
+  ///
+  /// In en, this message translates to:
+  /// **'Progressive PR lengthening · dropped QRS · cyclic dropout pattern'**
+  String get hrEcgFeatAv2;
+
+  /// No description provided for @hrEcgFeatAv3.
+  ///
+  /// In en, this message translates to:
+  /// **'No P–QRS relationship · independent atrial/ventricular rates · escape rhythm'**
+  String get hrEcgFeatAv3;
+
+  /// No description provided for @hrEcgFeatInconclusive.
+  ///
+  /// In en, this message translates to:
+  /// **'Apple Watch could not classify this tracing confidently.'**
+  String get hrEcgFeatInconclusive;
+
+  /// No description provided for @hrEcgFeatUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Classification not available.'**
+  String get hrEcgFeatUnknown;
 
   /// No description provided for @hrIrregularRhythm.
   ///
@@ -5309,7 +5771,7 @@ abstract class AppLocalizations {
   /// No description provided for @hrExplainElevatedStreak.
   ///
   /// In en, this message translates to:
-  /// **'Resting heart rate has stayed in the 80–95 bpm range for several days. Watch for stress, overtraining, or early illness.'**
+  /// **'Resting heart rate has stayed at or above 105 bpm for several days. Watch for stress, overtraining, or early illness.'**
   String get hrExplainElevatedStreak;
 
   /// No description provided for @hrExplainSpike.
@@ -5339,13 +5801,13 @@ abstract class AppLocalizations {
   /// No description provided for @hrAlertGenericBody.
   ///
   /// In en, this message translates to:
-  /// **'Your resting heart rate is stably high (80–95 bpm) or rising day to day. Open Heart Rate & Rhythm for details.'**
+  /// **'Your resting heart rate is stably high (≥105 bpm) or rising day to day. Open Heart Rate & Rhythm for details.'**
   String get hrAlertGenericBody;
 
   /// No description provided for @hrRestingChartTitle.
   ///
   /// In en, this message translates to:
-  /// **'Resting heart rate'**
+  /// **'Heart Rate'**
   String get hrRestingChartTitle;
 
   /// No description provided for @hrAvgResting.
@@ -5354,10 +5816,64 @@ abstract class AppLocalizations {
   /// **'Avg {bpm} bpm'**
   String hrAvgResting(int bpm);
 
+  /// No description provided for @historyGlucoseAvg.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg {value} {unit}'**
+  String historyGlucoseAvg(String value, String unit);
+
+  /// No description provided for @historyBpAvg.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg {sys}/{dia} mmHg'**
+  String historyBpAvg(int sys, int dia);
+
+  /// No description provided for @historyGlucoseZoneNormalImperial.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal fasting ≤99 mg/dL'**
+  String get historyGlucoseZoneNormalImperial;
+
+  /// No description provided for @historyGlucoseZoneNormalMetric.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal fasting ≤5.5 mmol/L'**
+  String get historyGlucoseZoneNormalMetric;
+
+  /// No description provided for @historyGlucoseZoneAttention.
+  ///
+  /// In en, this message translates to:
+  /// **'Above normal or prediabetes range'**
+  String get historyGlucoseZoneAttention;
+
+  /// No description provided for @historyGlucoseZoneHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High / diabetes range'**
+  String get historyGlucoseZoneHigh;
+
+  /// No description provided for @historyBpZoneNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Systolic ≤120 mmHg'**
+  String get historyBpZoneNormal;
+
+  /// No description provided for @historyBpZoneElevated.
+  ///
+  /// In en, this message translates to:
+  /// **'Elevated 121–139 mmHg'**
+  String get historyBpZoneElevated;
+
+  /// No description provided for @historyBpZoneHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High ≥140 mmHg'**
+  String get historyBpZoneHigh;
+
   /// No description provided for @hrZoneNormal.
   ///
   /// In en, this message translates to:
-  /// **'Green — {low}–{high} bpm (normal)'**
+  /// **'Green — {low}–{high} bpm at rest (normal)'**
   String hrZoneNormal(int low, int high);
 
   /// No description provided for @hrZoneAttention.

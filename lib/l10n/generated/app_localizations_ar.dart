@@ -205,10 +205,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get signUpForFree => 'سجّل مجانًا';
 
   @override
-  String get alreadyHaveAccount => 'لديك حساب؟ سجّل الدخول';
+  String get alreadyHaveAccount => 'لديك حساب؟';
 
   @override
-  String get dontHaveAccount => 'ليس لديك حساب؟ أنشئ حسابًا';
+  String get dontHaveAccount => 'ليس لديك حساب؟';
 
   @override
   String get email => 'البريد الإلكتروني';
@@ -247,6 +247,70 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get passwordTooShort =>
       'يجب أن تتكون كلمة المرور من 8 أحرف على الأقل.';
+
+  @override
+  String get emailAlreadyRegistered =>
+      'هذا البريد مستخدم بالفعل. يُرجى تسجيل الدخول.';
+
+  @override
+  String get invalidEmailOrPassword =>
+      'البريد الإلكتروني أو كلمة المرور غير صحيحة. تحقق وحاول مرة أخرى.';
+
+  @override
+  String get authNetworkError =>
+      'تعذر الوصول إلى الخادم. تحقق من الاتصال وحاول مرة أخرى.';
+
+  @override
+  String get authServerSyncFailed =>
+      'تعذر تسجيل هذا البريد على الخادم. تحقق من الاتصال وحاول مرة أخرى.';
+
+  @override
+  String get authAccountNotOnServer =>
+      'لا توجد نسخة سحابية لهذا البريد بعد. افتح التطبيق على الجهاز الأصلي مع الإنترنت ثم حاول مرة أخرى.';
+
+  @override
+  String get authCodeSent =>
+      'أرسلنا رمزاً من 6 أرقام إلى بريدك. صالح لمدة 10 دقائق.';
+
+  @override
+  String get authEnterCode => 'رمز التأكيد';
+
+  @override
+  String get authVerifyAndCreate => 'تأكيد وإنشاء الحساب';
+
+  @override
+  String get authResendCode => 'إعادة إرسال الرمز';
+
+  @override
+  String get authInvalidCode => 'الرمز غير صالح أو منتهٍ.';
+
+  @override
+  String get authResendTooSoon => 'انتظر قليلاً قبل طلب رمز جديد.';
+
+  @override
+  String get authEmailDeliveryFailed => 'تعذر إرسال البريد. حاول لاحقاً.';
+
+  @override
+  String get forgotPassword => 'هل نسيت كلمة المرور؟';
+
+  @override
+  String get forgotPasswordSend => 'إرسال رمز إعادة التعيين';
+
+  @override
+  String get forgotPasswordTitle => 'إعادة تعيين كلمة المرور';
+
+  @override
+  String get forgotPasswordNew => 'كلمة مرور جديدة';
+
+  @override
+  String get forgotPasswordConfirm => 'حفظ كلمة المرور الجديدة';
+
+  @override
+  String get forgotPasswordDone =>
+      'تم تحديث كلمة المرور. سجّل الدخول بالجديدة.';
+
+  @override
+  String get authAccountNotFound => 'لا يوجد حساب سحابي لهذا البريد.';
 
   @override
   String get featureTrackVitals => 'تتبّع العلامات الحيوية والسكر';
@@ -697,27 +761,27 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String stepsRangeSedentary(String max) {
-    return '0–$max steps';
+    return '0–$max خطوة';
   }
 
   @override
   String stepsRangeBuilding(String min, String max) {
-    return '$min–$max steps';
+    return '$min–$max خطوة';
   }
 
   @override
   String stepsRangeBaseline(String min, String max) {
-    return '$min–$max steps';
+    return '$min–$max خطوة';
   }
 
   @override
   String stepsRangeStrong(String min, String max) {
-    return '$min–$max steps';
+    return '$min–$max خطوة';
   }
 
   @override
   String stepsRangeGoal(String min) {
-    return '$min+ steps';
+    return '$min+ خطوة';
   }
 
   @override
@@ -727,11 +791,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get morningNotificationTitle => 'صباح الخير — ملخص صحتك';
 
   @override
-  String get noNotificationsToday => 'No notifications for today yet.';
+  String get noNotificationsToday => 'لا توجد إشعارات لليوم بعد.';
 
   @override
-  String get notificationsAppearHere =>
-      'Notifications that already arrived today appear here.';
+  String get notificationsAppearHere => 'تظهر هنا الإشعارات التي وصلت اليوم.';
 
   @override
   String get phaPlusUnlockedTitle => 'أنت على PHA Plus+!';
@@ -741,15 +804,15 @@ class AppLocalizationsAr extends AppLocalizations {
       'جميع الميزات مفتوحة. استمتع بالرفع غير المحدود وPsychoTest وجدول العلاج.';
 
   @override
-  String get onboardingQuest2BuildAvatar => 'Quest 2: Build your avatar';
+  String get onboardingQuest2BuildAvatar => 'المهمة 2: أنشئ ملفك';
 
   @override
   String onboardingQuest2FillFields(int hp) {
-    return 'Fill all 3 fields — earn +$hp HP on complete.';
+    return 'املأ الحقول الثلاثة للمتابعة.';
   }
 
   @override
-  String get rewardedStats => 'Rewarded stats';
+  String get rewardedStats => 'إحصاءات مكافأة';
 
   @override
   String get yourGender => 'جنسك';
@@ -765,67 +828,67 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String completeQuest2(int hp) {
-    return 'Complete Quest 2 (+$hp HP)';
+    return 'أكمل المهمة 2';
   }
 
   @override
-  String get backToQuest2 => 'Back to Quest 2';
+  String get backToQuest2 => 'العودة إلى المهمة 2';
 
   @override
-  String get onboardingQuest3PowerUp => 'Quest 3: Power-up (bonus)';
+  String get onboardingQuest3PowerUp => 'المهمة 3: تعزيز (مكافأة)';
 
   @override
   String get onboardingQuest3BpDone =>
-      'You already logged BP and glucose today. Come back tomorrow for your next reading.';
+      'سجّلت ضغط الدم والسكر اليوم. عد غدًا للقراءة التالية.';
 
   @override
   String onboardingQuest3Optional(int bpHp, int glucoseHp) {
-    return 'Optional vitals — +$bpHp HP for BP, +$glucoseHp HP for glucose. Once per day.';
+    return 'مؤشرات اختيارية — سجّل ضغط الدم والسكر (مرة يوميًا).';
   }
 
   @override
-  String get onboardingAllQuestsComplete => 'All quests complete!';
+  String get onboardingAllQuestsComplete => 'اكتملت جميع المهام!';
 
   @override
   String onboardingEarnedHp(int hp, int level, String title) {
-    return 'You earned $hp HP · Level $level $title';
+    return 'المستوى $level · $title';
   }
 
   @override
-  String get onboardingBonusVitals => 'Bonus vitals unlocked extra insights!';
+  String get onboardingBonusVitals => 'المؤشرات الإضافية فتحت مزيدًا من الرؤى!';
 
   @override
-  String get healthPower => 'Health Power';
+  String get healthPower => 'طاقة الصحة';
 
   @override
-  String get onboardingCreateAccount => 'Create account and become healthy →';
+  String get onboardingCreateAccount => 'أنشئ حسابًا وابدأ بصحة أفضل ←';
 
   @override
-  String get onboardingEnterDashboard => 'Enter dashboard →';
+  String get onboardingEnterDashboard => 'ادخل لوحة التحكم ←';
 
   @override
   String get badgeUnitPro => 'Unit Pro';
 
   @override
-  String get badgeFoundation => 'Foundation';
+  String get badgeFoundation => 'الأساس';
 
   @override
   String get badgeHeartTrack => 'تتبع القلب';
 
   @override
-  String get badgeSugarSense => 'Sugar Sense';
+  String get badgeSugarSense => 'حاسة السكر';
 
   @override
   String get badgeChampion => 'Champion';
 
   @override
-  String get levelHealthRookie => 'Health Rookie';
+  String get levelHealthRookie => 'مبتدئ صحي';
 
   @override
-  String get levelProfileBuilder => 'Profile Builder';
+  String get levelProfileBuilder => 'باني الملف';
 
   @override
-  String get levelVitalsPro => 'Vitals Pro';
+  String get levelVitalsPro => 'محترف المؤشرات';
 
   @override
   String get picked => 'PICKED';
@@ -834,13 +897,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get saving => 'Saving…';
 
   @override
-  String get claimBonusFinish => 'Claim bonus & finish 🏆';
+  String get claimBonusFinish => 'احفظ وأنهِ 🏆';
 
   @override
-  String get skipBonusQuest => 'Skip bonus quest';
+  String get skipBonusQuest => 'تخطي';
 
   @override
-  String get calculatingRewards => 'Calculating rewards…';
+  String get calculatingRewards => 'Saving…';
 
   @override
   String get categoryBloodPressure => 'ضغط الدم';
@@ -876,7 +939,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get categoryNutrition => 'التغذية';
 
   @override
-  String get categoryPsychoTest => 'PsychoTest';
+  String get categoryPsychoTest => 'اختبار نفسي';
 
   @override
   String get categoryActivity => 'النشاط';
@@ -962,7 +1025,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String stepsLabel(String count) {
-    return '$count steps';
+    return '$count خطوة';
   }
 
   @override
@@ -999,19 +1062,19 @@ class AppLocalizationsAr extends AppLocalizations {
       'لا تدخين مُبلغ — من أقوى عوامل الحماية للقلب والرئتين.';
 
   @override
-  String get smokingLessPack => '<1 pack/day';
+  String get smokingLessPack => '<1 علبة/يوم';
 
   @override
-  String get smokingOnePack => '~1 pack/day';
+  String get smokingOnePack => '~1 علبة/يوم';
 
   @override
-  String get smokingMorePack => '>1 pack/day';
+  String get smokingMorePack => '>1 علبة/يوم';
 
   @override
-  String get smokingActive => 'Active smoker';
+  String get smokingActive => 'مدخن نشط';
 
   @override
-  String get smokingNonSmoker => 'Non-smoker';
+  String get smokingNonSmoker => 'غير مدخن';
 
   @override
   String get smokingWarning =>
@@ -1084,7 +1147,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String nutritionRecentMeals(int count) {
-    return '$count recent meals';
+    return '$count وجبات حديثة';
   }
 
   @override
@@ -1101,7 +1164,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String psychoLoad(int total, String label) {
-    return 'Load $total · $label';
+    return 'الحمل $total · $label';
   }
 
   @override
@@ -1135,16 +1198,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get priorityLow => 'Low';
 
   @override
-  String get profileUpdatedSuccess => 'Profile updated successfully!';
+  String get profileUpdatedSuccess => 'تم تحديث الملف الشخصي بنجاح!';
 
   @override
-  String get termsOfService => 'Terms of Service & Disclaimer';
+  String get termsOfService => 'شروط الخدمة وإخلاء المسؤولية';
 
   @override
-  String get howWeHandleData => 'How we handle your data';
+  String get howWeHandleData => 'كيف نتعامل مع بياناتك';
 
   @override
-  String get sameScoreHint => 'Same score as on Home';
+  String get sameScoreHint => 'نفس الدرجة كما في الصفحة الرئيسية';
 
   @override
   String get eveningNotificationTitle => 'تسجيل مسائي';
@@ -1182,54 +1245,53 @@ class AppLocalizationsAr extends AppLocalizations {
   String get uploadAnalysisTitle => 'رفع التحليل';
 
   @override
-  String get uploadFileType => 'File Type';
+  String get uploadFileType => 'نوع الملف';
 
   @override
-  String get uploadPdf => 'PDF Document';
+  String get uploadPdf => 'مستند PDF';
 
   @override
-  String get uploadPhoto => 'Photo / Image';
+  String get uploadPhoto => 'صورة / صورة فوتوغرافية';
 
   @override
-  String get uploadSelectFile => 'Select File';
+  String get uploadSelectFile => 'اختر ملفًا';
 
   @override
-  String get uploadClickToSelect => 'Click to select a file';
+  String get uploadClickToSelect => 'انقر لاختيار ملف';
 
   @override
   String uploadClickToChange(int size) {
-    return '$size KB — click to change';
+    return '$size كيلوبايت — انقر للتغيير';
   }
 
   @override
-  String get uploadLimitReached => 'Limit reached';
+  String get uploadLimitReached => 'تم بلوغ الحد';
 
   @override
-  String get uploadUpgradeMore => 'Upgrade to upload more';
+  String get uploadUpgradeMore => 'رقِّ خطتك لرفع المزيد';
 
   @override
-  String get uploadFile => 'Upload File';
+  String get uploadFile => 'رفع ملف';
 
   @override
-  String get uploadAnalyzing => 'Analyzing...';
+  String get uploadAnalyzing => 'جارٍ التحليل…';
 
   @override
-  String get uploadAnalyzingAiDoc => 'Analyzing your file with Ai Doc…';
+  String get uploadAnalyzingAiDoc => 'جارٍ تحليل ملفك مع Ai Doc…';
 
   @override
-  String get uploadFailed => 'Upload failed. Please try again.';
+  String get uploadFailed => 'فشل الرفع. حاول مرة أخرى.';
 
   @override
-  String get uploadCouldNotRead =>
-      'Could not read the selected file. Please pick it again.';
+  String get uploadCouldNotRead => 'تعذر قراءة الملف المحدد. اختره مجددًا.';
 
   @override
   String get uploadLimitMessage =>
-      'Upload limit reached. Upgrade to PHA Plus+ for unlimited uploads.';
+      'تم بلوغ حد الرفع. رقِّ إلى PHA Plus+ للرفع بلا حدود.';
 
   @override
   String uploadFreePlan(int count) {
-    return 'Free plan: $count/2 uploads used. Max 2 pages per file.';
+    return 'الخطة المجانية: $count/2 رفع مستخدم. بحد أقصى صفحتان لكل ملف.';
   }
 
   @override
@@ -1237,7 +1299,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get mealAfterAnalysis =>
-      'After analysis, tap ✓ only if you ate this dish — it adds to today\'s calories.';
+      'بعد التحليل، اضغط ✓ فقط إذا أكلت هذا الطبق — يُضاف إلى سعرات اليوم.';
 
   @override
   String get mealCamera => 'Camera';
@@ -1246,36 +1308,35 @@ class AppLocalizationsAr extends AppLocalizations {
   String get mealGallery => 'Gallery';
 
   @override
-  String get mealAnalyze => 'Analyze Meal';
+  String get mealAnalyze => 'حلّل الوجبة';
 
   @override
-  String get mealAnalyzing => 'Analyzing…';
+  String get mealAnalyzing => 'جارٍ التحليل…';
 
   @override
-  String get mealFailed => 'Analysis failed. Please try again.';
+  String get mealFailed => 'فشل التحليل. حاول مرة أخرى.';
 
   @override
   String get mealFreeLimit =>
-      'Free limit reached (2 meals per 24h). Upgrade to PHA Plus+ for unlimited meal checks.';
+      'تم بلوغ الحد المجاني (وجبتان / 24 ساعة). رقِّ إلى PHA Plus+ لفحوصات بلا حدود.';
 
   @override
   String mealFreePlan(int count, int limit) {
-    return 'Free plan: $count/$limit meals logged in the last 24 hours.';
+    return 'الخطة المجانية: $count/$limit وجبات خلال آخر 24 ساعة.';
   }
 
   @override
-  String get mealLogged =>
-      'Meal logged — counted in today\'s intake & Health Index.';
+  String get mealLogged => 'سُجّلت الوجبة — تُحسب في متناول اليوم ومؤشر الصحة.';
 
   @override
   String get mealTapConfirm =>
-      'Tap ✓ to confirm you ate this — adds to today\'s intake.';
+      'اضغط ✓ لتأكيد أنك أكلتها — تُضاف لمتناول اليوم.';
 
   @override
   String get mealDiscard => 'Discard';
 
   @override
-  String get mealTotalIntake => 'Total Intake';
+  String get mealTotalIntake => 'إجمالي المتناول';
 
   @override
   String get mealCarb => 'Carb';
@@ -1287,71 +1348,89 @@ class AppLocalizationsAr extends AppLocalizations {
   String get mealFat => 'Fat';
 
   @override
-  String get mealNoMealsToday => 'No meals confirmed today yet.';
+  String get mealNoMealsToday => 'لا وجبات مؤكدة اليوم بعد.';
 
   @override
   String mealNoMealsLogged(int target) {
-    return 'No meals logged · target ~$target kcal';
+    return 'لا وجبات · الهدف ~$target سعرة';
   }
 
   @override
-  String get mealConfirmHint => 'Confirm meals after analysis to track intake.';
+  String get mealConfirmHint => 'أكد الوجبات بعد التحليل لتتبع المتناول.';
 
   @override
   String get aiDocTitle => 'مساعد Ai Doc';
 
   @override
   String get aiDocWelcome =>
-      'Hello! I\'m your Ai Doc Assistant. Would you like us to use the data you provided during onboarding? After that, you can describe your problem in detail — or share a photo of a meal, lab result, or anything health-related.';
+      'مرحبًا! أنا مساعد Ai Doc. هل نستخدم بياناتك من الإعداد الأولي؟ بعد ذلك يمكنك وصف مشكلتك بالتفصيل — أو مشاركة صورة لوجبة أو نتيجة تحليل أو أي أمر صحي.';
 
   @override
-  String get aiDocOffline => 'Ai Doc is offline — API key not set.';
+  String get aiDocOffline => 'Ai Doc غير متصل — مفتاح API غير مضبوط.';
 
   @override
-  String get aiDocFreeLimit => 'Free consultation limit reached.';
+  String get aiDocFreeLimit => 'تم بلوغ حد الاستشارات المجانية.';
 
   @override
   String aiDocFreeRemaining(int remaining) {
-    return '$remaining of 3 free consultations remaining.';
+    return 'يتبقى $remaining من 3 استشارات مجانية.';
   }
 
   @override
-  String get aiDocAnalyzingHealth => 'Analyzing your health data…';
+  String get aiDocAnalyzingHealth => 'جارٍ تحليل بياناتك الصحية…';
 
   @override
-  String get aiDocLooking => 'Looking at that…';
+  String get aiDocLooking => 'أراجع ذلك…';
 
   @override
-  String get aiDocAskPlaceholder => 'Ask about symptoms, or add a photo note';
+  String get aiDocAskPlaceholder => 'اسأل عن الأعراض أو أضف ملاحظة بصورة';
 
   @override
-  String get aiDocUpgradeChat => 'Upgrade to continue chatting…';
+  String get aiDocUpgradeChat => 'رقِّ خطتك لمتابعة الدردشة…';
 
   @override
   String get aiDocNoProblem =>
-      'No problem! Whenever you\'re ready, describe your symptoms or health concerns in detail — or share a photo.';
+      'لا بأس! عندما تكون مستعدًا صف أعراضك أو مخاوفك بالتفصيل — أو شارك صورة.';
 
   @override
   String get aiDocPhoto => 'Photo';
 
   @override
-  String get wellnessResults => 'Wellness Results';
+  String get aiDocHoldToSpeak => 'اضغط مطولاً للتحدث';
+
+  @override
+  String get aiDocListening => 'جاري الاستماع… أفلت للإرسال';
+
+  @override
+  String get aiDocSpeechUnavailable =>
+      'الإدخال الصوتي غير متاح على هذا الجهاز.';
+
+  @override
+  String get aiDocSpeechPermissionDenied =>
+      'يلزم إذن الميكروفون أو التعرف على الكلام للرسائل الصوتية.';
+
+  @override
+  String get aiDocSpeechEmpty =>
+      'لم يُكتشف كلام. اضغط مطولاً على الميكروفون وحاول مجددًا.';
+
+  @override
+  String get wellnessResults => 'نتائج العافية';
 
   @override
   String wellnessQuestion(int current, int total) {
-    return 'Question $current of $total';
+    return 'السؤال $current من $total';
   }
 
   @override
   String percentComplete(int percent) {
-    return '$percent% complete';
+    return 'اكتمل $percent%';
   }
 
   @override
-  String get questionUnavailable => 'Question unavailable';
+  String get questionUnavailable => 'السؤال غير متاح';
 
   @override
-  String get wellnessVeryPoor => 'Very poor';
+  String get wellnessVeryPoor => 'ضعيف جدًا';
 
   @override
   String get wellnessPoor => 'Poor';
@@ -1363,117 +1442,114 @@ class AppLocalizationsAr extends AppLocalizations {
   String get wellnessGood => 'Good';
 
   @override
-  String get wellnessExcellent => 'Excellent';
+  String get wellnessExcellent => 'ممتاز';
 
   @override
-  String get badHabitsSummaryTitle => 'Bad Habits Summary';
+  String get badHabitsSummaryTitle => 'ملخص العادات السيئة';
 
   @override
   String get badHabitsSaved =>
-      'Saved to your health history. Honest tracking is the first step toward change.';
+      'حُفظ في سجلك الصحي. التتبع الصادق أول خطوة نحو التغيير.';
 
   @override
-  String get badHabitsSocialMediaLabel => 'Social media';
+  String get badHabitsSocialMediaLabel => 'وسائل التواصل';
 
   @override
   String badHabitsStep(int step, int total) {
-    return 'Step $step of $total';
+    return 'الخطوة $step من $total';
   }
 
   @override
   String get badHabitsDoYouSmoke => 'هل تدخن؟';
 
   @override
-  String get badHabitsHowMuchSmoke => 'How much do you smoke?';
+  String get badHabitsHowMuchSmoke => 'كم تدخن؟';
 
   @override
-  String get badHabitsDoYouDrink => 'Do you drink alcohol?';
+  String get badHabitsDoYouDrink => 'هل تشرب الكحول؟';
 
   @override
-  String get badHabitsHowMuchDrink => 'How often and how much do you drink?';
+  String get badHabitsHowMuchDrink => 'كم مرة وكم تشرب؟';
 
   @override
   String get badHabitsSocialMedia =>
-      'How much time do you spend uselessly on social media?';
+      'كم تقضي من الوقت بلا فائدة على وسائل التواصل؟';
 
   @override
   String get treatmentYourSchedule => 'جدولك';
 
   @override
-  String get treatmentAddMedicine => 'Add medicine or supplement';
+  String get treatmentAddMedicine => 'أضف دواءً أو مكملًا';
 
   @override
-  String get treatmentNewEntry => 'New entry';
+  String get treatmentNewEntry => 'إدخال جديد';
 
   @override
-  String get treatmentMedicineName => 'Name of medicine or dietary supplement';
+  String get treatmentMedicineName => 'اسم الدواء أو المكمل الغذائي';
 
   @override
-  String get treatmentMedicinePlaceholder => 'e.g. Vitamin D, Metformin';
+  String get treatmentMedicinePlaceholder => 'مثل: فيتامين D، ميتفورمين';
 
   @override
-  String get treatmentHowManyTimes => 'How many times a day';
+  String get treatmentHowManyTimes => 'كم مرة يوميًا';
 
   @override
   String treatmentDoseTime(int n) {
-    return 'Dose $n time';
+    return 'وقت الجرعة $n';
   }
 
   @override
-  String get treatmentAddAnother => 'Add another';
+  String get treatmentAddAnother => 'أضف آخر';
 
   @override
   String get treatmentSaveSchedule => 'حفظ الجدول';
 
   @override
-  String get treatmentSaved =>
-      'Treatment schedule saved — pill reminders are on';
+  String get treatmentSaved => 'حُفظ جدول العلاج — تذكيرات الحبوب مفعّلة';
 
   @override
-  String get treatmentEnterName =>
-      'Enter at least one medicine or supplement name.';
+  String get treatmentEnterName => 'أدخل اسم دواء أو مكمل واحد على الأقل.';
 
   @override
-  String get treatmentSaveFailed => 'Could not save. Please try again.';
+  String get treatmentSaveFailed => 'تعذر الحفظ. حاول مرة أخرى.';
 
   @override
   String get treatmentNotifOff =>
-      'Schedule saved, but notifications are off. Enable alerts in Settings to get pill reminders.';
+      'حُفظ الجدول لكن الإشعارات متوقفة. فعّلها في الإعدادات لتذكيرات الحبوب.';
 
   @override
-  String get psychoTestSubtitle => 'Stress & Psychosomatic Self-Assessment';
+  String get psychoTestSubtitle => 'تقييم ذاتي للتوتر والنفس جسدي';
 
   @override
   String get psychoTestIntro =>
-      'This assessment contains 3 blocks with a total of 20 questions. Answer honestly — there are no right or wrong answers. Results are saved to your profile.';
+      'يضم التقييم 3 أقسام و20 سؤالًا. أجب بصدق — لا إجابات صحيحة أو خاطئة. تُحفظ النتائج في ملفك.';
 
   @override
   String get psychoBlock1Title => 'BLOCK 1';
 
   @override
-  String get psychoBlock1Subtitle => 'Stress Awareness';
+  String get psychoBlock1Subtitle => 'وعي التوتر';
 
   @override
   String get psychoBlock2Title => 'BLOCK 2';
 
   @override
-  String get psychoBlock2Subtitle => 'Physical Symptoms';
+  String get psychoBlock2Subtitle => 'أعراض جسدية';
 
   @override
   String get psychoBlock3Title => 'BLOCK 3';
 
   @override
-  String get psychoBlock3Subtitle => 'Behavioral Profile';
+  String get psychoBlock3Subtitle => 'الملف السلوكي';
 
   @override
-  String get psychoAnswerHint =>
-      'Each question has 3 answer options: Never · Sometimes · Often';
+  String get psychoAnswerHint => 'لكل سؤال 3 خيارات: أبدًا · أحيانًا · كثيرًا';
 
   @override
   String get psychoStartAssessment => 'بدء التقييم';
 
   @override
-  String get psychoYourResult => 'YOUR RESULT';
+  String get psychoYourResult => 'نتيجتك';
 
   @override
   String get psychoRetake => 'Retake';
@@ -1482,27 +1558,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String get psychoNever => 'Never';
 
   @override
-  String get psychoSometimes => 'Sometimes';
+  String get psychoSometimes => 'أحيانًا';
 
   @override
   String get psychoOften => 'Often';
 
   @override
   String psychoQuestionsCount(int count) {
-    return '$count questions';
+    return '$count أسئلة';
   }
 
   @override
-  String get onboardingBackToQuest2 => 'Back to Quest 3';
+  String get onboardingBackToQuest2 => 'العودة إلى المهمة 3';
 
   @override
   String onboardingBpGlucose(int hp) {
-    return 'BP / +$hp HP';
+    return 'ضغط الدم';
   }
 
   @override
   String onboardingGlucoseHp(int hp) {
-    return 'Glucose / +$hp HP';
+    return 'السكر';
   }
 
   @override
@@ -1513,12 +1589,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String onboardingReadyForPha(int percent) {
-    return '$percent% — ready for PHA';
+    return '$percent% — جاهز لـ PHA';
   }
 
   @override
   String onboardingRedeemHp(int hp, int percent) {
-    return 'Redeem your $hp HP for $percent% off your first 6-month or annual PHA Plus+ subscription.';
+    return 'احصل على خصم $percent% على أول اشتراك PHA Plus+ لـ 6 أشهر أو سنوي.';
   }
 
   @override
@@ -1529,19 +1605,20 @@ class AppLocalizationsAr extends AppLocalizations {
       'خطتك نشطة. أكمل التمرين اليومي وأجب على تسجيل المساء.';
 
   @override
-  String get activityRestNote => 'Rest no more than 2 minutes between sets.';
+  String get activityRestNote => 'لا تزد الراحة على دقيقتين بين المجموعات.';
 
   @override
   String get dailyLabel => 'Daily';
 
   @override
-  String get fileTypePdf => 'PDF up to 2 pages (free plan)';
+  String get fileTypePdf => 'PDF حتى صفحتين (الخطة المجانية)';
 
   @override
-  String get upgradeToPhaPlus => 'Upgrade to PHA Plus+';
+  String get upgradeToPhaPlus => 'الترقية إلى PHA Plus+';
 
   @override
-  String get healthAnalysisSubtitleShort => 'Same score as Home Health Index';
+  String get healthAnalysisSubtitleShort =>
+      'نفس درجة مؤشر الصحة في الصفحة الرئيسية';
 
   @override
   String get wellnessQ1 => 'ما مدى الشعور بالتوتر الآن؟';
@@ -1684,7 +1761,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get loginTrustedBy => 'موثوق به من قبل المهتمين بالصحة حول العالم.';
 
   @override
-  String get loginSignUpSubtitle => 'ابدأ تتبع صحتك اليوم — مجاناً للأبد.';
+  String get loginSignUpSubtitle => 'ابدأ تتبع صحتك اليوم.';
 
   @override
   String get loginSignInSubtitle => 'سجّل الدخول للوصول إلى لوحة صحتك.';
@@ -1786,6 +1863,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get vitalsPromptEvery5DaysHint => 'تذكير كل 5 أيام وليس يومياً.';
 
   @override
+  String get vitalsPromptSectionTitle => 'ضغط الدم والسكر';
+
+  @override
+  String get vitalsPromptSectionSubtitle =>
+      'كم مرة يجب أن يطلب PHA تسجيل الضغط والسكر؟';
+
+  @override
+  String get vitalsPromptDaily => 'مرة يوميًا';
+
+  @override
+  String get vitalsPromptDailyHint => 'تذكير كل يوم حتى تسجّل قيم اليوم.';
+
+  @override
+  String get vitalsPromptNever => 'لا تسأل';
+
+  @override
+  String get vitalsPromptNeverHint => 'بدون تذكيرات تلقائية للضغط أو السكر.';
+
+  @override
   String get vitalsBpLabel => 'ضغط الدم (mmHg)';
 
   @override
@@ -1856,6 +1952,26 @@ class AppLocalizationsAr extends AppLocalizations {
   String get upgradeTrialTitle => 'افتح جميع ميزات PHA Plus+';
 
   @override
+  String get purchaseErrorInvalidCredentials =>
+      'خطأ في الشراء: بيانات اعتماد الفوترة غير صالحة. في RevenueCat → Project settings → API keys انسخ Apple public SDK key (appl_…) إلى dart_define.json كمفتاح REVENUECAT_IOS_API_KEY وتحقق من ربط App Store Connect.';
+
+  @override
+  String get purchaseErrorNetwork =>
+      'خطأ في الشبكة أثناء الاتصال بـ App Store. تحقق من الاتصال وحاول مرة أخرى.';
+
+  @override
+  String get purchaseErrorStore =>
+      'تعذر على App Store إكمال الشراء. حاول لاحقًا.';
+
+  @override
+  String get purchaseErrorNoOfferings =>
+      'الخطط غير متاحة بعد. تحقق من offerings في RevenueCat ومنتجات App Store Connect.';
+
+  @override
+  String get purchaseErrorNoPackage =>
+      'هذه الخطة غير متاحة في المتجر الآن. جرّب خطة أخرى أو لاحقًا.';
+
+  @override
   String get upgradeTrialBody1 =>
       'تحكم كامل بصحتك! افتح جميع خيارات PHA Plus+ المميزة.';
 
@@ -1873,7 +1989,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String upgradeHpBanner(int hp, int percent) {
-    return 'لديك $hp HP! استبدلها بخصم $percent%.';
+    return 'خصم $percent% على الخطط لمدة 6 أشهر والسنوية.';
   }
 
   @override
@@ -1946,7 +2062,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get planAnnual => 'سنوي';
 
   @override
-  String get planHpDiscountNote => 'تم تطبيق خصم 20% HP.';
+  String get planHpDiscountNote => 'تم تطبيق خصم 20%.';
 
   @override
   String get planSave17 => 'وفر ~17%.';
@@ -1969,6 +2085,22 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get psychoTestPromoBody =>
       'تقييم ذاتي متعمق لمستويات التوتر والأنماط جسدية النفسية.';
+
+  @override
+  String get promoCodeLabel => 'رمز ترويجي';
+
+  @override
+  String get promoCodeHint => 'أدخل الرمز الترويجي';
+
+  @override
+  String get promoCodeApply => 'تطبيق';
+
+  @override
+  String get promoCodeInvalid => 'رمز ترويجي غير صالح.';
+
+  @override
+  String get promoCodeAlreadyUsed =>
+      'تم استخدام هذا الرمز مسبقاً لهذا الملف الشخصي.';
 
   @override
   String psychoQuestionOfBlock(int current, int total) {
@@ -2007,6 +2139,27 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get trialSevenDayFree => 'تجربة مجانية 7 أيام';
+
+  @override
+  String get trialNotifChannelName => 'تذكيرات الفترة التجريبية';
+
+  @override
+  String get trialNotifChannelDesc =>
+      'تنبيهات قبل انتهاء الفترة التجريبية المجانية';
+
+  @override
+  String get trialNotifThreeDaysTitle => 'تنتهي التجربة خلال 3 أيام';
+
+  @override
+  String get trialNotifThreeDaysBody =>
+      'تنتهي تجربتك المجانية لمدة 7 أيام خلال 3 أيام. اشترك في PHA Plus+ للاحتفاظ بجميع الميزات.';
+
+  @override
+  String get trialNotifTwentyFourHoursTitle => 'تنتهي التجربة خلال 24 ساعة';
+
+  @override
+  String get trialNotifTwentyFourHoursBody =>
+      'بقي أقل من يوم على انتهاء التجربة المجانية. اشترك الآن للاحتفاظ بالوصول الكامل إلى PHA.';
 
   @override
   String get uploadImageFormats => 'JPG, PNG, GIF';
@@ -2759,6 +2912,46 @@ class AppLocalizationsAr extends AppLocalizations {
   String get actionHeartRateDesc => 'فحص القلب عبر الساعة الذكية';
 
   @override
+  String get actionEcg => 'تخطيط القلب';
+
+  @override
+  String get actionEcgDesc =>
+      'قراءة تخطيط القلب من أقطاب Apple Watch والمستشعرات المتوافقة';
+
+  @override
+  String get hrEcgEmpty =>
+      'لا توجد تسجيلات من الأقطاب. سجّل تخطيطاً على Apple Watch (Series 4+) ثم اضغط قراءة المستشعرات.';
+
+  @override
+  String get hrEcgConnectSensors => 'السماح بالوصول لمستشعر تخطيط القلب';
+
+  @override
+  String get hrEcgReadSensors => 'قراءة تخطيط القلب من المستشعرات';
+
+  @override
+  String get hrEcgNeedPermissionTitle => 'يلزم الوصول لمستشعر تخطيط القلب';
+
+  @override
+  String get hrEcgNeedPermissionBody =>
+      'تقرأ PHA تخطيط القلب الذي تكتبه أقطاب Apple Watch في Apple Health. فعّل تخطيط القلب في أذونات الصحة.';
+
+  @override
+  String get hrEcgSensorHow =>
+      'يُلتقط تخطيط القلب بأقطاب Apple Watch (التاج الرقمي + البلورة). PHA تقرأ HealthKit وليست بديلاً عن تخطيط سريري.';
+
+  @override
+  String get hrEcgSensorAndroid =>
+      'قراءة تخطيط القلب عبر Health Connect غير متاحة بعد على Android. على iPhone استخدم Apple Watch Series 4+.';
+
+  @override
+  String get hrEcgLatestFromSensor => 'آخر قراءة من الأقطاب';
+
+  @override
+  String hrEcgSensorMeta(String source, int samples, int hz) {
+    return '$source · $samples عيّنة · $hz هرتز';
+  }
+
+  @override
   String get unitBpm => 'نبضة/د';
 
   @override
@@ -2895,7 +3088,7 @@ class AppLocalizationsAr extends AppLocalizations {
       'معدل القلب عند الراحة وتغيّر المعدل يعكسان التوتر والتعافي واللياقة. القفزات أو عدة أيام مرتفعة تستحق الانتباه.';
 
   @override
-  String get hrEcgTitle => 'تخطيط قلب حديث (Apple Watch)';
+  String get hrEcgTitle => 'تسجيلات تخطيط القلب من الأقطاب';
 
   @override
   String get hrEcgSinusRhythm => 'إيقاع جيبي';
@@ -2910,7 +3103,77 @@ class AppLocalizationsAr extends AppLocalizations {
   String get hrEcgInconclusive => 'غير حاسم';
 
   @override
-  String get hrEcgNotSet => 'بلا تصنيف';
+  String get hrEcgNotSet => 'غير مصنّف';
+
+  @override
+  String get hrEcgSinusTachycardia => 'تسرع قلب جيبي';
+
+  @override
+  String get hrEcgSinusBradycardia => 'بطء قلب جيبي';
+
+  @override
+  String get hrEcgVentricularTachycardia => 'تسرع بطيني';
+
+  @override
+  String get hrEcgVentricularFibrillation => 'رجفان بطيني';
+
+  @override
+  String get hrEcgAvBlock1 => 'حصار أذيني بطيني من الدرجة الأولى';
+
+  @override
+  String get hrEcgAvBlock2MobitzI =>
+      'حصار أذيني بطيني من الدرجة الثانية (موبيتز I)';
+
+  @override
+  String get hrEcgAvBlock3 => 'حصار أذيني بطيني من الدرجة الثالثة';
+
+  @override
+  String get hrEcgReferenceTitle => 'إيقاعات تخطيط القلب باختصار';
+
+  @override
+  String get hrEcgReferenceSubtitle =>
+      'سمات تعليمية — للتثقيف فقط وليست تشخيصاً.';
+
+  @override
+  String get hrEcgFeatNormalSinus =>
+      'المعدل 60–100 · منتظم · كل P قبل QRS · PR 0.12–0.20 ث · QRS < 0.12 ث';
+
+  @override
+  String get hrEcgFeatSinusTachy =>
+      'المعدل > 100 · منتظم · كل P قبل QRS · PR 0.12–0.20 ث · QRS < 0.12 ث';
+
+  @override
+  String get hrEcgFeatSinusBrady =>
+      'المعدل < 60 · منتظم · كل P قبل QRS · PR 0.12–0.20 ث · QRS < 0.12 ث';
+
+  @override
+  String get hrEcgFeatAfib =>
+      'المعدل غالباً 100–250 · غير منتظم · بلا موجات P · QRS عادة ≤ 0.12 ث';
+
+  @override
+  String get hrEcgFeatVt =>
+      'المعدل 100–250 · منتظم · QRS واسع (≥ 0.12 ث) · غالباً بلا P';
+
+  @override
+  String get hrEcgFeatVf =>
+      'خط أساس فوضوي · بلا QRS منظم · بلا P — نمط طارئ تعليمي';
+
+  @override
+  String get hrEcgFeatAv1 => 'PR > 0.20 ث · كل P يتبعه QRS · QRS < 0.12 ث';
+
+  @override
+  String get hrEcgFeatAv2 => 'تطاول PR تدريجي · سقوط QRS · نمط دوري';
+
+  @override
+  String get hrEcgFeatAv3 =>
+      'لا علاقة بين P و QRS · معدلات مستقلة · إيقاع هروبي';
+
+  @override
+  String get hrEcgFeatInconclusive =>
+      'تعذر على Apple Watch تصنيف هذا التسجيل بثقة.';
+
+  @override
+  String get hrEcgFeatUnknown => 'التصنيف غير متاح.';
 
   @override
   String get hrIrregularRhythm => 'تنبيهات إيقاع غير منتظم';
@@ -2946,7 +3209,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get hrExplainElevatedStreak =>
-      'معدل الراحة بقي ضمن 80–95 نبضة/د لعدة أيام. راقب التوتر أو الإفراط في التمرين أو بداية مرض.';
+      'معدل الراحة بقي عند ≥105 نبضة/د لعدة أيام. راقب التوتر أو الإفراط في التمرين أو بداية مرض.';
 
   @override
   String get hrExplainSpike =>
@@ -2964,10 +3227,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get hrAlertGenericBody =>
-      'معدل الراحة ثابت بين 80–95 نبضة/د أو يرتفع يومًا بعد يوم. افتح معدل وإيقاع القلب للتفاصيل.';
+      'معدل الراحة ثابت عند ≥105 نبضة/د أو يرتفع يومًا بعد يوم. افتح معدل وإيقاع القلب للتفاصيل.';
 
   @override
-  String get hrRestingChartTitle => 'معدل القلب عند الراحة';
+  String get hrRestingChartTitle => 'معدل القلب';
 
   @override
   String hrAvgResting(int bpm) {
@@ -2975,8 +3238,39 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String historyGlucoseAvg(String value, String unit) {
+    return 'متوسط $value $unit';
+  }
+
+  @override
+  String historyBpAvg(int sys, int dia) {
+    return 'متوسط $sys/$dia mmHg';
+  }
+
+  @override
+  String get historyGlucoseZoneNormalImperial => 'طبيعي صائم ≤99 mg/dL';
+
+  @override
+  String get historyGlucoseZoneNormalMetric => 'طبيعي صائم ≤5.5 mmol/L';
+
+  @override
+  String get historyGlucoseZoneAttention => 'فوق الطبيعي أو مقدمات السكري';
+
+  @override
+  String get historyGlucoseZoneHigh => 'مرتفع / سكري';
+
+  @override
+  String get historyBpZoneNormal => 'الانقباضي ≤120 mmHg';
+
+  @override
+  String get historyBpZoneElevated => 'مرتفع 121–139 mmHg';
+
+  @override
+  String get historyBpZoneHigh => 'عالٍ ≥140 mmHg';
+
+  @override
   String hrZoneNormal(int low, int high) {
-    return 'أخضر — $low–$high نبضة/د (طبيعي)';
+    return 'أخضر — $low–$high نبضة/د في الراحة (طبيعي)';
   }
 
   @override

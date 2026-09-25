@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
@@ -14,6 +15,7 @@ import 'models.dart';
 import 'locale_controller.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'l10n/medical_l10n.dart';
+import 'patient_sync.dart';
 import 'units.dart';
 
 const _uuid = Uuid();
@@ -336,7 +338,10 @@ $rules
         buf.writeln('- ${entry.key}:');
         for (final row in entry.value.take(6)) {
           final at = (row['recorded_at'] as String?)?.substring(0, 10) ?? '';
-          buf.writeln('  · $at — ${row['value']}');
+          final raw = (row['value'] as num).toDouble();
+          buf.writeln(
+            '  · $at — ${_displayMetricValue(entry.key, raw, snapshot?.unitSystem ?? 'metric')}',
+          );
         }
       }
     }
@@ -596,6 +601,8 @@ $rules
       'response': response,
       'created_at': DateTime.now().toUtc().toIso8601String(),
     });
+    // Ai Doc / diagnosis chat history — email-keyed server backup.
+    unawaited(PatientSync.pushForUser(userId));
   }
 
   /// Persists an uploaded analysis as a chat exchange for history.
@@ -622,17 +629,25 @@ $rules
       limit: 20,
     );
     final buf = StringBuffer();
+    UnitSystem unitSys = 'metric';
     if (profiles.isNotEmpty) {
       final p = profiles.first;
+      unitSys = (p['unit_system'] as String?) ?? 'metric';
       final parts = <String>[];
       final age = p['age'];
       if (age != null) parts.add('age $age');
       final gender = p['gender'];
       if (gender != null) parts.add('gender $gender');
-      final height = p['height'];
-      if (height != null) parts.add('height ${height}cm');
-      final weight = p['weight'];
-      if (weight != null) parts.add('weight ${weight}kg');
+      final height = (p['height'] as num?)?.toDouble();
+      if (height != null) {
+        final h = formatHeight(height, unitSys);
+        parts.add('height ${h.value}${h.unit.isEmpty ? '' : ' ${h.unit}'}');
+      }
+      final weight = (p['weight'] as num?)?.toDouble();
+      if (weight != null) {
+        final w = formatWeight(weight, unitSys);
+        parts.add('weight ${w.value} ${w.unit}');
+      }
       if (parts.isNotEmpty) buf.writeln('Profile: ${parts.join(', ')}.');
     }
     final latest = <String, double>{};
@@ -641,11 +656,53 @@ $rules
       latest.putIfAbsent(t, () => (m['value'] as num).toDouble());
     }
     if (latest.isNotEmpty) {
-      buf.write(
-        'Recent metrics: ${latest.entries.map((e) => '${e.key} ${e.value}').join(', ')}',
-      );
+      final parts = <String>[];
+      for (final e in latest.entries) {
+        parts.add(_formatMetricForPrompt(e.key, e.value, unitSys));
+      }
+      buf.write('Recent metrics: ${parts.join(', ')}');
     }
     return buf.toString();
+  }
+
+  static String _formatMetricForPrompt(
+    String type,
+    double storageValue,
+    UnitSystem sys,
+  ) {
+    switch (type) {
+      case 'glucose':
+        final g = formatGlucose(storageValue, sys);
+        return 'glucose ${g.value} ${g.unit}';
+      case 'weight':
+        final w = formatWeight(storageValue, sys);
+        return 'weight ${w.value} ${w.unit}';
+      case 'distance':
+        final d = formatDistance(storageValue, sys);
+        return 'distance ${d.value} ${d.unit}';
+      default:
+        return '$type $storageValue';
+    }
+  }
+
+  static String _displayMetricValue(
+    String type,
+    double storageValue,
+    UnitSystem sys,
+  ) {
+    switch (type) {
+      case 'glucose':
+        final g = formatGlucose(storageValue, sys);
+        return '${g.value} ${g.unit}';
+      case 'weight':
+        final w = formatWeight(storageValue, sys);
+        return '${w.value} ${w.unit}';
+      case 'distance':
+        final d = formatDistance(storageValue, sys);
+        return '${d.value} ${d.unit}';
+      default:
+        return storageValue.toString();
+    }
   }
 }
 
@@ -665,21 +722,29 @@ class HealthAnalysisService {
 
   static Finding _glucose(double gMgdl, UnitSystem sys, AppLocalizations l10n) {
     final c = GlucoseGuidelines.classify(gMgdl, sys);
+    final formatted = formatGlucose(gMgdl, sys);
+    final unit = l10n.localizeUnitLabel(formatted.unit);
     return Finding(
       category: l10n.categoryBloodGlucose,
       status: c.status,
-      value: c.label,
+      value: '${formatted.value} $unit',
       message: l10n.glucoseMessage(c.band),
     );
   }
 
-  static Finding _weight(double weight, double? heightCm, AppLocalizations l10n) {
-    final c = BmiGuidelines.classify(weight, heightCm);
+  static Finding _weight(
+    double weightKg,
+    double? heightCm,
+    UnitSystem sys,
+    AppLocalizations l10n,
+  ) {
+    final c = BmiGuidelines.classify(weightKg, heightCm);
     final String value;
     if (c.band == 'weight_only' || heightCm == null || heightCm <= 0) {
-      value = '${weight.toStringAsFixed(1)} ${l10n.unitKg}';
+      final w = formatWeight(weightKg, sys);
+      value = '${w.value} ${l10n.localizeUnitLabel(w.unit)}';
     } else {
-      final bmi = weight / ((heightCm / 100) * (heightCm / 100));
+      final bmi = weightKg / ((heightCm / 100) * (heightCm / 100));
       value = l10n.clinicalBmiValue(bmi.toStringAsFixed(1));
     }
     return Finding(
@@ -1069,7 +1134,7 @@ class HealthAnalysisService {
         latest['weight'] ?? (profileRows.isNotEmpty
             ? (profileRows.first['weight'] as num?)?.toDouble()
             : null);
-    if (weight != null) findings.add(_weight(weight, heightCm, l10n));
+    if (weight != null) findings.add(_weight(weight, heightCm, unitSystem, l10n));
 
     final steps = latest['steps'];
     if (steps != null) findings.add(_steps(steps, l10n));
@@ -1105,7 +1170,7 @@ class HealthAnalysisService {
       diastolic: dia,
       fastingGlucoseMgdl: glucose,
     ));
-    final correlationFindings = correlation.toFindings(l10n);
+    final correlationFindings = correlation.toFindings(l10n, unitSystem: unitSystem);
     bool hasWeightFinding(String category) {
       final c = category.toLowerCase();
       return c.contains('weight') ||
@@ -1238,6 +1303,8 @@ class HealthAnalysisService {
           jsonEncode(recommendations.map((r) => r.toJson()).toList()),
       'analyzed_at': analyzedAt,
     });
+    // Persist Insights deviations (warning/critical findings) to email-keyed backup.
+    unawaited(PatientSync.pushForUser(userId));
     return (await latest_(id))!;
   }
 
@@ -1313,6 +1380,7 @@ class HealthConnectService {
       }),
     });
     await HealthIndexService.recalculate(userId);
+    unawaited(PatientSync.pushForUser(userId));
   }
 
   /// Reads today's steps and distance from the device, then stores them locally.

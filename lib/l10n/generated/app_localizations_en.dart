@@ -205,10 +205,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signUpForFree => 'Sign up for free';
 
   @override
-  String get alreadyHaveAccount => 'Already have an account? Sign in';
+  String get alreadyHaveAccount => 'Already have an account?';
 
   @override
-  String get dontHaveAccount => 'Don\'t have an account? Sign up';
+  String get dontHaveAccount => 'Don\'t have an account?';
 
   @override
   String get email => 'Email';
@@ -246,6 +246,72 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordTooShort => 'Password must be at least 8 characters.';
+
+  @override
+  String get emailAlreadyRegistered =>
+      'This email is already in use. Please sign in instead.';
+
+  @override
+  String get invalidEmailOrPassword =>
+      'Invalid email or password. Please check and try again.';
+
+  @override
+  String get authNetworkError =>
+      'Cannot reach the server. Check your internet connection and try again.';
+
+  @override
+  String get authServerSyncFailed =>
+      'Could not register this email on the server. Check your connection and try again.';
+
+  @override
+  String get authAccountNotOnServer =>
+      'No cloud backup for this email yet. Open the app once on the original device with internet, then try again.';
+
+  @override
+  String get authCodeSent =>
+      'We sent a 6-digit code to your email. It is valid for 10 minutes.';
+
+  @override
+  String get authEnterCode => 'Confirmation code';
+
+  @override
+  String get authVerifyAndCreate => 'Confirm and create account';
+
+  @override
+  String get authResendCode => 'Resend code';
+
+  @override
+  String get authInvalidCode => 'Invalid or expired code.';
+
+  @override
+  String get authResendTooSoon =>
+      'Please wait a moment before requesting another code.';
+
+  @override
+  String get authEmailDeliveryFailed =>
+      'Could not send the email. Try again later.';
+
+  @override
+  String get forgotPassword => 'Forgot password?';
+
+  @override
+  String get forgotPasswordSend => 'Send reset code';
+
+  @override
+  String get forgotPasswordTitle => 'Reset password';
+
+  @override
+  String get forgotPasswordNew => 'New password';
+
+  @override
+  String get forgotPasswordConfirm => 'Set new password';
+
+  @override
+  String get forgotPasswordDone =>
+      'Password updated. Sign in with the new password.';
+
+  @override
+  String get authAccountNotFound => 'No cloud account found for this email.';
 
   @override
   String get featureTrackVitals => 'Track vitals & glucose';
@@ -748,7 +814,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String onboardingQuest2FillFields(int hp) {
-    return 'Fill all 3 fields — earn +$hp HP on complete.';
+    return 'Fill all 3 fields to continue.';
   }
 
   @override
@@ -768,7 +834,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String completeQuest2(int hp) {
-    return 'Complete Quest 2 (+$hp HP)';
+    return 'Complete Quest 2';
   }
 
   @override
@@ -783,7 +849,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String onboardingQuest3Optional(int bpHp, int glucoseHp) {
-    return 'Optional vitals — +$bpHp HP for BP, +$glucoseHp HP for glucose. Once per day.';
+    return 'Optional vitals — log blood pressure and glucose (once per day).';
   }
 
   @override
@@ -791,7 +857,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String onboardingEarnedHp(int hp, int level, String title) {
-    return 'You earned $hp HP · Level $level $title';
+    return 'Level $level · $title';
   }
 
   @override
@@ -837,13 +903,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get saving => 'Saving…';
 
   @override
-  String get claimBonusFinish => 'Claim bonus & finish 🏆';
+  String get claimBonusFinish => 'Save & finish 🏆';
 
   @override
-  String get skipBonusQuest => 'Skip bonus quest';
+  String get skipBonusQuest => 'Skip';
 
   @override
-  String get calculatingRewards => 'Calculating rewards…';
+  String get calculatingRewards => 'Saving…';
 
   @override
   String get categoryBloodPressure => 'Blood Pressure';
@@ -1345,6 +1411,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aiDocPhoto => 'Photo';
 
   @override
+  String get aiDocHoldToSpeak => 'Hold to speak';
+
+  @override
+  String get aiDocListening => 'Listening… release to send';
+
+  @override
+  String get aiDocSpeechUnavailable =>
+      'Voice input is not available on this device.';
+
+  @override
+  String get aiDocSpeechPermissionDenied =>
+      'Microphone or speech recognition permission is required for voice messages.';
+
+  @override
+  String get aiDocSpeechEmpty =>
+      'No speech detected. Hold the mic and try again.';
+
+  @override
   String get wellnessResults => 'Wellness Results';
 
   @override
@@ -1507,12 +1591,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String onboardingBpGlucose(int hp) {
-    return 'BP / +$hp HP';
+    return 'Blood pressure';
   }
 
   @override
   String onboardingGlucoseHp(int hp) {
-    return 'Glucose / +$hp HP';
+    return 'Glucose';
   }
 
   @override
@@ -1528,7 +1612,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String onboardingRedeemHp(int hp, int percent) {
-    return 'Redeem your $hp HP for $percent% off your first 6-month or annual PHA Plus+ subscription.';
+    return 'Get $percent% off your first 6-month or annual PHA Plus+ subscription.';
   }
 
   @override
@@ -1703,8 +1787,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Trusted by health-conscious individuals worldwide.';
 
   @override
-  String get loginSignUpSubtitle =>
-      'Start tracking your health today — free forever.';
+  String get loginSignUpSubtitle => 'Start tracking your health today.';
 
   @override
   String get loginSignInSubtitle => 'Sign in to access your health dashboard.';
@@ -1808,6 +1891,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get vitalsPromptEvery5DaysHint => 'Remind every 5 days, not daily.';
 
   @override
+  String get vitalsPromptSectionTitle => 'Blood pressure & glucose';
+
+  @override
+  String get vitalsPromptSectionSubtitle =>
+      'How often should PHA ask you to log BP and blood sugar?';
+
+  @override
+  String get vitalsPromptDaily => 'Once a day';
+
+  @override
+  String get vitalsPromptDailyHint =>
+      'Remind every day until you log today’s values.';
+
+  @override
+  String get vitalsPromptNever => 'Don\'t ask';
+
+  @override
+  String get vitalsPromptNeverHint => 'No automatic BP or glucose prompts.';
+
+  @override
   String get vitalsBpLabel => 'Blood pressure (mmHg)';
 
   @override
@@ -1879,6 +1982,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get upgradeTrialTitle => 'Unlock All Features of PHA Plus+';
 
   @override
+  String get purchaseErrorInvalidCredentials =>
+      'Purchase setup error: invalid billing credentials. In RevenueCat → Project settings → API keys, copy the Apple public SDK key (appl_…) into dart_define.json as REVENUECAT_IOS_API_KEY, and confirm App Store Connect is linked under Apps & providers.';
+
+  @override
+  String get purchaseErrorNetwork =>
+      'Network error while contacting the App Store. Check your connection and try again.';
+
+  @override
+  String get purchaseErrorStore =>
+      'The App Store could not complete the purchase. Try again later.';
+
+  @override
+  String get purchaseErrorNoOfferings =>
+      'Subscription plans are not available yet. Check RevenueCat offerings and App Store Connect products.';
+
+  @override
+  String get purchaseErrorNoPackage =>
+      'This plan is not available in the store right now. Try another plan or try again later.';
+
+  @override
   String get upgradeTrialBody1 =>
       'Take full control of your health! Unlock all premium options in PHA Plus+ and gain the ability to monitor your health, physical activity, nutrition, and medical indicators in real time.';
 
@@ -1898,7 +2021,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String upgradeHpBanner(int hp, int percent) {
-    return 'You have $hp HP! Redeem for $percent% off 6-month or annual plans.';
+    return '$percent% off 6-month and annual plans.';
   }
 
   @override
@@ -1971,7 +2094,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get planAnnual => 'Annual';
 
   @override
-  String get planHpDiscountNote => '20% HP discount applied.';
+  String get planHpDiscountNote => '20% discount applied.';
 
   @override
   String get planSave17 => 'Save ~17%.';
@@ -1994,6 +2117,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get psychoTestPromoBody =>
       'In-depth self-assessment for stress levels, psychosomatic patterns, and mental wellness indicators.';
+
+  @override
+  String get promoCodeLabel => 'Promo code';
+
+  @override
+  String get promoCodeHint => 'Enter promo code';
+
+  @override
+  String get promoCodeApply => 'Apply';
+
+  @override
+  String get promoCodeInvalid => 'Invalid promo code.';
+
+  @override
+  String get promoCodeAlreadyUsed =>
+      'This promo code has already been used on this profile.';
 
   @override
   String psychoQuestionOfBlock(int current, int total) {
@@ -2033,6 +2172,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get trialSevenDayFree => '7-day free trial';
+
+  @override
+  String get trialNotifChannelName => 'Trial reminders';
+
+  @override
+  String get trialNotifChannelDesc => 'Alerts before your free trial ends';
+
+  @override
+  String get trialNotifThreeDaysTitle => 'Trial ends in 3 days';
+
+  @override
+  String get trialNotifThreeDaysBody =>
+      'Your 7-day free trial ends in 3 days. Subscribe to PHA Plus+ to keep all features.';
+
+  @override
+  String get trialNotifTwentyFourHoursTitle => 'Trial ends in 24 hours';
+
+  @override
+  String get trialNotifTwentyFourHoursBody =>
+      'Less than a day left in your free trial. Subscribe now to keep full access to PHA.';
 
   @override
   String get uploadImageFormats => 'JPG, PNG, GIF';
@@ -2792,6 +2951,46 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionHeartRateDesc => 'Heart check with Smart Watch';
 
   @override
+  String get actionEcg => 'ECG';
+
+  @override
+  String get actionEcgDesc =>
+      'Read electrode ECG from Apple Watch and compatible sensors';
+
+  @override
+  String get hrEcgEmpty =>
+      'No electrode ECG recordings found. Take an ECG on Apple Watch (Series 4+), then tap Read sensors.';
+
+  @override
+  String get hrEcgConnectSensors => 'Allow ECG sensor access';
+
+  @override
+  String get hrEcgReadSensors => 'Read ECG from sensors';
+
+  @override
+  String get hrEcgNeedPermissionTitle => 'ECG sensor access needed';
+
+  @override
+  String get hrEcgNeedPermissionBody =>
+      'PHA reads Electrocardiogram data written by Apple Watch electrodes into Apple Health. Enable ECG in the Health permission sheet.';
+
+  @override
+  String get hrEcgSensorHow =>
+      'ECG is captured by electrodes on Apple Watch (Digital Crown + crystal). PHA reads those HealthKit recordings — it does not replace a clinical ECG.';
+
+  @override
+  String get hrEcgSensorAndroid =>
+      'Electrode ECG via Health Connect is not available on this Android build yet. On iPhone, use Apple Watch Series 4+ ECG.';
+
+  @override
+  String get hrEcgLatestFromSensor => 'Latest electrode reading';
+
+  @override
+  String hrEcgSensorMeta(String source, int samples, int hz) {
+    return '$source · $samples electrode samples · $hz Hz';
+  }
+
+  @override
   String get unitBpm => 'bpm';
 
   @override
@@ -2928,7 +3127,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Resting heart rate and HRV reflect stress, recovery, and fitness. Sudden jumps or several high days in a row deserve attention.';
 
   @override
-  String get hrEcgTitle => 'Recent ECG (Apple Watch)';
+  String get hrEcgTitle => 'Electrode ECG recordings';
 
   @override
   String get hrEcgSinusRhythm => 'Sinus rhythm';
@@ -2944,6 +3143,77 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hrEcgNotSet => 'Not classified';
+
+  @override
+  String get hrEcgSinusTachycardia => 'Sinus tachycardia';
+
+  @override
+  String get hrEcgSinusBradycardia => 'Sinus bradycardia';
+
+  @override
+  String get hrEcgVentricularTachycardia => 'Ventricular tachycardia';
+
+  @override
+  String get hrEcgVentricularFibrillation => 'Ventricular fibrillation';
+
+  @override
+  String get hrEcgAvBlock1 => 'First-degree AV block';
+
+  @override
+  String get hrEcgAvBlock2MobitzI => 'Second-degree AV block (Mobitz I)';
+
+  @override
+  String get hrEcgAvBlock3 => 'Third-degree AV block';
+
+  @override
+  String get hrEcgReferenceTitle => 'ECG rhythms at a glance';
+
+  @override
+  String get hrEcgReferenceSubtitle =>
+      'Key teaching features — educational only, not a diagnosis.';
+
+  @override
+  String get hrEcgFeatNormalSinus =>
+      'Rate 60–100 bpm · regular · each P before QRS · PR 0.12–0.20 s · QRS < 0.12 s';
+
+  @override
+  String get hrEcgFeatSinusTachy =>
+      'Rate > 100 bpm · regular · each P before QRS · PR 0.12–0.20 s · QRS < 0.12 s';
+
+  @override
+  String get hrEcgFeatSinusBrady =>
+      'Rate < 60 bpm · regular · each P before QRS · PR 0.12–0.20 s · QRS < 0.12 s';
+
+  @override
+  String get hrEcgFeatAfib =>
+      'Rate often 100–250 bpm · irregular · no P waves · QRS usually ≤ 0.12 s';
+
+  @override
+  String get hrEcgFeatVt =>
+      'Rate 100–250 bpm · regular · wide QRS (≥ 0.12 s) · P waves usually absent';
+
+  @override
+  String get hrEcgFeatVf =>
+      'Chaotic baseline · no organized QRS · no P waves — emergency teaching pattern';
+
+  @override
+  String get hrEcgFeatAv1 =>
+      'PR > 0.20 s · every P followed by QRS · QRS < 0.12 s';
+
+  @override
+  String get hrEcgFeatAv2 =>
+      'Progressive PR lengthening · dropped QRS · cyclic dropout pattern';
+
+  @override
+  String get hrEcgFeatAv3 =>
+      'No P–QRS relationship · independent atrial/ventricular rates · escape rhythm';
+
+  @override
+  String get hrEcgFeatInconclusive =>
+      'Apple Watch could not classify this tracing confidently.';
+
+  @override
+  String get hrEcgFeatUnknown => 'Classification not available.';
 
   @override
   String get hrIrregularRhythm => 'Irregular rhythm alerts';
@@ -2980,7 +3250,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hrExplainElevatedStreak =>
-      'Resting heart rate has stayed in the 80–95 bpm range for several days. Watch for stress, overtraining, or early illness.';
+      'Resting heart rate has stayed at or above 105 bpm for several days. Watch for stress, overtraining, or early illness.';
 
   @override
   String get hrExplainSpike =>
@@ -2998,10 +3268,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hrAlertGenericBody =>
-      'Your resting heart rate is stably high (80–95 bpm) or rising day to day. Open Heart Rate & Rhythm for details.';
+      'Your resting heart rate is stably high (≥105 bpm) or rising day to day. Open Heart Rate & Rhythm for details.';
 
   @override
-  String get hrRestingChartTitle => 'Resting heart rate';
+  String get hrRestingChartTitle => 'Heart Rate';
 
   @override
   String hrAvgResting(int bpm) {
@@ -3009,8 +3279,39 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String historyGlucoseAvg(String value, String unit) {
+    return 'Avg $value $unit';
+  }
+
+  @override
+  String historyBpAvg(int sys, int dia) {
+    return 'Avg $sys/$dia mmHg';
+  }
+
+  @override
+  String get historyGlucoseZoneNormalImperial => 'Normal fasting ≤99 mg/dL';
+
+  @override
+  String get historyGlucoseZoneNormalMetric => 'Normal fasting ≤5.5 mmol/L';
+
+  @override
+  String get historyGlucoseZoneAttention => 'Above normal or prediabetes range';
+
+  @override
+  String get historyGlucoseZoneHigh => 'High / diabetes range';
+
+  @override
+  String get historyBpZoneNormal => 'Systolic ≤120 mmHg';
+
+  @override
+  String get historyBpZoneElevated => 'Elevated 121–139 mmHg';
+
+  @override
+  String get historyBpZoneHigh => 'High ≥140 mmHg';
+
+  @override
   String hrZoneNormal(int low, int high) {
-    return 'Green — $low–$high bpm (normal)';
+    return 'Green — $low–$high bpm at rest (normal)';
   }
 
   @override

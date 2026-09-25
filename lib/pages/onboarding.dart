@@ -60,11 +60,7 @@ class _OnboardingPageState extends State<OnboardingPage>
     'champion': false,
   };
 
-  String? _hpToastMsg;
-  int _hpToastAmount = 0;
-
   late final AnimationController _bgFloat;
-  late final AnimationController _toastCtrl;
 
   final _age = TextEditingController();
   final _heightCm = TextEditingController();
@@ -110,7 +106,6 @@ class _OnboardingPageState extends State<OnboardingPage>
     WidgetsBinding.instance.addObserver(this);
     _bgFloat = AnimationController(vsync: this, duration: const Duration(seconds: 4))
       ..repeat(reverse: true);
-    _toastCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 2200));
 
     if (beforeSignUp) {
       _restoreDraft();
@@ -227,16 +222,31 @@ class _OnboardingPageState extends State<OnboardingPage>
     final needGlucose = await DailyVitalsService.shouldPromptGlucose(_vitalsScope);
 
     final hasBasics = ageVal != null && heightCm != null && weightKg != null;
+    final hasPartialBasics = ageVal != null ||
+        heightCm != null ||
+        weightKg != null ||
+        gender != null;
     final hpStored = (r['health_points'] as int?) ?? 0;
+    // Fresh Sign up accounts have no profile yet — always show Quest 1
+    // (units + language/region). Only skip it when the user already started
+    // basics or earned the units HP reward in a previous session.
+    final unitsAlreadyDone =
+        hasPartialBasics || hasBasics || hpStored >= hpUnitsReward;
 
     setState(() {
       unitSystem = (r['unit_system'] as String?) ?? 'metric';
       gender = r['gender'] as String?;
       _fillBasicsFields(ageVal: ageVal, heightCm: heightCm, weightKg: weightKg);
-      quest1Done = true;
+      quest1Done = unitsAlreadyDone;
       quest2Done = hasBasics;
-      step = hasBasics ? 3 : 2;
-      _badges['units'] = true;
+      if (hasBasics) {
+        step = 3;
+      } else if (unitsAlreadyDone) {
+        step = 2;
+      } else {
+        step = 1;
+      }
+      _badges['units'] = unitsAlreadyDone;
       if (hasBasics) _badges['foundation'] = true;
       hp = hpStored.clamp(0, maxOnboardingHp);
       _needBpToday = needBp;
@@ -313,28 +323,17 @@ class _OnboardingPageState extends State<OnboardingPage>
     _basicsSaveTimer?.cancel();
     unawaited(_persistBasicsDraft());
     _bgFloat.dispose();
-    _toastCtrl.dispose();
     for (final c in [_age, _heightCm, _heightFt, _heightIn, _weight, _systolic, _diastolic, _glucose]) {
       c.dispose();
     }
     super.dispose();
   }
 
-  void _grantHp(int amount, {String? toast, String? badgeKey}) {
+  void _grantHp(int amount, {String? badgeKey}) {
     setState(() {
       hp = (hp + amount).clamp(0, maxOnboardingHp);
-      if (toast != null) {
-        _hpToastMsg = toast;
-        _hpToastAmount = amount;
-      }
       if (badgeKey != null) _badges[badgeKey] = true;
     });
-    if (toast != null) {
-      _toastCtrl.forward(from: 0);
-      Future.delayed(const Duration(milliseconds: 2200), () {
-        if (mounted) setState(() => _hpToastMsg = null);
-      });
-    }
   }
 
   Future<void> _insertMetrics(AuthProvider auth, List<Map<String, dynamic>> inserts) async {
@@ -413,7 +412,7 @@ class _OnboardingPageState extends State<OnboardingPage>
       quest1Done = true;
       step = 2;
     });
-    _grantHp(hpUnitsReward, toast: context.l10n.onboardingQuest1Complete, badgeKey: 'units');
+    _grantHp(hpUnitsReward, badgeKey: 'units');
   }
 
   Future<void> _submitGeneral() async {
@@ -476,7 +475,7 @@ class _OnboardingPageState extends State<OnboardingPage>
         step = 3;
         error = '';
       });
-      _grantHp(hpBasicReward, toast: context.l10n.onboardingQuest2Complete, badgeKey: 'foundation');
+      _grantHp(hpBasicReward, badgeKey: 'foundation');
     }
   }
 
@@ -565,6 +564,8 @@ class _OnboardingPageState extends State<OnboardingPage>
       );
       await auth.refreshPlanStatus();
       await HealthIndexService.recalculate(auth.user!.id);
+      await OnboardingPrefs.markDevicePreOnboardingDone();
+      unawaited(auth.syncPatientHistory());
     }
 
     if (mounted) {
@@ -574,17 +575,19 @@ class _OnboardingPageState extends State<OnboardingPage>
         step = 4;
       });
       if (bonusHp > 0) {
-        _grantHp(bonusHp, toast: context.l10n.onboardingBonusComplete);
+        _grantHp(bonusHp);
       }
       setState(() => _badges['champion'] = true);
     }
   }
 
-  void _finishJourney() => widget.onComplete();
+  void _finishJourney() {
+    unawaited(OnboardingPrefs.markDevicePreOnboardingDone());
+    widget.onComplete();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     return Scaffold(
       backgroundColor: C.gray50,
       body: Stack(
@@ -598,17 +601,6 @@ class _OnboardingPageState extends State<OnboardingPage>
                   constraints: const BoxConstraints(maxWidth: 460),
                   child: Column(
                     children: [
-                      if (_hpToastMsg != null) ...[
-                        OnboardingHpToast(message: _hpToastMsg!, hp: _hpToastAmount),
-                        SizedBox(height: 6),
-                      ],
-                      OnboardingGameHud(
-                        hp: hp,
-                        level: _level,
-                        levelTitle: _levelTitle(l10n),
-                        power: _power,
-                      ),
-                      SizedBox(height: 8),
                       AnimatedSwitcher(
                         duration: const Duration(milliseconds: 350),
                         switchInCurve: Curves.easeOutCubic,
@@ -685,7 +677,6 @@ class _OnboardingPageState extends State<OnboardingPage>
         OnboardingQuestCard(
           title: context.l10n.onboardingQuest1CardTitle,
           subtitle: context.l10n.onboardingQuest1CardSubtitle,
-          reward: '+$hpUnitsReward HP',
           icon: Icons.public,
           accent: C.blue500,
         ),
@@ -816,7 +807,7 @@ class _OnboardingPageState extends State<OnboardingPage>
         ),
         SizedBox(height: 4),
         Text(
-          l10n.onboardingQuest2FillFields(hpBasicReward),
+          l10n.onboardingQuest2FillFields(0),
           textAlign: TextAlign.center,
           style: TextStyle(color: C.gray500, fontSize: 12),
         ),
@@ -909,7 +900,7 @@ class _OnboardingPageState extends State<OnboardingPage>
         ),
         SizedBox(height: 12),
         PrimaryButton(
-          label: saving ? l10n.saving : l10n.completeQuest2(hpBasicReward),
+          label: saving ? l10n.saving : l10n.completeQuest2(0),
           color: C.teal600,
           icon: Icon(Icons.military_tech, size: 18, color: C.white),
           onPressed: saving ? null : _submitGeneral,
@@ -951,7 +942,7 @@ class _OnboardingPageState extends State<OnboardingPage>
         Text(
           allLoggedToday
               ? l10n.onboardingQuest3BpDone
-              : l10n.onboardingQuest3Optional(hpBpReward, hpGlucoseReward),
+              : l10n.onboardingQuest3Optional(0, 0),
           textAlign: TextAlign.center,
           style: TextStyle(color: C.gray500, fontSize: 13),
         ),
@@ -963,14 +954,14 @@ class _OnboardingPageState extends State<OnboardingPage>
                 Expanded(
                   child: _bonusTile(
                     '♥ BP',
-                    '+$hpBpReward HP',
+                    l10n.bloodPressure,
                     hasBp && _diastolic.text.isNotEmpty && _systolic.text.isNotEmpty,
                   ),
                 ),
               if (showBp && showGlucose) SizedBox(width: 8),
               if (showGlucose)
                 Expanded(
-                  child: _bonusTile('💧 Glucose', '+$hpGlucoseReward HP', hasGlucose),
+                  child: _bonusTile('💧 Glucose', l10n.bloodGlucose, hasGlucose),
                 ),
             ],
           ),
@@ -1034,7 +1025,7 @@ class _OnboardingPageState extends State<OnboardingPage>
     );
   }
 
-  Widget _bonusTile(String label, String hpLabel, bool active) {
+  Widget _bonusTile(String label, String detail, bool active) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
       padding: const EdgeInsets.all(12),
@@ -1046,7 +1037,7 @@ class _OnboardingPageState extends State<OnboardingPage>
       child: Column(
         children: [
           Text(label, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
-          Text(hpLabel,
+          Text(detail,
               style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
@@ -1070,18 +1061,10 @@ class _OnboardingPageState extends State<OnboardingPage>
         ),
         SizedBox(height: 8),
         Text(
-          l10n.onboardingEarnedHp(hp, _level, _levelTitle(l10n)),
+          l10n.onboardingEarnedHp(0, _level, _levelTitle(l10n)),
           textAlign: TextAlign.center,
           style: TextStyle(color: C.teal400, fontWeight: FontWeight.w700, fontSize: 15),
         ),
-        if (hp >= maxOnboardingHp) ...[
-          SizedBox(height: 8),
-          Text(
-            l10n.onboardingRedeemHp(maxOnboardingHp, hpFirstPurchaseDiscountPercent),
-            textAlign: TextAlign.center,
-            style: TextStyle(color: C.amber700, fontWeight: FontWeight.w600, fontSize: 13),
-          ),
-        ],
         if (vitalsBonus) ...[
           SizedBox(height: 6),
           Text(l10n.onboardingBonusVitals,
@@ -1107,8 +1090,8 @@ class _OnboardingPageState extends State<OnboardingPage>
           ),
           child: Column(
             children: [
-              Text(l10n.healthPower,
-                  style: TextStyle(color: C.white, fontWeight: FontWeight.w600)),
+              Text(l10n.onboardingReadyForPha((_power * 100).round()),
+                  style: TextStyle(color: C.white.withValues(alpha: 0.95), fontSize: 14, fontWeight: FontWeight.w600)),
               SizedBox(height: 8),
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
@@ -1119,9 +1102,6 @@ class _OnboardingPageState extends State<OnboardingPage>
                   color: C.amber300,
                 ),
               ),
-              SizedBox(height: 6),
-              Text(l10n.onboardingReadyForPha((_power * 100).round()),
-                  style: TextStyle(color: C.white.withValues(alpha: 0.9), fontSize: 12)),
             ],
           ),
         ),

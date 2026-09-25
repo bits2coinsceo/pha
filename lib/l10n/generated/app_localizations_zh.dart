@@ -204,10 +204,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get signUpForFree => '免费注册';
 
   @override
-  String get alreadyHaveAccount => '已有账户？登录';
+  String get alreadyHaveAccount => '已有账户？';
 
   @override
-  String get dontHaveAccount => '没有账户？注册';
+  String get dontHaveAccount => '没有账户？';
 
   @override
   String get email => '邮箱';
@@ -244,6 +244,63 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get passwordTooShort => '密码至少需要 8 个字符。';
+
+  @override
+  String get emailAlreadyRegistered => '该邮箱已被使用。请登录。';
+
+  @override
+  String get invalidEmailOrPassword => '邮箱或密码无效。请检查后重试。';
+
+  @override
+  String get authNetworkError => '无法连接服务器。请检查网络后重试。';
+
+  @override
+  String get authServerSyncFailed => '无法在服务器上注册此邮箱。请检查网络后重试。';
+
+  @override
+  String get authAccountNotOnServer => '此邮箱尚无云端备份。请先在原设备联网打开应用，然后再试。';
+
+  @override
+  String get authCodeSent => '我们已向你的邮箱发送 6 位验证码，10 分钟内有效。';
+
+  @override
+  String get authEnterCode => '验证码';
+
+  @override
+  String get authVerifyAndCreate => '确认并创建账户';
+
+  @override
+  String get authResendCode => '重新发送验证码';
+
+  @override
+  String get authInvalidCode => '验证码无效或已过期。';
+
+  @override
+  String get authResendTooSoon => '请稍后再请求新的验证码。';
+
+  @override
+  String get authEmailDeliveryFailed => '邮件发送失败，请稍后再试。';
+
+  @override
+  String get forgotPassword => '忘记密码？';
+
+  @override
+  String get forgotPasswordSend => '发送重置码';
+
+  @override
+  String get forgotPasswordTitle => '重置密码';
+
+  @override
+  String get forgotPasswordNew => '新密码';
+
+  @override
+  String get forgotPasswordConfirm => '保存新密码';
+
+  @override
+  String get forgotPasswordDone => '密码已更新。请用新密码登录。';
+
+  @override
+  String get authAccountNotFound => '未找到此邮箱的云端账户。';
 
   @override
   String get featureTrackVitals => '追踪生命体征与血糖';
@@ -685,27 +742,27 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String stepsRangeSedentary(String max) {
-    return '0–$max steps';
+    return '0–$max 步';
   }
 
   @override
   String stepsRangeBuilding(String min, String max) {
-    return '$min–$max steps';
+    return '$min–$max 步';
   }
 
   @override
   String stepsRangeBaseline(String min, String max) {
-    return '$min–$max steps';
+    return '$min–$max 步';
   }
 
   @override
   String stepsRangeStrong(String min, String max) {
-    return '$min–$max steps';
+    return '$min–$max 步';
   }
 
   @override
   String stepsRangeGoal(String min) {
-    return '$min+ steps';
+    return '$min+ 步';
   }
 
   @override
@@ -715,11 +772,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get morningNotificationTitle => '早上好 — 您的健康回顾';
 
   @override
-  String get noNotificationsToday => 'No notifications for today yet.';
+  String get noNotificationsToday => '今天还没有通知。';
 
   @override
-  String get notificationsAppearHere =>
-      'Notifications that already arrived today appear here.';
+  String get notificationsAppearHere => '今天已送达的通知会显示在这里。';
 
   @override
   String get phaPlusUnlockedTitle => '您已开通 PHA Plus+！';
@@ -728,15 +784,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get phaPlusUnlockedBody => '所有功能已解锁。享受无限上传、PsychoTest 和治疗日程。';
 
   @override
-  String get onboardingQuest2BuildAvatar => 'Quest 2: Build your avatar';
+  String get onboardingQuest2BuildAvatar => '任务 2：建立你的档案';
 
   @override
   String onboardingQuest2FillFields(int hp) {
-    return 'Fill all 3 fields — earn +$hp HP on complete.';
+    return '请填写全部 3 项后继续。';
   }
 
   @override
-  String get rewardedStats => 'Rewarded stats';
+  String get rewardedStats => '奖励统计';
 
   @override
   String get yourGender => '您的性别';
@@ -752,67 +808,66 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String completeQuest2(int hp) {
-    return 'Complete Quest 2 (+$hp HP)';
+    return '完成任务 2';
   }
 
   @override
-  String get backToQuest2 => 'Back to Quest 2';
+  String get backToQuest2 => '返回任务 2';
 
   @override
-  String get onboardingQuest3PowerUp => 'Quest 3: Power-up (bonus)';
+  String get onboardingQuest3PowerUp => '任务 3：强化（奖励）';
 
   @override
-  String get onboardingQuest3BpDone =>
-      'You already logged BP and glucose today. Come back tomorrow for your next reading.';
+  String get onboardingQuest3BpDone => '你今天已记录血压和血糖。明天再回来进行下一次测量。';
 
   @override
   String onboardingQuest3Optional(int bpHp, int glucoseHp) {
-    return 'Optional vitals — +$bpHp HP for BP, +$glucoseHp HP for glucose. Once per day.';
+    return '可选体征 — 记录血压和血糖（每天一次）。';
   }
 
   @override
-  String get onboardingAllQuestsComplete => 'All quests complete!';
+  String get onboardingAllQuestsComplete => '全部任务完成！';
 
   @override
   String onboardingEarnedHp(int hp, int level, String title) {
-    return 'You earned $hp HP · Level $level $title';
+    return '等级 $level · $title';
   }
 
   @override
-  String get onboardingBonusVitals => 'Bonus vitals unlocked extra insights!';
+  String get onboardingBonusVitals => '奖励体征已解锁更多洞察！';
 
   @override
-  String get healthPower => 'Health Power';
+  String get healthPower => '健康能量';
 
   @override
-  String get onboardingCreateAccount => 'Create account and become healthy →';
+  String get onboardingCreateAccount => '创建账户，开始健康之旅 →';
 
   @override
-  String get onboardingEnterDashboard => 'Enter dashboard →';
+  String get onboardingEnterDashboard => '进入仪表盘 →';
 
   @override
   String get badgeUnitPro => 'Unit Pro';
 
   @override
-  String get badgeFoundation => 'Foundation';
+  String get badgeFoundation => '基础';
 
   @override
   String get badgeHeartTrack => '心率追踪';
 
   @override
-  String get badgeSugarSense => 'Sugar Sense';
+  String get badgeSugarSense => '血糖感知';
 
   @override
   String get badgeChampion => 'Champion';
 
   @override
-  String get levelHealthRookie => 'Health Rookie';
+  String get levelHealthRookie => '健康新手';
 
   @override
-  String get levelProfileBuilder => 'Profile Builder';
+  String get levelProfileBuilder => '档案搭建者';
 
   @override
-  String get levelVitalsPro => 'Vitals Pro';
+  String get levelVitalsPro => '体征达人';
 
   @override
   String get picked => 'PICKED';
@@ -821,13 +876,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get saving => 'Saving…';
 
   @override
-  String get claimBonusFinish => 'Claim bonus & finish 🏆';
+  String get claimBonusFinish => '保存并完成 🏆';
 
   @override
-  String get skipBonusQuest => 'Skip bonus quest';
+  String get skipBonusQuest => '跳过';
 
   @override
-  String get calculatingRewards => 'Calculating rewards…';
+  String get calculatingRewards => 'Saving…';
 
   @override
   String get categoryBloodPressure => '血压';
@@ -863,7 +918,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get categoryNutrition => '营养';
 
   @override
-  String get categoryPsychoTest => 'PsychoTest';
+  String get categoryPsychoTest => '心理测试';
 
   @override
   String get categoryActivity => '活动';
@@ -940,7 +995,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String stepsLabel(String count) {
-    return '$count steps';
+    return '$count 步';
   }
 
   @override
@@ -970,19 +1025,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get smokingGood => '未报告吸烟 — 对心肺健康是最强保护因素之一。';
 
   @override
-  String get smokingLessPack => '<1 pack/day';
+  String get smokingLessPack => '<1 包/天';
 
   @override
-  String get smokingOnePack => '~1 pack/day';
+  String get smokingOnePack => '约 1 包/天';
 
   @override
-  String get smokingMorePack => '>1 pack/day';
+  String get smokingMorePack => '>1 包/天';
 
   @override
-  String get smokingActive => 'Active smoker';
+  String get smokingActive => '当前吸烟';
 
   @override
-  String get smokingNonSmoker => 'Non-smoker';
+  String get smokingNonSmoker => '不吸烟';
 
   @override
   String get smokingWarning => '吸烟是健康指数的主要风险因素。设定戒烟日、去除诱因，并用 Plus+ → 坏习惯追踪进度。';
@@ -1046,7 +1101,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String nutritionRecentMeals(int count) {
-    return '$count recent meals';
+    return '最近 $count 餐';
   }
 
   @override
@@ -1060,7 +1115,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String psychoLoad(int total, String label) {
-    return 'Load $total · $label';
+    return '负荷 $total · $label';
   }
 
   @override
@@ -1091,16 +1146,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get priorityLow => 'Low';
 
   @override
-  String get profileUpdatedSuccess => 'Profile updated successfully!';
+  String get profileUpdatedSuccess => '个人资料已成功更新！';
 
   @override
-  String get termsOfService => 'Terms of Service & Disclaimer';
+  String get termsOfService => '服务条款与免责声明';
 
   @override
-  String get howWeHandleData => 'How we handle your data';
+  String get howWeHandleData => '我们如何处理你的数据';
 
   @override
-  String get sameScoreHint => 'Same score as on Home';
+  String get sameScoreHint => '与首页相同的分数';
 
   @override
   String get eveningNotificationTitle => '晚间检查';
@@ -1133,62 +1188,59 @@ class AppLocalizationsZh extends AppLocalizations {
   String get uploadAnalysisTitle => '上传分析';
 
   @override
-  String get uploadFileType => 'File Type';
+  String get uploadFileType => '文件类型';
 
   @override
-  String get uploadPdf => 'PDF Document';
+  String get uploadPdf => 'PDF 文档';
 
   @override
-  String get uploadPhoto => 'Photo / Image';
+  String get uploadPhoto => '照片 / 图片';
 
   @override
-  String get uploadSelectFile => 'Select File';
+  String get uploadSelectFile => '选择文件';
 
   @override
-  String get uploadClickToSelect => 'Click to select a file';
+  String get uploadClickToSelect => '点击选择文件';
 
   @override
   String uploadClickToChange(int size) {
-    return '$size KB — click to change';
+    return '$size KB — 点击更换';
   }
 
   @override
-  String get uploadLimitReached => 'Limit reached';
+  String get uploadLimitReached => '已达上限';
 
   @override
-  String get uploadUpgradeMore => 'Upgrade to upload more';
+  String get uploadUpgradeMore => '升级以上传更多';
 
   @override
-  String get uploadFile => 'Upload File';
+  String get uploadFile => '上传文件';
 
   @override
-  String get uploadAnalyzing => 'Analyzing...';
+  String get uploadAnalyzing => '分析中…';
 
   @override
-  String get uploadAnalyzingAiDoc => 'Analyzing your file with Ai Doc…';
+  String get uploadAnalyzingAiDoc => '正在用 Ai Doc 分析文件…';
 
   @override
-  String get uploadFailed => 'Upload failed. Please try again.';
+  String get uploadFailed => '上传失败，请重试。';
 
   @override
-  String get uploadCouldNotRead =>
-      'Could not read the selected file. Please pick it again.';
+  String get uploadCouldNotRead => '无法读取所选文件，请重新选择。';
 
   @override
-  String get uploadLimitMessage =>
-      'Upload limit reached. Upgrade to PHA Plus+ for unlimited uploads.';
+  String get uploadLimitMessage => '已达上传上限。升级 PHA Plus+ 可无限上传。';
 
   @override
   String uploadFreePlan(int count) {
-    return 'Free plan: $count/2 uploads used. Max 2 pages per file.';
+    return '免费方案：已用 $count/2 次上传。每文件最多 2 页。';
   }
 
   @override
   String get mealTakePhoto => '拍摄或上传餐食照片';
 
   @override
-  String get mealAfterAnalysis =>
-      'After analysis, tap ✓ only if you ate this dish — it adds to today\'s calories.';
+  String get mealAfterAnalysis => '分析后，仅在你确实吃了这道菜时点 ✓ — 会计入今日热量。';
 
   @override
   String get mealCamera => 'Camera';
@@ -1197,36 +1249,33 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mealGallery => 'Gallery';
 
   @override
-  String get mealAnalyze => 'Analyze Meal';
+  String get mealAnalyze => '分析餐食';
 
   @override
-  String get mealAnalyzing => 'Analyzing…';
+  String get mealAnalyzing => '分析中…';
 
   @override
-  String get mealFailed => 'Analysis failed. Please try again.';
+  String get mealFailed => '分析失败，请重试。';
 
   @override
-  String get mealFreeLimit =>
-      'Free limit reached (2 meals per 24h). Upgrade to PHA Plus+ for unlimited meal checks.';
+  String get mealFreeLimit => '已达免费上限（24 小时内 2 餐）。升级 PHA Plus+ 可无限检查。';
 
   @override
   String mealFreePlan(int count, int limit) {
-    return 'Free plan: $count/$limit meals logged in the last 24 hours.';
+    return '免费方案：过去 24 小时已记录 $count/$limit 餐。';
   }
 
   @override
-  String get mealLogged =>
-      'Meal logged — counted in today\'s intake & Health Index.';
+  String get mealLogged => '餐食已记录 — 计入今日摄入与健康指数。';
 
   @override
-  String get mealTapConfirm =>
-      'Tap ✓ to confirm you ate this — adds to today\'s intake.';
+  String get mealTapConfirm => '点 ✓ 确认你吃了这餐 — 计入今日摄入。';
 
   @override
   String get mealDiscard => 'Discard';
 
   @override
-  String get mealTotalIntake => 'Total Intake';
+  String get mealTotalIntake => '总摄入';
 
   @override
   String get mealCarb => 'Carb';
@@ -1238,71 +1287,85 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mealFat => 'Fat';
 
   @override
-  String get mealNoMealsToday => 'No meals confirmed today yet.';
+  String get mealNoMealsToday => '今天还没有确认的餐食。';
 
   @override
   String mealNoMealsLogged(int target) {
-    return 'No meals logged · target ~$target kcal';
+    return '暂无餐食 · 目标约 $target 千卡';
   }
 
   @override
-  String get mealConfirmHint => 'Confirm meals after analysis to track intake.';
+  String get mealConfirmHint => '分析后确认餐食以记录摄入。';
 
   @override
   String get aiDocTitle => 'Ai Doc 助手';
 
   @override
   String get aiDocWelcome =>
-      'Hello! I\'m your Ai Doc Assistant. Would you like us to use the data you provided during onboarding? After that, you can describe your problem in detail — or share a photo of a meal, lab result, or anything health-related.';
+      '你好！我是 Ai Doc 助手。是否使用你在引导流程中提供的数据？之后可详细描述问题，或分享餐食、化验单等健康相关照片。';
 
   @override
-  String get aiDocOffline => 'Ai Doc is offline — API key not set.';
+  String get aiDocOffline => 'Ai Doc 离线 — 未设置 API 密钥。';
 
   @override
-  String get aiDocFreeLimit => 'Free consultation limit reached.';
+  String get aiDocFreeLimit => '免费咨询次数已用完。';
 
   @override
   String aiDocFreeRemaining(int remaining) {
-    return '$remaining of 3 free consultations remaining.';
+    return '剩余 $remaining/3 次免费咨询。';
   }
 
   @override
-  String get aiDocAnalyzingHealth => 'Analyzing your health data…';
+  String get aiDocAnalyzingHealth => '正在分析你的健康数据…';
 
   @override
-  String get aiDocLooking => 'Looking at that…';
+  String get aiDocLooking => '正在查看…';
 
   @override
-  String get aiDocAskPlaceholder => 'Ask about symptoms, or add a photo note';
+  String get aiDocAskPlaceholder => '询问症状，或添加照片备注';
 
   @override
-  String get aiDocUpgradeChat => 'Upgrade to continue chatting…';
+  String get aiDocUpgradeChat => '升级以继续对话…';
 
   @override
-  String get aiDocNoProblem =>
-      'No problem! Whenever you\'re ready, describe your symptoms or health concerns in detail — or share a photo.';
+  String get aiDocNoProblem => '没问题！准备好时请详细描述症状或健康问题——也可分享照片。';
 
   @override
   String get aiDocPhoto => 'Photo';
 
   @override
-  String get wellnessResults => 'Wellness Results';
+  String get aiDocHoldToSpeak => '按住说话';
+
+  @override
+  String get aiDocListening => '正在听…松开即可发送';
+
+  @override
+  String get aiDocSpeechUnavailable => '此设备不支持语音输入。';
+
+  @override
+  String get aiDocSpeechPermissionDenied => '语音消息需要麦克风或语音识别权限。';
+
+  @override
+  String get aiDocSpeechEmpty => '未检测到语音。请按住麦克风再试。';
+
+  @override
+  String get wellnessResults => '身心结果';
 
   @override
   String wellnessQuestion(int current, int total) {
-    return 'Question $current of $total';
+    return '第 $current / $total 题';
   }
 
   @override
   String percentComplete(int percent) {
-    return '$percent% complete';
+    return '已完成 $percent%';
   }
 
   @override
-  String get questionUnavailable => 'Question unavailable';
+  String get questionUnavailable => '题目不可用';
 
   @override
-  String get wellnessVeryPoor => 'Very poor';
+  String get wellnessVeryPoor => '很差';
 
   @override
   String get wellnessPoor => 'Poor';
@@ -1314,117 +1377,110 @@ class AppLocalizationsZh extends AppLocalizations {
   String get wellnessGood => 'Good';
 
   @override
-  String get wellnessExcellent => 'Excellent';
+  String get wellnessExcellent => '非常好';
 
   @override
-  String get badHabitsSummaryTitle => 'Bad Habits Summary';
+  String get badHabitsSummaryTitle => '不良习惯摘要';
 
   @override
-  String get badHabitsSaved =>
-      'Saved to your health history. Honest tracking is the first step toward change.';
+  String get badHabitsSaved => '已保存到健康历史。诚实记录是改变的第一步。';
 
   @override
-  String get badHabitsSocialMediaLabel => 'Social media';
+  String get badHabitsSocialMediaLabel => '社交媒体';
 
   @override
   String badHabitsStep(int step, int total) {
-    return 'Step $step of $total';
+    return '第 $step / $total 步';
   }
 
   @override
   String get badHabitsDoYouSmoke => '您吸烟吗？';
 
   @override
-  String get badHabitsHowMuchSmoke => 'How much do you smoke?';
+  String get badHabitsHowMuchSmoke => '你抽烟的量是多少？';
 
   @override
-  String get badHabitsDoYouDrink => 'Do you drink alcohol?';
+  String get badHabitsDoYouDrink => '你喝酒吗？';
 
   @override
-  String get badHabitsHowMuchDrink => 'How often and how much do you drink?';
+  String get badHabitsHowMuchDrink => '你喝酒的频率和量是多少？';
 
   @override
-  String get badHabitsSocialMedia =>
-      'How much time do you spend uselessly on social media?';
+  String get badHabitsSocialMedia => '你在社交媒体上无意义刷多久？';
 
   @override
   String get treatmentYourSchedule => '您的日程';
 
   @override
-  String get treatmentAddMedicine => 'Add medicine or supplement';
+  String get treatmentAddMedicine => '添加药品或补充剂';
 
   @override
-  String get treatmentNewEntry => 'New entry';
+  String get treatmentNewEntry => '新记录';
 
   @override
-  String get treatmentMedicineName => 'Name of medicine or dietary supplement';
+  String get treatmentMedicineName => '药品或膳食补充剂名称';
 
   @override
-  String get treatmentMedicinePlaceholder => 'e.g. Vitamin D, Metformin';
+  String get treatmentMedicinePlaceholder => '例如：维生素 D、二甲双胍';
 
   @override
-  String get treatmentHowManyTimes => 'How many times a day';
+  String get treatmentHowManyTimes => '每天几次';
 
   @override
   String treatmentDoseTime(int n) {
-    return 'Dose $n time';
+    return '第 $n 次用药时间';
   }
 
   @override
-  String get treatmentAddAnother => 'Add another';
+  String get treatmentAddAnother => '再添加';
 
   @override
   String get treatmentSaveSchedule => '保存日程';
 
   @override
-  String get treatmentSaved =>
-      'Treatment schedule saved — pill reminders are on';
+  String get treatmentSaved => '治疗计划已保存 — 用药提醒已开启';
 
   @override
-  String get treatmentEnterName =>
-      'Enter at least one medicine or supplement name.';
+  String get treatmentEnterName => '请至少输入一种药品或补充剂名称。';
 
   @override
-  String get treatmentSaveFailed => 'Could not save. Please try again.';
+  String get treatmentSaveFailed => '无法保存，请重试。';
 
   @override
-  String get treatmentNotifOff =>
-      'Schedule saved, but notifications are off. Enable alerts in Settings to get pill reminders.';
+  String get treatmentNotifOff => '日程已保存，但通知已关闭。请在设置中开启以接收用药提醒。';
 
   @override
-  String get psychoTestSubtitle => 'Stress & Psychosomatic Self-Assessment';
+  String get psychoTestSubtitle => '压力与心身自评';
 
   @override
-  String get psychoTestIntro =>
-      'This assessment contains 3 blocks with a total of 20 questions. Answer honestly — there are no right or wrong answers. Results are saved to your profile.';
+  String get psychoTestIntro => '本评估共 3 个板块、20 道题。请如实作答——没有对错。结果会保存到你的档案。';
 
   @override
   String get psychoBlock1Title => 'BLOCK 1';
 
   @override
-  String get psychoBlock1Subtitle => 'Stress Awareness';
+  String get psychoBlock1Subtitle => '压力觉察';
 
   @override
   String get psychoBlock2Title => 'BLOCK 2';
 
   @override
-  String get psychoBlock2Subtitle => 'Physical Symptoms';
+  String get psychoBlock2Subtitle => '身体症状';
 
   @override
   String get psychoBlock3Title => 'BLOCK 3';
 
   @override
-  String get psychoBlock3Subtitle => 'Behavioral Profile';
+  String get psychoBlock3Subtitle => '行为画像';
 
   @override
-  String get psychoAnswerHint =>
-      'Each question has 3 answer options: Never · Sometimes · Often';
+  String get psychoAnswerHint => '每题 3 个选项：从不 · 有时 · 经常';
 
   @override
   String get psychoStartAssessment => '开始评估';
 
   @override
-  String get psychoYourResult => 'YOUR RESULT';
+  String get psychoYourResult => '你的结果';
 
   @override
   String get psychoRetake => 'Retake';
@@ -1433,27 +1489,27 @@ class AppLocalizationsZh extends AppLocalizations {
   String get psychoNever => 'Never';
 
   @override
-  String get psychoSometimes => 'Sometimes';
+  String get psychoSometimes => '有时';
 
   @override
   String get psychoOften => 'Often';
 
   @override
   String psychoQuestionsCount(int count) {
-    return '$count questions';
+    return '$count 道题';
   }
 
   @override
-  String get onboardingBackToQuest2 => 'Back to Quest 3';
+  String get onboardingBackToQuest2 => '返回任务 3';
 
   @override
   String onboardingBpGlucose(int hp) {
-    return 'BP / +$hp HP';
+    return '血压';
   }
 
   @override
   String onboardingGlucoseHp(int hp) {
-    return 'Glucose / +$hp HP';
+    return '血糖';
   }
 
   @override
@@ -1464,12 +1520,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String onboardingReadyForPha(int percent) {
-    return '$percent% — ready for PHA';
+    return '$percent% — 已准备好使用 PHA';
   }
 
   @override
   String onboardingRedeemHp(int hp, int percent) {
-    return 'Redeem your $hp HP for $percent% off your first 6-month or annual PHA Plus+ subscription.';
+    return '首次购买 6 个月或年付 PHA Plus+ 可享 $percent% 折扣。';
   }
 
   @override
@@ -1479,19 +1535,19 @@ class AppLocalizationsZh extends AppLocalizations {
   String get activityCustomPlanHint => '计划已启用。完成每日锻炼并回答晚间打卡。';
 
   @override
-  String get activityRestNote => 'Rest no more than 2 minutes between sets.';
+  String get activityRestNote => '组间休息不超过 2 分钟。';
 
   @override
   String get dailyLabel => 'Daily';
 
   @override
-  String get fileTypePdf => 'PDF up to 2 pages (free plan)';
+  String get fileTypePdf => 'PDF 最多 2 页（免费方案）';
 
   @override
-  String get upgradeToPhaPlus => 'Upgrade to PHA Plus+';
+  String get upgradeToPhaPlus => '升级到 PHA Plus+';
 
   @override
-  String get healthAnalysisSubtitleShort => 'Same score as Home Health Index';
+  String get healthAnalysisSubtitleShort => '与首页健康指数相同';
 
   @override
   String get wellnessQ1 => '您现在感到多大压力？';
@@ -1630,7 +1686,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get loginTrustedBy => '受到全球健康意识用户的信赖。';
 
   @override
-  String get loginSignUpSubtitle => '今天开始追踪健康——永久免费。';
+  String get loginSignUpSubtitle => '今天开始追踪健康。';
 
   @override
   String get loginSignInSubtitle => '登录以访问健康面板。';
@@ -1729,6 +1785,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get vitalsPromptEvery5DaysHint => '每 5 天提醒，非每天。';
 
   @override
+  String get vitalsPromptSectionTitle => '血压与血糖';
+
+  @override
+  String get vitalsPromptSectionSubtitle => 'PHA 应多久询问一次血压和血糖？';
+
+  @override
+  String get vitalsPromptDaily => '每天一次';
+
+  @override
+  String get vitalsPromptDailyHint => '每天提醒，直到你记录今日数值。';
+
+  @override
+  String get vitalsPromptNever => '不询问';
+
+  @override
+  String get vitalsPromptNeverHint => '不自动提示血压或血糖。';
+
+  @override
   String get vitalsBpLabel => '血压 (mmHg)';
 
   @override
@@ -1799,6 +1873,23 @@ class AppLocalizationsZh extends AppLocalizations {
   String get upgradeTrialTitle => '解锁 PHA Plus+ 全部功能';
 
   @override
+  String get purchaseErrorInvalidCredentials =>
+      '购买设置错误：账单凭证无效。请在 RevenueCat → Project settings → API keys 复制 Apple public SDK key（appl_…）到 dart_define.json 的 REVENUECAT_IOS_API_KEY，并确认已关联 App Store Connect。';
+
+  @override
+  String get purchaseErrorNetwork => '连接 App Store 时网络错误。请检查网络后重试。';
+
+  @override
+  String get purchaseErrorStore => 'App Store 无法完成购买。请稍后再试。';
+
+  @override
+  String get purchaseErrorNoOfferings =>
+      '订阅方案暂不可用。请检查 RevenueCat offerings 与 App Store Connect 产品。';
+
+  @override
+  String get purchaseErrorNoPackage => '该方案当前在商店中不可用。请换一个或稍后再试。';
+
+  @override
   String get upgradeTrialBody1 => '全面掌控健康！解锁 PHA Plus+ 所有高级功能。';
 
   @override
@@ -1815,7 +1906,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String upgradeHpBanner(int hp, int percent) {
-    return '您有 $hp HP！可兑换 $percent% 折扣。';
+    return '半年和年付方案享 $percent% 折扣。';
   }
 
   @override
@@ -1888,7 +1979,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get planAnnual => '年付';
 
   @override
-  String get planHpDiscountNote => '已应用 20% HP 折扣。';
+  String get planHpDiscountNote => '已应用 20% 折扣。';
 
   @override
   String get planSave17 => '节省约 17%。';
@@ -1910,6 +2001,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get psychoTestPromoBody => '深度自评压力水平、心身模式及心理健康指标。';
+
+  @override
+  String get promoCodeLabel => '优惠码';
+
+  @override
+  String get promoCodeHint => '输入优惠码';
+
+  @override
+  String get promoCodeApply => '应用';
+
+  @override
+  String get promoCodeInvalid => '优惠码无效。';
+
+  @override
+  String get promoCodeAlreadyUsed => '此优惠码已在此个人资料中使用过。';
 
   @override
   String psychoQuestionOfBlock(int current, int total) {
@@ -1944,6 +2050,25 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trialSevenDayFree => '7 天免费试用';
+
+  @override
+  String get trialNotifChannelName => '试用提醒';
+
+  @override
+  String get trialNotifChannelDesc => '免费试用结束前提醒';
+
+  @override
+  String get trialNotifThreeDaysTitle => '试用还有 3 天结束';
+
+  @override
+  String get trialNotifThreeDaysBody =>
+      '您的 7 天免费试用将在 3 天后结束。订阅 PHA Plus+ 以保留全部功能。';
+
+  @override
+  String get trialNotifTwentyFourHoursTitle => '试用还有 24 小时结束';
+
+  @override
+  String get trialNotifTwentyFourHoursBody => '免费试用不足一天。立即订阅以保留 PHA 的完整访问权限。';
 
   @override
   String get uploadImageFormats => 'JPG、PNG、GIF';
@@ -2643,6 +2768,45 @@ class AppLocalizationsZh extends AppLocalizations {
   String get actionHeartRateDesc => '智能手表心脏检查';
 
   @override
+  String get actionEcg => '心电图';
+
+  @override
+  String get actionEcgDesc => '从 Apple Watch 及兼容电极传感器读取心电图';
+
+  @override
+  String get hrEcgEmpty =>
+      '未找到电极心电图。请在 Apple Watch（Series 4+）录制心电图，然后点“从传感器读取”。';
+
+  @override
+  String get hrEcgConnectSensors => '允许心电图传感器访问';
+
+  @override
+  String get hrEcgReadSensors => '从传感器读取心电图';
+
+  @override
+  String get hrEcgNeedPermissionTitle => '需要心电图传感器权限';
+
+  @override
+  String get hrEcgNeedPermissionBody =>
+      'PHA 读取 Apple Watch 电极写入 Apple 健康 的心电图。请在健康权限中开启心电图。';
+
+  @override
+  String get hrEcgSensorHow =>
+      '心电图由 Apple Watch 电极（数码表冠 + 背晶）采集。PHA 读取 HealthKit 记录，不能替代临床心电图。';
+
+  @override
+  String get hrEcgSensorAndroid =>
+      '此 Android 版本尚不支持通过 Health Connect 读取电极心电图。请在 iPhone 上使用 Apple Watch Series 4+。';
+
+  @override
+  String get hrEcgLatestFromSensor => '最新电极读数';
+
+  @override
+  String hrEcgSensorMeta(String source, int samples, int hz) {
+    return '$source · $samples 个采样 · $hz Hz';
+  }
+
+  @override
   String get unitBpm => '次/分';
 
   @override
@@ -2773,7 +2937,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get hrWhatItMeansBody => '静息心率与心率变异性反映压力、恢复和体能。突然升高或连续多日偏高需要关注。';
 
   @override
-  String get hrEcgTitle => '近期心电图（Apple Watch）';
+  String get hrEcgTitle => '电极心电图记录';
 
   @override
   String get hrEcgSinusRhythm => '窦性心律';
@@ -2789,6 +2953,69 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get hrEcgNotSet => '未分类';
+
+  @override
+  String get hrEcgSinusTachycardia => '窦性心动过速';
+
+  @override
+  String get hrEcgSinusBradycardia => '窦性心动过缓';
+
+  @override
+  String get hrEcgVentricularTachycardia => '室性心动过速';
+
+  @override
+  String get hrEcgVentricularFibrillation => '心室颤动';
+
+  @override
+  String get hrEcgAvBlock1 => '一度房室传导阻滞';
+
+  @override
+  String get hrEcgAvBlock2MobitzI => '二度房室传导阻滞（莫氏I型）';
+
+  @override
+  String get hrEcgAvBlock3 => '三度房室传导阻滞';
+
+  @override
+  String get hrEcgReferenceTitle => '心电图节律速览';
+
+  @override
+  String get hrEcgReferenceSubtitle => '教学要点 — 仅供参考，不是诊断。';
+
+  @override
+  String get hrEcgFeatNormalSinus =>
+      '心率 60–100 · 整齐 · 每个 P 在 QRS 前 · PR 0.12–0.20 秒 · QRS < 0.12 秒';
+
+  @override
+  String get hrEcgFeatSinusTachy =>
+      '心率 > 100 · 整齐 · 每个 P 在 QRS 前 · PR 0.12–0.20 秒 · QRS < 0.12 秒';
+
+  @override
+  String get hrEcgFeatSinusBrady =>
+      '心率 < 60 · 整齐 · 每个 P 在 QRS 前 · PR 0.12–0.20 秒 · QRS < 0.12 秒';
+
+  @override
+  String get hrEcgFeatAfib => '心率常 100–250 · 不齐 · 无 P 波 · QRS 通常 ≤ 0.12 秒';
+
+  @override
+  String get hrEcgFeatVt => '心率 100–250 · 整齐 · 宽 QRS（≥ 0.12 秒） · 通常无 P 波';
+
+  @override
+  String get hrEcgFeatVf => '基线紊乱 · 无明确 QRS · 无 P 波 — 急症教学型';
+
+  @override
+  String get hrEcgFeatAv1 => 'PR > 0.20 秒 · 每个 P 后有 QRS · QRS < 0.12 秒';
+
+  @override
+  String get hrEcgFeatAv2 => 'PR 逐渐延长 · QRS 脱落 · 周期性';
+
+  @override
+  String get hrEcgFeatAv3 => 'P 与 QRS 无关 · 房室各自频率 · 逸搏心律';
+
+  @override
+  String get hrEcgFeatInconclusive => 'Apple Watch 未能可靠分类该记录。';
+
+  @override
+  String get hrEcgFeatUnknown => '暂无分类。';
 
   @override
   String get hrIrregularRhythm => '不规则心律提醒';
@@ -2822,7 +3049,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get hrExplainLowHrv => '心率变异性偏低，可能表示压力较大或恢复不足 — 请优先睡眠与休息。';
 
   @override
-  String get hrExplainElevatedStreak => '静息心率连续多日处于 80–95 次/分。请留意压力、过度训练或早期疾病。';
+  String get hrExplainElevatedStreak => '静息心率连续多日处于 ≥105 次/分。请留意压力、过度训练或早期疾病。';
 
   @override
   String get hrExplainSpike => '静息心率较前一日明显升高。请留意身体感觉并明日复查。';
@@ -2838,10 +3065,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get hrAlertAttentionTitle => '静息心率偏高';
 
   @override
-  String get hrAlertGenericBody => '静息心率稳定在 80–95 次/分，或逐日上升。请打开「心率与心律」查看详情。';
+  String get hrAlertGenericBody => '静息心率稳定在 ≥105 次/分，或逐日上升。请打开「心率与心律」查看详情。';
 
   @override
-  String get hrRestingChartTitle => '静息心率';
+  String get hrRestingChartTitle => '心率';
 
   @override
   String hrAvgResting(int bpm) {
@@ -2849,8 +3076,39 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String historyGlucoseAvg(String value, String unit) {
+    return '平均 $value $unit';
+  }
+
+  @override
+  String historyBpAvg(int sys, int dia) {
+    return '平均 $sys/$dia mmHg';
+  }
+
+  @override
+  String get historyGlucoseZoneNormalImperial => '空腹正常 ≤99 mg/dL';
+
+  @override
+  String get historyGlucoseZoneNormalMetric => '空腹正常 ≤5.5 mmol/L';
+
+  @override
+  String get historyGlucoseZoneAttention => '高于正常或糖尿病前期';
+
+  @override
+  String get historyGlucoseZoneHigh => '偏高 / 糖尿病范围';
+
+  @override
+  String get historyBpZoneNormal => '收缩压 ≤120 mmHg';
+
+  @override
+  String get historyBpZoneElevated => '偏高 121–139 mmHg';
+
+  @override
+  String get historyBpZoneHigh => '高血压 ≥140 mmHg';
+
+  @override
   String hrZoneNormal(int low, int high) {
-    return '绿色 — $low–$high 次/分（正常）';
+    return '绿色 — 静息 $low–$high 次/分（正常）';
   }
 
   @override

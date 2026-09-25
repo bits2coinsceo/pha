@@ -4,9 +4,8 @@ import '../l10n/l10n_ext.dart';
 
 import '../theme.dart';
 
-/// Gamified HUD: level, HP, health power meter.
+/// Gamified HUD: level and progress (no HP scoring in the UI).
 class OnboardingGameHud extends StatelessWidget {
-  final int hp;
   final int level;
   final String levelTitle;
   final double power; // 0..1
@@ -14,7 +13,6 @@ class OnboardingGameHud extends StatelessWidget {
 
   const OnboardingGameHud({
     super.key,
-    required this.hp,
     required this.level,
     required this.levelTitle,
     required this.power,
@@ -57,7 +55,7 @@ class OnboardingGameHud extends StatelessWidget {
                         ),
                       ),
                       TextSpan(
-                        text: ' · ${l10n.onboardingDayStreak(streak)} · ${l10n.onboardingHudHealthPower}',
+                        text: ' · ${l10n.onboardingDayStreak(streak)}',
                         style: TextStyle(
                           color: C.white.withValues(alpha: 0.75),
                           fontWeight: FontWeight.w500,
@@ -68,8 +66,6 @@ class OnboardingGameHud extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(width: 6),
-              _hpPill(hp),
             ],
           ),
           SizedBox(height: 4),
@@ -105,26 +101,6 @@ class OnboardingGameHud extends StatelessWidget {
       child: Text('$level',
           style: TextStyle(
               color: C.white, fontWeight: FontWeight.w900, fontSize: 14)),
-    );
-  }
-
-  Widget _hpPill(int hp) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: C.amber400,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.favorite, size: 12, color: C.gray900),
-          SizedBox(width: 3),
-          Text('$hp HP',
-              style: TextStyle(
-                  fontWeight: FontWeight.w800, fontSize: 11, color: C.gray900)),
-        ],
-      ),
     );
   }
 }
@@ -263,9 +239,8 @@ class OnboardingBadgeStrip extends StatelessWidget {
 
 class OnboardingHpToast extends StatelessWidget {
   final String message;
-  final int hp;
 
-  const OnboardingHpToast({super.key, required this.message, required this.hp});
+  const OnboardingHpToast({super.key, required this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -292,9 +267,6 @@ class OnboardingHpToast extends StatelessWidget {
                   style: TextStyle(
                       fontWeight: FontWeight.w700, fontSize: 13, color: C.gray900)),
             ),
-            Text('+$hp HP',
-                style: TextStyle(
-                    fontWeight: FontWeight.w900, fontSize: 14, color: C.gray900)),
           ],
         ),
       ),
@@ -305,7 +277,7 @@ class OnboardingHpToast extends StatelessWidget {
 class OnboardingQuestCard extends StatelessWidget {
   final String title;
   final String subtitle;
-  final String reward;
+  final String? reward;
   final IconData icon;
   final Color accent;
   final bool locked;
@@ -314,7 +286,7 @@ class OnboardingQuestCard extends StatelessWidget {
     super.key,
     required this.title,
     required this.subtitle,
-    required this.reward,
+    this.reward,
     required this.icon,
     required this.accent,
     this.locked = false,
@@ -322,6 +294,7 @@ class OnboardingQuestCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final rewardLabel = reward?.trim() ?? '';
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -354,18 +327,19 @@ class OnboardingQuestCard extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: locked ? C.gray100 : C.amber100,
-              borderRadius: BorderRadius.circular(8),
+          if (rewardLabel.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: locked ? C.gray100 : C.amber100,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(rewardLabel,
+                  style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      color: locked ? C.gray400 : C.amber700)),
             ),
-            child: Text(reward,
-                style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    color: locked ? C.gray400 : C.amber700)),
-          ),
         ],
       ),
     );

@@ -150,6 +150,9 @@ class PatientHistoryResponse(BaseModel):
     health_analysis: list[dict]
     treatment_schedule: list[dict]
     meal_calorie_checks: list[dict] = Field(default_factory=list)
+    bad_habit_checks: list[dict] = Field(default_factory=list)
+    physical_activity_programs: list[dict] = Field(default_factory=list)
+    physical_activity_checkins: list[dict] = Field(default_factory=list)
 
 
 def require_patient_auth(

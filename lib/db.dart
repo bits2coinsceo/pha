@@ -6,6 +6,7 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'daily_metric_store.dart';
+import 'test_profile.dart';
 
 /// Local SQLite database — replaces Supabase Postgres for the Flutter port.
 /// Stores all health data on-device.
@@ -31,7 +32,7 @@ class Db {
       // Use native sqflite on mobile — do not override databaseFactory.
       _db = await sqflite.openDatabase(
         path,
-        version: 12,
+        version: 13,
         onCreate: _create,
         onUpgrade: _upgrade,
       );
@@ -40,9 +41,10 @@ class Db {
       databaseFactory = databaseFactoryFfi;
       _db = await databaseFactory.openDatabase(
         path,
-        options: OpenDatabaseOptions(version: 12, onCreate: _create, onUpgrade: _upgrade),
+        options: OpenDatabaseOptions(version: 13, onCreate: _create, onUpgrade: _upgrade),
       );
     }
+    await TestProfile.ensureSeeded();
   }
 
   Future<void> _upgrade(Database db, int oldVersion, int newVersion) async {
@@ -85,6 +87,13 @@ class Db {
     if (oldVersion < 12) {
       await DailyMetricStore.collapseDuplicateDailyMetrics(db);
       await DailyMetricStore.collapseDuplicateHealthIndex(db);
+    }
+    if (oldVersion < 13) {
+      try {
+        await db.execute(
+          'ALTER TABLE profiles ADD COLUMN promo_codes_used TEXT NOT NULL DEFAULT \'[]\'',
+        );
+      } catch (_) {}
     }
   }
 
@@ -220,6 +229,7 @@ class Db {
         subscription_expires_at TEXT,
         health_points INTEGER NOT NULL DEFAULT 0,
         hp_discount_used INTEGER NOT NULL DEFAULT 0,
+        promo_codes_used TEXT NOT NULL DEFAULT '[]',
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL
       )

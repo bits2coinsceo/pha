@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../auth.dart';
+import '../daily_vitals.dart';
 import '../db.dart';
 import '../l10n/l10n_ext.dart';
 import '../legal.dart';
@@ -27,9 +28,12 @@ class _ProfilePageState extends State<ProfilePage> {
   bool saving = false;
   String error = '';
   String success = '';
+  VitalsPromptMode _vitalsPromptMode = VitalsPromptMode.daily;
   final _name = TextEditingController();
   final _age = TextEditingController();
   final _height = TextEditingController();
+  final _heightFt = TextEditingController();
+  final _heightIn = TextEditingController();
   final _weight = TextEditingController();
 
   @override
@@ -43,27 +47,78 @@ class _ProfilePageState extends State<ProfilePage> {
     _name.dispose();
     _age.dispose();
     _height.dispose();
+    _heightFt.dispose();
+    _heightIn.dispose();
     _weight.dispose();
     super.dispose();
   }
 
+  bool get _isImperial =>
+      context.read<AuthProvider>().unitSystem == 'imperial';
+
   Future<void> _load() async {
-    final userId = context.read<AuthProvider>().user!.id;
+    final auth = context.read<AuthProvider>();
+    final userId = auth.user!.id;
+    final imperial = auth.unitSystem == 'imperial';
     final rows = await Db.instance.raw.query('profiles', where: 'id = ?', whereArgs: [userId]);
     if (rows.isNotEmpty) {
       final r = rows.first;
       _name.text = (r['display_name'] as String?) ?? '';
       _age.text = r['age'] != null ? '${r['age']}' : '';
-      _height.text = r['height'] != null ? '${(r['height'] as num).toInt()}' : '';
-      _weight.text = r['weight'] != null
-          ? (r['weight'] as num).toStringAsFixed((r['weight'] as num) % 1 == 0 ? 0 : 1)
-          : '';
+      final heightCm = (r['height'] as num?)?.toDouble();
+      final weightKg = (r['weight'] as num?)?.toDouble();
+      if (heightCm != null) {
+        if (imperial) {
+          final h = cmToFtIn(heightCm);
+          _heightFt.text = '${h.ft}';
+          _heightIn.text = '${h.inch}';
+        } else {
+          _height.text = '${heightCm.round()}';
+        }
+      }
+      if (weightKg != null) {
+        _weight.text = imperial
+            ? kgToLbs(weightKg).toStringAsFixed(0)
+            : weightKg.toStringAsFixed(weightKg % 1 == 0 ? 0 : 1);
+      }
     }
-    setState(() => loading = false);
+    final mode = await DailyVitalsService.getPromptMode(userId);
+    if (!mounted) return;
+    setState(() {
+      _vitalsPromptMode = mode;
+      loading = false;
+    });
+  }
+
+  Future<void> _setVitalsPromptMode(VitalsPromptMode mode) async {
+    final userId = context.read<AuthProvider>().user!.id;
+    setState(() => _vitalsPromptMode = mode);
+    await DailyVitalsService.setPromptMode(userId, mode);
+  }
+
+  double? _parseHeightCm() {
+    if (_isImperial) {
+      if (_heightFt.text.trim().isEmpty && _heightIn.text.trim().isEmpty) {
+        return null;
+      }
+      final ft = parseUserNumber(_heightFt.text) ?? 0;
+      final inch = parseUserNumber(_heightIn.text) ?? 0;
+      return ftInToCm(ft, inch);
+    }
+    if (_height.text.trim().isEmpty) return null;
+    return parseUserNumber(_height.text);
+  }
+
+  double? _parseWeightKg() {
+    if (_weight.text.trim().isEmpty) return null;
+    final v = parseUserNumber(_weight.text);
+    if (v == null) return null;
+    return _isImperial ? lbsToKg(v) : v;
   }
 
   Future<void> _save() async {
     final userId = context.read<AuthProvider>().user!.id;
+    final l10n = context.l10n;
     setState(() {
       saving = true;
       error = '';
@@ -72,18 +127,19 @@ class _ProfilePageState extends State<ProfilePage> {
     int? age;
     if (_age.text.isNotEmpty) {
       age = int.tryParse(_age.text);
-      if (VitalValidation.age(age, context.l10n) != null) {
+      if (VitalValidation.age(age, l10n) != null) {
         setState(() {
-          error = VitalValidation.age(age, context.l10n)!;
+          error = VitalValidation.age(age, l10n)!;
           saving = false;
         });
         return;
       }
     }
-    int? height;
-    if (_height.text.isNotEmpty) {
-      height = int.tryParse(_height.text);
-      final hErr = VitalValidation.heightCm(height?.toDouble(), context.l10n);
+    final heightCm = _parseHeightCm();
+    if (_height.text.isNotEmpty ||
+        _heightFt.text.isNotEmpty ||
+        _heightIn.text.isNotEmpty) {
+      final hErr = VitalValidation.heightCm(heightCm, l10n);
       if (hErr != null) {
         setState(() {
           error = hErr;
@@ -92,10 +148,9 @@ class _ProfilePageState extends State<ProfilePage> {
         return;
       }
     }
-    double? weight;
+    final weightKg = _parseWeightKg();
     if (_weight.text.isNotEmpty) {
-      weight = parseUserNumber(_weight.text);
-      final wErr = VitalValidation.weightKg(weight, context.l10n);
+      final wErr = VitalValidation.weightKg(weightKg, l10n);
       if (wErr != null) {
         setState(() {
           error = wErr;
@@ -114,19 +169,21 @@ class _ProfilePageState extends State<ProfilePage> {
     await ProfileBasicsService.save(
       userId: userId,
       age: age,
-      heightCm: height,
-      weightKg: weight,
+      heightCm: heightCm?.round(),
+      weightKg: weightKg,
     );
     setState(() {
       saving = false;
-      success = context.l10n.profileUpdatedSuccess;
+      success = l10n.profileUpdatedSuccess;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final imperial = auth.unitSystem == 'imperial';
     final themeMode = context.watch<ThemeModeController>();
+    final l10n = context.l10n;
     return CosmicScaffold(
       body: Column(
         children: [
@@ -222,20 +279,71 @@ class _ProfilePageState extends State<ProfilePage> {
                                       decoration: appInput(context.l10n.onboardingAgeHint),
                                     ),
                                     SizedBox(height: 16),
-                                    _label(context.l10n.heightCm, Icons.straighten, C.sky500),
-                                    TextField(
-                                      controller: _height,
-                                      style: TextStyle(
-                                        color: C.gray900,
-                                        fontSize: 16,
-                                      ),
-                                      cursorColor: C.accentFocus,
-                                      keyboardType: TextInputType.number,
-                                      textInputAction: TextInputAction.next,
-                                      decoration: appInput(context.l10n.onboardingHeightHintMetric),
+                                    _label(
+                                      imperial
+                                          ? 'ft & in'
+                                          : l10n.heightCm,
+                                      Icons.straighten,
+                                      C.sky500,
                                     ),
+                                    if (imperial)
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: TextField(
+                                              controller: _heightFt,
+                                              style: TextStyle(
+                                                color: C.gray900,
+                                                fontSize: 16,
+                                              ),
+                                              cursorColor: C.accentFocus,
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              textInputAction:
+                                                  TextInputAction.next,
+                                              decoration: appInput('ft'),
+                                            ),
+                                          ),
+                                          SizedBox(width: 12),
+                                          Expanded(
+                                            child: TextField(
+                                              controller: _heightIn,
+                                              style: TextStyle(
+                                                color: C.gray900,
+                                                fontSize: 16,
+                                              ),
+                                              cursorColor: C.accentFocus,
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              textInputAction:
+                                                  TextInputAction.next,
+                                              decoration: appInput('in'),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    else
+                                      TextField(
+                                        controller: _height,
+                                        style: TextStyle(
+                                          color: C.gray900,
+                                          fontSize: 16,
+                                        ),
+                                        cursorColor: C.accentFocus,
+                                        keyboardType: TextInputType.number,
+                                        textInputAction: TextInputAction.next,
+                                        decoration: appInput(
+                                          l10n.onboardingHeightHintMetric,
+                                        ),
+                                      ),
                                     SizedBox(height: 16),
-                                    _label(context.l10n.weightKg, Icons.monitor_weight, C.blue500),
+                                    _label(
+                                      imperial
+                                          ? l10n.unitLbs
+                                          : l10n.weightKg,
+                                      Icons.monitor_weight,
+                                      C.blue500,
+                                    ),
                                     TextField(
                                       controller: _weight,
                                       style: TextStyle(
@@ -248,7 +356,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                         decimal: true,
                                       ),
                                       textInputAction: TextInputAction.done,
-                                      decoration: appInput(context.l10n.onboardingWeightHintMetric),
+                                      decoration: appInput(
+                                        imperial
+                                            ? l10n.onboardingWeightHintImperial
+                                            : l10n.onboardingWeightHintMetric,
+                                      ),
                                     ),
                                     SizedBox(height: 24),
                                     PrimaryButton(
@@ -258,6 +370,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                   ],
                                 ),
                               ),
+                              SizedBox(height: 24),
+                              _vitalsPromptCard(l10n),
                               SizedBox(height: 24),
                               // Not const — must rebuild with ThemeModeController / C.* colors.
                               LanguagePicker(expanded: true),
@@ -409,4 +523,126 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
       );
+
+  Widget _vitalsPromptCard(AppLocalizations l10n) {
+    return Container(
+      width: double.infinity,
+      decoration: cardDecoration(border: C.gray200),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: C.rose50,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(Icons.monitor_heart_outlined,
+                    color: C.rose600, size: 22),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.vitalsPromptSectionTitle,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: C.gray900,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      l10n.vitalsPromptSectionSubtitle,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: C.gray500,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _vitalsPromptOption(
+            mode: VitalsPromptMode.daily,
+            title: l10n.vitalsPromptDaily,
+            subtitle: l10n.vitalsPromptDailyHint,
+          ),
+          _vitalsPromptOption(
+            mode: VitalsPromptMode.every5Days,
+            title: l10n.vitalsPromptEvery5Days,
+            subtitle: l10n.vitalsPromptEvery5DaysHint,
+          ),
+          _vitalsPromptOption(
+            mode: VitalsPromptMode.off,
+            title: l10n.vitalsPromptNever,
+            subtitle: l10n.vitalsPromptNeverHint,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _vitalsPromptOption({
+    required VitalsPromptMode mode,
+    required String title,
+    required String subtitle,
+  }) {
+    final selected = _vitalsPromptMode == mode;
+    return InkWell(
+      onTap: () => _setVitalsPromptMode(mode),
+      borderRadius: BorderRadius.circular(10),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Icon(
+                selected
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_off,
+                size: 22,
+                color: selected ? C.accentPrimary : C.gray400,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: selected ? FontWeight.w700 : FontWeight.w600,
+                      color: C.gray900,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: C.gray500,
+                      height: 1.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

@@ -3,8 +3,11 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 import 'package:uuid/uuid.dart';
 
 import '../api.dart';
@@ -14,9 +17,12 @@ import '../daily_vitals.dart';
 import '../db.dart';
 import '../health_index.dart';
 import '../image_compress.dart';
+import '../locale_controller.dart';
 import '../medical_guidelines.dart';
 import '../meal_calories.dart';
 import '../onboarding_hp.dart';
+import '../patient_sync.dart';
+import '../pha_purchases.dart';
 import '../physical_activity.dart';
 import '../services.dart';
 import '../theme.dart';
@@ -419,7 +425,7 @@ class _CheckMealCaloriesModalState extends State<CheckMealCaloriesModal> {
       if (mounted) {
         setState(() {
           confirming = false;
-          error = 'Could not save meal: $e';
+          error = context.l10n.mealSaveFailed('$e');
         });
       }
     }
@@ -973,9 +979,14 @@ class _AIChatModalState extends State<AIChatModal> {
   final _input = TextEditingController();
   final _scroll = ScrollController();
   final _picker = ImagePicker();
+  final _speech = SpeechToText();
   bool loading = false;
   bool _analyzingOnboarding = false;
   bool _awaitingOnboardingConsent = true;
+  bool _listening = false;
+  bool _speechReady = false;
+  String _voiceDraft = '';
+  String? _speechHint;
   int? consultCount;
 
   @override
@@ -986,6 +997,134 @@ class _AIChatModalState extends State<AIChatModal> {
     if (!auth.isPlus) {
       _count('ai_consultations', auth.user!.id).then((c) => setState(() => consultCount = c));
     }
+  }
+
+  @override
+  void dispose() {
+    unawaited(_speech.cancel());
+    _input.dispose();
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  Future<bool> _ensureSpeechReady() async {
+    if (_speechReady) return true;
+    final ok = await _speech.initialize(
+      onError: (e) {
+        if (!mounted) return;
+        setState(() {
+          _listening = false;
+          _speechHint = e.errorMsg;
+        });
+      },
+      onStatus: (status) {
+        // Keep hold state until the user releases; status alone can flip early.
+      },
+    );
+    if (!mounted) return false;
+    setState(() => _speechReady = ok);
+    return ok;
+  }
+
+  Future<String?> _speechLocaleId() async {
+    final code = context.read<LocaleController>().locale.languageCode;
+    final preferred = switch (code) {
+      'es' => const ['es_ES', 'es_MX', 'es_US', 'es'],
+      'ru' => const ['ru_RU', 'ru'],
+      'zh' => const ['zh_CN', 'zh_Hans', 'zh_TW', 'zh'],
+      'ar' => const ['ar_SA', 'ar_AE', 'ar_EG', 'ar'],
+      _ => const ['en_US', 'en_GB', 'en'],
+    };
+    final available = await _speech.locales();
+    for (final id in preferred) {
+      for (final loc in available) {
+        if (loc.localeId == id ||
+            loc.localeId.toLowerCase().startsWith(id.toLowerCase())) {
+          return loc.localeId;
+        }
+      }
+    }
+    return null;
+  }
+
+  Future<void> _startVoiceHold() async {
+    final auth = context.read<AuthProvider>();
+    final l10n = context.l10n;
+    if (!auth.hasFreeAccess) {
+      widget.onNeedUpgrade();
+      return;
+    }
+    if (atLimit || loading || _listening) {
+      if (atLimit) widget.onNeedUpgrade();
+      return;
+    }
+    final ready = await _ensureSpeechReady();
+    if (!mounted) return;
+    if (!ready) {
+      setState(() => _speechHint = l10n.aiDocSpeechUnavailable);
+      return;
+    }
+    if (!_speech.isAvailable) {
+      setState(() => _speechHint = l10n.aiDocSpeechPermissionDenied);
+      return;
+    }
+
+    _voiceDraft = '';
+    setState(() {
+      _listening = true;
+      _speechHint = l10n.aiDocListening;
+    });
+
+    final localeId = await _speechLocaleId();
+    if (!mounted) return;
+    await _speech.listen(
+      onResult: (result) {
+        if (!mounted) return;
+        _voiceDraft = result.recognizedWords.trim();
+        setState(() {
+          _input.text = _voiceDraft;
+          _input.selection =
+              TextSelection.collapsed(offset: _input.text.length);
+        });
+      },
+      listenOptions: SpeechListenOptions(
+        localeId: localeId,
+        listenFor: const Duration(seconds: 60),
+        pauseFor: const Duration(seconds: 3),
+        partialResults: true,
+        cancelOnError: true,
+        listenMode: ListenMode.dictation,
+      ),
+    );
+  }
+
+  Future<void> _finishVoiceHold({required bool send}) async {
+    if (!_listening && !_speech.isListening) {
+      return;
+    }
+    final l10n = context.l10n;
+    if (send) {
+      await _speech.stop();
+    } else {
+      await _speech.cancel();
+    }
+    if (!mounted) return;
+    setState(() {
+      _listening = false;
+      _speechHint = null;
+    });
+    if (!send) {
+      return;
+    }
+    final text = _voiceDraft.trim().isNotEmpty
+        ? _voiceDraft.trim()
+        : _input.text.trim();
+    if (text.isEmpty) {
+      setState(() => _speechHint = l10n.aiDocSpeechEmpty);
+      return;
+    }
+    _input.text = text;
+    await _send();
   }
 
   Future<void> _loadConsultationHistory() async {
@@ -1020,13 +1159,6 @@ class _AIChatModalState extends State<AIChatModal> {
     if (rows.isNotEmpty || widget.seedMessages != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _scrollDown());
     }
-  }
-
-  @override
-  void dispose() {
-    _input.dispose();
-    _scroll.dispose();
-    super.dispose();
   }
 
   bool get atLimit => consultCount != null && consultCount! >= 3;
@@ -1210,49 +1342,146 @@ class _AIChatModalState extends State<AIChatModal> {
               Divider(color: C.gray100, height: 1),
               SizedBox(height: 12),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  IconButton(
-                    tooltip: l10n.mealCamera,
-                    onPressed: (loading || atLimit)
-                        ? null
-                        : () => _pickPhoto(ImageSource.camera),
-                    icon: Icon(Icons.photo_camera_outlined,
-                        color: (loading || atLimit) ? C.gray300 : C.blue600),
-                  ),
-                  IconButton(
-                    tooltip: l10n.mealGallery,
-                    onPressed: (loading || atLimit)
-                        ? null
-                        : () => _pickPhoto(ImageSource.gallery),
-                    icon: Icon(Icons.photo_library_outlined,
-                        color: (loading || atLimit) ? C.gray300 : C.blue600),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        tooltip: l10n.mealCamera,
+                        visualDensity: VisualDensity.compact,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(
+                          minWidth: 36,
+                          minHeight: 32,
+                        ),
+                        onPressed: (loading || atLimit)
+                            ? null
+                            : () => _pickPhoto(ImageSource.camera),
+                        icon: Icon(Icons.photo_camera_outlined,
+                            color: (loading || atLimit)
+                                ? C.gray300
+                                : C.blue600),
+                      ),
+                      IconButton(
+                        tooltip: l10n.mealGallery,
+                        visualDensity: VisualDensity.compact,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(
+                          minWidth: 36,
+                          minHeight: 32,
+                        ),
+                        onPressed: (loading || atLimit)
+                            ? null
+                            : () => _pickPhoto(ImageSource.gallery),
+                        icon: Icon(Icons.photo_library_outlined,
+                            color: (loading || atLimit)
+                                ? C.gray300
+                                : C.blue600),
+                      ),
+                    ],
                   ),
                   Expanded(
                     child: TextField(
                       controller: _input,
                       enabled: !loading && !atLimit,
-                      onSubmitted: (_) => _send(),
+                      minLines: 2,
+                      maxLines: 3,
+                      textInputAction: TextInputAction.newline,
+                      keyboardType: TextInputType.multiline,
                       decoration: appInput(atLimit
                               ? l10n.aiDocUpgradeChat
                               : l10n.aiDocAskPlaceholder)
-                          .copyWith(fillColor: C.gray50),
+                          .copyWith(
+                        fillColor: C.gray50,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+                      ),
                     ),
                   ),
                   SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: atLimit ? widget.onNeedUpgrade : () => _send(),
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: atLimit ? C.amber500 : C.blue500,
-                        borderRadius: BorderRadius.circular(12),
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      GestureDetector(
+                        onTap: atLimit
+                            ? widget.onNeedUpgrade
+                            : () => _send(),
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: atLimit ? C.amber500 : C.blue500,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            atLimit ? Icons.auto_awesome : Icons.send,
+                            size: 16,
+                            color: C.white,
+                          ),
+                        ),
                       ),
-                      child: Icon(atLimit ? Icons.auto_awesome : Icons.send,
-                          size: 16, color: C.white),
-                    ),
+                      const SizedBox(height: 6),
+                      GestureDetector(
+                        onTapDown: (loading || atLimit)
+                            ? null
+                            : (_) => unawaited(_startVoiceHold()),
+                        onTapUp: (_) =>
+                            unawaited(_finishVoiceHold(send: true)),
+                        onTapCancel: () =>
+                            unawaited(_finishVoiceHold(send: false)),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 150),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: _listening
+                                ? C.rose500
+                                : (loading || atLimit)
+                                    ? C.gray200
+                                    : C.blue50,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: _listening
+                                  ? C.rose500
+                                  : (loading || atLimit)
+                                      ? C.gray200
+                                      : C.blue200,
+                            ),
+                          ),
+                          child: Icon(
+                            _listening ? Icons.mic : Icons.mic_none,
+                            size: 16,
+                            color: _listening
+                                ? C.white
+                                : (loading || atLimit)
+                                    ? C.gray400
+                                    : C.blue600,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
+              if (_speechHint != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  _speechHint!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: _listening ? C.rose600 : C.gray500,
+                  ),
+                ),
+              ] else ...[
+                const SizedBox(height: 6),
+                Text(
+                  context.l10n.aiDocHoldToSpeak,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 11, color: C.gray400),
+                ),
+              ],
             ],
           ),
         ),
@@ -1262,14 +1491,24 @@ class _AIChatModalState extends State<AIChatModal> {
 
   Widget _bubble(_Msg m) {
     final l10n = context.l10n;
-    final avatar = Container(
-      width: 28,
-      height: 28,
-      decoration: BoxDecoration(
-          color: m.isUser ? C.blue100 : C.teal100, shape: BoxShape.circle),
-      child: Icon(m.isUser ? Icons.person : Icons.smart_toy,
-          size: 16, color: m.isUser ? C.blue600 : C.teal600),
-    );
+    final avatar = m.isUser
+        ? Container(
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              color: C.blue100,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.person, size: 16, color: C.blue600),
+          )
+        : ClipOval(
+            child: Image.asset(
+              'assets/ai_doc_avatar.png',
+              width: 28,
+              height: 28,
+              fit: BoxFit.cover,
+            ),
+          );
     final bubble = Flexible(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -2009,6 +2248,7 @@ class _PhysicalActivityModalState extends State<PhysicalActivityModal> {
       'created_at': DateTime.now().toUtc().toIso8601String(),
     });
     await PhysicalActivityService.scheduleEveningReminder(userId);
+    unawaited(PatientSync.pushForUser(userId));
     if (mounted) {
       setState(() {
         saving = false;
@@ -2483,6 +2723,7 @@ class _DailyVitalsDialogState extends State<DailyVitalsDialog> {
     }
     await DailyVitalsService.recordPromptHandled(userId);
     await HealthIndexService.recalculate(userId);
+    unawaited(PatientSync.pushForUser(userId));
     if (mounted) Navigator.pop(context, true);
   }
 
@@ -2645,7 +2886,9 @@ class _DailyVitalsDialogState extends State<DailyVitalsDialog> {
             if (widget.needGlucose) ...[
               SizedBox(height: 16),
               Text(
-                l10n.vitalsGlucoseLabel(isImperial ? 'mg/dL' : 'mmol/L'),
+                l10n.vitalsGlucoseLabel(
+                  isImperial ? l10n.unitMgdl : l10n.unitMmol,
+                ),
                 style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
               ),
               SizedBox(height: 8),
@@ -2711,7 +2954,7 @@ class _LogMetricModalState extends State<LogMetricModal> {
         (value: 'distance', label: l10n.distance, unit: imp ? l10n.unitMiles : l10n.unitKm, hint: imp ? l10n.logMetricHintDistanceImperial : l10n.logMetricHintDistanceMetric),
         (value: 'active_time', label: l10n.activeTime, unit: l10n.unitMin, hint: l10n.logMetricHintActiveTime),
         (value: 'weight', label: l10n.weight, unit: imp ? l10n.unitLbs : l10n.unitKg, hint: imp ? l10n.logMetricHintWeightImperial : l10n.logMetricHintWeightMetric),
-        (value: 'glucose', label: l10n.bloodGlucose, unit: imp ? 'mg/dL' : 'mmol/L', hint: imp ? l10n.vitalsGlucoseHintImperial : l10n.vitalsGlucoseHintMetric),
+        (value: 'glucose', label: l10n.bloodGlucose, unit: imp ? l10n.unitMgdl : l10n.unitMmol, hint: imp ? l10n.vitalsGlucoseHintImperial : l10n.vitalsGlucoseHintMetric),
         (value: 'water', label: l10n.water, unit: l10n.unitMl, hint: l10n.logMetricHintWater),
       ];
 
@@ -2834,16 +3077,110 @@ class UpgradeModal extends StatefulWidget {
 class _UpgradeModalState extends State<UpgradeModal> {
   String? loadingPlan;
   bool done = false;
+  String error = '';
+  final _promoCtrl = TextEditingController();
+  bool _promoLoading = false;
+  String _promoError = '';
+
+  @override
+  void dispose() {
+    _promoCtrl.dispose();
+    super.dispose();
+  }
 
   Future<void> _upgrade(String plan) async {
-    setState(() => loadingPlan = plan);
-    await context.read<AuthProvider>().upgradeToPlus(plan);
     setState(() {
-      done = true;
-      loadingPlan = null;
+      loadingPlan = plan;
+      error = '';
     });
-    await Future.delayed(const Duration(milliseconds: 1800));
-    if (mounted) Navigator.pop(context);
+    try {
+      // Real App Store / RevenueCat purchase — do not unlock without payment.
+      final purchased = await PhaPurchases.purchasePlan(plan);
+      if (!purchased) {
+        if (mounted) setState(() => loadingPlan = null);
+        return;
+      }
+      if (!mounted) return;
+      await context.read<AuthProvider>().upgradeToPlus(plan);
+      if (!mounted) return;
+      setState(() {
+        done = true;
+        loadingPlan = null;
+      });
+      await Future.delayed(const Duration(milliseconds: 1800));
+      if (mounted) Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        loadingPlan = null;
+        error = _purchaseErrorMessage(e);
+      });
+    }
+  }
+
+  Future<void> _applyPromo() async {
+    final code = _promoCtrl.text.trim();
+    if (code.isEmpty || _promoLoading || loadingPlan != null) return;
+    setState(() {
+      _promoLoading = true;
+      _promoError = '';
+      error = '';
+    });
+    try {
+      await context.read<AuthProvider>().redeemPromoCode(code);
+      if (!mounted) return;
+      setState(() {
+        done = true;
+        _promoLoading = false;
+      });
+      await Future.delayed(const Duration(milliseconds: 1800));
+      if (mounted) Navigator.pop(context);
+    } on PromoException catch (e) {
+      if (!mounted) return;
+      final l10n = context.l10n;
+      setState(() {
+        _promoLoading = false;
+        _promoError = switch (e.code) {
+          PromoException.alreadyUsed => l10n.promoCodeAlreadyUsed,
+          _ => l10n.promoCodeInvalid,
+        };
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _promoLoading = false;
+        _promoError = context.l10n.promoCodeInvalid;
+      });
+    }
+  }
+
+  String _purchaseErrorMessage(Object e) {
+    final l10n = context.l10n;
+    if (e is PhaPurchaseException) {
+      return switch (e.code) {
+        PhaPurchaseException.invalidCredentials =>
+          l10n.purchaseErrorInvalidCredentials,
+        PhaPurchaseException.network => l10n.purchaseErrorNetwork,
+        PhaPurchaseException.storeProblem => l10n.purchaseErrorStore,
+        PhaPurchaseException.noOfferings => l10n.purchaseErrorNoOfferings,
+        PhaPurchaseException.noPackage => l10n.purchaseErrorNoPackage,
+        _ => e.message,
+      };
+    }
+    if (e is PlatformException) {
+      final code = PurchasesErrorHelper.getErrorCode(e);
+      if (code == PurchasesErrorCode.invalidCredentialsError) {
+        return l10n.purchaseErrorInvalidCredentials;
+      }
+      if (code == PurchasesErrorCode.networkError) {
+        return l10n.purchaseErrorNetwork;
+      }
+    }
+    return e
+        .toString()
+        .replaceFirst('Exception: ', '')
+        .replaceFirst('StateError: ', '')
+        .replaceFirst('PhaPurchaseException: ', '');
   }
 
   List<(String, String, String)> _upgradeFeatures(AppLocalizations l10n) => [
@@ -2942,10 +3279,19 @@ class _UpgradeModalState extends State<UpgradeModal> {
             Text(l10n.upgradeSubtitle,
                 style: TextStyle(fontSize: 14, color: C.gray500)),
           ],
+          if (error.isNotEmpty) ...[
+            SizedBox(height: 12),
+            AppBanner(
+              text: error,
+              bg: C.red50,
+              border: C.red200,
+              fg: C.red700,
+            ),
+          ],
           if (hpDiscount) ...[
             SizedBox(height: 12),
             AppBanner(
-              text: l10n.upgradeHpBanner(maxOnboardingHp, hpFirstPurchaseDiscountPercent),
+              text: l10n.upgradeHpBanner(0, hpFirstPurchaseDiscountPercent),
               bg: C.amber50,
               border: C.amber200,
               fg: C.amber700,
@@ -3051,6 +3397,93 @@ class _UpgradeModalState extends State<UpgradeModal> {
               ],
             ),
           ),
+          SizedBox(height: 16),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              l10n.promoCodeLabel,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: C.gray500,
+              ),
+            ),
+          ),
+          SizedBox(height: 8),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _promoCtrl,
+                  enabled: !_promoLoading && loadingPlan == null,
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) => _applyPromo(),
+                  decoration: InputDecoration(
+                    hintText: l10n.promoCodeHint,
+                    hintStyle: TextStyle(fontSize: 13, color: C.gray400),
+                    isDense: true,
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    filled: true,
+                    fillColor: C.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: C.gray200),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: C.gray200),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: C.amber400, width: 1.5),
+                    ),
+                  ),
+                  style: TextStyle(fontSize: 14, color: C.gray900),
+                ),
+              ),
+              SizedBox(width: 8),
+              GestureDetector(
+                onTap: (_promoLoading || loadingPlan != null) ? null : _applyPromo,
+                child: Container(
+                  height: 44,
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    gradient: kAmberGradient,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: _promoLoading
+                      ? SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: C.white,
+                          ),
+                        )
+                      : Text(
+                          l10n.promoCodeApply,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: C.white,
+                          ),
+                        ),
+                ),
+              ),
+            ],
+          ),
+          if (_promoError.isNotEmpty) ...[
+            SizedBox(height: 8),
+            AppBanner(
+              text: _promoError,
+              bg: C.red50,
+              border: C.red200,
+              fg: C.red700,
+            ),
+          ],
           SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(16),

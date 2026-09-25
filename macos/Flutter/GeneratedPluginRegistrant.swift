@@ -14,6 +14,7 @@ import flutter_timezone
 import logging_on_oslog
 import purchases_flutter
 import shared_preferences_foundation
+import speech_to_text
 import sqflite_darwin
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
@@ -26,5 +27,6 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   LoggingOnOslogPlugin.register(with: registry.registrar(forPlugin: "LoggingOnOslogPlugin"))
   PurchasesFlutterPlugin.register(with: registry.registrar(forPlugin: "PurchasesFlutterPlugin"))
   SharedPreferencesPlugin.register(with: registry.registrar(forPlugin: "SharedPreferencesPlugin"))
+  SpeechToTextPlugin.register(with: registry.registrar(forPlugin: "SpeechToTextPlugin"))
   SqflitePlugin.register(with: registry.registrar(forPlugin: "SqflitePlugin"))
 }

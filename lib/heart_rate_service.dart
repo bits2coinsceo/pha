@@ -14,14 +14,20 @@ import 'db.dart';
 import 'health_index.dart';
 import 'health_telemetry.dart';
 import 'heart_rate.dart';
+import 'ecg_rhythms.dart';
 import 'l10n/generated/app_localizations.dart';
+import 'l10n/medical_l10n.dart';
 import 'locale_controller.dart';
 
 const _uuid = Uuid();
 const _hrAuthKey = 'health_heart_rate_authorized';
+const _ecgAuthKey = 'health_ecg_authorized';
 const _hrAlertCooldownKey = 'heart_rate_alert_last_at';
+const _hrQuietSyncAtPrefix = 'hr_quiet_sync_at_';
 const _hrAlertNotifId = 2101;
 const _hrAlarmSound = 'Alarm.mp3';
+/// Minimum gap between opportunistic HealthKit HR pulls.
+const _quietSyncMinInterval = Duration(minutes: 10);
 
 /// One HealthKit (or stored) heart-rate sample.
 class HeartSample {
@@ -34,11 +40,26 @@ class EcgSummary {
   final DateTime at;
   final double? averageBpm;
   final String classification;
+  /// Electrode sample rate from the watch (Hz), when provided.
+  final double? samplingFrequencyHz;
+  /// Number of voltage samples from the electrode strip.
+  final int voltageSampleCount;
+  /// Downsampled voltages for a simple waveform preview (mV-ish units).
+  final List<double> waveformPreview;
+  /// HealthKit / device source name (e.g. Apple Watch).
+  final String sourceName;
+
   const EcgSummary({
     required this.at,
-    this.averageBpm,
     required this.classification,
+    this.averageBpm,
+    this.samplingFrequencyHz,
+    this.voltageSampleCount = 0,
+    this.waveformPreview = const [],
+    this.sourceName = '',
   });
+
+  bool get fromElectrodeSensor => voltageSampleCount > 0;
 }
 
 /// Full snapshot used by the Heart Rate & Rhythm Quick Action.
@@ -94,6 +115,7 @@ class HeartRateService {
     HealthDataType.WALKING_HEART_RATE,
     HealthDataType.HEART_RATE_VARIABILITY_SDNN,
     HealthDataType.IRREGULAR_HEART_RATE_EVENT,
+    HealthDataType.ELECTROCARDIOGRAM,
   ];
 
   static const _permissions = [
@@ -102,7 +124,65 @@ class HeartRateService {
     HealthDataAccess.READ,
     HealthDataAccess.READ,
     HealthDataAccess.READ,
+    HealthDataAccess.READ,
   ];
+
+  static const _ecgTypes = [
+    HealthDataType.ELECTROCARDIOGRAM,
+  ];
+
+  static const _ecgPermissions = [
+    HealthDataAccess.READ,
+  ];
+
+  /// Electrode ECG (Apple Watch Series 4+ via HealthKit). Not on Health Connect.
+  static bool get ecgSensorSupported =>
+      !kIsWeb && Platform.isIOS && HealthTelemetryService.isSupported;
+
+  /// Asks for HealthKit ECG (electrode) access — separate from heart-rate auth.
+  static Future<bool> requestEcgPermission() async {
+    if (!ecgSensorSupported) return false;
+    try {
+      await _ensureConfigured();
+      final prefs = await SharedPreferences.getInstance();
+      // Always request once per install for ECG; new type needs a fresh sheet
+      // even if heart-rate types were already authorized.
+      final granted = await _health
+          .requestAuthorization(_ecgTypes, permissions: _ecgPermissions)
+          .timeout(const Duration(seconds: 45));
+      await prefs.setBool(_ecgAuthKey, true);
+      return granted || Platform.isIOS;
+    } catch (e) {
+      debugPrint('HeartRateService.requestEcgPermission failed: $e');
+      return false;
+    }
+  }
+
+  static Future<bool> hasEcgPermissionHint() async {
+    if (!ecgSensorSupported) return false;
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_ecgAuthKey) ?? false;
+  }
+
+  /// Reads electrode ECG recordings from Apple Health (written by Apple Watch).
+  static Future<List<EcgSummary>> fetchEcgFromSensors({
+    Duration lookback = const Duration(days: 90),
+  }) async {
+    if (!ecgSensorSupported) return const [];
+    try {
+      await _ensureConfigured();
+    } catch (_) {
+      return const [];
+    }
+    final now = DateTime.now();
+    final points = await _safeQuery(
+      _ecgTypes,
+      now.subtract(lookback),
+      now,
+      timeout: const Duration(seconds: 20),
+    );
+    return _parseEcgs(points);
+  }
 
   static bool get isSupported => HealthTelemetryService.isSupported;
 
@@ -189,6 +269,41 @@ class HeartRateService {
     return newest;
   }
 
+  /// Pulls HealthKit HR metrics into the local DB without opening the modal.
+  /// Never shows an auth sheet. Throttled unless [force] is true.
+  /// Returns true when HealthKit data was read and persisted.
+  static Future<bool> syncQuietly(
+    String userId, {
+    bool force = false,
+    bool notifyOnRisk = false,
+  }) async {
+    if (!isSupported || !Db.instance.isReady) return false;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final key = '$_hrQuietSyncAtPrefix$userId';
+      if (!force) {
+        final lastMs = prefs.getInt(key);
+        if (lastMs != null) {
+          final last =
+              DateTime.fromMillisecondsSinceEpoch(lastMs, isUtc: true);
+          if (DateTime.now().toUtc().difference(last) < _quietSyncMinInterval) {
+            return false;
+          }
+        }
+      }
+
+      final snap = await syncAndLoad(
+        userId,
+        notifyOnRisk: notifyOnRisk,
+      );
+      await prefs.setInt(key, DateTime.now().toUtc().millisecondsSinceEpoch);
+      return snap.hasData && snap.error == null;
+    } catch (e, st) {
+      debugPrint('HeartRateService.syncQuietly failed: $e\n$st');
+      return false;
+    }
+  }
+
   static HeartSample? _newestSample(List<HealthDataPoint> points) {
     HeartSample? best;
     for (final p in points) {
@@ -257,6 +372,12 @@ class HeartRateService {
           start7,
           now,
         ),
+        _safeQuery(
+          [HealthDataType.ELECTROCARDIOGRAM],
+          now.subtract(const Duration(days: 90)),
+          now,
+          timeout: const Duration(seconds: 20),
+        ),
       ]);
 
       final latestPoints = results[0];
@@ -265,6 +386,8 @@ class HeartRateService {
       final walkingPoints = results[3];
       final hrvPoints = results[4];
       final irregularPoints = results[5];
+      final ecgPoints = results[6];
+      final recentEcgs = _parseEcgs(ecgPoints);
 
       final newest = _newestSample(latestPoints);
       final samples = _numericSamples(hrPoints);
@@ -295,12 +418,12 @@ class HeartRateService {
       }
 
       // Persist in background — do not block the graph UI.
-      unawaited(_persistDay(
+      unawaited(_persistMaps(
         userId: userId,
-        resting: restingByDay[DailyMetricStore.localDateKey()],
-        walking: walkingByDay[DailyMetricStore.localDateKey()],
-        hrv: hrvByDay[DailyMetricStore.localDateKey()],
-        avgHr: avgByDay[DailyMetricStore.localDateKey()],
+        restingByDay: restingByDay,
+        walkingByDay: walkingByDay,
+        hrvByDay: hrvByDay,
+        avgByDay: avgByDay,
         samplesToday: samples24h
             .where((s) =>
                 DailyMetricStore.localDateKey(s.at) ==
@@ -350,7 +473,7 @@ class HeartRateService {
         hrvMs: hrvToday,
         irregularRhythm: irregular,
         irregularEventCount: irregularPoints.length,
-        recentEcgs: const [],
+        recentEcgs: recentEcgs,
         assessment: assessment,
         permissionGranted: prompted || hasHkData,
       );
@@ -542,6 +665,29 @@ class HeartRateService {
       buf.writeln(
           '${l10n.hrIrregularRhythm}: ${snap.irregularEventCount}');
     }
+    if (snap.recentEcgs.isNotEmpty) {
+      buf.writeln(l10n.hrEcgTitle);
+      for (final e in snap.recentEcgs.take(5)) {
+        buf.writeln(
+          '  ${e.at.toLocal().toIso8601String()} · '
+          '${l10n.hrEcgClassification(e.classification)}'
+          '${e.averageBpm != null ? ' · ${e.averageBpm!.round()} ${l10n.unitBpm}' : ''}',
+        );
+      }
+    }
+    final appleKind = snap.recentEcgs.isEmpty
+        ? null
+        : EcgRhythmKnowledge.fromAppleClassification(
+            snap.recentEcgs.first.classification,
+          );
+    buf.writeln();
+    buf.writeln(
+      EcgRhythmKnowledge.aiDocBrief(
+        appleClass: appleKind,
+        restingBpm: snap.restingBpm,
+        irregularRhythm: snap.irregularRhythm,
+      ),
+    );
     return buf.toString();
   }
 
@@ -569,6 +715,46 @@ class HeartRateService {
       permissionGranted: permissionGranted,
       error: error,
     );
+  }
+
+  static List<EcgSummary> _parseEcgs(List<HealthDataPoint> points) {
+    final out = <EcgSummary>[];
+    for (final p in points) {
+      final value = p.value;
+      if (value is! ElectrocardiogramHealthValue) continue;
+      final classification = value.classification?.name ?? 'NOT_SET';
+      final voltages = value.voltageValues
+          .map((v) => v.voltage.toDouble())
+          .where((v) => v.isFinite)
+          .toList();
+      out.add(
+        EcgSummary(
+          at: p.dateTo,
+          averageBpm: value.averageHeartRate?.toDouble(),
+          classification: classification,
+          samplingFrequencyHz: value.samplingFrequency,
+          voltageSampleCount: voltages.length,
+          waveformPreview: _downsampleWaveform(voltages, target: 96),
+          sourceName: p.sourceName.trim().isEmpty ? 'Apple Watch' : p.sourceName,
+        ),
+      );
+    }
+    out.sort((a, b) => b.at.compareTo(a.at));
+    if (out.length > 12) return out.sublist(0, 12);
+    return out;
+  }
+
+  /// Keep a short preview for UI — full electrode strips are thousands of points.
+  static List<double> _downsampleWaveform(List<double> raw, {int target = 96}) {
+    if (raw.isEmpty) return const [];
+    if (raw.length <= target) return List<double>.from(raw);
+    final step = raw.length / target;
+    final out = <double>[];
+    for (var i = 0; i < target; i++) {
+      final idx = (i * step).floor().clamp(0, raw.length - 1);
+      out.add(raw[idx]);
+    }
+    return out;
   }
 
   static Future<List<HealthDataPoint>> _safeQuery(
@@ -645,50 +831,36 @@ class HeartRateService {
     });
   }
 
-  static Future<void> _persistDay({
+  static Future<void> _persistMaps({
     required String userId,
-    required double? resting,
-    required double? walking,
-    required double? hrv,
-    required double? avgHr,
+    required Map<String, double> restingByDay,
+    required Map<String, double> walkingByDay,
+    required Map<String, double> hrvByDay,
+    required Map<String, double> avgByDay,
     required List<HeartSample> samplesToday,
     required int irregularCount,
   }) async {
     if (!Db.instance.isReady) return;
 
-    if (resting != null) {
-      await DailyMetricStore.upsertToday(
-        userId: userId,
-        metricType: 'resting_heart_rate',
-        value: resting,
-        source: 'healthkit',
-      );
+    Future<void> writeMap(String metricType, Map<String, double> byDay) async {
+      for (final e in byDay.entries) {
+        if (e.value <= 0) continue;
+        final day = _dayFromKey(e.key);
+        if (day == null) continue;
+        await DailyMetricStore.upsertOnLocalDay(
+          userId: userId,
+          metricType: metricType,
+          value: e.value,
+          day: day,
+          source: 'healthkit',
+        );
+      }
     }
-    if (walking != null) {
-      await DailyMetricStore.upsertToday(
-        userId: userId,
-        metricType: 'walking_heart_rate',
-        value: walking,
-        source: 'healthkit',
-      );
-    }
-    if (hrv != null) {
-      await DailyMetricStore.upsertToday(
-        userId: userId,
-        metricType: 'hrv_sdnn',
-        value: hrv,
-        source: 'healthkit',
-      );
-    }
-    if (avgHr != null) {
-      await DailyMetricStore.upsertToday(
-        userId: userId,
-        metricType: 'heart_rate_avg',
-        value: avgHr,
-        source: 'healthkit',
-      );
-    }
-    // latestBpm is reflected via downsampled samples + heart_rate_avg.
+
+    await writeMap('resting_heart_rate', restingByDay);
+    await writeMap('walking_heart_rate', walkingByDay);
+    await writeMap('hrv_sdnn', hrvByDay);
+    await writeMap('heart_rate_avg', avgByDay);
 
     // Replace today's downsampled HR samples.
     final bounds = DailyMetricStore.localDayBounds();
@@ -726,6 +898,16 @@ class HeartRateService {
       source: 'healthkit',
       notes: irregularCount > 0 ? 'irregular_events' : 'none',
     );
+  }
+
+  static DateTime? _dayFromKey(String key) {
+    final parts = key.split('-');
+    if (parts.length != 3) return null;
+    final y = int.tryParse(parts[0]);
+    final m = int.tryParse(parts[1]);
+    final d = int.tryParse(parts[2]);
+    if (y == null || m == null || d == null) return null;
+    return DateTime(y, m, d);
   }
 
   static List<HeartSample> _downsample(

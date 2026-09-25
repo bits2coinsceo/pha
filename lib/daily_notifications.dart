@@ -312,17 +312,21 @@ class DailyNotificationService {
   /// Builds short localized tip text and schedules next morning/evening pushes.
   ///
   /// Bodies are deterministic templates (no AI) so they stay translated, short,
-  /// and load instantly. Evening text refreshes when steps move before 20:00.
+  /// and load instantly. Evening OS text always includes today's step count.
   /// Morning OS push body is computed for the **delivery calendar day** so
-  /// "Yesterday" matches the day before the notification fires (not the day
-  /// the schedule was created).
+  /// "Yesterday" matches the day before the notification fires.
   ///
-  /// Before baking the morning banner, yesterday's steps are pulled from
-  /// HealthKit / Health Connect. On iOS a background refresh ~20 minutes
-  /// before 10:30 rewrites the pending banner with the finalized total.
+  /// Step sync checkpoints (iOS BG + HealthKit rewrite of pending banners):
+  /// - **00:00** on the morning delivery day (yesterday's steps for 10:30)
+  /// - **30 minutes before** the evening 20:00 push (today's steps)
   static Future<void> scheduleForUser(String userId) async {
     if (!_initialized) await init();
-    if (!await hasPermission()) return;
+    // Always (re)prompt once if OS permission is missing — otherwise TestFlight
+    // installs that skipped HealthKit still never get morning/evening pushes.
+    if (!await hasPermission()) {
+      final granted = await requestPermission();
+      if (!granted) return;
+    }
 
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('daily_notif_active_user_id', userId);
@@ -409,7 +413,6 @@ class DailyNotificationService {
         userId: userId,
         l10n: l10n,
         eveningBody: clipped,
-        eveningPassed: eveningPassed,
       );
       return;
     }
@@ -420,7 +423,6 @@ class DailyNotificationService {
       userId: userId,
       l10n: l10n,
       eveningBody: cachedEveningBody,
-      eveningPassed: eveningPassed,
     );
   }
 
@@ -428,18 +430,27 @@ class DailyNotificationService {
     required String userId,
     required AppLocalizations l10n,
     required String eveningBody,
-    required bool eveningPassed,
   }) async {
     if (!_initialized) return;
 
     final details = NotificationDetails(
-      iOS: DarwinNotificationDetails(presentAlert: true, presentSound: true),
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+        sound: 'default',
+        // Avoid .timeSensitive — needs a paid entitlement; can crash on device.
+        interruptionLevel: InterruptionLevel.active,
+      ),
       android: AndroidNotificationDetails(
         'pha_daily',
         l10n.notifChannelName,
         channelDescription: l10n.notifChannelDesc,
-        importance: Importance.high,
+        importance: Importance.max,
         priority: Priority.high,
+        playSound: true,
+        enableVibration: true,
+        category: AndroidNotificationCategory.reminder,
       ),
     );
 
@@ -455,16 +466,20 @@ class DailyNotificationService {
       // Finalize yesterday from the device before baking the banner.
       await _syncDayForMorningPush(userId, yesterday);
 
+      final knownSteps = await _stepsOnDay(userId, yesterday);
+      // Always include a numeric step count in the morning OS push.
       final osMorningBody = _clip(
         await _localizedMorningBody(
           userId,
           l10n,
           forDeliveryDay: deliveryDay,
-          avoidZeroBanner: true,
+          avoidZeroBanner: false,
         ),
         _osPushBodyMax,
       );
 
+      // Daily repeating calendar trigger — survives app kill better than a
+      // one-shot zonedSchedule (required for reliable TestFlight / device pushes).
       await _plugin.zonedSchedule(
         _morningId,
         l10n.morningNotificationTitle,
@@ -474,28 +489,68 @@ class DailyNotificationService {
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+        payload: 'morning_health_tip',
       );
 
+      // Native HealthKit fill at delivery-day 00:00 (+ late pre-push).
       await _scheduleNativeMorningPrep(
         fireAt: morningAt,
         title: l10n.morningNotificationTitle,
         userId: userId,
         l10n: l10n,
         deliveryDay: deliveryDay,
+        knownSteps: knownSteps,
+        scheduledBody: osMorningBody,
       );
 
-      if (!eveningPassed) {
-        await _plugin.zonedSchedule(
-          _eveningId,
-          l10n.eveningNotificationTitle,
-          _clip(eveningBody, _osPushBodyMax),
-          _nextTime(_eveningHour, _eveningMinute),
-          details,
-          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-        );
-      }
+      final eveningAt = _nextTime(_eveningHour, _eveningMinute);
+      final eveningDay =
+          DateTime(eveningAt.year, eveningAt.month, eveningAt.day);
+      await _syncDayForMorningPush(userId, eveningDay);
+      await _syncDayForMorningPush(
+        userId,
+        eveningDay.subtract(const Duration(days: 1)),
+      );
+
+      final todayStepsOs = await _stepsOnDay(userId, eveningDay);
+      final yesterdayStepsOs = await _stepsOnDay(
+        userId,
+        eveningDay.subtract(const Duration(days: 1)),
+      );
+      // OS evening banner always carries step counts (never a steps-less tip).
+      final osEveningBody = _clip(
+        await _localizedEveningBody(
+          userId,
+          l10n,
+          todaySteps: todayStepsOs,
+          yesterdaySteps: yesterdayStepsOs,
+        ),
+        _osPushBodyMax,
+      );
+
+      await _plugin.zonedSchedule(
+        _eveningId,
+        l10n.eveningNotificationTitle,
+        osEveningBody,
+        eveningAt,
+        details,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        matchDateTimeComponents: DateTimeComponents.time,
+        payload: 'evening_health_tip',
+      );
+
+      await _scheduleNativeEveningPrep(
+        fireAt: eveningAt,
+        title: l10n.eveningNotificationTitle,
+        userId: userId,
+        l10n: l10n,
+        todaySteps: todayStepsOs,
+        yesterdaySteps: yesterdayStepsOs,
+        scheduledBody: osEveningBody,
+      );
     } catch (e, st) {
       debugPrint('DailyNotificationService.scheduleForUser failed: $e\n$st');
     }
@@ -510,6 +565,8 @@ class DailyNotificationService {
     required String userId,
     required AppLocalizations l10n,
     required DateTime deliveryDay,
+    required int knownSteps,
+    required String scheduledBody,
   }) async {
     if (kIsWeb || !Platform.isIOS) return;
     try {
@@ -527,14 +584,70 @@ class DailyNotificationService {
         '$_stepsTemplateSentinel',
         '__STEPS__',
       );
+      final fallback = _clip(
+        knownSteps >= 0 ? scheduledBody : l10n.notifMorningFallbackDetailed,
+        _osPushBodyMax,
+      );
+      // Delivery-day midnight (00:00) refreshes yesterday's steps for the
+      // morning banner; keep a late pre-push as a second chance.
+      final midnight = tz.TZDateTime(
+        tz.local,
+        fireAt.year,
+        fireAt.month,
+        fireAt.day,
+      );
+      final prePush = fireAt.subtract(const Duration(minutes: 1));
       const channel = MethodChannel('pha.morning_push_prep/methods');
       await channel.invokeMethod<void>('schedule', {
         'fireAtMs': fireAt.millisecondsSinceEpoch,
+        'midnightMs': midnight.millisecondsSinceEpoch,
+        'prePushMs': prePush.millisecondsSinceEpoch,
         'title': title,
+        // Native fills __STEPS__ from HealthKit for the day before fireAt.
         'bodyTemplate': _clip(template, _osPushBodyMax),
+        'bodyFallback': fallback,
       });
     } catch (e, st) {
       debugPrint('Morning push prep schedule failed: $e\n$st');
+    }
+  }
+
+  static const _todayTemplateSentinel = 812837465;
+  static const _yesterdayTemplateSentinel = 712837465;
+
+  /// iOS: rewrite evening OS banner 30 minutes before 20:00 with live steps.
+  static Future<void> _scheduleNativeEveningPrep({
+    required tz.TZDateTime fireAt,
+    required String title,
+    required String userId,
+    required AppLocalizations l10n,
+    required int todaySteps,
+    required int yesterdaySteps,
+    required String scheduledBody,
+  }) async {
+    if (kIsWeb || !Platform.isIOS) return;
+    try {
+      final index = await _indexSnapshot(userId, l10n);
+      final withSentinel = l10n.notifEveningShort(
+        _todayTemplateSentinel,
+        _yesterdayTemplateSentinel,
+        index.score,
+        index.status,
+      );
+      final template = withSentinel
+          .replaceAll('$_todayTemplateSentinel', '__TODAY__')
+          .replaceAll('$_yesterdayTemplateSentinel', '__YESTERDAY__');
+      final prePush = fireAt.subtract(const Duration(minutes: 30));
+      const channel = MethodChannel('pha.evening_push_prep/methods');
+      await channel.invokeMethod<void>('schedule', {
+        'fireAtMs': fireAt.millisecondsSinceEpoch,
+        'prePushMs': prePush.millisecondsSinceEpoch,
+        'title': title,
+        'bodyTemplate': _clip(template, _osPushBodyMax),
+        'bodyFallback': _clip(scheduledBody, _osPushBodyMax),
+      });
+    } catch (e, st) {
+      debugPrint('Evening push prep schedule failed: $e\n$st');
     }
   }
 
@@ -649,7 +762,7 @@ class DailyNotificationService {
     final steps = await _stepsOnDay(userId, yesterday);
     final kcal = await _mealKcalOnDay(userId, yesterday);
     final index = await _indexSnapshot(userId, l10n);
-    if (avoidZeroBanner && steps <= 0 && kcal <= 0) {
+    if (avoidZeroBanner && steps <= 0) {
       return l10n.notifMorningFallbackDetailed;
     }
     return l10n.notifMorningShort(

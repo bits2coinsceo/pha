@@ -1,13 +1,21 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
+import '../api.dart';
 import '../auth.dart';
+import '../core/app_logger.dart';
 import '../cosmic_ui.dart';
 import '../legal.dart';
 import '../theme.dart';
 import '../l10n/l10n_ext.dart';
 import '../widgets.dart';
 import '../widgets/language_picker.dart';
+
+enum _AuthStep { credentials, verifySignup, forgotEmail, forgotReset }
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -22,39 +30,182 @@ class _LoginPageState extends State<LoginPage> {
   bool loading = false;
   bool acceptedTerms = false;
   bool acceptedPrivacy = false;
+  _AuthStep step = _AuthStep.credentials;
   String error = '';
+  String notice = '';
   final _email = TextEditingController();
   final _password = TextEditingController();
   final _name = TextEditingController();
+  final _code = TextEditingController();
+  final _newPassword = TextEditingController();
 
   @override
   void dispose() {
     _email.dispose();
     _password.dispose();
     _name.dispose();
+    _code.dispose();
+    _newPassword.dispose();
     super.dispose();
+  }
+
+  String _authMessage(AuthException e) {
+    return switch (e.code) {
+      AuthException.emailAlreadyRegistered => context.l10n.emailAlreadyRegistered,
+      AuthException.invalidCredentials => context.l10n.invalidEmailOrPassword,
+      AuthException.networkError => context.l10n.authNetworkError,
+      AuthException.serverSyncFailed => context.l10n.authServerSyncFailed,
+      AuthException.accountNotOnServer => context.l10n.authAccountNotOnServer,
+      _ => e.code,
+    };
+  }
+
+  String _apiMessage(ApiException e) {
+    AppLogger.e(
+      'auth failed base=${ApiConfig.baseUrl} status=${e.status} detail=${e.message}',
+      category: LogCategory.auth,
+    );
+    return switch (e.message) {
+      'email_already_registered' => context.l10n.emailAlreadyRegistered,
+      'resend_too_soon' || 'too_many_attempts' => context.l10n.authResendTooSoon,
+      'email_delivery_failed' => context.l10n.authEmailDeliveryFailed,
+      'account_not_found' => context.l10n.authAccountNotFound,
+      'invalid_code' || 'code_expired' => context.l10n.authInvalidCode,
+      _ => context.l10n.authNetworkError,
+    };
+  }
+
+  void _logTransportFailure(Object error, StackTrace stackTrace) {
+    AppLogger.e(
+      'auth transport failed base=${ApiConfig.baseUrl}',
+      error: error,
+      stackTrace: stackTrace,
+      category: LogCategory.auth,
+    );
   }
 
   Future<void> _submit() async {
     setState(() {
       error = '';
+      notice = '';
       loading = true;
     });
     final auth = context.read<AuthProvider>();
     try {
-      if (isSignUp) {
-        if (!acceptedTerms || !acceptedPrivacy) {
-          throw Exception(context.l10n.pleaseAcceptLegal);
-        }
-        if (_password.text.length < 8) {
-          throw Exception(context.l10n.passwordTooShort);
-        }
-        await auth.signUp(_email.text, _password.text, _name.text);
-      } else {
-        await auth.signIn(_email.text, _password.text);
+      switch (step) {
+        case _AuthStep.verifySignup:
+          if (_code.text.trim().length != 6) {
+            throw Exception(context.l10n.authInvalidCode);
+          }
+          await ApiClient.verifyRegistrationCode(
+            email: _email.text,
+            code: _code.text,
+          );
+          await auth.signUp(_email.text, _password.text, _name.text);
+        case _AuthStep.forgotEmail:
+          await ApiClient.sendPasswordResetCode(_email.text);
+          if (!mounted) return;
+          setState(() {
+            step = _AuthStep.forgotReset;
+            notice = context.l10n.authCodeSent;
+            _code.clear();
+          });
+        case _AuthStep.forgotReset:
+          if (_code.text.trim().length != 6) {
+            throw Exception(context.l10n.authInvalidCode);
+          }
+          if (_newPassword.text.length < 8) {
+            throw Exception(context.l10n.passwordTooShort);
+          }
+          await ApiClient.verifyPasswordReset(
+            email: _email.text,
+            code: _code.text,
+            newSyncToken: AuthProvider.passwordHash(_newPassword.text),
+          );
+          if (!mounted) return;
+          setState(() {
+            step = _AuthStep.credentials;
+            isSignUp = false;
+            notice = context.l10n.forgotPasswordDone;
+            _password.text = _newPassword.text;
+            _code.clear();
+            _newPassword.clear();
+          });
+        case _AuthStep.credentials:
+          if (isSignUp) {
+            if (!acceptedTerms || !acceptedPrivacy) {
+              throw Exception(context.l10n.pleaseAcceptLegal);
+            }
+            if (_password.text.length < 8) {
+              throw Exception(context.l10n.passwordTooShort);
+            }
+            await ApiClient.sendRegistrationCode(_email.text);
+            if (!mounted) return;
+            setState(() {
+              step = _AuthStep.verifySignup;
+              notice = context.l10n.authCodeSent;
+              _code.clear();
+            });
+          } else {
+            await auth.signIn(_email.text, _password.text);
+          }
       }
-    } catch (e) {
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      setState(() => error = _authMessage(e));
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() => error = _apiMessage(e));
+    } on SocketException catch (e, st) {
+      if (!mounted) return;
+      _logTransportFailure(e, st);
+      setState(() => error = context.l10n.authNetworkError);
+    } on TimeoutException catch (e, st) {
+      if (!mounted) return;
+      _logTransportFailure(e, st);
+      setState(() => error = context.l10n.authNetworkError);
+    } on http.ClientException catch (e, st) {
+      if (!mounted) return;
+      _logTransportFailure(e, st);
+      setState(() => error = context.l10n.authNetworkError);
+    } catch (e, st) {
+      if (!mounted) return;
+      _logTransportFailure(e, st);
       setState(() => error = e.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => loading = false);
+    }
+  }
+
+  Future<void> _resend() async {
+    setState(() {
+      error = '';
+      notice = '';
+      loading = true;
+    });
+    try {
+      if (step == _AuthStep.verifySignup) {
+        await ApiClient.sendRegistrationCode(_email.text);
+      } else if (step == _AuthStep.forgotReset) {
+        await ApiClient.sendPasswordResetCode(_email.text);
+      }
+      if (!mounted) return;
+      setState(() => notice = context.l10n.authCodeSent);
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() => error = _apiMessage(e));
+    } on SocketException catch (e, st) {
+      if (!mounted) return;
+      _logTransportFailure(e, st);
+      setState(() => error = context.l10n.authNetworkError);
+    } on TimeoutException catch (e, st) {
+      if (!mounted) return;
+      _logTransportFailure(e, st);
+      setState(() => error = context.l10n.authNetworkError);
+    } on http.ClientException catch (e, st) {
+      if (!mounted) return;
+      _logTransportFailure(e, st);
+      setState(() => error = context.l10n.authNetworkError);
     } finally {
       if (mounted) setState(() => loading = false);
     }
@@ -63,13 +214,45 @@ class _LoginPageState extends State<LoginPage> {
   void _switchMode() {
     setState(() {
       isSignUp = !isSignUp;
+      step = _AuthStep.credentials;
       error = '';
+      notice = '';
       acceptedTerms = false;
       acceptedPrivacy = false;
       _email.clear();
       _password.clear();
       _name.clear();
+      _code.clear();
+      _newPassword.clear();
     });
+  }
+
+  void _backToCredentials() {
+    setState(() {
+      step = _AuthStep.credentials;
+      error = '';
+      notice = '';
+      _code.clear();
+      _newPassword.clear();
+    });
+  }
+
+  String _primaryLabel() {
+    if (loading) {
+      return switch (step) {
+        _AuthStep.verifySignup => context.l10n.creatingAccount,
+        _AuthStep.forgotEmail || _AuthStep.forgotReset => context.l10n.signingIn,
+        _AuthStep.credentials =>
+          isSignUp ? context.l10n.creatingAccount : context.l10n.signingIn,
+      };
+    }
+    return switch (step) {
+      _AuthStep.verifySignup => context.l10n.authVerifyAndCreate,
+      _AuthStep.forgotEmail => context.l10n.forgotPasswordSend,
+      _AuthStep.forgotReset => context.l10n.forgotPasswordConfirm,
+      _AuthStep.credentials =>
+        isSignUp ? context.l10n.createAccount : context.l10n.signIn,
+    };
   }
 
   Future<void> _openLegal(LegalDocument doc) async {
@@ -84,16 +267,18 @@ class _LoginPageState extends State<LoginPage> {
         fit: StackFit.expand,
         children: [
           const CosmicBackground(),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final wide = constraints.maxWidth >= 1024;
-              return Row(
-                children: [
-                  if (wide) Expanded(child: _brandingPanel()),
-                  Expanded(child: _formPanel(wide)),
-                ],
-              );
-            },
+          SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final wide = constraints.maxWidth >= 1024;
+                return Row(
+                  children: [
+                    if (wide) Expanded(child: _brandingPanel()),
+                    Expanded(child: _formPanel(wide)),
+                  ],
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -283,9 +468,16 @@ class _LoginPageState extends State<LoginPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      isSignUp
-                          ? context.l10n.createYourAccount
-                          : context.l10n.welcomeBack,
+                      switch (step) {
+                        _AuthStep.verifySignup => context.l10n.authEnterCode,
+                        _AuthStep.forgotEmail ||
+                        _AuthStep.forgotReset =>
+                          context.l10n.forgotPasswordTitle,
+                        _AuthStep.credentials =>
+                          isSignUp
+                              ? context.l10n.createYourAccount
+                              : context.l10n.welcomeBack,
+                      },
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -294,9 +486,16 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      isSignUp
-                          ? context.l10n.loginSignUpSubtitle
-                          : context.l10n.loginSignInSubtitle,
+                      switch (step) {
+                        _AuthStep.verifySignup ||
+                        _AuthStep.forgotReset =>
+                          _email.text.trim(),
+                        _AuthStep.forgotEmail => context.l10n.forgotPassword,
+                        _AuthStep.credentials =>
+                          isSignUp
+                              ? context.l10n.loginSignUpSubtitle
+                              : context.l10n.loginSignInSubtitle,
+                      },
                       style: TextStyle(color: C.gray500, fontSize: 14),
                     ),
                     SizedBox(height: 16),
@@ -312,7 +511,17 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       SizedBox(height: 16),
                     ],
-                    if (isSignUp) ...[
+                    if (notice.isNotEmpty) ...[
+                      AppBanner(
+                        text: notice,
+                        bg: C.green50,
+                        border: C.green200,
+                        fg: C.green500,
+                        icon: Icons.mark_email_read_outlined,
+                      ),
+                      SizedBox(height: 16),
+                    ],
+                    if (step == _AuthStep.credentials && isSignUp) ...[
                       _label(context.l10n.loginFullName),
                       TextField(
                         controller: _name,
@@ -320,37 +529,77 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       SizedBox(height: 16),
                     ],
-                    _label(context.l10n.loginEmailLabel),
-                    TextField(
-                      controller: _email,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: appInput(context.l10n.loginEmailPlaceholder),
-                    ),
-                    SizedBox(height: 16),
-                    _label(context.l10n.password),
-                    TextField(
-                      controller: _password,
-                      obscureText: !showPassword,
-                      decoration:
-                          appInput(
-                            isSignUp
-                                ? context.l10n.loginPasswordHintSignUp
-                                : context.l10n.loginPasswordHintSignIn,
-                          ).copyWith(
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                showPassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
-                                size: 18,
-                                color: C.gray400,
+                    if (step == _AuthStep.credentials ||
+                        step == _AuthStep.forgotEmail) ...[
+                      _label(context.l10n.loginEmailLabel),
+                      TextField(
+                        controller: _email,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: appInput(context.l10n.loginEmailPlaceholder),
+                      ),
+                      SizedBox(height: 16),
+                    ],
+                    if (step == _AuthStep.credentials) ...[
+                      _label(context.l10n.password),
+                      TextField(
+                        controller: _password,
+                        obscureText: !showPassword,
+                        decoration:
+                            appInput(
+                              isSignUp
+                                  ? context.l10n.loginPasswordHintSignUp
+                                  : context.l10n.loginPasswordHintSignIn,
+                            ).copyWith(
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  showPassword
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  size: 18,
+                                  color: C.gray400,
+                                ),
+                                onPressed: () => setState(
+                                  () => showPassword = !showPassword,
+                                ),
                               ),
-                              onPressed: () =>
-                                  setState(() => showPassword = !showPassword),
                             ),
+                      ),
+                    ],
+                    if (step == _AuthStep.verifySignup ||
+                        step == _AuthStep.forgotReset) ...[
+                      _label(context.l10n.authEnterCode),
+                      TextField(
+                        controller: _code,
+                        keyboardType: TextInputType.number,
+                        maxLength: 6,
+                        decoration: appInput('000000').copyWith(
+                          counterText: '',
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                    ],
+                    if (step == _AuthStep.forgotReset) ...[
+                      _label(context.l10n.forgotPasswordNew),
+                      TextField(
+                        controller: _newPassword,
+                        obscureText: !showPassword,
+                        decoration: appInput(context.l10n.loginPasswordHintSignUp)
+                            .copyWith(
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              showPassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              size: 18,
+                              color: C.gray400,
+                            ),
+                            onPressed: () =>
+                                setState(() => showPassword = !showPassword),
                           ),
-                    ),
-                    if (isSignUp) ...[
+                        ),
+                      ),
+                    ],
+                    if (step == _AuthStep.credentials && isSignUp) ...[
                       SizedBox(height: 16),
                       _legalCheckbox(
                         value: acceptedTerms,
@@ -368,27 +617,52 @@ class _LoginPageState extends State<LoginPage> {
                         prefix: context.l10n.legalAgreePrefix,
                       ),
                     ],
+                    if (step == _AuthStep.credentials && !isSignUp) ...[
+                      SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: loading
+                              ? null
+                              : () => setState(() {
+                                  step = _AuthStep.forgotEmail;
+                                  error = '';
+                                  notice = '';
+                                }),
+                          child: Text(context.l10n.forgotPassword),
+                        ),
+                      ),
+                    ],
                     SizedBox(height: 20),
                     PrimaryButton(
-                      label: loading
-                          ? (isSignUp
-                                ? context.l10n.creatingAccount
-                                : context.l10n.signingIn)
-                          : (isSignUp
-                                ? context.l10n.createAccount
-                                : context.l10n.signIn),
+                      label: _primaryLabel(),
                       onPressed: loading
                           ? null
-                          : (isSignUp && (!acceptedTerms || !acceptedPrivacy))
+                          : (step == _AuthStep.credentials &&
+                                  isSignUp &&
+                                  (!acceptedTerms || !acceptedPrivacy))
                           ? null
                           : _submit,
                     ),
-                    SizedBox(height: 24),
-                    Divider(color: C.gray100, height: 1),
-                    SizedBox(height: 24),
-                    Center(
-                      child: GestureDetector(
-                        onTap: _switchMode,
+                    if (step == _AuthStep.verifySignup ||
+                        step == _AuthStep.forgotReset) ...[
+                      SizedBox(height: 8),
+                      Center(
+                        child: TextButton(
+                          onPressed: loading ? null : _resend,
+                          child: Text(context.l10n.authResendCode),
+                        ),
+                      ),
+                    ],
+                    if (step != _AuthStep.credentials) ...[
+                      SizedBox(height: 8),
+                      PrimaryButton(
+                        label: context.l10n.back,
+                        onPressed: loading ? null : _backToCredentials,
+                      ),
+                    ] else ...[
+                      SizedBox(height: 16),
+                      Center(
                         child: Text(
                           isSignUp
                               ? context.l10n.alreadyHaveAccount
@@ -397,7 +671,14 @@ class _LoginPageState extends State<LoginPage> {
                           style: TextStyle(fontSize: 14, color: C.gray500),
                         ),
                       ),
-                    ),
+                      SizedBox(height: 8),
+                      PrimaryButton(
+                        label: isSignUp
+                            ? context.l10n.signIn
+                            : context.l10n.signUp,
+                        onPressed: loading ? null : _switchMode,
+                      ),
+                    ],
                   ],
                 ),
               ),

@@ -9,6 +9,7 @@ import 'dart:math';
 
 import 'medical_guidelines.dart';
 import 'models.dart';
+import 'units.dart';
 import 'l10n/generated/app_localizations.dart';
 import 'l10n/medical_l10n.dart';
 
@@ -164,8 +165,15 @@ class ClinicalCorrelationReport {
     this.ageInsights = const [],
   });
 
-  List<Finding> toFindings(AppLocalizations l10n) =>
-      ClinicalCorrelationEngine.findingsFrom(this, l10n);
+  List<Finding> toFindings(
+    AppLocalizations l10n, {
+    UnitSystem unitSystem = 'metric',
+  }) =>
+      ClinicalCorrelationEngine.findingsFrom(
+        this,
+        l10n,
+        unitSystem: unitSystem,
+      );
 
   List<Recommendation> toRecommendations(AppLocalizations l10n) =>
       ClinicalCorrelationEngine.recommendationsFrom(this, l10n);
@@ -239,7 +247,11 @@ abstract final class ClinicalCorrelationEngine {
     );
   }
 
-  static List<Finding> findingsFrom(ClinicalCorrelationReport r, AppLocalizations l10n) {
+  static List<Finding> findingsFrom(
+    ClinicalCorrelationReport r,
+    AppLocalizations l10n, {
+    UnitSystem unitSystem = 'metric',
+  }) {
     final out = <Finding>[];
 
     if (r.bmi != null) {
@@ -274,10 +286,14 @@ abstract final class ClinicalCorrelationEngine {
 
     if (r.idealWeight != null && r.bmi != null) {
       final i = r.idealWeight!;
+      final w = formatWeight(i.midpointKg, unitSystem);
+      final unit = l10n.localizeUnitLabel(w.unit);
       out.add(Finding(
         category: l10n.clinicalCategoryHealthyWeight,
         status: 'info',
-        value: l10n.clinicalAroundKg(i.midpointKg.round()),
+        value: unitSystem == 'imperial'
+            ? '${w.value} $unit'
+            : l10n.clinicalAroundKg(i.midpointKg.round()),
         message: l10n.clinicalIdealWeightNote,
       ));
     }

@@ -12,6 +12,7 @@ import flutter_local_notifications
   ) -> Bool {
     // Must register BG tasks before launch returns (Apple requirement).
     MorningPushPrep.registerBackgroundTask()
+    EveningPushPrep.registerBackgroundTask()
     // Do NOT register plugins or set UNUserNotificationCenter.delegate here.
     // With FlutterImplicitEngine / UIScene, the engine may not be ready yet when
     // iOS delivers a cold-start notification tap — doing that too early can crash.
@@ -28,6 +29,9 @@ import flutter_local_notifications
       with: engineBridge.applicationRegistrar.messenger()
     )
     MorningPushPrep.register(
+      with: engineBridge.applicationRegistrar.messenger()
+    )
+    EveningPushPrep.register(
       with: engineBridge.applicationRegistrar.messenger()
     )
     if #available(iOS 10.0, *) {

@@ -65,8 +65,8 @@
   "signUp": "注册",
   "createAccount": "创建账户",
   "signUpForFree": "免费注册",
-  "alreadyHaveAccount": "已有账户？登录",
-  "dontHaveAccount": "没有账户？注册",
+  "alreadyHaveAccount": "已有账户？",
+  "dontHaveAccount": "没有账户？",
   "email": "邮箱",
   "password": "密码",
   "displayName": "显示名称",
@@ -79,6 +79,25 @@
   "acceptPrivacy": "我接受隐私政策",
   "pleaseAcceptLegal": "请阅读并接受用户协议和隐私政策以继续。",
   "passwordTooShort": "密码至少需要 8 个字符。",
+  "emailAlreadyRegistered": "该邮箱已被使用。请登录。",
+  "invalidEmailOrPassword": "邮箱或密码无效。请检查后重试。",
+  "authNetworkError": "无法连接服务器。请检查网络后重试。",
+  "authServerSyncFailed": "无法在服务器上注册此邮箱。请检查网络后重试。",
+  "authAccountNotOnServer": "此邮箱尚无云端备份。请先在原设备联网打开应用，然后再试。",
+  "authCodeSent": "我们已向你的邮箱发送 6 位验证码，10 分钟内有效。",
+  "authEnterCode": "验证码",
+  "authVerifyAndCreate": "确认并创建账户",
+  "authResendCode": "重新发送验证码",
+  "authInvalidCode": "验证码无效或已过期。",
+  "authResendTooSoon": "请稍后再请求新的验证码。",
+  "authEmailDeliveryFailed": "邮件发送失败，请稍后再试。",
+  "forgotPassword": "忘记密码？",
+  "forgotPasswordSend": "发送重置码",
+  "forgotPasswordTitle": "重置密码",
+  "forgotPasswordNew": "新密码",
+  "forgotPasswordConfirm": "保存新密码",
+  "forgotPasswordDone": "密码已更新。请用新密码登录。",
+  "authAccountNotFound": "未找到此邮箱的云端账户。",
   "featureTrackVitals": "追踪生命体征与血糖",
   "featureAiInsights": "AI 健康洞察",
   "featureSmartAnalysis": "智能分析",
@@ -252,7 +271,7 @@
       }
     }
   },
-  "stepsRangeSedentary": "0–{max} steps",
+  "stepsRangeSedentary": "0–{max} 步",
   "@stepsRangeSedentary": {
     "placeholders": {
       "max": {
@@ -260,7 +279,7 @@
       }
     }
   },
-  "stepsRangeBuilding": "{min}–{max} steps",
+  "stepsRangeBuilding": "{min}–{max} 步",
   "@stepsRangeBuilding": {
     "placeholders": {
       "min": {
@@ -271,7 +290,7 @@
       }
     }
   },
-  "stepsRangeBaseline": "{min}–{max} steps",
+  "stepsRangeBaseline": "{min}–{max} 步",
   "@stepsRangeBaseline": {
     "placeholders": {
       "min": {
@@ -282,7 +301,7 @@
       }
     }
   },
-  "stepsRangeStrong": "{min}–{max} steps",
+  "stepsRangeStrong": "{min}–{max} 步",
   "@stepsRangeStrong": {
     "placeholders": {
       "min": {
@@ -293,7 +312,7 @@
       }
     }
   },
-  "stepsRangeGoal": "{min}+ steps",
+  "stepsRangeGoal": "{min}+ 步",
   "@stepsRangeGoal": {
     "placeholders": {
       "min": {
@@ -303,12 +322,12 @@
   },
   "todaysNotifications": "今日通知",
   "morningNotificationTitle": "早上好 — 您的健康回顾",
-  "noNotificationsToday": "No notifications for today yet.",
-  "notificationsAppearHere": "Notifications that already arrived today appear here.",
+  "noNotificationsToday": "今天还没有通知。",
+  "notificationsAppearHere": "今天已送达的通知会显示在这里。",
   "phaPlusUnlockedTitle": "您已开通 PHA Plus+！",
   "phaPlusUnlockedBody": "所有功能已解锁。享受无限上传、PsychoTest 和治疗日程。",
-  "onboardingQuest2BuildAvatar": "Quest 2: Build your avatar",
-  "onboardingQuest2FillFields": "Fill all 3 fields — earn +{hp} HP on complete.",
+  "onboardingQuest2BuildAvatar": "任务 2：建立你的档案",
+  "onboardingQuest2FillFields": "请填写全部 3 项后继续。",
   "@onboardingQuest2FillFields": {
     "placeholders": {
       "hp": {
@@ -316,12 +335,12 @@
       }
     }
   },
-  "rewardedStats": "Rewarded stats",
+  "rewardedStats": "奖励统计",
   "yourGender": "您的性别",
   "male": "男",
   "female": "女",
   "unitYearsLong": "years",
-  "completeQuest2": "Complete Quest 2 (+{hp} HP)",
+  "completeQuest2": "完成任务 2",
   "@completeQuest2": {
     "placeholders": {
       "hp": {
@@ -329,10 +348,10 @@
       }
     }
   },
-  "backToQuest2": "Back to Quest 2",
-  "onboardingQuest3PowerUp": "Quest 3: Power-up (bonus)",
-  "onboardingQuest3BpDone": "You already logged BP and glucose today. Come back tomorrow for your next reading.",
-  "onboardingQuest3Optional": "Optional vitals — +{bpHp} HP for BP, +{glucoseHp} HP for glucose. Once per day.",
+  "backToQuest2": "返回任务 2",
+  "onboardingQuest3PowerUp": "任务 3：强化（奖励）",
+  "onboardingQuest3BpDone": "你今天已记录血压和血糖。明天再回来进行下一次测量。",
+  "onboardingQuest3Optional": "可选体征 — 记录血压和血糖（每天一次）。",
   "@onboardingQuest3Optional": {
     "placeholders": {
       "bpHp": {
@@ -343,8 +362,8 @@
       }
     }
   },
-  "onboardingAllQuestsComplete": "All quests complete!",
-  "onboardingEarnedHp": "You earned {hp} HP · Level {level} {title}",
+  "onboardingAllQuestsComplete": "全部任务完成！",
+  "onboardingEarnedHp": "等级 {level} · {title}",
   "@onboardingEarnedHp": {
     "placeholders": {
       "hp": {
@@ -358,23 +377,23 @@
       }
     }
   },
-  "onboardingBonusVitals": "Bonus vitals unlocked extra insights!",
-  "healthPower": "Health Power",
-  "onboardingCreateAccount": "Create account and become healthy →",
-  "onboardingEnterDashboard": "Enter dashboard →",
+  "onboardingBonusVitals": "奖励体征已解锁更多洞察！",
+  "healthPower": "健康能量",
+  "onboardingCreateAccount": "创建账户，开始健康之旅 →",
+  "onboardingEnterDashboard": "进入仪表盘 →",
   "badgeUnitPro": "Unit Pro",
-  "badgeFoundation": "Foundation",
+  "badgeFoundation": "基础",
   "badgeHeartTrack": "心率追踪",
-  "badgeSugarSense": "Sugar Sense",
+  "badgeSugarSense": "血糖感知",
   "badgeChampion": "Champion",
-  "levelHealthRookie": "Health Rookie",
-  "levelProfileBuilder": "Profile Builder",
-  "levelVitalsPro": "Vitals Pro",
+  "levelHealthRookie": "健康新手",
+  "levelProfileBuilder": "档案搭建者",
+  "levelVitalsPro": "体征达人",
   "picked": "PICKED",
   "saving": "Saving…",
-  "claimBonusFinish": "Claim bonus & finish 🏆",
-  "skipBonusQuest": "Skip bonus quest",
-  "calculatingRewards": "Calculating rewards…",
+  "claimBonusFinish": "保存并完成 🏆",
+  "skipBonusQuest": "跳过",
+  "calculatingRewards": "Saving…",
   "categoryBloodPressure": "血压",
   "categoryBloodGlucose": "血糖",
   "categoryWeight": "Weight",
@@ -386,7 +405,7 @@
   "categoryAlcohol": "饮酒",
   "categoryScreenTime": "屏幕时间",
   "categoryNutrition": "营养",
-  "categoryPsychoTest": "PsychoTest",
+  "categoryPsychoTest": "心理测试",
   "categoryActivity": "活动",
   "categoryHeartRate": "心率与心律",
   "categoryAge": "年龄",
@@ -430,7 +449,7 @@
   "bmiMsgOverweight": "您的体重略高于健康范围。建议温和每周减重，保持蛋白质摄入和每日步数。",
   "bmiMsgObeseI": "您的体重明显高于健康范围。这可能升高血压和血糖。改善饮食、多步行，并与医生制定计划会很有帮助。",
   "bmiMsgObeseII": "您的体重远高于健康范围。请咨询医生制定安全计划，保护心脏和代谢。",
-  "stepsLabel": "{count} steps",
+  "stepsLabel": "{count} 步",
   "@stepsLabel": {
     "placeholders": {
       "count": {
@@ -453,11 +472,11 @@
   "wellnessMsgNeedsAttention": "身心得分提示压力偏高。保护睡眠、减少晚咖啡因，本周多社交连接。",
   "wellnessMsgCritical": "压力负荷高。考虑重做 Wellness Check；若持续请咨询心理健康专业人士。",
   "smokingGood": "未报告吸烟 — 对心肺健康是最强保护因素之一。",
-  "smokingLessPack": "<1 pack/day",
-  "smokingOnePack": "~1 pack/day",
-  "smokingMorePack": ">1 pack/day",
-  "smokingActive": "Active smoker",
-  "smokingNonSmoker": "Non-smoker",
+  "smokingLessPack": "<1 包/天",
+  "smokingOnePack": "约 1 包/天",
+  "smokingMorePack": ">1 包/天",
+  "smokingActive": "当前吸烟",
+  "smokingNonSmoker": "不吸烟",
   "smokingWarning": "吸烟是健康指数的主要风险因素。设定戒烟日、去除诱因，并用 Plus+ → 坏习惯追踪进度。",
   "alcoholNone": "无",
   "alcoholGood": "未报告饮酒 — 有助于血压、睡眠和肝脏。",
@@ -478,7 +497,7 @@
   "screenConstant": "持续不断",
   "screenConstantTip": "高屏幕时间挤占运动和睡眠。设置应用限制，用步行替换一次刷手机。",
   "screenDefaultTip": "检查屏幕习惯 — 晚间小限制常能帮助身心得分。",
-  "nutritionRecentMeals": "{count} recent meals",
+  "nutritionRecentMeals": "最近 {count} 餐",
   "@nutritionRecentMeals": {
     "placeholders": {
       "count": {
@@ -489,7 +508,7 @@
   "nutritionWarning": "最近几餐需要关注。多吃蔬菜和蛋白质，少超加工零食；记录下一餐以获得反馈。",
   "nutritionGood": "最近餐食质量良好。保持这个模式 — 有助于血糖和体重。",
   "nutritionInfo": "最近餐食质量参差。每天改进一项（更多纤维或蛋白质，少含糖饮料）。",
-  "psychoLoad": "Load {total} · {label}",
+  "psychoLoad": "负荷 {total} · {label}",
   "@psychoLoad": {
     "placeholders": {
       "total": {
@@ -509,10 +528,10 @@
   "priorityHigh": "High",
   "priorityMedium": "Medium",
   "priorityLow": "Low",
-  "profileUpdatedSuccess": "Profile updated successfully!",
-  "termsOfService": "Terms of Service & Disclaimer",
-  "howWeHandleData": "How we handle your data",
-  "sameScoreHint": "Same score as on Home",
+  "profileUpdatedSuccess": "个人资料已成功更新！",
+  "termsOfService": "服务条款与免责声明",
+  "howWeHandleData": "我们如何处理你的数据",
+  "sameScoreHint": "与首页相同的分数",
   "eveningNotificationTitle": "晚间检查",
   "bpMsgLow": "血压低于通常成人范围（低血压）。保持水分，若头晕请咨询医生。",
   "bpMsgOptimal": "血压理想（<120/<80）。请继续保持健康生活方式。",
@@ -523,12 +542,12 @@
   "bpMsgGrade3": "血压非常高。请立即就医。",
   "bpMsgDiabetes": "血压非常高。请立即就医。",
   "uploadAnalysisTitle": "上传分析",
-  "uploadFileType": "File Type",
-  "uploadPdf": "PDF Document",
-  "uploadPhoto": "Photo / Image",
-  "uploadSelectFile": "Select File",
-  "uploadClickToSelect": "Click to select a file",
-  "uploadClickToChange": "{size} KB — click to change",
+  "uploadFileType": "文件类型",
+  "uploadPdf": "PDF 文档",
+  "uploadPhoto": "照片 / 图片",
+  "uploadSelectFile": "选择文件",
+  "uploadClickToSelect": "点击选择文件",
+  "uploadClickToChange": "{size} KB — 点击更换",
   "@uploadClickToChange": {
     "placeholders": {
       "size": {
@@ -536,15 +555,15 @@
       }
     }
   },
-  "uploadLimitReached": "Limit reached",
-  "uploadUpgradeMore": "Upgrade to upload more",
-  "uploadFile": "Upload File",
-  "uploadAnalyzing": "Analyzing...",
-  "uploadAnalyzingAiDoc": "Analyzing your file with Ai Doc…",
-  "uploadFailed": "Upload failed. Please try again.",
-  "uploadCouldNotRead": "Could not read the selected file. Please pick it again.",
-  "uploadLimitMessage": "Upload limit reached. Upgrade to PHA Plus+ for unlimited uploads.",
-  "uploadFreePlan": "Free plan: {count}/2 uploads used. Max 2 pages per file.",
+  "uploadLimitReached": "已达上限",
+  "uploadUpgradeMore": "升级以上传更多",
+  "uploadFile": "上传文件",
+  "uploadAnalyzing": "分析中…",
+  "uploadAnalyzingAiDoc": "正在用 Ai Doc 分析文件…",
+  "uploadFailed": "上传失败，请重试。",
+  "uploadCouldNotRead": "无法读取所选文件，请重新选择。",
+  "uploadLimitMessage": "已达上传上限。升级 PHA Plus+ 可无限上传。",
+  "uploadFreePlan": "免费方案：已用 {count}/2 次上传。每文件最多 2 页。",
   "@uploadFreePlan": {
     "placeholders": {
       "count": {
@@ -553,14 +572,14 @@
     }
   },
   "mealTakePhoto": "拍摄或上传餐食照片",
-  "mealAfterAnalysis": "After analysis, tap ✓ only if you ate this dish — it adds to today's calories.",
+  "mealAfterAnalysis": "分析后，仅在你确实吃了这道菜时点 ✓ — 会计入今日热量。",
   "mealCamera": "Camera",
   "mealGallery": "Gallery",
-  "mealAnalyze": "Analyze Meal",
-  "mealAnalyzing": "Analyzing…",
-  "mealFailed": "Analysis failed. Please try again.",
-  "mealFreeLimit": "Free limit reached (2 meals per 24h). Upgrade to PHA Plus+ for unlimited meal checks.",
-  "mealFreePlan": "Free plan: {count}/{limit} meals logged in the last 24 hours.",
+  "mealAnalyze": "分析餐食",
+  "mealAnalyzing": "分析中…",
+  "mealFailed": "分析失败，请重试。",
+  "mealFreeLimit": "已达免费上限（24 小时内 2 餐）。升级 PHA Plus+ 可无限检查。",
+  "mealFreePlan": "免费方案：过去 24 小时已记录 {count}/{limit} 餐。",
   "@mealFreePlan": {
     "placeholders": {
       "count": {
@@ -571,15 +590,15 @@
       }
     }
   },
-  "mealLogged": "Meal logged — counted in today's intake & Health Index.",
-  "mealTapConfirm": "Tap ✓ to confirm you ate this — adds to today's intake.",
+  "mealLogged": "餐食已记录 — 计入今日摄入与健康指数。",
+  "mealTapConfirm": "点 ✓ 确认你吃了这餐 — 计入今日摄入。",
   "mealDiscard": "Discard",
-  "mealTotalIntake": "Total Intake",
+  "mealTotalIntake": "总摄入",
   "mealCarb": "Carb",
   "mealProteins": "Proteins",
   "mealFat": "Fat",
-  "mealNoMealsToday": "No meals confirmed today yet.",
-  "mealNoMealsLogged": "No meals logged · target ~{target} kcal",
+  "mealNoMealsToday": "今天还没有确认的餐食。",
+  "mealNoMealsLogged": "暂无餐食 · 目标约 {target} 千卡",
   "@mealNoMealsLogged": {
     "placeholders": {
       "target": {
@@ -587,12 +606,12 @@
       }
     }
   },
-  "mealConfirmHint": "Confirm meals after analysis to track intake.",
+  "mealConfirmHint": "分析后确认餐食以记录摄入。",
   "aiDocTitle": "Ai Doc 助手",
-  "aiDocWelcome": "Hello! I'm your Ai Doc Assistant. Would you like us to use the data you provided during onboarding? After that, you can describe your problem in detail — or share a photo of a meal, lab result, or anything health-related.",
-  "aiDocOffline": "Ai Doc is offline — API key not set.",
-  "aiDocFreeLimit": "Free consultation limit reached.",
-  "aiDocFreeRemaining": "{remaining} of 3 free consultations remaining.",
+  "aiDocWelcome": "你好！我是 Ai Doc 助手。是否使用你在引导流程中提供的数据？之后可详细描述问题，或分享餐食、化验单等健康相关照片。",
+  "aiDocOffline": "Ai Doc 离线 — 未设置 API 密钥。",
+  "aiDocFreeLimit": "免费咨询次数已用完。",
+  "aiDocFreeRemaining": "剩余 {remaining}/3 次免费咨询。",
   "@aiDocFreeRemaining": {
     "placeholders": {
       "remaining": {
@@ -600,14 +619,19 @@
       }
     }
   },
-  "aiDocAnalyzingHealth": "Analyzing your health data…",
-  "aiDocLooking": "Looking at that…",
-  "aiDocAskPlaceholder": "Ask about symptoms, or add a photo note",
-  "aiDocUpgradeChat": "Upgrade to continue chatting…",
-  "aiDocNoProblem": "No problem! Whenever you're ready, describe your symptoms or health concerns in detail — or share a photo.",
+  "aiDocAnalyzingHealth": "正在分析你的健康数据…",
+  "aiDocLooking": "正在查看…",
+  "aiDocAskPlaceholder": "询问症状，或添加照片备注",
+  "aiDocUpgradeChat": "升级以继续对话…",
+  "aiDocNoProblem": "没问题！准备好时请详细描述症状或健康问题——也可分享照片。",
   "aiDocPhoto": "Photo",
-  "wellnessResults": "Wellness Results",
-  "wellnessQuestion": "Question {current} of {total}",
+  "aiDocHoldToSpeak": "按住说话",
+  "aiDocListening": "正在听…松开即可发送",
+  "aiDocSpeechUnavailable": "此设备不支持语音输入。",
+  "aiDocSpeechPermissionDenied": "语音消息需要麦克风或语音识别权限。",
+  "aiDocSpeechEmpty": "未检测到语音。请按住麦克风再试。",
+  "wellnessResults": "身心结果",
+  "wellnessQuestion": "第 {current} / {total} 题",
   "@wellnessQuestion": {
     "placeholders": {
       "current": {
@@ -618,7 +642,7 @@
       }
     }
   },
-  "percentComplete": "{percent}% complete",
+  "percentComplete": "已完成 {percent}%",
   "@percentComplete": {
     "placeholders": {
       "percent": {
@@ -626,16 +650,16 @@
       }
     }
   },
-  "questionUnavailable": "Question unavailable",
-  "wellnessVeryPoor": "Very poor",
+  "questionUnavailable": "题目不可用",
+  "wellnessVeryPoor": "很差",
   "wellnessPoor": "Poor",
   "wellnessModerate": "Moderate",
   "wellnessGood": "Good",
-  "wellnessExcellent": "Excellent",
-  "badHabitsSummaryTitle": "Bad Habits Summary",
-  "badHabitsSaved": "Saved to your health history. Honest tracking is the first step toward change.",
-  "badHabitsSocialMediaLabel": "Social media",
-  "badHabitsStep": "Step {step} of {total}",
+  "wellnessExcellent": "非常好",
+  "badHabitsSummaryTitle": "不良习惯摘要",
+  "badHabitsSaved": "已保存到健康历史。诚实记录是改变的第一步。",
+  "badHabitsSocialMediaLabel": "社交媒体",
+  "badHabitsStep": "第 {step} / {total} 步",
   "@badHabitsStep": {
     "placeholders": {
       "step": {
@@ -647,17 +671,17 @@
     }
   },
   "badHabitsDoYouSmoke": "您吸烟吗？",
-  "badHabitsHowMuchSmoke": "How much do you smoke?",
-  "badHabitsDoYouDrink": "Do you drink alcohol?",
-  "badHabitsHowMuchDrink": "How often and how much do you drink?",
-  "badHabitsSocialMedia": "How much time do you spend uselessly on social media?",
+  "badHabitsHowMuchSmoke": "你抽烟的量是多少？",
+  "badHabitsDoYouDrink": "你喝酒吗？",
+  "badHabitsHowMuchDrink": "你喝酒的频率和量是多少？",
+  "badHabitsSocialMedia": "你在社交媒体上无意义刷多久？",
   "treatmentYourSchedule": "您的日程",
-  "treatmentAddMedicine": "Add medicine or supplement",
-  "treatmentNewEntry": "New entry",
-  "treatmentMedicineName": "Name of medicine or dietary supplement",
-  "treatmentMedicinePlaceholder": "e.g. Vitamin D, Metformin",
-  "treatmentHowManyTimes": "How many times a day",
-  "treatmentDoseTime": "Dose {n} time",
+  "treatmentAddMedicine": "添加药品或补充剂",
+  "treatmentNewEntry": "新记录",
+  "treatmentMedicineName": "药品或膳食补充剂名称",
+  "treatmentMedicinePlaceholder": "例如：维生素 D、二甲双胍",
+  "treatmentHowManyTimes": "每天几次",
+  "treatmentDoseTime": "第 {n} 次用药时间",
   "@treatmentDoseTime": {
     "placeholders": {
       "n": {
@@ -665,28 +689,28 @@
       }
     }
   },
-  "treatmentAddAnother": "Add another",
+  "treatmentAddAnother": "再添加",
   "treatmentSaveSchedule": "保存日程",
-  "treatmentSaved": "Treatment schedule saved — pill reminders are on",
-  "treatmentEnterName": "Enter at least one medicine or supplement name.",
-  "treatmentSaveFailed": "Could not save. Please try again.",
-  "treatmentNotifOff": "Schedule saved, but notifications are off. Enable alerts in Settings to get pill reminders.",
-  "psychoTestSubtitle": "Stress & Psychosomatic Self-Assessment",
-  "psychoTestIntro": "This assessment contains 3 blocks with a total of 20 questions. Answer honestly — there are no right or wrong answers. Results are saved to your profile.",
+  "treatmentSaved": "治疗计划已保存 — 用药提醒已开启",
+  "treatmentEnterName": "请至少输入一种药品或补充剂名称。",
+  "treatmentSaveFailed": "无法保存，请重试。",
+  "treatmentNotifOff": "日程已保存，但通知已关闭。请在设置中开启以接收用药提醒。",
+  "psychoTestSubtitle": "压力与心身自评",
+  "psychoTestIntro": "本评估共 3 个板块、20 道题。请如实作答——没有对错。结果会保存到你的档案。",
   "psychoBlock1Title": "BLOCK 1",
-  "psychoBlock1Subtitle": "Stress Awareness",
+  "psychoBlock1Subtitle": "压力觉察",
   "psychoBlock2Title": "BLOCK 2",
-  "psychoBlock2Subtitle": "Physical Symptoms",
+  "psychoBlock2Subtitle": "身体症状",
   "psychoBlock3Title": "BLOCK 3",
-  "psychoBlock3Subtitle": "Behavioral Profile",
-  "psychoAnswerHint": "Each question has 3 answer options: Never · Sometimes · Often",
+  "psychoBlock3Subtitle": "行为画像",
+  "psychoAnswerHint": "每题 3 个选项：从不 · 有时 · 经常",
   "psychoStartAssessment": "开始评估",
-  "psychoYourResult": "YOUR RESULT",
+  "psychoYourResult": "你的结果",
   "psychoRetake": "Retake",
   "psychoNever": "Never",
-  "psychoSometimes": "Sometimes",
+  "psychoSometimes": "有时",
   "psychoOften": "Often",
-  "psychoQuestionsCount": "{count} questions",
+  "psychoQuestionsCount": "{count} 道题",
   "@psychoQuestionsCount": {
     "placeholders": {
       "count": {
@@ -694,8 +718,8 @@
       }
     }
   },
-  "onboardingBackToQuest2": "Back to Quest 3",
-  "onboardingBpGlucose": "BP / +{hp} HP",
+  "onboardingBackToQuest2": "返回任务 3",
+  "onboardingBpGlucose": "血压",
   "@onboardingBpGlucose": {
     "placeholders": {
       "hp": {
@@ -703,7 +727,7 @@
       }
     }
   },
-  "onboardingGlucoseHp": "Glucose / +{hp} HP",
+  "onboardingGlucoseHp": "血糖",
   "@onboardingGlucoseHp": {
     "placeholders": {
       "hp": {
@@ -713,7 +737,7 @@
   },
   "onboardingSys": "Sys",
   "onboardingDia": "Dia",
-  "onboardingReadyForPha": "{percent}% — ready for PHA",
+  "onboardingReadyForPha": "{percent}% — 已准备好使用 PHA",
   "@onboardingReadyForPha": {
     "placeholders": {
       "percent": {
@@ -721,7 +745,7 @@
       }
     }
   },
-  "onboardingRedeemHp": "Redeem your {hp} HP for {percent}% off your first 6-month or annual PHA Plus+ subscription.",
+  "onboardingRedeemHp": "首次购买 6 个月或年付 PHA Plus+ 可享 {percent}% 折扣。",
   "@onboardingRedeemHp": {
     "placeholders": {
       "hp": {
@@ -734,11 +758,11 @@
   },
   "activityCurrentPlanSubtitle": "您当前的身体活动计划",
   "activityCustomPlanHint": "计划已启用。完成每日锻炼并回答晚间打卡。",
-  "activityRestNote": "Rest no more than 2 minutes between sets.",
+  "activityRestNote": "组间休息不超过 2 分钟。",
   "dailyLabel": "Daily",
-  "fileTypePdf": "PDF up to 2 pages (free plan)",
-  "upgradeToPhaPlus": "Upgrade to PHA Plus+",
-  "healthAnalysisSubtitleShort": "Same score as Home Health Index",
+  "fileTypePdf": "PDF 最多 2 页（免费方案）",
+  "upgradeToPhaPlus": "升级到 PHA Plus+",
+  "healthAnalysisSubtitleShort": "与首页健康指数相同",
   "wellnessQ1": "您现在感到多大压力？",
   "wellnessQ2": "昨晚睡得怎么样？",
   "wellnessQ3": "今天的精力如何？",
@@ -797,7 +821,7 @@
   "loginHeroLine3": "追踪。",
   "loginHeroBody": "监测指标，获取 AI 洞察，掌控健康之旅。",
   "loginTrustedBy": "受到全球健康意识用户的信赖。",
-  "loginSignUpSubtitle": "今天开始追踪健康——永久免费。",
+  "loginSignUpSubtitle": "今天开始追踪健康。",
   "loginSignInSubtitle": "登录以访问健康面板。",
   "loginFullName": "全名",
   "loginNamePlaceholder": "张三",
@@ -830,6 +854,12 @@
   "vitalsPromptTurnOffHint": "跳过每日血压/血糖提示。",
   "vitalsPromptEvery5Days": "每 5 天询问一次",
   "vitalsPromptEvery5DaysHint": "每 5 天提醒，非每天。",
+  "vitalsPromptSectionTitle": "血压与血糖",
+  "vitalsPromptSectionSubtitle": "PHA 应多久询问一次血压和血糖？",
+  "vitalsPromptDaily": "每天一次",
+  "vitalsPromptDailyHint": "每天提醒，直到你记录今日数值。",
+  "vitalsPromptNever": "不询问",
+  "vitalsPromptNeverHint": "不自动提示血压或血糖。",
   "vitalsBpLabel": "血压 (mmHg)",
   "vitalsGlucoseLabel": "血糖 ({unit})",
   "@vitalsGlucoseLabel": {
@@ -866,12 +896,17 @@
   "logMetricHintWeightMetric": "例如 72.5",
   "logMetricHintWater": "例如 2000",
   "upgradeTrialTitle": "解锁 PHA Plus+ 全部功能",
+  "purchaseErrorInvalidCredentials": "购买设置错误：账单凭证无效。请在 RevenueCat → Project settings → API keys 复制 Apple public SDK key（appl_…）到 dart_define.json 的 REVENUECAT_IOS_API_KEY，并确认已关联 App Store Connect。",
+  "purchaseErrorNetwork": "连接 App Store 时网络错误。请检查网络后重试。",
+  "purchaseErrorStore": "App Store 无法完成购买。请稍后再试。",
+  "purchaseErrorNoOfferings": "订阅方案暂不可用。请检查 RevenueCat offerings 与 App Store Connect 产品。",
+  "purchaseErrorNoPackage": "该方案当前在商店中不可用。请换一个或稍后再试。",
   "upgradeTrialBody1": "全面掌控健康！解锁 PHA Plus+ 所有高级功能。",
   "upgradeTrialBody2": "了解潜在风险并调整生活方式。无限计算卡路里并获得个性化建议。",
   "upgradeTagline": "您的健康。您的掌控。始终如此。",
   "upgradeTitle": "解锁全部功能",
   "upgradeSubtitle": "释放个人健康助手的全部能力",
-  "upgradeHpBanner": "您有 {hp} HP！可兑换 {percent}% 折扣。",
+  "upgradeHpBanner": "半年和年付方案享 {percent}% 折扣。",
   "@upgradeHpBanner": {
     "placeholders": {
       "hp": {
@@ -905,7 +940,7 @@
   "planBilledMonthly": "按月计费。",
   "planSemiannual": "6 个月",
   "planAnnual": "年付",
-  "planHpDiscountNote": "已应用 20% HP 折扣。",
+  "planHpDiscountNote": "已应用 20% 折扣。",
   "planSave17": "节省约 17%。",
   "planSave42": "节省约 42%。",
   "planPerMonth": "/月",
@@ -913,6 +948,11 @@
   "planPerYear": "/年",
   "planBestBadge": "最佳",
   "psychoTestPromoBody": "深度自评压力水平、心身模式及心理健康指标。",
+  "promoCodeLabel": "优惠码",
+  "promoCodeHint": "输入优惠码",
+  "promoCodeApply": "应用",
+  "promoCodeInvalid": "优惠码无效。",
+  "promoCodeAlreadyUsed": "此优惠码已在此个人资料中使用过。",
   "psychoQuestionOfBlock": "第 {current}/{total} 题",
   "@psychoQuestionOfBlock": {
     "placeholders": {
@@ -940,6 +980,12 @@
   "aiDocNoOnboardingData": "尚未找到您的 onboarding 数据。请先完成 onboarding。",
   "activityYourProgramFallback": "您的计划",
   "trialSevenDayFree": "7 天免费试用",
+  "trialNotifChannelName": "试用提醒",
+  "trialNotifChannelDesc": "免费试用结束前提醒",
+  "trialNotifThreeDaysTitle": "试用还有 3 天结束",
+  "trialNotifThreeDaysBody": "您的 7 天免费试用将在 3 天后结束。订阅 PHA Plus+ 以保留全部功能。",
+  "trialNotifTwentyFourHoursTitle": "试用还有 24 小时结束",
+  "trialNotifTwentyFourHoursBody": "免费试用不足一天。立即订阅以保留 PHA 的完整访问权限。",
   "uploadImageFormats": "JPG、PNG、GIF",
   "mealSaveFailed": "无法保存：{error}",
   "@mealSaveFailed": {
@@ -1398,6 +1444,17 @@
 
   "actionHeartRate": "心率与心律",
   "actionHeartRateDesc": "智能手表心脏检查",
+  "actionEcg": "心电图",
+  "actionEcgDesc": "从 Apple Watch 及兼容电极传感器读取心电图",
+  "hrEcgEmpty": "未找到电极心电图。请在 Apple Watch（Series 4+）录制心电图，然后点“从传感器读取”。",
+  "hrEcgConnectSensors": "允许心电图传感器访问",
+  "hrEcgReadSensors": "从传感器读取心电图",
+  "hrEcgNeedPermissionTitle": "需要心电图传感器权限",
+  "hrEcgNeedPermissionBody": "PHA 读取 Apple Watch 电极写入 Apple 健康 的心电图。请在健康权限中开启心电图。",
+  "hrEcgSensorHow": "心电图由 Apple Watch 电极（数码表冠 + 背晶）采集。PHA 读取 HealthKit 记录，不能替代临床心电图。",
+  "hrEcgSensorAndroid": "此 Android 版本尚不支持通过 Health Connect 读取电极心电图。请在 iPhone 上使用 Apple Watch Series 4+。",
+  "hrEcgLatestFromSensor": "最新电极读数",
+  "hrEcgSensorMeta": "{source} · {samples} 个采样 · {hz} Hz",
   "unitBpm": "次/分",
   "unitMs": "毫秒",
   "hrEvents": "次事件",
@@ -1439,12 +1496,32 @@
   "hrNoChartData": "该时段无图表数据",
   "hrWhatItMeans": "这意味着什么",
   "hrWhatItMeansBody": "静息心率与心率变异性反映压力、恢复和体能。突然升高或连续多日偏高需要关注。",
-  "hrEcgTitle": "近期心电图（Apple Watch）",
+  "hrEcgTitle": "电极心电图记录",
   "hrEcgSinusRhythm": "窦性心律",
   "hrEcgAtrialFibrillation": "心房颤动",
   "hrEcgLowOrHighHr": "心率过低或过高",
   "hrEcgInconclusive": "无法判定",
   "hrEcgNotSet": "未分类",
+  "hrEcgSinusTachycardia": "窦性心动过速",
+  "hrEcgSinusBradycardia": "窦性心动过缓",
+  "hrEcgVentricularTachycardia": "室性心动过速",
+  "hrEcgVentricularFibrillation": "心室颤动",
+  "hrEcgAvBlock1": "一度房室传导阻滞",
+  "hrEcgAvBlock2MobitzI": "二度房室传导阻滞（莫氏I型）",
+  "hrEcgAvBlock3": "三度房室传导阻滞",
+  "hrEcgReferenceTitle": "心电图节律速览",
+  "hrEcgReferenceSubtitle": "教学要点 — 仅供参考，不是诊断。",
+  "hrEcgFeatNormalSinus": "心率 60–100 · 整齐 · 每个 P 在 QRS 前 · PR 0.12–0.20 秒 · QRS < 0.12 秒",
+  "hrEcgFeatSinusTachy": "心率 > 100 · 整齐 · 每个 P 在 QRS 前 · PR 0.12–0.20 秒 · QRS < 0.12 秒",
+  "hrEcgFeatSinusBrady": "心率 < 60 · 整齐 · 每个 P 在 QRS 前 · PR 0.12–0.20 秒 · QRS < 0.12 秒",
+  "hrEcgFeatAfib": "心率常 100–250 · 不齐 · 无 P 波 · QRS 通常 ≤ 0.12 秒",
+  "hrEcgFeatVt": "心率 100–250 · 整齐 · 宽 QRS（≥ 0.12 秒） · 通常无 P 波",
+  "hrEcgFeatVf": "基线紊乱 · 无明确 QRS · 无 P 波 — 急症教学型",
+  "hrEcgFeatAv1": "PR > 0.20 秒 · 每个 P 后有 QRS · QRS < 0.12 秒",
+  "hrEcgFeatAv2": "PR 逐渐延长 · QRS 脱落 · 周期性",
+  "hrEcgFeatAv3": "P 与 QRS 无关 · 房室各自频率 · 逸搏心律",
+  "hrEcgFeatInconclusive": "Apple Watch 未能可靠分类该记录。",
+  "hrEcgFeatUnknown": "暂无分类。",
   "hrIrregularRhythm": "不规则心律提醒",
   "hrTrendImproving": "改善",
   "hrTrendWorsening": "变差",
@@ -1454,15 +1531,37 @@
   "hrExplainHighResting": "静息心率为 {bpm} 次/分 — 高于通常上限 {max}。压力、疾病、咖啡因或恢复不足可能升高。",
   "hrExplainLowResting": "静息心率为 {bpm} 次/分 — 低于通常下限 {min}。运动员常较低；如头晕乏力请就医。",
   "hrExplainLowHrv": "心率变异性偏低，可能表示压力较大或恢复不足 — 请优先睡眠与休息。",
-  "hrExplainElevatedStreak": "静息心率连续多日处于 80–95 次/分。请留意压力、过度训练或早期疾病。",
+  "hrExplainElevatedStreak": "静息心率连续多日处于 ≥105 次/分。请留意压力、过度训练或早期疾病。",
   "hrExplainSpike": "静息心率较前一日明显升高。请留意身体感觉并明日复查。",
   "hrExplainIrregular": "Apple Watch 报告了不规则心律。这不是诊断 — 若提醒持续或身体不适，请咨询医生。",
   "hrAlertRiskTitle": "心率警报",
   "hrAlertAttentionTitle": "静息心率偏高",
-  "hrAlertGenericBody": "静息心率稳定在 80–95 次/分，或逐日上升。请打开「心率与心律」查看详情。",
-  "hrRestingChartTitle": "静息心率",
+  "hrAlertGenericBody": "静息心率稳定在 ≥105 次/分，或逐日上升。请打开「心率与心律」查看详情。",
+  "hrRestingChartTitle": "心率",
   "hrAvgResting": "平均 {bpm} 次/分",
-  "hrZoneNormal": "绿色 — {low}–{high} 次/分（正常）",
+
+  "historyGlucoseAvg": "平均 {value} {unit}",
+  "@historyGlucoseAvg": {
+    "placeholders": {
+      "value": {"type": "String"},
+      "unit": {"type": "String"}
+    }
+  },
+  "historyBpAvg": "平均 {sys}/{dia} mmHg",
+  "@historyBpAvg": {
+    "placeholders": {
+      "sys": {"type": "int"},
+      "dia": {"type": "int"}
+    }
+  },
+  "historyGlucoseZoneNormalImperial": "空腹正常 ≤99 mg/dL",
+  "historyGlucoseZoneNormalMetric": "空腹正常 ≤5.5 mmol/L",
+  "historyGlucoseZoneAttention": "高于正常或糖尿病前期",
+  "historyGlucoseZoneHigh": "偏高 / 糖尿病范围",
+  "historyBpZoneNormal": "收缩压 ≤120 mmHg",
+  "historyBpZoneElevated": "偏高 121–139 mmHg",
+  "historyBpZoneHigh": "高血压 ≥140 mmHg",
+  "hrZoneNormal": "绿色 — 静息 {low}–{high} 次/分（正常）",
   "hrZoneAttention": "黄色 — 轻度偏离",
   "hrZoneRisk": "红色 — 显著偏离 / 风险"
 }

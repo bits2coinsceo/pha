@@ -24,6 +24,10 @@
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>$(PRODUCT_COPYRIGHT)</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>PHA uses the microphone so you can dictate messages to Ai Doc instead of typing.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>PHA converts your spoken words into text for Ai Doc consultations.</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>

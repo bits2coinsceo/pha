@@ -231,15 +231,14 @@ class HealthIndexService {
       lifestyle['psychotest'] = PsychoGuidelines.indexContribution(total);
     }
 
-    // Heart rate: fitness only with activity; otherwise elevated = stress.
+    // Heart rate: resting band only (not exercise). With activity → fitness;
+    // without activity, elevated resting pulse is treated as stress.
     final restingHr = latest['resting_heart_rate'];
     final hrv = latest['hrv_sdnn'];
-    final avgHr = latest['heart_rate_avg'];
     final irregular = (latest['irregular_rhythm'] ?? 0) > 0;
     final heartScore = HeartRateGuidelines.indexContribution(
       restingBpm: restingHr,
       hrvMs: hrv,
-      avgBpm: avgHr,
       irregularRhythm: irregular,
       age: age,
     );

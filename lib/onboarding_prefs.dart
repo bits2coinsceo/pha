@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import 'db.dart';
@@ -36,13 +37,17 @@ class OnboardingDraftData {
 }
 
 /// Onboarding data collected before sign-up. Persisted to SQLite incrementally
-/// (on every quest/page change) so an interrupted onboarding is never repeated,
-/// then applied to the profile + health metrics once the user registers.
+/// (on every quest/page change) and mirrored to SharedPreferences so an
+/// interrupted / completed onboarding survives app kill. Applied to the profile
+/// + health metrics once the user registers, then synced to the server by email.
 class OnboardingPrefs {
   // There is only one pre-signup user on a device, so the draft is a singleton.
   static const _id = 'pending';
+  static const _deviceDoneKey = 'pha_pre_onboarding_done';
+  static const _draftBackupKey = 'pha_onboarding_draft_backup';
 
   static Future<Map<String, Object?>?> _row() async {
+    if (!Db.instance.isReady) return null;
     final rows = await Db.instance.raw
         .query('onboarding_drafts', where: 'id = ?', whereArgs: [_id]);
     return rows.isEmpty ? null : rows.first;
@@ -69,15 +74,80 @@ class OnboardingPrefs {
         whereArgs: [_id],
       );
     }
+    await _mirrorDraftToPrefs();
+  }
+
+  /// Durable device flag — survives draft clear after signup apply.
+  static Future<void> markDevicePreOnboardingDone() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_deviceDoneKey, true);
+  }
+
+  static Future<bool> isDevicePreOnboardingDone() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_deviceDoneKey) ?? false;
+  }
+
+  static Future<void> _mirrorDraftToPrefs() async {
+    final r = await _row();
+    if (r == null) return;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      _draftBackupKey,
+      jsonEncode({
+        'unit_system': r['unit_system'],
+        'age': r['age'],
+        'height': r['height'],
+        'weight': r['weight'],
+        'gender': r['gender'],
+        'metrics_json': r['metrics_json'],
+        'step': r['step'],
+        'completed': r['completed'],
+        'health_points': r['health_points'],
+        'updated_at': r['updated_at'],
+      }),
+    );
+    if ((r['completed'] as int?) == 1) {
+      await prefs.setBool(_deviceDoneKey, true);
+    }
+  }
+
+  static Future<void> _restoreDraftFromPrefsIfNeeded() async {
+    if (await _row() != null) return;
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_draftBackupKey);
+    if (raw == null || raw.isEmpty || !Db.instance.isReady) return;
+    try {
+      final map = jsonDecode(raw) as Map<String, dynamic>;
+      await Db.instance.raw.insert('onboarding_drafts', {
+        'id': _id,
+        'unit_system': map['unit_system'] as String? ?? 'metric',
+        'age': map['age'],
+        'height': map['height'],
+        'weight': map['weight'],
+        'gender': map['gender'],
+        'metrics_json': map['metrics_json'],
+        'step': (map['step'] as num?)?.toInt() ?? 1,
+        'completed': (map['completed'] as num?)?.toInt() ?? 0,
+        'health_points': (map['health_points'] as num?)?.toInt() ?? 0,
+        'updated_at':
+            map['updated_at'] as String? ?? DateTime.now().toUtc().toIso8601String(),
+      });
+    } catch (_) {
+      // Corrupt backup — ignore and let onboarding restart if needed.
+    }
   }
 
   static Future<bool> isComplete() async {
+    await _restoreDraftFromPrefsIfNeeded();
+    if (await isDevicePreOnboardingDone()) return true;
     final r = await _row();
     return r != null && (r['completed'] as int) == 1;
   }
 
   /// Loads the current draft (completed or in-progress) for restoring the UI.
   static Future<OnboardingDraftData?> load() async {
+    await _restoreDraftFromPrefsIfNeeded();
     final r = await _row();
     if (r == null) return null;
     final metricsJson = r['metrics_json'] as String?;
@@ -156,17 +226,22 @@ class OnboardingPrefs {
     required String unitSystem,
     Map<String, double> extraMetrics = const {},
     required int healthPoints,
-  }) =>
-      _upsert({
-        'unit_system': unitSystem,
-        'metrics_json': jsonEncode(extraMetrics),
-        'step': 4,
-        'completed': 1,
-        'health_points': healthPoints.clamp(0, maxOnboardingHp),
-      });
+  }) async {
+    await _upsert({
+      'unit_system': unitSystem,
+      'metrics_json': jsonEncode(extraMetrics),
+      'step': 4,
+      'completed': 1,
+      'health_points': healthPoints.clamp(0, maxOnboardingHp),
+    });
+    await markDevicePreOnboardingDone();
+  }
 
-  /// Copies onboarding draft basics onto a freshly registered user, then clears the draft.
+  /// Copies onboarding draft basics onto a freshly registered user.
+  /// Keeps a SharedPreferences completion flag so cold start does not restart
+  /// the pre-signup flow after the SQLite draft is cleared.
   static Future<void> applyToUser(String userId) async {
+    await _restoreDraftFromPrefsIfNeeded();
     final r = await _row();
     if (r == null) return;
     final completed = (r['completed'] as int) == 1;
@@ -179,6 +254,7 @@ class OnboardingPrefs {
     }
 
     final unit = r['unit_system'] as String? ?? 'metric';
+    final now = DateTime.now().toUtc().toIso8601String();
 
     await Db.instance.raw.update(
       'profiles',
@@ -190,12 +266,12 @@ class OnboardingPrefs {
         if (gender != null) 'gender': gender,
         if (completed) 'onboarding_completed': 1,
         'health_points': ((r['health_points'] as int?) ?? 0).clamp(0, maxOnboardingHp),
+        'updated_at': now,
       },
       where: 'id = ?',
       whereArgs: [userId],
     );
 
-    final now = DateTime.now().toUtc().toIso8601String();
     final metrics = <MapEntry<String, double>>[
       if (weight != null) MapEntry('weight', weight),
     ];
@@ -226,13 +302,21 @@ class OnboardingPrefs {
 
     if (completed) {
       await HealthIndexService.recalculate(userId);
-      await clear();
+      await markDevicePreOnboardingDone();
+      // Clear SQLite draft only — SharedPreferences backup + device-done flag remain.
+      await Db.instance.raw
+          .delete('onboarding_drafts', where: 'id = ?', whereArgs: [_id]);
     }
   }
 
   /// For tests / full reset.
   static Future<void> clear() async {
-    await Db.instance.raw
-        .delete('onboarding_drafts', where: 'id = ?', whereArgs: [_id]);
+    if (Db.instance.isReady) {
+      await Db.instance.raw
+          .delete('onboarding_drafts', where: 'id = ?', whereArgs: [_id]);
+    }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_draftBackupKey);
+    await prefs.remove(_deviceDoneKey);
   }
 }

@@ -29,6 +29,7 @@ class Dashboard extends StatefulWidget {
   final VoidCallback onOpenBadHabits;
   final VoidCallback onOpenPhysicalActivity;
   final VoidCallback onOpenHeartRate;
+  final VoidCallback onOpenEcg;
   final VoidCallback onOpenLogMetric;
   final VoidCallback onOpenPsychoTest;
   final VoidCallback onOpenTreatmentSchedule;
@@ -46,6 +47,7 @@ class Dashboard extends StatefulWidget {
     required this.onOpenBadHabits,
     required this.onOpenPhysicalActivity,
     required this.onOpenHeartRate,
+    required this.onOpenEcg,
     required this.onOpenLogMetric,
     required this.onOpenPsychoTest,
     required this.onOpenTreatmentSchedule,
@@ -355,6 +357,15 @@ class _DashboardState extends State<Dashboard> {
         onTap: widget.onOpenHeartRate,
       ),
       QuickAction(
+        title: l10n.actionEcg,
+        description: l10n.actionEcgDesc,
+        icon: Icons.monitor_heart_outlined,
+        color: C.purple600,
+        bgColor: C.purple100,
+        locked: !isPlus,
+        onTap: widget.onOpenEcg,
+      ),
+      QuickAction(
         title: l10n.actionMealCalories,
         description: l10n.actionMealCaloriesDesc,
         icon: Icons.restaurant_outlined,
@@ -402,11 +413,15 @@ class _DashboardState extends State<Dashboard> {
       ChartData(l10n.age, age != null ? '$age' : '—', l10n.unitYears, C.orange500, const []),
       ChartData(l10n.height, heightFmt.value, l10n.localizeUnitLabel(heightFmt.unit), C.sky500, const []),
       ChartData(l10n.weight, weightFmt.value, l10n.localizeUnitLabel(weightFmt.unit), C.blue500,
-          weight != null ? [weight!.toDouble()] : const []),
+          weight != null
+              ? [toDisplayValue('weight', weight!.toDouble(), unit)]
+              : const []),
       ChartData(l10n.bloodPressure, bpValue, l10n.unitMmhg, C.green500,
           systolic != null && diastolic != null ? [systolic!.toDouble()] : const []),
       ChartData(l10n.bloodGlucose, glucoseFmt.value, l10n.localizeUnitLabel(glucoseFmt.unit), C.red500,
-          glucose != null ? [glucose!.toDouble()] : const []),
+          glucose != null
+              ? [toDisplayValue('glucose', glucose!.toDouble(), unit)]
+              : const []),
       ChartData(l10n.steps, fmtThousands(steps), l10n.unitSteps, C.teal500, stepHistory),
     ];
 

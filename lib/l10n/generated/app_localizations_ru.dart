@@ -205,10 +205,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get signUpForFree => 'Зарегистрироваться бесплатно';
 
   @override
-  String get alreadyHaveAccount => 'Уже есть аккаунт? Войти';
+  String get alreadyHaveAccount => 'Уже есть аккаунт?';
 
   @override
-  String get dontHaveAccount => 'Нет аккаунта? Зарегистрироваться';
+  String get dontHaveAccount => 'Нет аккаунта?';
 
   @override
   String get email => 'Email';
@@ -246,6 +246,71 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get passwordTooShort => 'Пароль должен быть не короче 8 символов.';
+
+  @override
+  String get emailAlreadyRegistered =>
+      'Эта почта уже используется. Войдите в аккаунт.';
+
+  @override
+  String get invalidEmailOrPassword =>
+      'Неверный email или пароль. Проверьте данные и попробуйте снова.';
+
+  @override
+  String get authNetworkError =>
+      'Нет связи с сервером. Проверьте интернет и попробуйте снова.';
+
+  @override
+  String get authServerSyncFailed =>
+      'Не удалось зарегистрировать почту на сервере. Проверьте интернет и попробуйте снова.';
+
+  @override
+  String get authAccountNotOnServer =>
+      'Облачного бэкапа для этой почты ещё нет. Откройте приложение на исходном устройстве с интернетом, затем попробуйте снова.';
+
+  @override
+  String get authCodeSent =>
+      'Мы отправили 6-значный код на почту. Он действует 10 минут.';
+
+  @override
+  String get authEnterCode => 'Код подтверждения';
+
+  @override
+  String get authVerifyAndCreate => 'Подтвердить и создать аккаунт';
+
+  @override
+  String get authResendCode => 'Отправить код ещё раз';
+
+  @override
+  String get authInvalidCode => 'Неверный или просроченный код.';
+
+  @override
+  String get authResendTooSoon =>
+      'Подождите немного перед повторной отправкой кода.';
+
+  @override
+  String get authEmailDeliveryFailed =>
+      'Не удалось отправить письмо. Попробуйте позже.';
+
+  @override
+  String get forgotPassword => 'Забыли пароль?';
+
+  @override
+  String get forgotPasswordSend => 'Отправить код сброса';
+
+  @override
+  String get forgotPasswordTitle => 'Сброс пароля';
+
+  @override
+  String get forgotPasswordNew => 'Новый пароль';
+
+  @override
+  String get forgotPasswordConfirm => 'Сохранить новый пароль';
+
+  @override
+  String get forgotPasswordDone => 'Пароль обновлён. Войдите с новым паролем.';
+
+  @override
+  String get authAccountNotFound => 'Облачный аккаунт с этой почтой не найден.';
 
   @override
   String get featureTrackVitals => 'Показатели и глюкоза';
@@ -751,7 +816,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String onboardingQuest2FillFields(int hp) {
-    return 'Заполните все 3 поля — получите +$hp HP за завершение.';
+    return 'Заполните все 3 поля, чтобы продолжить.';
   }
 
   @override
@@ -771,7 +836,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String completeQuest2(int hp) {
-    return 'Завершить квест 2 (+$hp HP)';
+    return 'Завершить квест 2';
   }
 
   @override
@@ -786,7 +851,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String onboardingQuest3Optional(int bpHp, int glucoseHp) {
-    return 'Дополнительные показатели — +$bpHp HP за АД, +$glucoseHp HP за глюкозу. Раз в день.';
+    return 'Дополнительные показатели — давление и глюкоза (раз в день).';
   }
 
   @override
@@ -794,7 +859,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String onboardingEarnedHp(int hp, int level, String title) {
-    return 'Вы заработали $hp HP · Уровень $level $title';
+    return 'Уровень $level · $title';
   }
 
   @override
@@ -826,7 +891,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get badgeChampion => 'Champion';
 
   @override
-  String get levelHealthRookie => 'Health Rookie';
+  String get levelHealthRookie => 'Новичок здоровья';
 
   @override
   String get levelProfileBuilder => 'Создатель профиля';
@@ -841,13 +906,13 @@ class AppLocalizationsRu extends AppLocalizations {
   String get saving => 'Сохранение…';
 
   @override
-  String get claimBonusFinish => 'Получить бонус и завершить 🏆';
+  String get claimBonusFinish => 'Сохранить и завершить 🏆';
 
   @override
-  String get skipBonusQuest => 'Пропустить бонусный квест';
+  String get skipBonusQuest => 'Пропустить';
 
   @override
-  String get calculatingRewards => 'Подсчёт наград…';
+  String get calculatingRewards => 'Сохранение…';
 
   @override
   String get categoryBloodPressure => 'Артериальное давление';
@@ -1350,6 +1415,24 @@ class AppLocalizationsRu extends AppLocalizations {
   String get aiDocPhoto => 'Фото';
 
   @override
+  String get aiDocHoldToSpeak => 'Удерживайте, чтобы говорить';
+
+  @override
+  String get aiDocListening => 'Слушаю… отпустите, чтобы отправить';
+
+  @override
+  String get aiDocSpeechUnavailable =>
+      'Голосовой ввод недоступен на этом устройстве.';
+
+  @override
+  String get aiDocSpeechPermissionDenied =>
+      'Для голосовых сообщений нужен доступ к микрофону и распознаванию речи.';
+
+  @override
+  String get aiDocSpeechEmpty =>
+      'Речь не распознана. Удерживайте микрофон и попробуйте снова.';
+
+  @override
   String get wellnessResults => 'Результаты самочувствия';
 
   @override
@@ -1512,12 +1595,12 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String onboardingBpGlucose(int hp) {
-    return 'АД / +$hp HP';
+    return 'Артериальное давление';
   }
 
   @override
   String onboardingGlucoseHp(int hp) {
-    return 'Глюкоза / +$hp HP';
+    return 'Глюкоза';
   }
 
   @override
@@ -1533,7 +1616,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String onboardingRedeemHp(int hp, int percent) {
-    return 'Обменяйте $hp HP на скидку $percent% на первую 6-месячную или годовую подписку PHA Plus+.';
+    return 'Скидка $percent% на первую 6-месячную или годовую подписку PHA Plus+.';
   }
 
   @override
@@ -1706,8 +1789,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'Нам доверяют заботящиеся о здоровье по всему миру.';
 
   @override
-  String get loginSignUpSubtitle =>
-      'Начните отслеживать здоровье сегодня — бесплатно навсегда.';
+  String get loginSignUpSubtitle => 'Начните отслеживать здоровье сегодня.';
 
   @override
   String get loginSignInSubtitle => 'Войдите, чтобы открыть панель здоровья.';
@@ -1813,6 +1895,27 @@ class AppLocalizationsRu extends AppLocalizations {
       'Напоминать каждые 5 дней, не ежедневно.';
 
   @override
+  String get vitalsPromptSectionTitle => 'Давление и сахар';
+
+  @override
+  String get vitalsPromptSectionSubtitle =>
+      'Как часто PHA будет просить ввести давление и глюкозу?';
+
+  @override
+  String get vitalsPromptDaily => 'Раз в день';
+
+  @override
+  String get vitalsPromptDailyHint =>
+      'Напоминать каждый день, пока не внесете значения.';
+
+  @override
+  String get vitalsPromptNever => 'Не спрашивать';
+
+  @override
+  String get vitalsPromptNeverHint =>
+      'Без автоматических запросов АД и глюкозы.';
+
+  @override
   String get vitalsBpLabel => 'Артериальное давление (мм рт. ст.)';
 
   @override
@@ -1884,6 +1987,26 @@ class AppLocalizationsRu extends AppLocalizations {
   String get upgradeTrialTitle => 'Разблокируйте все функции PHA Plus+';
 
   @override
+  String get purchaseErrorInvalidCredentials =>
+      'Ошибка оплаты: неверные ключи биллинга. В RevenueCat → Project settings → API keys скопируйте Apple public SDK key (appl_…) в dart_define.json как REVENUECAT_IOS_API_KEY и проверьте связь с App Store Connect.';
+
+  @override
+  String get purchaseErrorNetwork =>
+      'Нет связи с App Store. Проверьте интернет и попробуйте снова.';
+
+  @override
+  String get purchaseErrorStore =>
+      'App Store не смог завершить покупку. Попробуйте позже.';
+
+  @override
+  String get purchaseErrorNoOfferings =>
+      'Тарифы пока недоступны. Проверьте offerings в RevenueCat и продукты в App Store Connect.';
+
+  @override
+  String get purchaseErrorNoPackage =>
+      'Этот план сейчас недоступен в магазине. Выберите другой или попробуйте позже.';
+
+  @override
   String get upgradeTrialBody1 =>
       'Полный контроль над здоровьем! Разблокируйте все премиум-функции PHA Plus+ и отслеживайте здоровье, активность, питание и медицинские показатели в реальном времени.';
 
@@ -1903,7 +2026,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String upgradeHpBanner(int hp, int percent) {
-    return 'У вас $hp HP! Обменяйте на скидку $percent% на 6-месячный или годовой план.';
+    return 'Скидка $percent% на 6-месячный и годовой планы.';
   }
 
   @override
@@ -1976,7 +2099,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get planAnnual => 'Годовой';
 
   @override
-  String get planHpDiscountNote => 'Скидка 20% HP применена.';
+  String get planHpDiscountNote => 'Скидка 20% применена.';
 
   @override
   String get planSave17 => 'Экономия ~17%.';
@@ -1999,6 +2122,22 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get psychoTestPromoBody =>
       'Углублённая самооценка уровня стресса, психосоматических паттернов и показателей ментального здоровья.';
+
+  @override
+  String get promoCodeLabel => 'Промокод';
+
+  @override
+  String get promoCodeHint => 'Введите промокод';
+
+  @override
+  String get promoCodeApply => 'Применить';
+
+  @override
+  String get promoCodeInvalid => 'Неверный промокод.';
+
+  @override
+  String get promoCodeAlreadyUsed =>
+      'Этот промокод уже использован для данного профиля.';
 
   @override
   String psychoQuestionOfBlock(int current, int total) {
@@ -2039,6 +2178,28 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get trialSevenDayFree => '7 дней бесплатно';
+
+  @override
+  String get trialNotifChannelName => 'Напоминания о триале';
+
+  @override
+  String get trialNotifChannelDesc =>
+      'Уведомления до окончания бесплатного периода';
+
+  @override
+  String get trialNotifThreeDaysTitle => 'Триал заканчивается через 3 дня';
+
+  @override
+  String get trialNotifThreeDaysBody =>
+      'Бесплатный период 7 дней закончится через 3 дня. Оформите PHA Plus+, чтобы сохранить все функции.';
+
+  @override
+  String get trialNotifTwentyFourHoursTitle =>
+      'Триал заканчивается через 24 часа';
+
+  @override
+  String get trialNotifTwentyFourHoursBody =>
+      'До конца бесплатного периода остались сутки. Подпишитесь, чтобы сохранить полный доступ к PHA.';
 
   @override
   String get uploadImageFormats => 'JPG, PNG, GIF';
@@ -2804,6 +2965,46 @@ class AppLocalizationsRu extends AppLocalizations {
   String get actionHeartRateDesc => 'Проверка сердца с умных часов';
 
   @override
+  String get actionEcg => 'ЭКГ';
+
+  @override
+  String get actionEcgDesc =>
+      'Считывание ЭКГ с электродов Apple Watch и совместимых датчиков';
+
+  @override
+  String get hrEcgEmpty =>
+      'Нет записей ЭКГ с электродов. Снимите ЭКГ на Apple Watch (Series 4+), затем нажмите «Считать с датчиков».';
+
+  @override
+  String get hrEcgConnectSensors => 'Разрешить доступ к датчику ЭКГ';
+
+  @override
+  String get hrEcgReadSensors => 'Считать ЭКГ с датчиков';
+
+  @override
+  String get hrEcgNeedPermissionTitle => 'Нужен доступ к датчику ЭКГ';
+
+  @override
+  String get hrEcgNeedPermissionBody =>
+      'PHA читает ЭКГ, записанные электродами Apple Watch в Apple Health. Включите ЭКГ в окне разрешений Здоровья.';
+
+  @override
+  String get hrEcgSensorHow =>
+      'ЭКГ снимается электродами Apple Watch (Digital Crown + кристалл). PHA читает эти записи HealthKit — это не замена клинической ЭКГ.';
+
+  @override
+  String get hrEcgSensorAndroid =>
+      'Считывание ЭКГ через Health Connect на этой Android-сборке пока недоступно. На iPhone используйте Apple Watch Series 4+.';
+
+  @override
+  String get hrEcgLatestFromSensor => 'Последнее снятие с электродов';
+
+  @override
+  String hrEcgSensorMeta(String source, int samples, int hz) {
+    return '$source · $samples отсчётов · $hz Гц';
+  }
+
+  @override
   String get unitBpm => 'уд/мин';
 
   @override
@@ -2940,7 +3141,7 @@ class AppLocalizationsRu extends AppLocalizations {
       'ЧСС в покое и ВСР отражают стресс, восстановление и форму. Резкие скачки или несколько дней подряд с высоким пульсом требуют внимания.';
 
   @override
-  String get hrEcgTitle => 'Недавние ЭКГ (Apple Watch)';
+  String get hrEcgTitle => 'Записи ЭКГ с электродов';
 
   @override
   String get hrEcgSinusRhythm => 'Синусовый ритм';
@@ -2955,7 +3156,77 @@ class AppLocalizationsRu extends AppLocalizations {
   String get hrEcgInconclusive => 'Неопределённо';
 
   @override
-  String get hrEcgNotSet => 'Без классификации';
+  String get hrEcgNotSet => 'Не классифицировано';
+
+  @override
+  String get hrEcgSinusTachycardia => 'Синусовая тахикардия';
+
+  @override
+  String get hrEcgSinusBradycardia => 'Синусовая брадикардия';
+
+  @override
+  String get hrEcgVentricularTachycardia => 'Желудочковая тахикардия';
+
+  @override
+  String get hrEcgVentricularFibrillation => 'Желудочковая фибрилляция';
+
+  @override
+  String get hrEcgAvBlock1 => 'AV-блокада I степени';
+
+  @override
+  String get hrEcgAvBlock2MobitzI => 'AV-блокада II степени (Мобитц I)';
+
+  @override
+  String get hrEcgAvBlock3 => 'AV-блокада III степени (полная)';
+
+  @override
+  String get hrEcgReferenceTitle => 'Ритмы ЭКГ в одном взгляде';
+
+  @override
+  String get hrEcgReferenceSubtitle =>
+      'Ключевые признаки — только для обучения, не диагноз.';
+
+  @override
+  String get hrEcgFeatNormalSinus =>
+      'ЧСС 60–100 · регулярный · каждый P перед QRS · PR 0,12–0,20 с · QRS < 0,12 с';
+
+  @override
+  String get hrEcgFeatSinusTachy =>
+      'ЧСС > 100 · регулярный · каждый P перед QRS · PR 0,12–0,20 с · QRS < 0,12 с';
+
+  @override
+  String get hrEcgFeatSinusBrady =>
+      'ЧСС < 60 · регулярный · каждый P перед QRS · PR 0,12–0,20 с · QRS < 0,12 с';
+
+  @override
+  String get hrEcgFeatAfib =>
+      'ЧСС часто 100–250 · нерегулярный · нет зубцов P · QRS обычно ≤ 0,12 с';
+
+  @override
+  String get hrEcgFeatVt =>
+      'ЧСС 100–250 · регулярный · широкие QRS (≥ 0,12 с) · P обычно нет';
+
+  @override
+  String get hrEcgFeatVf =>
+      'Хаотическая базовая линия · нет организованного QRS · нет P — экстренный паттерн';
+
+  @override
+  String get hrEcgFeatAv1 => 'PR > 0,20 с · каждый P с QRS · QRS < 0,12 с';
+
+  @override
+  String get hrEcgFeatAv2 =>
+      'Прогрессивное удлинение PR · выпадение QRS · циклический паттерн';
+
+  @override
+  String get hrEcgFeatAv3 =>
+      'Нет связи P и QRS · независимые частоты · ускользающий ритм';
+
+  @override
+  String get hrEcgFeatInconclusive =>
+      'Apple Watch не смогла уверенно классифицировать запись.';
+
+  @override
+  String get hrEcgFeatUnknown => 'Классификация недоступна.';
 
   @override
   String get hrIrregularRhythm => 'Оповещения о нерегулярном ритме';
@@ -2991,7 +3262,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get hrExplainElevatedStreak =>
-      'ЧСС в покое несколько дней в диапазоне 80–95 уд/мин. Возможны стресс, перетренированность или начало болезни.';
+      'ЧСС в покое несколько дней на уровне ≥105 уд/мин. Возможны стресс, перетренированность или начало болезни.';
 
   @override
   String get hrExplainSpike =>
@@ -3009,10 +3280,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get hrAlertGenericBody =>
-      'ЧСС в покое стабильно в диапазоне 80–95 уд/мин или растёт изо дня в день. Откройте «ЧСС и ритм» для подробностей.';
+      'ЧСС в покое стабильно ≥105 уд/мин или растёт изо дня в день. Откройте «ЧСС и ритм» для подробностей.';
 
   @override
-  String get hrRestingChartTitle => 'ЧСС в покое';
+  String get hrRestingChartTitle => 'Пульс';
 
   @override
   String hrAvgResting(int bpm) {
@@ -3020,8 +3291,39 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String historyGlucoseAvg(String value, String unit) {
+    return 'Ср. $value $unit';
+  }
+
+  @override
+  String historyBpAvg(int sys, int dia) {
+    return 'Ср. $sys/$dia mmHg';
+  }
+
+  @override
+  String get historyGlucoseZoneNormalImperial => 'Норма натощак ≤99 mg/dL';
+
+  @override
+  String get historyGlucoseZoneNormalMetric => 'Норма натощак ≤5.5 mmol/L';
+
+  @override
+  String get historyGlucoseZoneAttention => 'Выше нормы или предиабет';
+
+  @override
+  String get historyGlucoseZoneHigh => 'Высокий / диабет';
+
+  @override
+  String get historyBpZoneNormal => 'Систолическое ≤120 mmHg';
+
+  @override
+  String get historyBpZoneElevated => 'Повышенное 121–139 mmHg';
+
+  @override
+  String get historyBpZoneHigh => 'Высокое ≥140 mmHg';
+
+  @override
   String hrZoneNormal(int low, int high) {
-    return 'Зелёный — $low–$high уд/мин (норма)';
+    return 'Зелёный — $low–$high уд/мин в покое (норма)';
   }
 
   @override

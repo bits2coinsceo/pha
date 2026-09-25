@@ -1,7 +1,8 @@
 /// Resting heart rate / HRV / rhythm wellness bands for Ai Doc & Heart Check.
 ///
 /// These are general adult wellness ranges, not a medical diagnosis.
-/// Resting HR typically 60–80 bpm; 80–95 is an elevated band to watch.
+/// The 60–105 bpm band is for **resting** HR only — not walking, workouts,
+/// or other load. Live / activity samples use [zoneForCurrent] / walking rules.
 /// Persist thresholds stay tunable via [MedicalGuidelines] constants.
 library;
 
@@ -61,7 +62,7 @@ class HeartRateAssessment {
       walkingBpm != null ||
       irregularRhythm;
 
-  /// OS alarm: stably elevated 80–95, a sharp day-to-day rise, ≥95, or irregular rhythm.
+  /// OS alarm: stably elevated ≥105, a sharp day-to-day rise, or irregular rhythm.
   bool get shouldAlarm {
     if (irregularRhythm) return true;
     if (elevatedRestingStreak || sharpChange) return true;
@@ -77,7 +78,7 @@ class HeartRateGuidelines {
   HeartRateGuidelines._();
 
   /// Age-adjusted resting HR comfort band (bpm).
-  /// Base 60–95 (elevated watch-band starts at 80); athletes use a lower floor.
+  /// Base 60–105; athletes use a lower floor.
   static ({int low, int high}) restingRange({
     int? age,
     bool athlete = false,
@@ -109,10 +110,11 @@ class HeartRateGuidelines {
     return HeartZone.normal;
   }
 
-  /// Instant (non-resting) HR — context-free wellness band.
+  /// Instant (non-resting) HR — broader band; exercise can raise pulse normally.
+  /// Do **not** apply the resting 60–105 comfort range here.
   static HeartZone zoneForCurrent(double bpm) {
-    if (bpm < 40 || bpm > 150) return HeartZone.risk;
-    if (bpm < 50 || bpm > 120) return HeartZone.attention;
+    if (bpm < 40 || bpm > 180) return HeartZone.risk;
+    if (bpm < 50 || bpm > 160) return HeartZone.attention;
     return HeartZone.normal;
   }
 
@@ -138,7 +140,7 @@ class HeartRateGuidelines {
     return HeartTrend.stable;
   }
 
-  /// True when resting HR stays in/above 80–95 bpm for several days.
+  /// True when resting HR stays at/above the normal max for several days.
   static bool elevatedStreak(List<double> recentRestingOldestFirst, {int days = 3}) {
     final cut = MedicalGuidelines.restingHrElevatedCutOff.toDouble();
     final tail = recentRestingOldestFirst.where((v) => v > 0).toList();
@@ -147,7 +149,7 @@ class HeartRateGuidelines {
     return last.every((v) => v >= cut);
   }
 
-  /// True when resting HR stays at/above 95 bpm for several days.
+  /// True when resting HR stays at/above the elevated-high cut-off for several days.
   static bool highElevatedStreak(
     List<double> recentRestingOldestFirst, {
     int days = 3,
@@ -168,19 +170,19 @@ class HeartRateGuidelines {
   }
 
   /// 0–100 contribution for Health Index from heart check metrics.
+  /// Scores **resting** HR only (plus HRV / irregular rhythm). Daily average
+  /// or exercise HR must not use the resting 60–105 band.
   /// Returns null when there is no usable heart data yet.
   static double? indexContribution({
     double? restingBpm,
     double? hrvMs,
-    double? avgBpm,
     bool irregularRhythm = false,
     int? age,
     bool athlete = false,
   }) {
     final parts = <double>[];
-    final bpm = restingBpm ?? avgBpm;
-    if (bpm != null && bpm > 0) {
-      parts.add(_restingIndexScore(bpm, age: age, athlete: athlete));
+    if (restingBpm != null && restingBpm > 0) {
+      parts.add(_restingIndexScore(restingBpm, age: age, athlete: athlete));
     }
     if (hrvMs != null && hrvMs > 0) {
       parts.add(switch (zoneForHrv(hrvMs)) {
@@ -261,9 +263,12 @@ class HeartRateGuidelines {
     if (streak) bump(HeartZone.attention, 'resting');
     if (sharp) bump(HeartZone.attention, 'spike');
 
-    // Walking HR alone rarely overrides resting assessment.
-    if (walkingBpm != null && walkingBpm > 140) {
+    // Walking HR during activity — only flag extreme values; never use resting 105.
+    if (walkingBpm != null && walkingBpm > 160) {
       bump(HeartZone.attention, 'current');
+    }
+    if (walkingBpm != null && walkingBpm > 180) {
+      bump(HeartZone.risk, 'current');
     }
 
     final status = switch (worst) {

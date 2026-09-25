@@ -65,8 +65,8 @@
   "signUp": "Registrarse",
   "createAccount": "Crear cuenta",
   "signUpForFree": "Regístrate gratis",
-  "alreadyHaveAccount": "¿Ya tienes cuenta? Inicia sesión",
-  "dontHaveAccount": "¿No tienes cuenta? Regístrate",
+  "alreadyHaveAccount": "¿Ya tienes cuenta?",
+  "dontHaveAccount": "¿No tienes cuenta?",
   "email": "Correo",
   "password": "Contraseña",
   "displayName": "Nombre visible",
@@ -79,6 +79,25 @@
   "acceptPrivacy": "Acepto la Política de privacidad",
   "pleaseAcceptLegal": "Lee y acepta el Acuerdo y la Política de privacidad para continuar.",
   "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
+  "emailAlreadyRegistered": "Este correo ya está en uso. Inicia sesión en su lugar.",
+  "invalidEmailOrPassword": "Email o contraseña no válidos. Compruébalos e inténtalo de nuevo.",
+  "authNetworkError": "No se puede conectar al servidor. Comprueba tu conexión e inténtalo de nuevo.",
+  "authServerSyncFailed": "No se pudo registrar este correo en el servidor. Comprueba tu conexión e inténtalo de nuevo.",
+  "authAccountNotOnServer": "Aún no hay copia en la nube para este correo. Abre la app en el dispositivo original con internet y vuelve a intentarlo.",
+  "authCodeSent": "Enviamos un código de 6 dígitos a tu correo. Es válido 10 minutos.",
+  "authEnterCode": "Código de confirmación",
+  "authVerifyAndCreate": "Confirmar y crear cuenta",
+  "authResendCode": "Reenviar código",
+  "authInvalidCode": "Código no válido o caducado.",
+  "authResendTooSoon": "Espera un momento antes de pedir otro código.",
+  "authEmailDeliveryFailed": "No se pudo enviar el correo. Inténtalo más tarde.",
+  "forgotPassword": "¿Olvidaste la contraseña?",
+  "forgotPasswordSend": "Enviar código de restablecimiento",
+  "forgotPasswordTitle": "Restablecer contraseña",
+  "forgotPasswordNew": "Nueva contraseña",
+  "forgotPasswordConfirm": "Guardar nueva contraseña",
+  "forgotPasswordDone": "Contraseña actualizada. Inicia sesión con la nueva.",
+  "authAccountNotFound": "No hay una cuenta en la nube con este correo.",
   "featureTrackVitals": "Controla signos vitales y glucosa",
   "featureAiInsights": "Análisis de salud con IA",
   "featureSmartAnalysis": "Análisis inteligente",
@@ -252,7 +271,7 @@
       }
     }
   },
-  "stepsRangeSedentary": "0–{max} steps",
+  "stepsRangeSedentary": "0–{max} pasos",
   "@stepsRangeSedentary": {
     "placeholders": {
       "max": {
@@ -260,7 +279,7 @@
       }
     }
   },
-  "stepsRangeBuilding": "{min}–{max} steps",
+  "stepsRangeBuilding": "{min}–{max} pasos",
   "@stepsRangeBuilding": {
     "placeholders": {
       "min": {
@@ -271,7 +290,7 @@
       }
     }
   },
-  "stepsRangeBaseline": "{min}–{max} steps",
+  "stepsRangeBaseline": "{min}–{max} pasos",
   "@stepsRangeBaseline": {
     "placeholders": {
       "min": {
@@ -282,7 +301,7 @@
       }
     }
   },
-  "stepsRangeStrong": "{min}–{max} steps",
+  "stepsRangeStrong": "{min}–{max} pasos",
   "@stepsRangeStrong": {
     "placeholders": {
       "min": {
@@ -293,7 +312,7 @@
       }
     }
   },
-  "stepsRangeGoal": "{min}+ steps",
+  "stepsRangeGoal": "{min}+ pasos",
   "@stepsRangeGoal": {
     "placeholders": {
       "min": {
@@ -303,12 +322,12 @@
   },
   "todaysNotifications": "Notificaciones de hoy",
   "morningNotificationTitle": "Buenos días — tu resumen de salud",
-  "noNotificationsToday": "No notifications for today yet.",
-  "notificationsAppearHere": "Notifications that already arrived today appear here.",
+  "noNotificationsToday": "Aún no hay notificaciones de hoy.",
+  "notificationsAppearHere": "Las notificaciones que ya llegaron hoy aparecen aquí.",
   "phaPlusUnlockedTitle": "¡Estás en PHA Plus+!",
   "phaPlusUnlockedBody": "Todas las funciones están desbloqueadas. Disfruta de cargas ilimitadas, PsychoTest y el horario de tratamiento.",
-  "onboardingQuest2BuildAvatar": "Quest 2: Build your avatar",
-  "onboardingQuest2FillFields": "Fill all 3 fields — earn +{hp} HP on complete.",
+  "onboardingQuest2BuildAvatar": "Misión 2: Crea tu perfil",
+  "onboardingQuest2FillFields": "Completa los 3 campos para continuar.",
   "@onboardingQuest2FillFields": {
     "placeholders": {
       "hp": {
@@ -316,12 +335,12 @@
       }
     }
   },
-  "rewardedStats": "Rewarded stats",
+  "rewardedStats": "Estadísticas recompensadas",
   "yourGender": "Tu género",
   "male": "Masculino",
   "female": "Femenino",
   "unitYearsLong": "years",
-  "completeQuest2": "Complete Quest 2 (+{hp} HP)",
+  "completeQuest2": "Completar misión 2",
   "@completeQuest2": {
     "placeholders": {
       "hp": {
@@ -329,10 +348,10 @@
       }
     }
   },
-  "backToQuest2": "Back to Quest 2",
-  "onboardingQuest3PowerUp": "Quest 3: Power-up (bonus)",
-  "onboardingQuest3BpDone": "You already logged BP and glucose today. Come back tomorrow for your next reading.",
-  "onboardingQuest3Optional": "Optional vitals — +{bpHp} HP for BP, +{glucoseHp} HP for glucose. Once per day.",
+  "backToQuest2": "Volver a la misión 2",
+  "onboardingQuest3PowerUp": "Misión 3: Mejora (bonus)",
+  "onboardingQuest3BpDone": "Ya registraste PA y glucosa hoy. Vuelve mañana para la siguiente lectura.",
+  "onboardingQuest3Optional": "Vitales opcionales — registra presión y glucosa (una vez al día).",
   "@onboardingQuest3Optional": {
     "placeholders": {
       "bpHp": {
@@ -343,8 +362,8 @@
       }
     }
   },
-  "onboardingAllQuestsComplete": "All quests complete!",
-  "onboardingEarnedHp": "You earned {hp} HP · Level {level} {title}",
+  "onboardingAllQuestsComplete": "¡Todas las misiones completadas!",
+  "onboardingEarnedHp": "Nivel {level} · {title}",
   "@onboardingEarnedHp": {
     "placeholders": {
       "hp": {
@@ -358,23 +377,23 @@
       }
     }
   },
-  "onboardingBonusVitals": "Bonus vitals unlocked extra insights!",
+  "onboardingBonusVitals": "¡Los vitales bonus desbloquearon más insights!",
   "healthPower": "Health Power",
-  "onboardingCreateAccount": "Create account and become healthy →",
-  "onboardingEnterDashboard": "Enter dashboard →",
+  "onboardingCreateAccount": "Crear cuenta y empezar a cuidarte →",
+  "onboardingEnterDashboard": "Entrar al panel →",
   "badgeUnitPro": "Unit Pro",
-  "badgeFoundation": "Foundation",
+  "badgeFoundation": "Base",
   "badgeHeartTrack": "Ritmo cardíaco",
-  "badgeSugarSense": "Sugar Sense",
+  "badgeSugarSense": "Sensor de azúcar",
   "badgeChampion": "Champion",
-  "levelHealthRookie": "Health Rookie",
-  "levelProfileBuilder": "Profile Builder",
-  "levelVitalsPro": "Vitals Pro",
+  "levelHealthRookie": "Novato de la salud",
+  "levelProfileBuilder": "Constructor de perfil",
+  "levelVitalsPro": "Pro de vitales",
   "picked": "PICKED",
   "saving": "Saving…",
-  "claimBonusFinish": "Claim bonus & finish 🏆",
-  "skipBonusQuest": "Skip bonus quest",
-  "calculatingRewards": "Calculating rewards…",
+  "claimBonusFinish": "Guardar y terminar 🏆",
+  "skipBonusQuest": "Omitir",
+  "calculatingRewards": "Saving…",
   "categoryBloodPressure": "Presión arterial",
   "categoryBloodGlucose": "Glucosa en sangre",
   "categoryWeight": "Weight",
@@ -430,7 +449,7 @@
   "bmiMsgOverweight": "Tu peso está un poco por encima del rango saludable. Busca una pérdida suave semanal, mantén la proteína y tus pasos diarios.",
   "bmiMsgObeseI": "Tu peso está claramente por encima del rango saludable. Esto puede elevar la presión y el azúcar. Mejor alimentación, más caminatas y un plan con el médico ayudan mucho.",
   "bmiMsgObeseII": "Tu peso está muy por encima del rango saludable. Consulta a un médico para un plan seguro que proteja tu corazón y metabolismo.",
-  "stepsLabel": "{count} steps",
+  "stepsLabel": "{count} pasos",
   "@stepsLabel": {
     "placeholders": {
       "count": {
@@ -453,11 +472,11 @@
   "wellnessMsgNeedsAttention": "El bienestar sugiere estrés elevado. Protege el sueño, reduce cafeína tardía y reconecta socialmente.",
   "wellnessMsgCritical": "Alta carga de estrés. Repite el Wellness Check y habla con un profesional si persiste.",
   "smokingGood": "No fumas — uno de los factores protectores más fuertes para corazón y pulmones.",
-  "smokingLessPack": "<1 pack/day",
-  "smokingOnePack": "~1 pack/day",
-  "smokingMorePack": ">1 pack/day",
-  "smokingActive": "Active smoker",
-  "smokingNonSmoker": "Non-smoker",
+  "smokingLessPack": "<1 paquete/día",
+  "smokingOnePack": "~1 paquete/día",
+  "smokingMorePack": ">1 paquete/día",
+  "smokingActive": "Fumador activo",
+  "smokingNonSmoker": "No fumador",
   "smokingWarning": "Fumar es un factor de riesgo clave del Índice de Salud. Fija una fecha para dejarlo, elimina desencadenantes y usa Plus+ → Malos hábitos para seguir el progreso.",
   "alcoholNone": "Ninguno",
   "alcoholGood": "Sin alcohol reportado — útil para PA, sueño e hígado.",
@@ -478,7 +497,7 @@
   "screenConstant": "Constante",
   "screenConstantTip": "Mucho tiempo de pantalla resta movimiento y sueño. Pon límites y cambia un scroll por un paseo.",
   "screenDefaultTip": "Revisa hábitos de pantalla — límites nocturnos suelen ayudar al bienestar.",
-  "nutritionRecentMeals": "{count} recent meals",
+  "nutritionRecentMeals": "{count} comidas recientes",
   "@nutritionRecentMeals": {
     "placeholders": {
       "count": {
@@ -489,7 +508,7 @@
   "nutritionWarning": "Varias comidas recientes necesitan atención. Prioriza verduras, proteína y menos ultraprocesados; registra la próxima comida para feedback.",
   "nutritionGood": "La calidad reciente de las comidas se ve fuerte. Mantén el patrón: apoya glucosa y peso en tu Índice.",
   "nutritionInfo": "Calidad de comidas mixta últimamente. Apunta a una mejora al día (más fibra o proteína, menos bebidas azucaradas).",
-  "psychoLoad": "Load {total} · {label}",
+  "psychoLoad": "Carga {total} · {label}",
   "@psychoLoad": {
     "placeholders": {
       "total": {
@@ -509,10 +528,10 @@
   "priorityHigh": "High",
   "priorityMedium": "Medium",
   "priorityLow": "Low",
-  "profileUpdatedSuccess": "Profile updated successfully!",
-  "termsOfService": "Terms of Service & Disclaimer",
-  "howWeHandleData": "How we handle your data",
-  "sameScoreHint": "Same score as on Home",
+  "profileUpdatedSuccess": "¡Perfil actualizado correctamente!",
+  "termsOfService": "Términos del servicio y aviso legal",
+  "howWeHandleData": "Cómo tratamos tus datos",
+  "sameScoreHint": "Misma puntuación que en Inicio",
   "eveningNotificationTitle": "Control vespertino",
   "bpMsgLow": "La presión arterial está por debajo del rango habitual (hipotensión). Mantente hidratado y habla con un médico si te mareas.",
   "bpMsgOptimal": "La presión arterial es óptima (<120/<80). Mantén el estilo de vida saludable.",
@@ -522,12 +541,12 @@
   "bpMsgGrade2": "La presión arterial está claramente alta. Consulta a un médico pronto.",
   "bpMsgGrade3": "La presión arterial está muy alta. Busca atención médica sin demora.",
   "uploadAnalysisTitle": "Subir análisis",
-  "uploadFileType": "File Type",
-  "uploadPdf": "PDF Document",
-  "uploadPhoto": "Photo / Image",
-  "uploadSelectFile": "Select File",
-  "uploadClickToSelect": "Click to select a file",
-  "uploadClickToChange": "{size} KB — click to change",
+  "uploadFileType": "Tipo de archivo",
+  "uploadPdf": "Documento PDF",
+  "uploadPhoto": "Foto / imagen",
+  "uploadSelectFile": "Seleccionar archivo",
+  "uploadClickToSelect": "Toca para seleccionar un archivo",
+  "uploadClickToChange": "{size} KB — toca para cambiar",
   "@uploadClickToChange": {
     "placeholders": {
       "size": {
@@ -535,15 +554,15 @@
       }
     }
   },
-  "uploadLimitReached": "Limit reached",
-  "uploadUpgradeMore": "Upgrade to upload more",
-  "uploadFile": "Upload File",
-  "uploadAnalyzing": "Analyzing...",
-  "uploadAnalyzingAiDoc": "Analyzing your file with Ai Doc…",
-  "uploadFailed": "Upload failed. Please try again.",
-  "uploadCouldNotRead": "Could not read the selected file. Please pick it again.",
-  "uploadLimitMessage": "Upload limit reached. Upgrade to PHA Plus+ for unlimited uploads.",
-  "uploadFreePlan": "Free plan: {count}/2 uploads used. Max 2 pages per file.",
+  "uploadLimitReached": "Límite alcanzado",
+  "uploadUpgradeMore": "Mejora el plan para subir más",
+  "uploadFile": "Subir archivo",
+  "uploadAnalyzing": "Analizando…",
+  "uploadAnalyzingAiDoc": "Analizando tu archivo con Ai Doc…",
+  "uploadFailed": "Error al subir. Inténtalo de nuevo.",
+  "uploadCouldNotRead": "No se pudo leer el archivo. Elige otro.",
+  "uploadLimitMessage": "Límite de subidas alcanzado. Mejora a PHA Plus+ para subidas ilimitadas.",
+  "uploadFreePlan": "Plan gratis: {count}/2 subidas. Máx. 2 páginas por archivo.",
   "@uploadFreePlan": {
     "placeholders": {
       "count": {
@@ -552,14 +571,14 @@
     }
   },
   "mealTakePhoto": "Toma o sube una foto de tu comida",
-  "mealAfterAnalysis": "After analysis, tap ✓ only if you ate this dish — it adds to today's calories.",
+  "mealAfterAnalysis": "Tras el análisis, toca ✓ solo si comiste este plato — se suma a las calorías de hoy.",
   "mealCamera": "Camera",
   "mealGallery": "Gallery",
-  "mealAnalyze": "Analyze Meal",
-  "mealAnalyzing": "Analyzing…",
-  "mealFailed": "Analysis failed. Please try again.",
-  "mealFreeLimit": "Free limit reached (2 meals per 24h). Upgrade to PHA Plus+ for unlimited meal checks.",
-  "mealFreePlan": "Free plan: {count}/{limit} meals logged in the last 24 hours.",
+  "mealAnalyze": "Analizar comida",
+  "mealAnalyzing": "Analizando…",
+  "mealFailed": "Falló el análisis. Inténtalo de nuevo.",
+  "mealFreeLimit": "Límite gratis alcanzado (2 comidas / 24 h). Mejora a PHA Plus+ para checks ilimitados.",
+  "mealFreePlan": "Plan gratis: {count}/{limit} comidas en las últimas 24 h.",
   "@mealFreePlan": {
     "placeholders": {
       "count": {
@@ -570,15 +589,15 @@
       }
     }
   },
-  "mealLogged": "Meal logged — counted in today's intake & Health Index.",
-  "mealTapConfirm": "Tap ✓ to confirm you ate this — adds to today's intake.",
+  "mealLogged": "Comida registrada — cuenta en la ingesta de hoy y el Health Index.",
+  "mealTapConfirm": "Toca ✓ para confirmar que lo comiste — suma a la ingesta de hoy.",
   "mealDiscard": "Discard",
-  "mealTotalIntake": "Total Intake",
+  "mealTotalIntake": "Ingesta total",
   "mealCarb": "Carb",
   "mealProteins": "Proteins",
   "mealFat": "Fat",
-  "mealNoMealsToday": "No meals confirmed today yet.",
-  "mealNoMealsLogged": "No meals logged · target ~{target} kcal",
+  "mealNoMealsToday": "Aún no hay comidas confirmadas hoy.",
+  "mealNoMealsLogged": "Sin comidas · meta ~{target} kcal",
   "@mealNoMealsLogged": {
     "placeholders": {
       "target": {
@@ -586,12 +605,12 @@
       }
     }
   },
-  "mealConfirmHint": "Confirm meals after analysis to track intake.",
+  "mealConfirmHint": "Confirma las comidas tras el análisis para registrar la ingesta.",
   "aiDocTitle": "Asistente Ai Doc",
-  "aiDocWelcome": "Hello! I'm your Ai Doc Assistant. Would you like us to use the data you provided during onboarding? After that, you can describe your problem in detail — or share a photo of a meal, lab result, or anything health-related.",
-  "aiDocOffline": "Ai Doc is offline — API key not set.",
-  "aiDocFreeLimit": "Free consultation limit reached.",
-  "aiDocFreeRemaining": "{remaining} of 3 free consultations remaining.",
+  "aiDocWelcome": "¡Hola! Soy tu asistente Ai Doc. ¿Quieres que usemos los datos del onboarding? Después puedes describir tu problema con detalle — o compartir una foto de una comida, análisis u otro dato de salud.",
+  "aiDocOffline": "Ai Doc no está disponible — falta la API key.",
+  "aiDocFreeLimit": "Límite de consultas gratis alcanzado.",
+  "aiDocFreeRemaining": "Te quedan {remaining} de 3 consultas gratis.",
   "@aiDocFreeRemaining": {
     "placeholders": {
       "remaining": {
@@ -599,14 +618,19 @@
       }
     }
   },
-  "aiDocAnalyzingHealth": "Analyzing your health data…",
-  "aiDocLooking": "Looking at that…",
-  "aiDocAskPlaceholder": "Ask about symptoms, or add a photo note",
-  "aiDocUpgradeChat": "Upgrade to continue chatting…",
-  "aiDocNoProblem": "No problem! Whenever you're ready, describe your symptoms or health concerns in detail — or share a photo.",
+  "aiDocAnalyzingHealth": "Analizando tus datos de salud…",
+  "aiDocLooking": "Revisando eso…",
+  "aiDocAskPlaceholder": "Pregunta por síntomas o añade una nota con foto",
+  "aiDocUpgradeChat": "Mejora el plan para seguir chateando…",
+  "aiDocNoProblem": "¡Sin problema! Cuando quieras, describe tus síntomas o preocupaciones con detalle — o comparte una foto.",
   "aiDocPhoto": "Photo",
-  "wellnessResults": "Wellness Results",
-  "wellnessQuestion": "Question {current} of {total}",
+  "aiDocHoldToSpeak": "Mantén pulsado para hablar",
+  "aiDocListening": "Escuchando… suelta para enviar",
+  "aiDocSpeechUnavailable": "La entrada de voz no está disponible en este dispositivo.",
+  "aiDocSpeechPermissionDenied": "Se necesita permiso de micrófono o reconocimiento de voz para mensajes de voz.",
+  "aiDocSpeechEmpty": "No se detectó habla. Mantén el micrófono y vuelve a intentarlo.",
+  "wellnessResults": "Resultados de bienestar",
+  "wellnessQuestion": "Pregunta {current} de {total}",
   "@wellnessQuestion": {
     "placeholders": {
       "current": {
@@ -617,7 +641,7 @@
       }
     }
   },
-  "percentComplete": "{percent}% complete",
+  "percentComplete": "{percent}% completado",
   "@percentComplete": {
     "placeholders": {
       "percent": {
@@ -625,16 +649,16 @@
       }
     }
   },
-  "questionUnavailable": "Question unavailable",
-  "wellnessVeryPoor": "Very poor",
+  "questionUnavailable": "Pregunta no disponible",
+  "wellnessVeryPoor": "Muy pobre",
   "wellnessPoor": "Poor",
   "wellnessModerate": "Moderate",
   "wellnessGood": "Good",
-  "wellnessExcellent": "Excellent",
-  "badHabitsSummaryTitle": "Bad Habits Summary",
-  "badHabitsSaved": "Saved to your health history. Honest tracking is the first step toward change.",
-  "badHabitsSocialMediaLabel": "Social media",
-  "badHabitsStep": "Step {step} of {total}",
+  "wellnessExcellent": "Excelente",
+  "badHabitsSummaryTitle": "Resumen de malos hábitos",
+  "badHabitsSaved": "Guardado en tu historial. El seguimiento honesto es el primer paso al cambio.",
+  "badHabitsSocialMediaLabel": "Redes sociales",
+  "badHabitsStep": "Paso {step} de {total}",
   "@badHabitsStep": {
     "placeholders": {
       "step": {
@@ -646,17 +670,17 @@
     }
   },
   "badHabitsDoYouSmoke": "¿Fumas?",
-  "badHabitsHowMuchSmoke": "How much do you smoke?",
-  "badHabitsDoYouDrink": "Do you drink alcohol?",
-  "badHabitsHowMuchDrink": "How often and how much do you drink?",
-  "badHabitsSocialMedia": "How much time do you spend uselessly on social media?",
+  "badHabitsHowMuchSmoke": "¿Cuánto fumas?",
+  "badHabitsDoYouDrink": "¿Bebes alcohol?",
+  "badHabitsHowMuchDrink": "¿Con qué frecuencia y cuánto bebes?",
+  "badHabitsSocialMedia": "¿Cuánto tiempo pasas en redes sin sentido?",
   "treatmentYourSchedule": "Tu horario",
-  "treatmentAddMedicine": "Add medicine or supplement",
-  "treatmentNewEntry": "New entry",
-  "treatmentMedicineName": "Name of medicine or dietary supplement",
-  "treatmentMedicinePlaceholder": "e.g. Vitamin D, Metformin",
-  "treatmentHowManyTimes": "How many times a day",
-  "treatmentDoseTime": "Dose {n} time",
+  "treatmentAddMedicine": "Añadir medicamento o suplemento",
+  "treatmentNewEntry": "Nueva entrada",
+  "treatmentMedicineName": "Nombre del medicamento o suplemento",
+  "treatmentMedicinePlaceholder": "p. ej. Vitamina D, Metformina",
+  "treatmentHowManyTimes": "Veces al día",
+  "treatmentDoseTime": "Hora de la dosis {n}",
   "@treatmentDoseTime": {
     "placeholders": {
       "n": {
@@ -664,28 +688,28 @@
       }
     }
   },
-  "treatmentAddAnother": "Add another",
+  "treatmentAddAnother": "Añadir otro",
   "treatmentSaveSchedule": "Guardar horario",
-  "treatmentSaved": "Treatment schedule saved — pill reminders are on",
-  "treatmentEnterName": "Enter at least one medicine or supplement name.",
-  "treatmentSaveFailed": "Could not save. Please try again.",
-  "treatmentNotifOff": "Schedule saved, but notifications are off. Enable alerts in Settings to get pill reminders.",
-  "psychoTestSubtitle": "Stress & Psychosomatic Self-Assessment",
-  "psychoTestIntro": "This assessment contains 3 blocks with a total of 20 questions. Answer honestly — there are no right or wrong answers. Results are saved to your profile.",
+  "treatmentSaved": "Horario guardado — recordatorios de pastillas activados",
+  "treatmentEnterName": "Introduce al menos un medicamento o suplemento.",
+  "treatmentSaveFailed": "No se pudo guardar. Inténtalo de nuevo.",
+  "treatmentNotifOff": "Horario guardado, pero las notificaciones están desactivadas. Actívalas en Ajustes para recordatorios.",
+  "psychoTestSubtitle": "Autoevaluación de estrés y psicosomática",
+  "psychoTestIntro": "Esta evaluación tiene 3 bloques y 20 preguntas. Responde con sinceridad: no hay respuestas correctas o incorrectas. Los resultados se guardan en tu perfil.",
   "psychoBlock1Title": "BLOCK 1",
-  "psychoBlock1Subtitle": "Stress Awareness",
+  "psychoBlock1Subtitle": "Conciencia del estrés",
   "psychoBlock2Title": "BLOCK 2",
-  "psychoBlock2Subtitle": "Physical Symptoms",
+  "psychoBlock2Subtitle": "Síntomas físicos",
   "psychoBlock3Title": "BLOCK 3",
-  "psychoBlock3Subtitle": "Behavioral Profile",
-  "psychoAnswerHint": "Each question has 3 answer options: Never · Sometimes · Often",
+  "psychoBlock3Subtitle": "Perfil conductual",
+  "psychoAnswerHint": "Cada pregunta tiene 3 opciones: Nunca · A veces · A menudo",
   "psychoStartAssessment": "Iniciar evaluación",
-  "psychoYourResult": "YOUR RESULT",
+  "psychoYourResult": "TU RESULTADO",
   "psychoRetake": "Retake",
   "psychoNever": "Never",
-  "psychoSometimes": "Sometimes",
+  "psychoSometimes": "A veces",
   "psychoOften": "Often",
-  "psychoQuestionsCount": "{count} questions",
+  "psychoQuestionsCount": "{count} preguntas",
   "@psychoQuestionsCount": {
     "placeholders": {
       "count": {
@@ -693,8 +717,8 @@
       }
     }
   },
-  "onboardingBackToQuest2": "Back to Quest 3",
-  "onboardingBpGlucose": "BP / +{hp} HP",
+  "onboardingBackToQuest2": "Volver a la misión 3",
+  "onboardingBpGlucose": "Presión arterial",
   "@onboardingBpGlucose": {
     "placeholders": {
       "hp": {
@@ -702,7 +726,7 @@
       }
     }
   },
-  "onboardingGlucoseHp": "Glucose / +{hp} HP",
+  "onboardingGlucoseHp": "Glucosa",
   "@onboardingGlucoseHp": {
     "placeholders": {
       "hp": {
@@ -712,7 +736,7 @@
   },
   "onboardingSys": "Sys",
   "onboardingDia": "Dia",
-  "onboardingReadyForPha": "{percent}% — ready for PHA",
+  "onboardingReadyForPha": "{percent}% — listo para PHA",
   "@onboardingReadyForPha": {
     "placeholders": {
       "percent": {
@@ -720,7 +744,7 @@
       }
     }
   },
-  "onboardingRedeemHp": "Redeem your {hp} HP for {percent}% off your first 6-month or annual PHA Plus+ subscription.",
+  "onboardingRedeemHp": "Obtén {percent}% de descuento en tu primera suscripción de 6 meses o anual de PHA Plus+.",
   "@onboardingRedeemHp": {
     "placeholders": {
       "hp": {
@@ -733,11 +757,11 @@
   },
   "activityCurrentPlanSubtitle": "Tu plan actual de actividad física",
   "activityCustomPlanHint": "Tu plan está activo. Completa el entrenamiento diario y responde al check-in nocturno.",
-  "activityRestNote": "Rest no more than 2 minutes between sets.",
+  "activityRestNote": "Descansa no más de 2 minutos entre series.",
   "dailyLabel": "Daily",
-  "fileTypePdf": "PDF up to 2 pages (free plan)",
-  "upgradeToPhaPlus": "Upgrade to PHA Plus+",
-  "healthAnalysisSubtitleShort": "Same score as Home Health Index",
+  "fileTypePdf": "PDF de hasta 2 páginas (plan gratis)",
+  "upgradeToPhaPlus": "Mejorar a PHA Plus+",
+  "healthAnalysisSubtitleShort": "Misma puntuación que el Health Index de Inicio",
   "wellnessQ1": "¿Qué tan estresado te sientes ahora?",
   "wellnessQ2": "¿Qué tal dormiste anoche?",
   "wellnessQ3": "¿Cómo está tu nivel de energía hoy?",
@@ -796,7 +820,7 @@
   "loginHeroLine3": "monitoreada.",
   "loginHeroBody": "Monitorea tus métricas, obtén insights con IA y controla tu bienestar.",
   "loginTrustedBy": "Confiado por personas conscientes de la salud en todo el mundo.",
-  "loginSignUpSubtitle": "Empieza a rastrear tu salud hoy — gratis para siempre.",
+  "loginSignUpSubtitle": "Empieza a rastrear tu salud hoy.",
   "loginSignInSubtitle": "Inicia sesión para acceder a tu panel de salud.",
   "loginFullName": "Nombre completo",
   "loginNamePlaceholder": "María García",
@@ -829,6 +853,12 @@
   "vitalsPromptTurnOffHint": "Omitir recordatorios diarios de PA/glucosa.",
   "vitalsPromptEvery5Days": "Preguntar cada 5 días",
   "vitalsPromptEvery5DaysHint": "Recordar cada 5 días, no diariamente.",
+  "vitalsPromptSectionTitle": "Presión y glucosa",
+  "vitalsPromptSectionSubtitle": "¿Con qué frecuencia debe pedir PHA la PA y el azúcar?",
+  "vitalsPromptDaily": "Una vez al día",
+  "vitalsPromptDailyHint": "Recordar cada día hasta que registres los valores de hoy.",
+  "vitalsPromptNever": "No preguntar",
+  "vitalsPromptNeverHint": "Sin avisos automáticos de PA o glucosa.",
   "vitalsBpLabel": "Presión arterial (mmHg)",
   "vitalsGlucoseLabel": "Glucosa en sangre ({unit})",
   "@vitalsGlucoseLabel": {
@@ -865,12 +895,17 @@
   "logMetricHintWeightMetric": "ej. 72.5",
   "logMetricHintWater": "ej. 2000",
   "upgradeTrialTitle": "Desbloquea todas las funciones de PHA Plus+",
+  "purchaseErrorInvalidCredentials": "Error de compra: credenciales de facturación no válidas. En RevenueCat → Project settings → API keys copia la Apple public SDK key (appl_…) en dart_define.json como REVENUECAT_IOS_API_KEY y comprueba App Store Connect.",
+  "purchaseErrorNetwork": "Error de red al contactar con App Store. Comprueba la conexión e inténtalo de nuevo.",
+  "purchaseErrorStore": "App Store no pudo completar la compra. Inténtalo más tarde.",
+  "purchaseErrorNoOfferings": "Los planes aún no están disponibles. Revisa offerings en RevenueCat y productos en App Store Connect.",
+  "purchaseErrorNoPackage": "Este plan no está disponible ahora. Prueba otro o más tarde.",
   "upgradeTrialBody1": "¡Control total de tu salud! Desbloquea todas las opciones premium de PHA Plus+.",
   "upgradeTrialBody2": "Mantente informado sobre riesgos y ajusta tu estilo de vida. Cuenta calorías sin límites.",
   "upgradeTagline": "Tu salud. Tu control. Siempre.",
   "upgradeTitle": "Desbloquear todo",
   "upgradeSubtitle": "Obtén todo el poder de tu Asistente de Salud Personal",
-  "upgradeHpBanner": "¡Tienes {hp} HP! Canjea por {percent}% de descuento en planes de 6 meses o anuales.",
+  "upgradeHpBanner": "{percent}% de descuento en planes de 6 meses y anuales.",
   "@upgradeHpBanner": {
     "placeholders": {
       "hp": {
@@ -904,7 +939,7 @@
   "planBilledMonthly": "Facturación mensual.",
   "planSemiannual": "6 meses",
   "planAnnual": "Anual",
-  "planHpDiscountNote": "Descuento 20% HP aplicado.",
+  "planHpDiscountNote": "Descuento del 20% aplicado.",
   "planSave17": "Ahorra ~17%.",
   "planSave42": "Ahorra ~42%.",
   "planPerMonth": "/mes",
@@ -912,6 +947,11 @@
   "planPerYear": "/año",
   "planBestBadge": "MEJOR",
   "psychoTestPromoBody": "Autoevaluación profunda de estrés, patrones psicosomáticos e indicadores de bienestar mental.",
+  "promoCodeLabel": "Código promocional",
+  "promoCodeHint": "Introduce el código",
+  "promoCodeApply": "Aplicar",
+  "promoCodeInvalid": "Código promocional no válido.",
+  "promoCodeAlreadyUsed": "Este código ya se usó en este perfil.",
   "psychoQuestionOfBlock": "P{current} de {total}",
   "@psychoQuestionOfBlock": {
     "placeholders": {
@@ -939,6 +979,12 @@
   "aiDocNoOnboardingData": "No encontré tus datos de onboarding. Completa la configuración primero.",
   "activityYourProgramFallback": "tu programa",
   "trialSevenDayFree": "Prueba gratis 7 días",
+  "trialNotifChannelName": "Recordatorios de prueba",
+  "trialNotifChannelDesc": "Avisos antes de que termine la prueba gratuita",
+  "trialNotifThreeDaysTitle": "La prueba termina en 3 días",
+  "trialNotifThreeDaysBody": "Tu prueba gratuita de 7 días termina en 3 días. Suscríbete a PHA Plus+ para conservar todas las funciones.",
+  "trialNotifTwentyFourHoursTitle": "La prueba termina en 24 horas",
+  "trialNotifTwentyFourHoursBody": "Queda menos de un día de prueba. Suscríbete ahora para mantener el acceso completo a PHA.",
   "uploadImageFormats": "JPG, PNG, GIF",
   "mealSaveFailed": "No se pudo guardar: {error}",
   "@mealSaveFailed": {
@@ -1398,6 +1444,17 @@
 
   "actionHeartRate": "Frecuencia y ritmo",
   "actionHeartRateDesc": "Chequeo cardíaco con smartwatch",
+  "actionEcg": "ECG",
+  "actionEcgDesc": "Leer ECG de electrodos del Apple Watch y sensores compatibles",
+  "hrEcgEmpty": "No hay ECG de electrodos. Toma un ECG en Apple Watch (Series 4+) y pulsa Leer sensores.",
+  "hrEcgConnectSensors": "Permitir acceso al sensor de ECG",
+  "hrEcgReadSensors": "Leer ECG de sensores",
+  "hrEcgNeedPermissionTitle": "Se necesita acceso al sensor de ECG",
+  "hrEcgNeedPermissionBody": "PHA lee el ECG escrito por los electrodos del Apple Watch en Apple Salud. Activa ECG en permisos de Salud.",
+  "hrEcgSensorHow": "El ECG lo capturan los electrodos del Apple Watch (Digital Crown + cristal). PHA lee HealthKit; no sustituye un ECG clínico.",
+  "hrEcgSensorAndroid": "ECG por electrodos vía Health Connect aún no está en esta build Android. En iPhone usa Apple Watch Series 4+.",
+  "hrEcgLatestFromSensor": "Última lectura de electrodos",
+  "hrEcgSensorMeta": "{source} · {samples} muestras · {hz} Hz",
   "unitBpm": "lpm",
   "unitMs": "ms",
   "hrEvents": "eventos",
@@ -1439,12 +1496,32 @@
   "hrNoChartData": "Sin datos para este periodo",
   "hrWhatItMeans": "Qué significa",
   "hrWhatItMeansBody": "La FC en reposo y la VFC reflejan estrés, recuperación y forma. Los saltos bruscos o varios días altos merecen atención.",
-  "hrEcgTitle": "ECG recientes (Apple Watch)",
+  "hrEcgTitle": "Registros de ECG por electrodos",
   "hrEcgSinusRhythm": "Ritmo sinusal",
   "hrEcgAtrialFibrillation": "Fibrilación auricular",
   "hrEcgLowOrHighHr": "FC baja o alta",
   "hrEcgInconclusive": "No concluyente",
   "hrEcgNotSet": "Sin clasificar",
+  "hrEcgSinusTachycardia": "Taquicardia sinusal",
+  "hrEcgSinusBradycardia": "Bradiquardia sinusal",
+  "hrEcgVentricularTachycardia": "Taquicardia ventricular",
+  "hrEcgVentricularFibrillation": "Fibrilación ventricular",
+  "hrEcgAvBlock1": "Bloqueo AV de primer grado",
+  "hrEcgAvBlock2MobitzI": "Bloqueo AV de segundo grado (Mobitz I)",
+  "hrEcgAvBlock3": "Bloqueo AV de tercer grado",
+  "hrEcgReferenceTitle": "Ritmos de ECG de un vistazo",
+  "hrEcgReferenceSubtitle": "Rasgos clave — solo educativo, no es un diagnóstico.",
+  "hrEcgFeatNormalSinus": "FC 60–100 · regular · cada P antes de QRS · PR 0,12–0,20 s · QRS < 0,12 s",
+  "hrEcgFeatSinusTachy": "FC > 100 · regular · cada P antes de QRS · PR 0,12–0,20 s · QRS < 0,12 s",
+  "hrEcgFeatSinusBrady": "FC < 60 · regular · cada P antes de QRS · PR 0,12–0,20 s · QRS < 0,12 s",
+  "hrEcgFeatAfib": "FC a menudo 100–250 · irregular · sin ondas P · QRS suele ≤ 0,12 s",
+  "hrEcgFeatVt": "FC 100–250 · regular · QRS anchos (≥ 0,12 s) · P suelen ausentes",
+  "hrEcgFeatVf": "Línea base caótica · sin QRS organizado · sin P — patrón de emergencia",
+  "hrEcgFeatAv1": "PR > 0,20 s · cada P con QRS · QRS < 0,12 s",
+  "hrEcgFeatAv2": "PR progresivo · QRS caído · patrón cíclico",
+  "hrEcgFeatAv3": "Sin relación P–QRS · frecuencias independientes · ritmo de escape",
+  "hrEcgFeatInconclusive": "Apple Watch no pudo clasificar este trazado con confianza.",
+  "hrEcgFeatUnknown": "Clasificación no disponible.",
   "hrIrregularRhythm": "Alertas de ritmo irregular",
   "hrTrendImproving": "Mejorando",
   "hrTrendWorsening": "Empeorando",
@@ -1454,15 +1531,37 @@
   "hrExplainHighResting": "FC en reposo {bpm} lpm — por encima del rango habitual hasta {max}. Estrés, enfermedad, cafeína o poca recuperación pueden elevarla.",
   "hrExplainLowResting": "FC en reposo {bpm} lpm — por debajo del mínimo habitual {min}. Los deportistas suelen tenerla más baja; consulta si hay mareo o debilidad.",
   "hrExplainLowHrv": "La variabilidad parece baja. Puede indicar estrés o recuperación incompleta: prioriza sueño y descanso.",
-  "hrExplainElevatedStreak": "La FC en reposo se mantiene entre 80 y 95 lpm varios días. Vigila estrés, sobreentrenamiento o inicio de enfermedad.",
+  "hrExplainElevatedStreak": "La FC en reposo se mantiene en ≥105 lpm varios días. Vigila estrés, sobreentrenamiento o inicio de enfermedad.",
   "hrExplainSpike": "La FC en reposo subió de forma notable de un día a otro. Anota cómo te sientes y revisa mañana.",
   "hrExplainIrregular": "Apple Watch notificó ritmo irregular. No es un diagnóstico: habla con un médico si continúan las alertas o te sientes mal.",
   "hrAlertRiskTitle": "Alarma de frecuencia cardíaca",
   "hrAlertAttentionTitle": "FC en reposo elevada",
-  "hrAlertGenericBody": "Tu FC en reposo está de forma estable en 80–95 lpm o sube día a día. Abre Frecuencia y ritmo para más detalles.",
-  "hrRestingChartTitle": "FC en reposo",
+  "hrAlertGenericBody": "Tu FC en reposo está de forma estable en ≥105 lpm o sube día a día. Abre Frecuencia y ritmo para más detalles.",
+  "hrRestingChartTitle": "Frecuencia cardíaca",
   "hrAvgResting": "Prom. {bpm} lpm",
-  "hrZoneNormal": "Verde — {low}–{high} lpm (normal)",
+
+  "historyGlucoseAvg": "Prom. {value} {unit}",
+  "@historyGlucoseAvg": {
+    "placeholders": {
+      "value": {"type": "String"},
+      "unit": {"type": "String"}
+    }
+  },
+  "historyBpAvg": "Prom. {sys}/{dia} mmHg",
+  "@historyBpAvg": {
+    "placeholders": {
+      "sys": {"type": "int"},
+      "dia": {"type": "int"}
+    }
+  },
+  "historyGlucoseZoneNormalImperial": "Normal en ayunas ≤99 mg/dL",
+  "historyGlucoseZoneNormalMetric": "Normal en ayunas ≤5.5 mmol/L",
+  "historyGlucoseZoneAttention": "Por encima de lo normal o prediabetes",
+  "historyGlucoseZoneHigh": "Alto / diabetes",
+  "historyBpZoneNormal": "Sistólica ≤120 mmHg",
+  "historyBpZoneElevated": "Elevada 121–139 mmHg",
+  "historyBpZoneHigh": "Alta ≥140 mmHg",
+  "hrZoneNormal": "Verde — {low}–{high} lpm en reposo (normal)",
   "hrZoneAttention": "Amarillo — desviación leve",
   "hrZoneRisk": "Rojo — desviación significativa / riesgo"
 }

@@ -5,7 +5,7 @@ and Legal Disclaimer — International Version
 
 Effective Date: July 15, 2026
 Last Updated: July 15, 2026
-© 2026 PHA Personal Health Assistant. Developed by Titan Capital Trade LLC
+© 2026 PHA Personal Health Assistant. Developed by ZORPH SRL
 
 IMPORTANT LEGAL NOTICE
 
@@ -13,7 +13,7 @@ This is a legally binding agreement intended primarily for users in the United S
 
 1. ACCEPTANCE OF TERMS
 
-This Terms of Service, End User License Agreement, and Disclaimer Agreement ("Agreement") is a legally binding contract between you ("User", "you") and PHA Personal Health Assistant. Developed by Titan Capital Trade LLC (the "Company", "we", "us", "our"), the developer and operator of the PHA Personal Health Assistant mobile application and any related websites, APIs, or services (collectively, the "Service", "App", "Company", "we", "us", "our").
+This Terms of Service, End User License Agreement, and Disclaimer Agreement ("Agreement") is a legally binding contract between you ("User", "you") and PHA Personal Health Assistant. Developed by ZORPH SRL (the "Company", "we", "us", "our"), the developer and operator of the PHA Personal Health Assistant mobile application and any related websites, APIs, or services (collectively, the "Service", "App", "Company", "we", "us", "our").
 
 By downloading, installing, creating an account, accessing, or using any part of the Service, you confirm that you have read, understood, and unconditionally agree to be bound by this Agreement, including all disclaimers, limitations of liability, and data processing provisions. If you do not agree to any part of this Agreement, you must immediately stop using the App and delete it from your device(s).
 
@@ -80,7 +80,7 @@ This limitation applies regardless of the legal theory (contract, tort including
 
 8. INTELLECTUAL PROPERTY RIGHTS AND LICENSE GRANT
 
-The App, its software code, user interface design, AI models and associated methodologies (to the extent proprietary), content, graphics, logos, trademarks, and all other intellectual property ("IP") are owned by or licensed to PHA Personal Health Assistant. Developed by Titan Capital Trade LLC (the "Company"). Subject to your full compliance with this Agreement, we grant you a limited, revocable, non-exclusive, non-transferable, non-sublicensable license to install and use the App solely for your own personal, non-commercial purposes on devices that you own or lawfully control. You may not reverse engineer, decompile, modify, distribute, or create derivative works from the App or its AI components.
+The App, its software code, user interface design, AI models and associated methodologies (to the extent proprietary), content, graphics, logos, trademarks, and all other intellectual property ("IP") are owned by or licensed to PHA Personal Health Assistant. Developed by ZORPH SRL (the "Company"). Subject to your full compliance with this Agreement, we grant you a limited, revocable, non-exclusive, non-transferable, non-sublicensable license to install and use the App solely for your own personal, non-commercial purposes on devices that you own or lawfully control. You may not reverse engineer, decompile, modify, distribute, or create derivative works from the App or its AI components.
 
 9. TERMINATION AND SUSPENSION
 
@@ -102,8 +102,8 @@ This Agreement, together with our Privacy Policy (if separately published), cons
 
 For any questions regarding this Agreement, to exercise your data protection rights, to report a security issue, or to provide legal notices, please contact the operator:
 
-PHA Personal Health Assistant. Developed by Titan Capital Trade LLC
-Email: titan.capital.trade@gmail.com
+PHA Personal Health Assistant. Developed by ZORPH SRL
+Email: support@pha-app.net
 Primary contact: via the App support channel or your registered email associated with the account.
 
 FINAL ACKNOWLEDGMENT AND CONSENT
@@ -114,4 +114,4 @@ BY DOWNLOADING, INSTALLING, OR USING THE PHA PERSONAL HEALTH ASSISTANT APPLICATI
 • You accept full personal responsibility and all risk for any and all consequences arising from your use of the App and your reliance (or non-reliance) on its Outputs.
 • All data you input into the App is provided voluntarily, and you consent to its collection, processing, and protection as described in Section 6 in accordance with applicable data protection laws and privacy principles.
 
-© 2026 PHA Personal Health Assistant. Developed by Titan Capital Trade LLC. All rights reserved. This document is intended to provide clear legal protection for the PHA Personal Health Assistant Service and to set appropriate expectations for users and regulators.
+© 2026 PHA Personal Health Assistant. Developed by ZORPH SRL. All rights reserved. This document is intended to provide clear legal protection for the PHA Personal Health Assistant Service and to set appropriate expectations for users and regulators.

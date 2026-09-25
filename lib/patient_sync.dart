@@ -4,6 +4,10 @@ import 'api.dart';
 import 'db.dart';
 
 /// Exports local health history and syncs it with the server (keyed by email).
+///
+/// Phone SQLite is the working copy (including uploaded files). The server keeps
+/// an email-keyed encrypted snapshot for restore: vitals, activity, Ai Doc chats,
+/// and Health Insights (`health_analysis`) deviations — not file binaries.
 class PatientSync {
   static const _tables = [
     'health_metrics',
@@ -21,7 +25,14 @@ class PatientSync {
     'physical_activity_checkins',
   ];
 
-  /// Pulls server history and merges if the server copy is newer.
+  /// Tables that may store on-device paths; binaries stay on the phone.
+  static const _localFilePathTables = {
+    'analysis_uploads',
+    'meal_calorie_checks',
+  };
+
+  /// Pulls server history and replaces local rows when the server copy is newer.
+  /// Used for account restore / new-device sign-in — not routine resume backup.
   static Future<void> pullAndMerge({
     required String email,
     required String syncToken,
@@ -54,17 +65,29 @@ class PatientSync {
         syncToken: syncToken,
       );
       if (remote == null) return null;
-
-      final userId = remote['user_id'] as String;
-      await _createProfile(email, syncToken, remote);
-      await _import(remote, userId);
-      return userId;
+      return applyRemoteSnapshot(
+        email: email,
+        syncToken: syncToken,
+        remote: remote,
+      );
     } on ApiException {
-      return null;
+      rethrow;
     }
   }
 
-  /// Uploads the full local history for this patient.
+  /// Creates/replaces the local profile and history from a server snapshot.
+  static Future<String> applyRemoteSnapshot({
+    required String email,
+    required String syncToken,
+    required Map<String, dynamic> remote,
+  }) async {
+    final userId = remote['user_id'] as String;
+    await _createProfile(email, syncToken, remote);
+    await _import(remote, userId);
+    return userId;
+  }
+
+  /// Uploads the full local history for this patient (phone → server backup).
   static Future<void> push({
     required String email,
     required String syncToken,
@@ -76,6 +99,29 @@ class PatientSync {
       syncToken: syncToken,
       payload: payload,
     );
+    // Keep local freshness aligned so a later pull cannot overwrite newer phone data.
+    await Db.instance.raw.update(
+      'profiles',
+      {'updated_at': payload['updated_at']},
+      where: 'id = ?',
+      whereArgs: [userId],
+    );
+  }
+
+  /// Convenience for write-sites that only know [userId].
+  static Future<void> pushForUser(String userId) async {
+    final rows = await Db.instance.raw.query(
+      'profiles',
+      columns: ['email', 'password_hash'],
+      where: 'id = ?',
+      whereArgs: [userId],
+      limit: 1,
+    );
+    if (rows.isEmpty) return;
+    final email = rows.first['email'] as String?;
+    final token = rows.first['password_hash'] as String?;
+    if (email == null || email.isEmpty || token == null || token.isEmpty) return;
+    await push(email: email, syncToken: token, userId: userId);
   }
 
   static Future<bool> existsOnServer(String email) async {
@@ -94,6 +140,9 @@ class PatientSync {
     final profile = Map<String, dynamic>.from(profiles.first);
     profile.remove('password_hash');
 
+    final updatedAt = DateTime.now().toUtc().toIso8601String();
+    profile['updated_at'] = updatedAt;
+
     final tables = <String, List<Map<String, dynamic>>>{};
     for (final table in _tables) {
       final rows = await db.query(
@@ -101,17 +150,31 @@ class PatientSync {
         where: 'user_id = ?',
         whereArgs: [userId],
       );
-      tables[table] = rows.map((r) => Map<String, dynamic>.from(r)).toList();
+      tables[table] = rows.map((r) {
+        final row = Map<String, dynamic>.from(r);
+        if (_localFilePathTables.contains(table) && row.containsKey('file_path')) {
+          // Keep display name only — original files remain on-device.
+          row['file_path'] = _fileNameOnly(row['file_path'] as String?);
+        }
+        return row;
+      }).toList();
     }
 
     return {
       'version': 1,
       'user_id': userId,
       'email': email.trim().toLowerCase(),
-      'updated_at': DateTime.now().toUtc().toIso8601String(),
+      'updated_at': updatedAt,
       'profile': profile,
       for (final entry in tables.entries) entry.key: entry.value,
     };
+  }
+
+  static String _fileNameOnly(String? path) {
+    if (path == null || path.isEmpty) return '';
+    final normalized = path.replaceAll('\\', '/');
+    final parts = normalized.split('/');
+    return parts.isEmpty ? '' : parts.last;
   }
 
   static Future<void> _createProfile(

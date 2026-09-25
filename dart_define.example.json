@@ -1,4 +1,5 @@
 {
   "PHA_API_BASE": "http://49.13.66.150:8080",
-  "PHA_API_KEY": "put-the-backend-API_KEY-here"
+  "PHA_API_KEY": "put-the-backend-API_KEY-here",
+  "REVENUECAT_IOS_API_KEY": "appl_YOUR_APPLE_PUBLIC_SDK_KEY"
 }

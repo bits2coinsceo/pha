@@ -65,8 +65,8 @@
   "signUp": "إنشاء حساب",
   "createAccount": "إنشاء حساب",
   "signUpForFree": "سجّل مجانًا",
-  "alreadyHaveAccount": "لديك حساب؟ سجّل الدخول",
-  "dontHaveAccount": "ليس لديك حساب؟ أنشئ حسابًا",
+  "alreadyHaveAccount": "لديك حساب؟",
+  "dontHaveAccount": "ليس لديك حساب؟",
   "email": "البريد الإلكتروني",
   "password": "كلمة المرور",
   "displayName": "الاسم المعروض",
@@ -79,6 +79,25 @@
   "acceptPrivacy": "أوافق على سياسة الخصوصية",
   "pleaseAcceptLegal": "يُرجى قراءة الاتفاقية وسياسة الخصوصية والموافقة عليهما للمتابعة.",
   "passwordTooShort": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل.",
+  "emailAlreadyRegistered": "هذا البريد مستخدم بالفعل. يُرجى تسجيل الدخول.",
+  "invalidEmailOrPassword": "البريد الإلكتروني أو كلمة المرور غير صحيحة. تحقق وحاول مرة أخرى.",
+  "authNetworkError": "تعذر الوصول إلى الخادم. تحقق من الاتصال وحاول مرة أخرى.",
+  "authServerSyncFailed": "تعذر تسجيل هذا البريد على الخادم. تحقق من الاتصال وحاول مرة أخرى.",
+  "authAccountNotOnServer": "لا توجد نسخة سحابية لهذا البريد بعد. افتح التطبيق على الجهاز الأصلي مع الإنترنت ثم حاول مرة أخرى.",
+  "authCodeSent": "أرسلنا رمزاً من 6 أرقام إلى بريدك. صالح لمدة 10 دقائق.",
+  "authEnterCode": "رمز التأكيد",
+  "authVerifyAndCreate": "تأكيد وإنشاء الحساب",
+  "authResendCode": "إعادة إرسال الرمز",
+  "authInvalidCode": "الرمز غير صالح أو منتهٍ.",
+  "authResendTooSoon": "انتظر قليلاً قبل طلب رمز جديد.",
+  "authEmailDeliveryFailed": "تعذر إرسال البريد. حاول لاحقاً.",
+  "forgotPassword": "هل نسيت كلمة المرور؟",
+  "forgotPasswordSend": "إرسال رمز إعادة التعيين",
+  "forgotPasswordTitle": "إعادة تعيين كلمة المرور",
+  "forgotPasswordNew": "كلمة مرور جديدة",
+  "forgotPasswordConfirm": "حفظ كلمة المرور الجديدة",
+  "forgotPasswordDone": "تم تحديث كلمة المرور. سجّل الدخول بالجديدة.",
+  "authAccountNotFound": "لا يوجد حساب سحابي لهذا البريد.",
   "featureTrackVitals": "تتبّع العلامات الحيوية والسكر",
   "featureAiInsights": "رؤى صحية بالذكاء الاصطناعي",
   "featureSmartAnalysis": "تحليل ذكي",
@@ -252,7 +271,7 @@
       }
     }
   },
-  "stepsRangeSedentary": "0–{max} steps",
+  "stepsRangeSedentary": "0–{max} خطوة",
   "@stepsRangeSedentary": {
     "placeholders": {
       "max": {
@@ -260,7 +279,7 @@
       }
     }
   },
-  "stepsRangeBuilding": "{min}–{max} steps",
+  "stepsRangeBuilding": "{min}–{max} خطوة",
   "@stepsRangeBuilding": {
     "placeholders": {
       "min": {
@@ -271,7 +290,7 @@
       }
     }
   },
-  "stepsRangeBaseline": "{min}–{max} steps",
+  "stepsRangeBaseline": "{min}–{max} خطوة",
   "@stepsRangeBaseline": {
     "placeholders": {
       "min": {
@@ -282,7 +301,7 @@
       }
     }
   },
-  "stepsRangeStrong": "{min}–{max} steps",
+  "stepsRangeStrong": "{min}–{max} خطوة",
   "@stepsRangeStrong": {
     "placeholders": {
       "min": {
@@ -293,7 +312,7 @@
       }
     }
   },
-  "stepsRangeGoal": "{min}+ steps",
+  "stepsRangeGoal": "{min}+ خطوة",
   "@stepsRangeGoal": {
     "placeholders": {
       "min": {
@@ -303,12 +322,12 @@
   },
   "todaysNotifications": "إشعارات اليوم",
   "morningNotificationTitle": "صباح الخير — ملخص صحتك",
-  "noNotificationsToday": "No notifications for today yet.",
-  "notificationsAppearHere": "Notifications that already arrived today appear here.",
+  "noNotificationsToday": "لا توجد إشعارات لليوم بعد.",
+  "notificationsAppearHere": "تظهر هنا الإشعارات التي وصلت اليوم.",
   "phaPlusUnlockedTitle": "أنت على PHA Plus+!",
   "phaPlusUnlockedBody": "جميع الميزات مفتوحة. استمتع بالرفع غير المحدود وPsychoTest وجدول العلاج.",
-  "onboardingQuest2BuildAvatar": "Quest 2: Build your avatar",
-  "onboardingQuest2FillFields": "Fill all 3 fields — earn +{hp} HP on complete.",
+  "onboardingQuest2BuildAvatar": "المهمة 2: أنشئ ملفك",
+  "onboardingQuest2FillFields": "املأ الحقول الثلاثة للمتابعة.",
   "@onboardingQuest2FillFields": {
     "placeholders": {
       "hp": {
@@ -316,12 +335,12 @@
       }
     }
   },
-  "rewardedStats": "Rewarded stats",
+  "rewardedStats": "إحصاءات مكافأة",
   "yourGender": "جنسك",
   "male": "ذكر",
   "female": "أنثى",
   "unitYearsLong": "years",
-  "completeQuest2": "Complete Quest 2 (+{hp} HP)",
+  "completeQuest2": "أكمل المهمة 2",
   "@completeQuest2": {
     "placeholders": {
       "hp": {
@@ -329,10 +348,10 @@
       }
     }
   },
-  "backToQuest2": "Back to Quest 2",
-  "onboardingQuest3PowerUp": "Quest 3: Power-up (bonus)",
-  "onboardingQuest3BpDone": "You already logged BP and glucose today. Come back tomorrow for your next reading.",
-  "onboardingQuest3Optional": "Optional vitals — +{bpHp} HP for BP, +{glucoseHp} HP for glucose. Once per day.",
+  "backToQuest2": "العودة إلى المهمة 2",
+  "onboardingQuest3PowerUp": "المهمة 3: تعزيز (مكافأة)",
+  "onboardingQuest3BpDone": "سجّلت ضغط الدم والسكر اليوم. عد غدًا للقراءة التالية.",
+  "onboardingQuest3Optional": "مؤشرات اختيارية — سجّل ضغط الدم والسكر (مرة يوميًا).",
   "@onboardingQuest3Optional": {
     "placeholders": {
       "bpHp": {
@@ -343,8 +362,8 @@
       }
     }
   },
-  "onboardingAllQuestsComplete": "All quests complete!",
-  "onboardingEarnedHp": "You earned {hp} HP · Level {level} {title}",
+  "onboardingAllQuestsComplete": "اكتملت جميع المهام!",
+  "onboardingEarnedHp": "المستوى {level} · {title}",
   "@onboardingEarnedHp": {
     "placeholders": {
       "hp": {
@@ -358,23 +377,23 @@
       }
     }
   },
-  "onboardingBonusVitals": "Bonus vitals unlocked extra insights!",
-  "healthPower": "Health Power",
-  "onboardingCreateAccount": "Create account and become healthy →",
-  "onboardingEnterDashboard": "Enter dashboard →",
+  "onboardingBonusVitals": "المؤشرات الإضافية فتحت مزيدًا من الرؤى!",
+  "healthPower": "طاقة الصحة",
+  "onboardingCreateAccount": "أنشئ حسابًا وابدأ بصحة أفضل ←",
+  "onboardingEnterDashboard": "ادخل لوحة التحكم ←",
   "badgeUnitPro": "Unit Pro",
-  "badgeFoundation": "Foundation",
+  "badgeFoundation": "الأساس",
   "badgeHeartTrack": "تتبع القلب",
-  "badgeSugarSense": "Sugar Sense",
+  "badgeSugarSense": "حاسة السكر",
   "badgeChampion": "Champion",
-  "levelHealthRookie": "Health Rookie",
-  "levelProfileBuilder": "Profile Builder",
-  "levelVitalsPro": "Vitals Pro",
+  "levelHealthRookie": "مبتدئ صحي",
+  "levelProfileBuilder": "باني الملف",
+  "levelVitalsPro": "محترف المؤشرات",
   "picked": "PICKED",
   "saving": "Saving…",
-  "claimBonusFinish": "Claim bonus & finish 🏆",
-  "skipBonusQuest": "Skip bonus quest",
-  "calculatingRewards": "Calculating rewards…",
+  "claimBonusFinish": "احفظ وأنهِ 🏆",
+  "skipBonusQuest": "تخطي",
+  "calculatingRewards": "Saving…",
   "categoryBloodPressure": "ضغط الدم",
   "categoryBloodGlucose": "سكر الدم",
   "categoryWeight": "Weight",
@@ -386,7 +405,7 @@
   "categoryAlcohol": "الكحول",
   "categoryScreenTime": "وقت الشاشة",
   "categoryNutrition": "التغذية",
-  "categoryPsychoTest": "PsychoTest",
+  "categoryPsychoTest": "اختبار نفسي",
   "categoryActivity": "النشاط",
   "categoryHeartRate": "معدل وإيقاع القلب",
   "categoryAge": "العمر",
@@ -430,7 +449,7 @@
   "bmiMsgOverweight": "وزنك أعلى قليلاً من النطاق الصحي. استهدف إنقاصاً أسبوعياً لطيفاً، حافظ على البروتين وخطواتك اليومية.",
   "bmiMsgObeseI": "وزنك أعلى بوضوح من النطاق الصحي. قد يرفع ضغط الدم وسكر الدم. طعام أفضل ومزيد من المشي وخطة مع الطبيب تساعد كثيراً.",
   "bmiMsgObeseII": "وزنك أعلى بكثير من النطاق الصحي. راجع الطبيب لخطة آمنة تحمي قلبك والأيض.",
-  "stepsLabel": "{count} steps",
+  "stepsLabel": "{count} خطوة",
   "@stepsLabel": {
     "placeholders": {
       "count": {
@@ -453,11 +472,11 @@
   "wellnessMsgNeedsAttention": "درجة العافية تشير لضغط مرتفع. احمِ النوم وقلل الكافيين المتأخر وتواصل اجتماعياً هذا الأسبوع.",
   "wellnessMsgCritical": "حمل ضغط عالٍ. أعد Wellness Check وتحدث مع مختص إن استمر.",
   "smokingGood": "لا تدخين مُبلغ — من أقوى عوامل الحماية للقلب والرئتين.",
-  "smokingLessPack": "<1 pack/day",
-  "smokingOnePack": "~1 pack/day",
-  "smokingMorePack": ">1 pack/day",
-  "smokingActive": "Active smoker",
-  "smokingNonSmoker": "Non-smoker",
+  "smokingLessPack": "<1 علبة/يوم",
+  "smokingOnePack": "~1 علبة/يوم",
+  "smokingMorePack": ">1 علبة/يوم",
+  "smokingActive": "مدخن نشط",
+  "smokingNonSmoker": "غير مدخن",
   "smokingWarning": "التدخين عامل خطر رئيسي لمؤشر الصحة. حدد يوم إقلاع، أزل المحفزات واستخدم Plus+ → العادات السيئة لتتبع التقدم.",
   "alcoholNone": "لا شيء",
   "alcoholGood": "لا استخدام كحول مُبلغ — مفيد للضغط والنوم والكبد.",
@@ -478,7 +497,7 @@
   "screenConstant": "مستمر",
   "screenConstantTip": "وقت شاشة عالٍ يزاحم الحركة والنوم. ضع حدوداً واستبدل تمرير بمشي.",
   "screenDefaultTip": "راجع عادات الشاشة — حدود مسائية صغيرة غالباً تساعد العافية.",
-  "nutritionRecentMeals": "{count} recent meals",
+  "nutritionRecentMeals": "{count} وجبات حديثة",
   "@nutritionRecentMeals": {
     "placeholders": {
       "count": {
@@ -489,7 +508,7 @@
   "nutritionWarning": "عدة وجبات حديثة تحتاج انتباهاً. فضّل الخضار والبروتين وقلل المعالج؛ سجّل الوجبة التالية للملاحظات.",
   "nutritionGood": "جودة الوجبات الأخيرة قوية. حافظ على النمط — يدعم السكر والوزن في المؤشر.",
   "nutritionInfo": "جودة وجبات مختلطة مؤخراً. استهدف تحسيناً واحداً يومياً (مزيد ألياف أو بروتين، أقل مشروبات سكرية).",
-  "psychoLoad": "Load {total} · {label}",
+  "psychoLoad": "الحمل {total} · {label}",
   "@psychoLoad": {
     "placeholders": {
       "total": {
@@ -509,10 +528,10 @@
   "priorityHigh": "High",
   "priorityMedium": "Medium",
   "priorityLow": "Low",
-  "profileUpdatedSuccess": "Profile updated successfully!",
-  "termsOfService": "Terms of Service & Disclaimer",
-  "howWeHandleData": "How we handle your data",
-  "sameScoreHint": "Same score as on Home",
+  "profileUpdatedSuccess": "تم تحديث الملف الشخصي بنجاح!",
+  "termsOfService": "شروط الخدمة وإخلاء المسؤولية",
+  "howWeHandleData": "كيف نتعامل مع بياناتك",
+  "sameScoreHint": "نفس الدرجة كما في الصفحة الرئيسية",
   "eveningNotificationTitle": "تسجيل مسائي",
   "bpMsgLow": "ضغط الدم أقل من النطاق المعتاد (انخفاض الضغط). اشرب سوائل كافية واستشر الطبيب عند الدوخة.",
   "bpMsgOptimal": "ضغط الدم مثالي (<120/<80). واصل أسلوب الحياة الصحي.",
@@ -523,12 +542,12 @@
   "bpMsgGrade3": "ضغط الدم مرتفع جداً. اطلب رعاية طبية دون تأخير.",
   "bpMsgDiabetes": "ضغط الدم مرتفع جداً. اطلب رعاية طبية دون تأخير.",
   "uploadAnalysisTitle": "رفع التحليل",
-  "uploadFileType": "File Type",
-  "uploadPdf": "PDF Document",
-  "uploadPhoto": "Photo / Image",
-  "uploadSelectFile": "Select File",
-  "uploadClickToSelect": "Click to select a file",
-  "uploadClickToChange": "{size} KB — click to change",
+  "uploadFileType": "نوع الملف",
+  "uploadPdf": "مستند PDF",
+  "uploadPhoto": "صورة / صورة فوتوغرافية",
+  "uploadSelectFile": "اختر ملفًا",
+  "uploadClickToSelect": "انقر لاختيار ملف",
+  "uploadClickToChange": "{size} كيلوبايت — انقر للتغيير",
   "@uploadClickToChange": {
     "placeholders": {
       "size": {
@@ -536,15 +555,15 @@
       }
     }
   },
-  "uploadLimitReached": "Limit reached",
-  "uploadUpgradeMore": "Upgrade to upload more",
-  "uploadFile": "Upload File",
-  "uploadAnalyzing": "Analyzing...",
-  "uploadAnalyzingAiDoc": "Analyzing your file with Ai Doc…",
-  "uploadFailed": "Upload failed. Please try again.",
-  "uploadCouldNotRead": "Could not read the selected file. Please pick it again.",
-  "uploadLimitMessage": "Upload limit reached. Upgrade to PHA Plus+ for unlimited uploads.",
-  "uploadFreePlan": "Free plan: {count}/2 uploads used. Max 2 pages per file.",
+  "uploadLimitReached": "تم بلوغ الحد",
+  "uploadUpgradeMore": "رقِّ خطتك لرفع المزيد",
+  "uploadFile": "رفع ملف",
+  "uploadAnalyzing": "جارٍ التحليل…",
+  "uploadAnalyzingAiDoc": "جارٍ تحليل ملفك مع Ai Doc…",
+  "uploadFailed": "فشل الرفع. حاول مرة أخرى.",
+  "uploadCouldNotRead": "تعذر قراءة الملف المحدد. اختره مجددًا.",
+  "uploadLimitMessage": "تم بلوغ حد الرفع. رقِّ إلى PHA Plus+ للرفع بلا حدود.",
+  "uploadFreePlan": "الخطة المجانية: {count}/2 رفع مستخدم. بحد أقصى صفحتان لكل ملف.",
   "@uploadFreePlan": {
     "placeholders": {
       "count": {
@@ -553,14 +572,14 @@
     }
   },
   "mealTakePhoto": "التقط أو ارفع صورة لوجبتك",
-  "mealAfterAnalysis": "After analysis, tap ✓ only if you ate this dish — it adds to today's calories.",
+  "mealAfterAnalysis": "بعد التحليل، اضغط ✓ فقط إذا أكلت هذا الطبق — يُضاف إلى سعرات اليوم.",
   "mealCamera": "Camera",
   "mealGallery": "Gallery",
-  "mealAnalyze": "Analyze Meal",
-  "mealAnalyzing": "Analyzing…",
-  "mealFailed": "Analysis failed. Please try again.",
-  "mealFreeLimit": "Free limit reached (2 meals per 24h). Upgrade to PHA Plus+ for unlimited meal checks.",
-  "mealFreePlan": "Free plan: {count}/{limit} meals logged in the last 24 hours.",
+  "mealAnalyze": "حلّل الوجبة",
+  "mealAnalyzing": "جارٍ التحليل…",
+  "mealFailed": "فشل التحليل. حاول مرة أخرى.",
+  "mealFreeLimit": "تم بلوغ الحد المجاني (وجبتان / 24 ساعة). رقِّ إلى PHA Plus+ لفحوصات بلا حدود.",
+  "mealFreePlan": "الخطة المجانية: {count}/{limit} وجبات خلال آخر 24 ساعة.",
   "@mealFreePlan": {
     "placeholders": {
       "count": {
@@ -571,15 +590,15 @@
       }
     }
   },
-  "mealLogged": "Meal logged — counted in today's intake & Health Index.",
-  "mealTapConfirm": "Tap ✓ to confirm you ate this — adds to today's intake.",
+  "mealLogged": "سُجّلت الوجبة — تُحسب في متناول اليوم ومؤشر الصحة.",
+  "mealTapConfirm": "اضغط ✓ لتأكيد أنك أكلتها — تُضاف لمتناول اليوم.",
   "mealDiscard": "Discard",
-  "mealTotalIntake": "Total Intake",
+  "mealTotalIntake": "إجمالي المتناول",
   "mealCarb": "Carb",
   "mealProteins": "Proteins",
   "mealFat": "Fat",
-  "mealNoMealsToday": "No meals confirmed today yet.",
-  "mealNoMealsLogged": "No meals logged · target ~{target} kcal",
+  "mealNoMealsToday": "لا وجبات مؤكدة اليوم بعد.",
+  "mealNoMealsLogged": "لا وجبات · الهدف ~{target} سعرة",
   "@mealNoMealsLogged": {
     "placeholders": {
       "target": {
@@ -587,12 +606,12 @@
       }
     }
   },
-  "mealConfirmHint": "Confirm meals after analysis to track intake.",
+  "mealConfirmHint": "أكد الوجبات بعد التحليل لتتبع المتناول.",
   "aiDocTitle": "مساعد Ai Doc",
-  "aiDocWelcome": "Hello! I'm your Ai Doc Assistant. Would you like us to use the data you provided during onboarding? After that, you can describe your problem in detail — or share a photo of a meal, lab result, or anything health-related.",
-  "aiDocOffline": "Ai Doc is offline — API key not set.",
-  "aiDocFreeLimit": "Free consultation limit reached.",
-  "aiDocFreeRemaining": "{remaining} of 3 free consultations remaining.",
+  "aiDocWelcome": "مرحبًا! أنا مساعد Ai Doc. هل نستخدم بياناتك من الإعداد الأولي؟ بعد ذلك يمكنك وصف مشكلتك بالتفصيل — أو مشاركة صورة لوجبة أو نتيجة تحليل أو أي أمر صحي.",
+  "aiDocOffline": "Ai Doc غير متصل — مفتاح API غير مضبوط.",
+  "aiDocFreeLimit": "تم بلوغ حد الاستشارات المجانية.",
+  "aiDocFreeRemaining": "يتبقى {remaining} من 3 استشارات مجانية.",
   "@aiDocFreeRemaining": {
     "placeholders": {
       "remaining": {
@@ -600,14 +619,19 @@
       }
     }
   },
-  "aiDocAnalyzingHealth": "Analyzing your health data…",
-  "aiDocLooking": "Looking at that…",
-  "aiDocAskPlaceholder": "Ask about symptoms, or add a photo note",
-  "aiDocUpgradeChat": "Upgrade to continue chatting…",
-  "aiDocNoProblem": "No problem! Whenever you're ready, describe your symptoms or health concerns in detail — or share a photo.",
+  "aiDocAnalyzingHealth": "جارٍ تحليل بياناتك الصحية…",
+  "aiDocLooking": "أراجع ذلك…",
+  "aiDocAskPlaceholder": "اسأل عن الأعراض أو أضف ملاحظة بصورة",
+  "aiDocUpgradeChat": "رقِّ خطتك لمتابعة الدردشة…",
+  "aiDocNoProblem": "لا بأس! عندما تكون مستعدًا صف أعراضك أو مخاوفك بالتفصيل — أو شارك صورة.",
   "aiDocPhoto": "Photo",
-  "wellnessResults": "Wellness Results",
-  "wellnessQuestion": "Question {current} of {total}",
+  "aiDocHoldToSpeak": "اضغط مطولاً للتحدث",
+  "aiDocListening": "جاري الاستماع… أفلت للإرسال",
+  "aiDocSpeechUnavailable": "الإدخال الصوتي غير متاح على هذا الجهاز.",
+  "aiDocSpeechPermissionDenied": "يلزم إذن الميكروفون أو التعرف على الكلام للرسائل الصوتية.",
+  "aiDocSpeechEmpty": "لم يُكتشف كلام. اضغط مطولاً على الميكروفون وحاول مجددًا.",
+  "wellnessResults": "نتائج العافية",
+  "wellnessQuestion": "السؤال {current} من {total}",
   "@wellnessQuestion": {
     "placeholders": {
       "current": {
@@ -618,7 +642,7 @@
       }
     }
   },
-  "percentComplete": "{percent}% complete",
+  "percentComplete": "اكتمل {percent}%",
   "@percentComplete": {
     "placeholders": {
       "percent": {
@@ -626,16 +650,16 @@
       }
     }
   },
-  "questionUnavailable": "Question unavailable",
-  "wellnessVeryPoor": "Very poor",
+  "questionUnavailable": "السؤال غير متاح",
+  "wellnessVeryPoor": "ضعيف جدًا",
   "wellnessPoor": "Poor",
   "wellnessModerate": "Moderate",
   "wellnessGood": "Good",
-  "wellnessExcellent": "Excellent",
-  "badHabitsSummaryTitle": "Bad Habits Summary",
-  "badHabitsSaved": "Saved to your health history. Honest tracking is the first step toward change.",
-  "badHabitsSocialMediaLabel": "Social media",
-  "badHabitsStep": "Step {step} of {total}",
+  "wellnessExcellent": "ممتاز",
+  "badHabitsSummaryTitle": "ملخص العادات السيئة",
+  "badHabitsSaved": "حُفظ في سجلك الصحي. التتبع الصادق أول خطوة نحو التغيير.",
+  "badHabitsSocialMediaLabel": "وسائل التواصل",
+  "badHabitsStep": "الخطوة {step} من {total}",
   "@badHabitsStep": {
     "placeholders": {
       "step": {
@@ -647,17 +671,17 @@
     }
   },
   "badHabitsDoYouSmoke": "هل تدخن؟",
-  "badHabitsHowMuchSmoke": "How much do you smoke?",
-  "badHabitsDoYouDrink": "Do you drink alcohol?",
-  "badHabitsHowMuchDrink": "How often and how much do you drink?",
-  "badHabitsSocialMedia": "How much time do you spend uselessly on social media?",
+  "badHabitsHowMuchSmoke": "كم تدخن؟",
+  "badHabitsDoYouDrink": "هل تشرب الكحول؟",
+  "badHabitsHowMuchDrink": "كم مرة وكم تشرب؟",
+  "badHabitsSocialMedia": "كم تقضي من الوقت بلا فائدة على وسائل التواصل؟",
   "treatmentYourSchedule": "جدولك",
-  "treatmentAddMedicine": "Add medicine or supplement",
-  "treatmentNewEntry": "New entry",
-  "treatmentMedicineName": "Name of medicine or dietary supplement",
-  "treatmentMedicinePlaceholder": "e.g. Vitamin D, Metformin",
-  "treatmentHowManyTimes": "How many times a day",
-  "treatmentDoseTime": "Dose {n} time",
+  "treatmentAddMedicine": "أضف دواءً أو مكملًا",
+  "treatmentNewEntry": "إدخال جديد",
+  "treatmentMedicineName": "اسم الدواء أو المكمل الغذائي",
+  "treatmentMedicinePlaceholder": "مثل: فيتامين D، ميتفورمين",
+  "treatmentHowManyTimes": "كم مرة يوميًا",
+  "treatmentDoseTime": "وقت الجرعة {n}",
   "@treatmentDoseTime": {
     "placeholders": {
       "n": {
@@ -665,28 +689,28 @@
       }
     }
   },
-  "treatmentAddAnother": "Add another",
+  "treatmentAddAnother": "أضف آخر",
   "treatmentSaveSchedule": "حفظ الجدول",
-  "treatmentSaved": "Treatment schedule saved — pill reminders are on",
-  "treatmentEnterName": "Enter at least one medicine or supplement name.",
-  "treatmentSaveFailed": "Could not save. Please try again.",
-  "treatmentNotifOff": "Schedule saved, but notifications are off. Enable alerts in Settings to get pill reminders.",
-  "psychoTestSubtitle": "Stress & Psychosomatic Self-Assessment",
-  "psychoTestIntro": "This assessment contains 3 blocks with a total of 20 questions. Answer honestly — there are no right or wrong answers. Results are saved to your profile.",
+  "treatmentSaved": "حُفظ جدول العلاج — تذكيرات الحبوب مفعّلة",
+  "treatmentEnterName": "أدخل اسم دواء أو مكمل واحد على الأقل.",
+  "treatmentSaveFailed": "تعذر الحفظ. حاول مرة أخرى.",
+  "treatmentNotifOff": "حُفظ الجدول لكن الإشعارات متوقفة. فعّلها في الإعدادات لتذكيرات الحبوب.",
+  "psychoTestSubtitle": "تقييم ذاتي للتوتر والنفس جسدي",
+  "psychoTestIntro": "يضم التقييم 3 أقسام و20 سؤالًا. أجب بصدق — لا إجابات صحيحة أو خاطئة. تُحفظ النتائج في ملفك.",
   "psychoBlock1Title": "BLOCK 1",
-  "psychoBlock1Subtitle": "Stress Awareness",
+  "psychoBlock1Subtitle": "وعي التوتر",
   "psychoBlock2Title": "BLOCK 2",
-  "psychoBlock2Subtitle": "Physical Symptoms",
+  "psychoBlock2Subtitle": "أعراض جسدية",
   "psychoBlock3Title": "BLOCK 3",
-  "psychoBlock3Subtitle": "Behavioral Profile",
-  "psychoAnswerHint": "Each question has 3 answer options: Never · Sometimes · Often",
+  "psychoBlock3Subtitle": "الملف السلوكي",
+  "psychoAnswerHint": "لكل سؤال 3 خيارات: أبدًا · أحيانًا · كثيرًا",
   "psychoStartAssessment": "بدء التقييم",
-  "psychoYourResult": "YOUR RESULT",
+  "psychoYourResult": "نتيجتك",
   "psychoRetake": "Retake",
   "psychoNever": "Never",
-  "psychoSometimes": "Sometimes",
+  "psychoSometimes": "أحيانًا",
   "psychoOften": "Often",
-  "psychoQuestionsCount": "{count} questions",
+  "psychoQuestionsCount": "{count} أسئلة",
   "@psychoQuestionsCount": {
     "placeholders": {
       "count": {
@@ -694,8 +718,8 @@
       }
     }
   },
-  "onboardingBackToQuest2": "Back to Quest 3",
-  "onboardingBpGlucose": "BP / +{hp} HP",
+  "onboardingBackToQuest2": "العودة إلى المهمة 3",
+  "onboardingBpGlucose": "ضغط الدم",
   "@onboardingBpGlucose": {
     "placeholders": {
       "hp": {
@@ -703,7 +727,7 @@
       }
     }
   },
-  "onboardingGlucoseHp": "Glucose / +{hp} HP",
+  "onboardingGlucoseHp": "السكر",
   "@onboardingGlucoseHp": {
     "placeholders": {
       "hp": {
@@ -713,7 +737,7 @@
   },
   "onboardingSys": "Sys",
   "onboardingDia": "Dia",
-  "onboardingReadyForPha": "{percent}% — ready for PHA",
+  "onboardingReadyForPha": "{percent}% — جاهز لـ PHA",
   "@onboardingReadyForPha": {
     "placeholders": {
       "percent": {
@@ -721,7 +745,7 @@
       }
     }
   },
-  "onboardingRedeemHp": "Redeem your {hp} HP for {percent}% off your first 6-month or annual PHA Plus+ subscription.",
+  "onboardingRedeemHp": "احصل على خصم {percent}% على أول اشتراك PHA Plus+ لـ 6 أشهر أو سنوي.",
   "@onboardingRedeemHp": {
     "placeholders": {
       "hp": {
@@ -734,11 +758,11 @@
   },
   "activityCurrentPlanSubtitle": "خطة نشاطك البدني الحالية",
   "activityCustomPlanHint": "خطتك نشطة. أكمل التمرين اليومي وأجب على تسجيل المساء.",
-  "activityRestNote": "Rest no more than 2 minutes between sets.",
+  "activityRestNote": "لا تزد الراحة على دقيقتين بين المجموعات.",
   "dailyLabel": "Daily",
-  "fileTypePdf": "PDF up to 2 pages (free plan)",
-  "upgradeToPhaPlus": "Upgrade to PHA Plus+",
-  "healthAnalysisSubtitleShort": "Same score as Home Health Index",
+  "fileTypePdf": "PDF حتى صفحتين (الخطة المجانية)",
+  "upgradeToPhaPlus": "الترقية إلى PHA Plus+",
+  "healthAnalysisSubtitleShort": "نفس درجة مؤشر الصحة في الصفحة الرئيسية",
   "wellnessQ1": "ما مدى الشعور بالتوتر الآن؟",
   "wellnessQ2": "كيف كان نومك الليلة الماضية؟",
   "wellnessQ3": "كيف مستوى طاقتك اليوم؟",
@@ -797,7 +821,7 @@
   "loginHeroLine3": "مُتتبَّعة.",
   "loginHeroBody": "راقب مؤشراتك واحصل على رؤى بالذكاء الاصطناعي.",
   "loginTrustedBy": "موثوق به من قبل المهتمين بالصحة حول العالم.",
-  "loginSignUpSubtitle": "ابدأ تتبع صحتك اليوم — مجاناً للأبد.",
+  "loginSignUpSubtitle": "ابدأ تتبع صحتك اليوم.",
   "loginSignInSubtitle": "سجّل الدخول للوصول إلى لوحة صحتك.",
   "loginFullName": "الاسم الكامل",
   "loginNamePlaceholder": "أحمد محمد",
@@ -830,6 +854,12 @@
   "vitalsPromptTurnOffHint": "تخطّي تذكيرات الضغط/السكر اليومية.",
   "vitalsPromptEvery5Days": "اسأل مرة كل 5 أيام",
   "vitalsPromptEvery5DaysHint": "تذكير كل 5 أيام وليس يومياً.",
+  "vitalsPromptSectionTitle": "ضغط الدم والسكر",
+  "vitalsPromptSectionSubtitle": "كم مرة يجب أن يطلب PHA تسجيل الضغط والسكر؟",
+  "vitalsPromptDaily": "مرة يوميًا",
+  "vitalsPromptDailyHint": "تذكير كل يوم حتى تسجّل قيم اليوم.",
+  "vitalsPromptNever": "لا تسأل",
+  "vitalsPromptNeverHint": "بدون تذكيرات تلقائية للضغط أو السكر.",
   "vitalsBpLabel": "ضغط الدم (mmHg)",
   "vitalsGlucoseLabel": "سكر الدم ({unit})",
   "@vitalsGlucoseLabel": {
@@ -866,12 +896,17 @@
   "logMetricHintWeightMetric": "مثال 72.5",
   "logMetricHintWater": "مثال 2000",
   "upgradeTrialTitle": "افتح جميع ميزات PHA Plus+",
+  "purchaseErrorInvalidCredentials": "خطأ في الشراء: بيانات اعتماد الفوترة غير صالحة. في RevenueCat → Project settings → API keys انسخ Apple public SDK key (appl_…) إلى dart_define.json كمفتاح REVENUECAT_IOS_API_KEY وتحقق من ربط App Store Connect.",
+  "purchaseErrorNetwork": "خطأ في الشبكة أثناء الاتصال بـ App Store. تحقق من الاتصال وحاول مرة أخرى.",
+  "purchaseErrorStore": "تعذر على App Store إكمال الشراء. حاول لاحقًا.",
+  "purchaseErrorNoOfferings": "الخطط غير متاحة بعد. تحقق من offerings في RevenueCat ومنتجات App Store Connect.",
+  "purchaseErrorNoPackage": "هذه الخطة غير متاحة في المتجر الآن. جرّب خطة أخرى أو لاحقًا.",
   "upgradeTrialBody1": "تحكم كامل بصحتك! افتح جميع خيارات PHA Plus+ المميزة.",
   "upgradeTrialBody2": "ابقَ على اطلاع بالمخاطر وعدّل نمط حياتك.",
   "upgradeTagline": "صحتك. سيطرتك. دائماً.",
   "upgradeTitle": "افتح جميع الميزات",
   "upgradeSubtitle": "احصل على القوة الكاملة لمساعدك الصحي",
-  "upgradeHpBanner": "لديك {hp} HP! استبدلها بخصم {percent}%.",
+  "upgradeHpBanner": "خصم {percent}% على الخطط لمدة 6 أشهر والسنوية.",
   "@upgradeHpBanner": {
     "placeholders": {
       "hp": {
@@ -905,7 +940,7 @@
   "planBilledMonthly": "يُفوتر شهرياً.",
   "planSemiannual": "6 أشهر",
   "planAnnual": "سنوي",
-  "planHpDiscountNote": "تم تطبيق خصم 20% HP.",
+  "planHpDiscountNote": "تم تطبيق خصم 20%.",
   "planSave17": "وفر ~17%.",
   "planSave42": "وفر ~42%.",
   "planPerMonth": "/شهر",
@@ -913,6 +948,11 @@
   "planPerYear": "/سنة",
   "planBestBadge": "الأفضل",
   "psychoTestPromoBody": "تقييم ذاتي متعمق لمستويات التوتر والأنماط جسدية النفسية.",
+  "promoCodeLabel": "رمز ترويجي",
+  "promoCodeHint": "أدخل الرمز الترويجي",
+  "promoCodeApply": "تطبيق",
+  "promoCodeInvalid": "رمز ترويجي غير صالح.",
+  "promoCodeAlreadyUsed": "تم استخدام هذا الرمز مسبقاً لهذا الملف الشخصي.",
   "psychoQuestionOfBlock": "س{current} من {total}",
   "@psychoQuestionOfBlock": {
     "placeholders": {
@@ -940,6 +980,12 @@
   "aiDocNoOnboardingData": "لم أجد بيانات الإعداد بعد. أكمل الإعداد أولاً.",
   "activityYourProgramFallback": "برنامجك",
   "trialSevenDayFree": "تجربة مجانية 7 أيام",
+  "trialNotifChannelName": "تذكيرات الفترة التجريبية",
+  "trialNotifChannelDesc": "تنبيهات قبل انتهاء الفترة التجريبية المجانية",
+  "trialNotifThreeDaysTitle": "تنتهي التجربة خلال 3 أيام",
+  "trialNotifThreeDaysBody": "تنتهي تجربتك المجانية لمدة 7 أيام خلال 3 أيام. اشترك في PHA Plus+ للاحتفاظ بجميع الميزات.",
+  "trialNotifTwentyFourHoursTitle": "تنتهي التجربة خلال 24 ساعة",
+  "trialNotifTwentyFourHoursBody": "بقي أقل من يوم على انتهاء التجربة المجانية. اشترك الآن للاحتفاظ بالوصول الكامل إلى PHA.",
   "uploadImageFormats": "JPG, PNG, GIF",
   "mealSaveFailed": "تعذر الحفظ: {error}",
   "@mealSaveFailed": {
@@ -1398,6 +1444,17 @@
 
   "actionHeartRate": "معدل وإيقاع القلب",
   "actionHeartRateDesc": "فحص القلب عبر الساعة الذكية",
+  "actionEcg": "تخطيط القلب",
+  "actionEcgDesc": "قراءة تخطيط القلب من أقطاب Apple Watch والمستشعرات المتوافقة",
+  "hrEcgEmpty": "لا توجد تسجيلات من الأقطاب. سجّل تخطيطاً على Apple Watch (Series 4+) ثم اضغط قراءة المستشعرات.",
+  "hrEcgConnectSensors": "السماح بالوصول لمستشعر تخطيط القلب",
+  "hrEcgReadSensors": "قراءة تخطيط القلب من المستشعرات",
+  "hrEcgNeedPermissionTitle": "يلزم الوصول لمستشعر تخطيط القلب",
+  "hrEcgNeedPermissionBody": "تقرأ PHA تخطيط القلب الذي تكتبه أقطاب Apple Watch في Apple Health. فعّل تخطيط القلب في أذونات الصحة.",
+  "hrEcgSensorHow": "يُلتقط تخطيط القلب بأقطاب Apple Watch (التاج الرقمي + البلورة). PHA تقرأ HealthKit وليست بديلاً عن تخطيط سريري.",
+  "hrEcgSensorAndroid": "قراءة تخطيط القلب عبر Health Connect غير متاحة بعد على Android. على iPhone استخدم Apple Watch Series 4+.",
+  "hrEcgLatestFromSensor": "آخر قراءة من الأقطاب",
+  "hrEcgSensorMeta": "{source} · {samples} عيّنة · {hz} هرتز",
   "unitBpm": "نبضة/د",
   "unitMs": "مللي ث",
   "hrEvents": "أحداث",
@@ -1439,12 +1496,32 @@
   "hrNoChartData": "لا بيانات لهذه الفترة",
   "hrWhatItMeans": "ماذا يعني هذا؟",
   "hrWhatItMeansBody": "معدل القلب عند الراحة وتغيّر المعدل يعكسان التوتر والتعافي واللياقة. القفزات أو عدة أيام مرتفعة تستحق الانتباه.",
-  "hrEcgTitle": "تخطيط قلب حديث (Apple Watch)",
+  "hrEcgTitle": "تسجيلات تخطيط القلب من الأقطاب",
   "hrEcgSinusRhythm": "إيقاع جيبي",
   "hrEcgAtrialFibrillation": "رجفان أذيني",
   "hrEcgLowOrHighHr": "معدل قلب منخفض أو مرتفع",
   "hrEcgInconclusive": "غير حاسم",
-  "hrEcgNotSet": "بلا تصنيف",
+  "hrEcgNotSet": "غير مصنّف",
+  "hrEcgSinusTachycardia": "تسرع قلب جيبي",
+  "hrEcgSinusBradycardia": "بطء قلب جيبي",
+  "hrEcgVentricularTachycardia": "تسرع بطيني",
+  "hrEcgVentricularFibrillation": "رجفان بطيني",
+  "hrEcgAvBlock1": "حصار أذيني بطيني من الدرجة الأولى",
+  "hrEcgAvBlock2MobitzI": "حصار أذيني بطيني من الدرجة الثانية (موبيتز I)",
+  "hrEcgAvBlock3": "حصار أذيني بطيني من الدرجة الثالثة",
+  "hrEcgReferenceTitle": "إيقاعات تخطيط القلب باختصار",
+  "hrEcgReferenceSubtitle": "سمات تعليمية — للتثقيف فقط وليست تشخيصاً.",
+  "hrEcgFeatNormalSinus": "المعدل 60–100 · منتظم · كل P قبل QRS · PR 0.12–0.20 ث · QRS < 0.12 ث",
+  "hrEcgFeatSinusTachy": "المعدل > 100 · منتظم · كل P قبل QRS · PR 0.12–0.20 ث · QRS < 0.12 ث",
+  "hrEcgFeatSinusBrady": "المعدل < 60 · منتظم · كل P قبل QRS · PR 0.12–0.20 ث · QRS < 0.12 ث",
+  "hrEcgFeatAfib": "المعدل غالباً 100–250 · غير منتظم · بلا موجات P · QRS عادة ≤ 0.12 ث",
+  "hrEcgFeatVt": "المعدل 100–250 · منتظم · QRS واسع (≥ 0.12 ث) · غالباً بلا P",
+  "hrEcgFeatVf": "خط أساس فوضوي · بلا QRS منظم · بلا P — نمط طارئ تعليمي",
+  "hrEcgFeatAv1": "PR > 0.20 ث · كل P يتبعه QRS · QRS < 0.12 ث",
+  "hrEcgFeatAv2": "تطاول PR تدريجي · سقوط QRS · نمط دوري",
+  "hrEcgFeatAv3": "لا علاقة بين P و QRS · معدلات مستقلة · إيقاع هروبي",
+  "hrEcgFeatInconclusive": "تعذر على Apple Watch تصنيف هذا التسجيل بثقة.",
+  "hrEcgFeatUnknown": "التصنيف غير متاح.",
   "hrIrregularRhythm": "تنبيهات إيقاع غير منتظم",
   "hrTrendImproving": "تحسّن",
   "hrTrendWorsening": "تدهور",
@@ -1454,15 +1531,37 @@
   "hrExplainHighResting": "معدل الراحة {bpm} نبضة/د — أعلى من الحد المعتاد {max}. قد يرفعه التوتر أو المرض أو الكافيين أو ضعف التعافي.",
   "hrExplainLowResting": "معدل الراحة {bpm} نبضة/د — أقل من الحد المعتاد {min}. الرياضيون غالبًا أقل؛ راجع الطبيب عند الدوخة أو الضعف.",
   "hrExplainLowHrv": "تغيّر معدل القلب منخفض. قد يعني توترًا أو تعافيًا ناقصًا — ركّز على النوم والراحة.",
-  "hrExplainElevatedStreak": "معدل الراحة بقي ضمن 80–95 نبضة/د لعدة أيام. راقب التوتر أو الإفراط في التمرين أو بداية مرض.",
+  "hrExplainElevatedStreak": "معدل الراحة بقي عند ≥105 نبضة/د لعدة أيام. راقب التوتر أو الإفراط في التمرين أو بداية مرض.",
   "hrExplainSpike": "ارتفع معدل الراحة بشكل ملحوظ من يوم لآخر. سجّل شعورك وأعد الفحص غدًا.",
   "hrExplainIrregular": "أبلغت Apple Watch عن إيقاع غير منتظم. هذا ليس تشخيصًا — ناقش الأمر مع طبيب إذا استمرت التنبيهات أو شعرت بتوعك.",
   "hrAlertRiskTitle": "إنذار معدل القلب",
   "hrAlertAttentionTitle": "معدل راحة مرتفع",
-  "hrAlertGenericBody": "معدل الراحة ثابت بين 80–95 نبضة/د أو يرتفع يومًا بعد يوم. افتح معدل وإيقاع القلب للتفاصيل.",
-  "hrRestingChartTitle": "معدل القلب عند الراحة",
+  "hrAlertGenericBody": "معدل الراحة ثابت عند ≥105 نبضة/د أو يرتفع يومًا بعد يوم. افتح معدل وإيقاع القلب للتفاصيل.",
+  "hrRestingChartTitle": "معدل القلب",
   "hrAvgResting": "متوسط {bpm} نبضة/د",
-  "hrZoneNormal": "أخضر — {low}–{high} نبضة/د (طبيعي)",
+
+  "historyGlucoseAvg": "متوسط {value} {unit}",
+  "@historyGlucoseAvg": {
+    "placeholders": {
+      "value": {"type": "String"},
+      "unit": {"type": "String"}
+    }
+  },
+  "historyBpAvg": "متوسط {sys}/{dia} mmHg",
+  "@historyBpAvg": {
+    "placeholders": {
+      "sys": {"type": "int"},
+      "dia": {"type": "int"}
+    }
+  },
+  "historyGlucoseZoneNormalImperial": "طبيعي صائم ≤99 mg/dL",
+  "historyGlucoseZoneNormalMetric": "طبيعي صائم ≤5.5 mmol/L",
+  "historyGlucoseZoneAttention": "فوق الطبيعي أو مقدمات السكري",
+  "historyGlucoseZoneHigh": "مرتفع / سكري",
+  "historyBpZoneNormal": "الانقباضي ≤120 mmHg",
+  "historyBpZoneElevated": "مرتفع 121–139 mmHg",
+  "historyBpZoneHigh": "عالٍ ≥140 mmHg",
+  "hrZoneNormal": "أخضر — {low}–{high} نبضة/د في الراحة (طبيعي)",
   "hrZoneAttention": "أصفر — انحراف خفيف",
   "hrZoneRisk": "أحمر — انحراف كبير / خطر"
 }

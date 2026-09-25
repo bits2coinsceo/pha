@@ -2,9 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.pha.phaFlutter.morningPrep</string>
+		<string>com.pha.phaFlutter.morningPrep.midnight</string>
+		<string>com.pha.phaFlutter.morningPrep.prePush</string>
+		<string>com.pha.phaFlutter.eveningPrep.prePush</string>
 	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
@@ -45,8 +50,12 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>PHA uses the camera to photograph meals for calorie analysis.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>PHA uses the microphone so you can dictate messages to Ai Doc instead of typing.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>PHA converts your spoken words into text for Ai Doc consultations.</string>
 	<key>NSHealthShareUsageDescription</key>
-	<string>PHA reads your steps, walking distance, heart rate, resting heart rate, heart rate variability, and ECG data from Apple Health (including Apple Watch) to show activity and heart rhythm on your dashboard.</string>
+	<string>PHA reads your steps, walking distance, heart rate, resting heart rate, heart rate variability, irregular rhythm alerts, and electrocardiogram (ECG) recordings from Apple Health — including data written by Apple Watch electrodes — to show activity and heart rhythm in the app.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>PHA may save activity summaries you choose to log in Apple Health.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>

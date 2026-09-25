@@ -65,8 +65,8 @@
   "signUp": "Регистрация",
   "createAccount": "Создать аккаунт",
   "signUpForFree": "Зарегистрироваться бесплатно",
-  "alreadyHaveAccount": "Уже есть аккаунт? Войти",
-  "dontHaveAccount": "Нет аккаунта? Зарегистрироваться",
+  "alreadyHaveAccount": "Уже есть аккаунт?",
+  "dontHaveAccount": "Нет аккаунта?",
   "email": "Email",
   "password": "Пароль",
   "displayName": "Отображаемое имя",
@@ -79,6 +79,25 @@
   "acceptPrivacy": "Я принимаю Политику конфиденциальности",
   "pleaseAcceptLegal": "Прочитайте и примите Соглашение и Политику конфиденциальности, чтобы продолжить.",
   "passwordTooShort": "Пароль должен быть не короче 8 символов.",
+  "emailAlreadyRegistered": "Эта почта уже используется. Войдите в аккаунт.",
+  "invalidEmailOrPassword": "Неверный email или пароль. Проверьте данные и попробуйте снова.",
+  "authNetworkError": "Нет связи с сервером. Проверьте интернет и попробуйте снова.",
+  "authServerSyncFailed": "Не удалось зарегистрировать почту на сервере. Проверьте интернет и попробуйте снова.",
+  "authAccountNotOnServer": "Облачного бэкапа для этой почты ещё нет. Откройте приложение на исходном устройстве с интернетом, затем попробуйте снова.",
+  "authCodeSent": "Мы отправили 6-значный код на почту. Он действует 10 минут.",
+  "authEnterCode": "Код подтверждения",
+  "authVerifyAndCreate": "Подтвердить и создать аккаунт",
+  "authResendCode": "Отправить код ещё раз",
+  "authInvalidCode": "Неверный или просроченный код.",
+  "authResendTooSoon": "Подождите немного перед повторной отправкой кода.",
+  "authEmailDeliveryFailed": "Не удалось отправить письмо. Попробуйте позже.",
+  "forgotPassword": "Забыли пароль?",
+  "forgotPasswordSend": "Отправить код сброса",
+  "forgotPasswordTitle": "Сброс пароля",
+  "forgotPasswordNew": "Новый пароль",
+  "forgotPasswordConfirm": "Сохранить новый пароль",
+  "forgotPasswordDone": "Пароль обновлён. Войдите с новым паролем.",
+  "authAccountNotFound": "Облачный аккаунт с этой почтой не найден.",
   "featureTrackVitals": "Показатели и глюкоза",
   "featureAiInsights": "ИИ-аналитика здоровья",
   "featureSmartAnalysis": "Умный анализ",
@@ -308,7 +327,7 @@
   "phaPlusUnlockedTitle": "Вы на PHA Plus+!",
   "phaPlusUnlockedBody": "Все функции разблокированы. Наслаждайтесь неограниченными загрузками, PsychoTest и расписанием лечения.",
   "onboardingQuest2BuildAvatar": "Квест 2: Создайте аватар",
-  "onboardingQuest2FillFields": "Заполните все 3 поля — получите +{hp} HP за завершение.",
+  "onboardingQuest2FillFields": "Заполните все 3 поля, чтобы продолжить.",
   "@onboardingQuest2FillFields": {
     "placeholders": {
       "hp": {
@@ -321,7 +340,7 @@
   "male": "Мужской",
   "female": "Женский",
   "unitYearsLong": "лет",
-  "completeQuest2": "Завершить квест 2 (+{hp} HP)",
+  "completeQuest2": "Завершить квест 2",
   "@completeQuest2": {
     "placeholders": {
       "hp": {
@@ -332,7 +351,7 @@
   "backToQuest2": "Назад к квесту 2",
   "onboardingQuest3PowerUp": "Квест 3: Усиление (бонус)",
   "onboardingQuest3BpDone": "Вы уже записали АД и глюкозу сегодня. Возвращайтесь завтра для следующего измерения.",
-  "onboardingQuest3Optional": "Дополнительные показатели — +{bpHp} HP за АД, +{glucoseHp} HP за глюкозу. Раз в день.",
+  "onboardingQuest3Optional": "Дополнительные показатели — давление и глюкоза (раз в день).",
   "@onboardingQuest3Optional": {
     "placeholders": {
       "bpHp": {
@@ -344,7 +363,7 @@
     }
   },
   "onboardingAllQuestsComplete": "Все квесты завершены!",
-  "onboardingEarnedHp": "Вы заработали {hp} HP · Уровень {level} {title}",
+  "onboardingEarnedHp": "Уровень {level} · {title}",
   "@onboardingEarnedHp": {
     "placeholders": {
       "hp": {
@@ -367,14 +386,14 @@
   "badgeHeartTrack": "Пульс",
   "badgeSugarSense": "Sugar Sense",
   "badgeChampion": "Champion",
-  "levelHealthRookie": "Health Rookie",
+  "levelHealthRookie": "Новичок здоровья",
   "levelProfileBuilder": "Создатель профиля",
   "levelVitalsPro": "Vitals Pro",
   "picked": "ВЫБРАНО",
   "saving": "Сохранение…",
-  "claimBonusFinish": "Получить бонус и завершить 🏆",
-  "skipBonusQuest": "Пропустить бонусный квест",
-  "calculatingRewards": "Подсчёт наград…",
+  "claimBonusFinish": "Сохранить и завершить 🏆",
+  "skipBonusQuest": "Пропустить",
+  "calculatingRewards": "Сохранение…",
   "categoryBloodPressure": "Артериальное давление",
   "categoryBloodGlucose": "Глюкоза крови",
   "categoryWeight": "Вес",
@@ -606,6 +625,11 @@
   "aiDocUpgradeChat": "Улучшите план, чтобы продолжить чат…",
   "aiDocNoProblem": "Хорошо! Когда будете готовы, опишите симптомы или проблемы со здоровьем — или отправьте фото.",
   "aiDocPhoto": "Фото",
+  "aiDocHoldToSpeak": "Удерживайте, чтобы говорить",
+  "aiDocListening": "Слушаю… отпустите, чтобы отправить",
+  "aiDocSpeechUnavailable": "Голосовой ввод недоступен на этом устройстве.",
+  "aiDocSpeechPermissionDenied": "Для голосовых сообщений нужен доступ к микрофону и распознаванию речи.",
+  "aiDocSpeechEmpty": "Речь не распознана. Удерживайте микрофон и попробуйте снова.",
   "wellnessResults": "Результаты самочувствия",
   "wellnessQuestion": "Вопрос {current} из {total}",
   "@wellnessQuestion": {
@@ -695,7 +719,7 @@
     }
   },
   "onboardingBackToQuest2": "Назад к квесту 2",
-  "onboardingBpGlucose": "АД / +{hp} HP",
+  "onboardingBpGlucose": "Артериальное давление",
   "@onboardingBpGlucose": {
     "placeholders": {
       "hp": {
@@ -703,7 +727,7 @@
       }
     }
   },
-  "onboardingGlucoseHp": "Глюкоза / +{hp} HP",
+  "onboardingGlucoseHp": "Глюкоза",
   "@onboardingGlucoseHp": {
     "placeholders": {
       "hp": {
@@ -721,7 +745,7 @@
       }
     }
   },
-  "onboardingRedeemHp": "Обменяйте {hp} HP на скидку {percent}% на первую 6-месячную или годовую подписку PHA Plus+.",
+  "onboardingRedeemHp": "Скидка {percent}% на первую 6-месячную или годовую подписку PHA Plus+.",
   "@onboardingRedeemHp": {
     "placeholders": {
       "hp": {
@@ -797,7 +821,7 @@
   "loginHeroLine3": "отслеживается.",
   "loginHeroBody": "Отслеживайте показатели, получайте ИИ-аналитику и управляйте своим здоровьем.",
   "loginTrustedBy": "Нам доверяют заботящиеся о здоровье по всему миру.",
-  "loginSignUpSubtitle": "Начните отслеживать здоровье сегодня — бесплатно навсегда.",
+  "loginSignUpSubtitle": "Начните отслеживать здоровье сегодня.",
   "loginSignInSubtitle": "Войдите, чтобы открыть панель здоровья.",
   "loginFullName": "Полное имя",
   "loginNamePlaceholder": "Иван Иванов",
@@ -830,6 +854,12 @@
   "vitalsPromptTurnOffHint": "Не спрашивать АД/глюкозу каждый день.",
   "vitalsPromptEvery5Days": "Спрашивать раз в 5 дней",
   "vitalsPromptEvery5DaysHint": "Напоминать каждые 5 дней, не ежедневно.",
+  "vitalsPromptSectionTitle": "Давление и сахар",
+  "vitalsPromptSectionSubtitle": "Как часто PHA будет просить ввести давление и глюкозу?",
+  "vitalsPromptDaily": "Раз в день",
+  "vitalsPromptDailyHint": "Напоминать каждый день, пока не внесете значения.",
+  "vitalsPromptNever": "Не спрашивать",
+  "vitalsPromptNeverHint": "Без автоматических запросов АД и глюкозы.",
   "vitalsBpLabel": "Артериальное давление (мм рт. ст.)",
   "vitalsGlucoseLabel": "Глюкоза крови ({unit})",
   "@vitalsGlucoseLabel": {
@@ -866,12 +896,17 @@
   "logMetricHintWeightMetric": "напр. 72.5",
   "logMetricHintWater": "напр. 2000",
   "upgradeTrialTitle": "Разблокируйте все функции PHA Plus+",
+  "purchaseErrorInvalidCredentials": "Ошибка оплаты: неверные ключи биллинга. В RevenueCat → Project settings → API keys скопируйте Apple public SDK key (appl_…) в dart_define.json как REVENUECAT_IOS_API_KEY и проверьте связь с App Store Connect.",
+  "purchaseErrorNetwork": "Нет связи с App Store. Проверьте интернет и попробуйте снова.",
+  "purchaseErrorStore": "App Store не смог завершить покупку. Попробуйте позже.",
+  "purchaseErrorNoOfferings": "Тарифы пока недоступны. Проверьте offerings в RevenueCat и продукты в App Store Connect.",
+  "purchaseErrorNoPackage": "Этот план сейчас недоступен в магазине. Выберите другой или попробуйте позже.",
   "upgradeTrialBody1": "Полный контроль над здоровьем! Разблокируйте все премиум-функции PHA Plus+ и отслеживайте здоровье, активность, питание и медицинские показатели в реальном времени.",
   "upgradeTrialBody2": "Будьте в курсе рисков и корректируйте образ жизни. Считайте калории без ограничений и получайте персональные рекомендации на основе ваших данных.",
   "upgradeTagline": "Ваше здоровье. Ваш контроль. Всегда.",
   "upgradeTitle": "Разблокировать все функции",
   "upgradeSubtitle": "Полная мощь вашего персонального помощника здоровья",
-  "upgradeHpBanner": "У вас {hp} HP! Обменяйте на скидку {percent}% на 6-месячный или годовой план.",
+  "upgradeHpBanner": "Скидка {percent}% на 6-месячный и годовой планы.",
   "@upgradeHpBanner": {
     "placeholders": {
       "hp": {
@@ -905,7 +940,7 @@
   "planBilledMonthly": "Оплата ежемесячно.",
   "planSemiannual": "6 месяцев",
   "planAnnual": "Годовой",
-  "planHpDiscountNote": "Скидка 20% HP применена.",
+  "planHpDiscountNote": "Скидка 20% применена.",
   "planSave17": "Экономия ~17%.",
   "planSave42": "Экономия ~42%.",
   "planPerMonth": "/мес",
@@ -913,6 +948,11 @@
   "planPerYear": "/год",
   "planBestBadge": "ЛУЧШ.",
   "psychoTestPromoBody": "Углублённая самооценка уровня стресса, психосоматических паттернов и показателей ментального здоровья.",
+  "promoCodeLabel": "Промокод",
+  "promoCodeHint": "Введите промокод",
+  "promoCodeApply": "Применить",
+  "promoCodeInvalid": "Неверный промокод.",
+  "promoCodeAlreadyUsed": "Этот промокод уже использован для данного профиля.",
   "psychoQuestionOfBlock": "В{current} из {total}",
   "@psychoQuestionOfBlock": {
     "placeholders": {
@@ -940,6 +980,12 @@
   "aiDocNoOnboardingData": "Данные онбординга не найдены. Сначала завершите настройку профиля.",
   "activityYourProgramFallback": "ваша программа",
   "trialSevenDayFree": "7 дней бесплатно",
+  "trialNotifChannelName": "Напоминания о триале",
+  "trialNotifChannelDesc": "Уведомления до окончания бесплатного периода",
+  "trialNotifThreeDaysTitle": "Триал заканчивается через 3 дня",
+  "trialNotifThreeDaysBody": "Бесплатный период 7 дней закончится через 3 дня. Оформите PHA Plus+, чтобы сохранить все функции.",
+  "trialNotifTwentyFourHoursTitle": "Триал заканчивается через 24 часа",
+  "trialNotifTwentyFourHoursBody": "До конца бесплатного периода остались сутки. Подпишитесь, чтобы сохранить полный доступ к PHA.",
   "uploadImageFormats": "JPG, PNG, GIF",
   "mealSaveFailed": "Не удалось сохранить: {error}",
   "@mealSaveFailed": {
@@ -1398,6 +1444,17 @@
 
   "actionHeartRate": "ЧСС и ритм",
   "actionHeartRateDesc": "Проверка сердца с умных часов",
+  "actionEcg": "ЭКГ",
+  "actionEcgDesc": "Считывание ЭКГ с электродов Apple Watch и совместимых датчиков",
+  "hrEcgEmpty": "Нет записей ЭКГ с электродов. Снимите ЭКГ на Apple Watch (Series 4+), затем нажмите «Считать с датчиков».",
+  "hrEcgConnectSensors": "Разрешить доступ к датчику ЭКГ",
+  "hrEcgReadSensors": "Считать ЭКГ с датчиков",
+  "hrEcgNeedPermissionTitle": "Нужен доступ к датчику ЭКГ",
+  "hrEcgNeedPermissionBody": "PHA читает ЭКГ, записанные электродами Apple Watch в Apple Health. Включите ЭКГ в окне разрешений Здоровья.",
+  "hrEcgSensorHow": "ЭКГ снимается электродами Apple Watch (Digital Crown + кристалл). PHA читает эти записи HealthKit — это не замена клинической ЭКГ.",
+  "hrEcgSensorAndroid": "Считывание ЭКГ через Health Connect на этой Android-сборке пока недоступно. На iPhone используйте Apple Watch Series 4+.",
+  "hrEcgLatestFromSensor": "Последнее снятие с электродов",
+  "hrEcgSensorMeta": "{source} · {samples} отсчётов · {hz} Гц",
   "unitBpm": "уд/мин",
   "unitMs": "мс",
   "hrEvents": "событий",
@@ -1439,12 +1496,32 @@
   "hrNoChartData": "Нет данных за этот период",
   "hrWhatItMeans": "Что это значит?",
   "hrWhatItMeansBody": "ЧСС в покое и ВСР отражают стресс, восстановление и форму. Резкие скачки или несколько дней подряд с высоким пульсом требуют внимания.",
-  "hrEcgTitle": "Недавние ЭКГ (Apple Watch)",
+  "hrEcgTitle": "Записи ЭКГ с электродов",
   "hrEcgSinusRhythm": "Синусовый ритм",
   "hrEcgAtrialFibrillation": "Фибрилляция предсердий",
   "hrEcgLowOrHighHr": "Низкая или высокая ЧСС",
   "hrEcgInconclusive": "Неопределённо",
-  "hrEcgNotSet": "Без классификации",
+  "hrEcgNotSet": "Не классифицировано",
+  "hrEcgSinusTachycardia": "Синусовая тахикардия",
+  "hrEcgSinusBradycardia": "Синусовая брадикардия",
+  "hrEcgVentricularTachycardia": "Желудочковая тахикардия",
+  "hrEcgVentricularFibrillation": "Желудочковая фибрилляция",
+  "hrEcgAvBlock1": "AV-блокада I степени",
+  "hrEcgAvBlock2MobitzI": "AV-блокада II степени (Мобитц I)",
+  "hrEcgAvBlock3": "AV-блокада III степени (полная)",
+  "hrEcgReferenceTitle": "Ритмы ЭКГ в одном взгляде",
+  "hrEcgReferenceSubtitle": "Ключевые признаки — только для обучения, не диагноз.",
+  "hrEcgFeatNormalSinus": "ЧСС 60–100 · регулярный · каждый P перед QRS · PR 0,12–0,20 с · QRS < 0,12 с",
+  "hrEcgFeatSinusTachy": "ЧСС > 100 · регулярный · каждый P перед QRS · PR 0,12–0,20 с · QRS < 0,12 с",
+  "hrEcgFeatSinusBrady": "ЧСС < 60 · регулярный · каждый P перед QRS · PR 0,12–0,20 с · QRS < 0,12 с",
+  "hrEcgFeatAfib": "ЧСС часто 100–250 · нерегулярный · нет зубцов P · QRS обычно ≤ 0,12 с",
+  "hrEcgFeatVt": "ЧСС 100–250 · регулярный · широкие QRS (≥ 0,12 с) · P обычно нет",
+  "hrEcgFeatVf": "Хаотическая базовая линия · нет организованного QRS · нет P — экстренный паттерн",
+  "hrEcgFeatAv1": "PR > 0,20 с · каждый P с QRS · QRS < 0,12 с",
+  "hrEcgFeatAv2": "Прогрессивное удлинение PR · выпадение QRS · циклический паттерн",
+  "hrEcgFeatAv3": "Нет связи P и QRS · независимые частоты · ускользающий ритм",
+  "hrEcgFeatInconclusive": "Apple Watch не смогла уверенно классифицировать запись.",
+  "hrEcgFeatUnknown": "Классификация недоступна.",
   "hrIrregularRhythm": "Оповещения о нерегулярном ритме",
   "hrTrendImproving": "Улучшение",
   "hrTrendWorsening": "Ухудшение",
@@ -1454,15 +1531,37 @@
   "hrExplainHighResting": "ЧСС в покое {bpm} уд/мин — выше обычного диапазона до {max}. Стресс, болезнь, кофеин или недосып могут повышать её.",
   "hrExplainLowResting": "ЧСС в покое {bpm} уд/мин — ниже обычного минимума {min}. У спортсменов часто ниже; обратитесь к врачу при головокружении или слабости.",
   "hrExplainLowHrv": "Вариабельность ритма низкая. Это может означать стресс или недостаточное восстановление — уделите внимание сну и отдыху.",
-  "hrExplainElevatedStreak": "ЧСС в покое несколько дней в диапазоне 80–95 уд/мин. Возможны стресс, перетренированность или начало болезни.",
+  "hrExplainElevatedStreak": "ЧСС в покое несколько дней на уровне ≥105 уд/мин. Возможны стресс, перетренированность или начало болезни.",
   "hrExplainSpike": "ЧСС в покое заметно выросла изо дня в день. Отметьте самочувствие и проверьте завтра.",
   "hrExplainIrregular": "Apple Watch сообщила о нерегулярном ритме. Это не диагноз — обсудите с врачом, если уведомления продолжаются или вы плохо себя чувствуете.",
   "hrAlertRiskTitle": "Тревога по пульсу",
   "hrAlertAttentionTitle": "Повышенная ЧСС в покое",
-  "hrAlertGenericBody": "ЧСС в покое стабильно в диапазоне 80–95 уд/мин или растёт изо дня в день. Откройте «ЧСС и ритм» для подробностей.",
-  "hrRestingChartTitle": "ЧСС в покое",
+  "hrAlertGenericBody": "ЧСС в покое стабильно ≥105 уд/мин или растёт изо дня в день. Откройте «ЧСС и ритм» для подробностей.",
+  "hrRestingChartTitle": "Пульс",
   "hrAvgResting": "Ср. {bpm} уд/мин",
-  "hrZoneNormal": "Зелёный — {low}–{high} уд/мин (норма)",
+
+  "historyGlucoseAvg": "Ср. {value} {unit}",
+  "@historyGlucoseAvg": {
+    "placeholders": {
+      "value": {"type": "String"},
+      "unit": {"type": "String"}
+    }
+  },
+  "historyBpAvg": "Ср. {sys}/{dia} mmHg",
+  "@historyBpAvg": {
+    "placeholders": {
+      "sys": {"type": "int"},
+      "dia": {"type": "int"}
+    }
+  },
+  "historyGlucoseZoneNormalImperial": "Норма натощак ≤99 mg/dL",
+  "historyGlucoseZoneNormalMetric": "Норма натощак ≤5.5 mmol/L",
+  "historyGlucoseZoneAttention": "Выше нормы или предиабет",
+  "historyGlucoseZoneHigh": "Высокий / диабет",
+  "historyBpZoneNormal": "Систолическое ≤120 mmHg",
+  "historyBpZoneElevated": "Повышенное 121–139 mmHg",
+  "historyBpZoneHigh": "Высокое ≥140 mmHg",
+  "hrZoneNormal": "Зелёный — {low}–{high} уд/мин в покое (норма)",
   "hrZoneAttention": "Жёлтый — лёгкое отклонение",
   "hrZoneRisk": "Красный — значительное отклонение / риск"
 }

@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../auth.dart';
 import '../db.dart';
+import '../ecg_rhythms.dart';
 import '../heart_rate.dart';
 import '../heart_rate_service.dart';
 import '../l10n/l10n_ext.dart';
@@ -388,10 +388,6 @@ class _HeartRateModalState extends State<HeartRateModal>
                     _chartSection(l10n, snap!),
                     const SizedBox(height: 14),
                     _meaningSection(l10n, snap!),
-                    if (snap!.recentEcgs.isNotEmpty) ...[
-                      const SizedBox(height: 14),
-                      _ecgSection(l10n, snap!),
-                    ],
                     if (snap!.irregularRhythm) ...[
                       const SizedBox(height: 14),
                       _alertBanner(
@@ -1100,46 +1096,6 @@ class _HeartRateModalState extends State<HeartRateModal>
     );
   }
 
-  Widget _ecgSection(AppLocalizations l10n, HeartRateSnapshot s) {
-    final fmt = DateFormat.MMMd().add_Hm();
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: cardDecoration(radius: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.hrEcgTitle,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: C.gray900,
-            ),
-          ),
-          const SizedBox(height: 8),
-          for (final e in s.recentEcgs)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Row(
-                children: [
-                  Icon(Icons.monitor_heart_outlined, size: 16, color: C.purple600),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      '${fmt.format(e.at.toLocal())}'
-                      '${e.averageBpm != null ? ' · ${e.averageBpm!.round()} ${l10n.unitBpm}' : ''}'
-                      ' · ${l10n.hrEcgClassification(e.classification)}',
-                      style: TextStyle(fontSize: 12, color: C.gray700),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
   Widget _alertBanner(String title, String body, Color bg, Color fg) {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -1194,6 +1150,12 @@ class _HeartRateModalState extends State<HeartRateModal>
     }
     if (a.restingBpm != null && a.restingBpm! < a.restingLow) {
       return l10n.hrExplainLowResting(a.restingBpm!.round(), a.restingLow);
+    }
+    // Classic ECG teaching labels for resting rate (60–100 sinus band).
+    final inferred = EcgRhythmKnowledge.inferFromRestingRate(a.restingBpm);
+    if (inferred == EcgRhythmKind.sinusTachycardia ||
+        inferred == EcgRhythmKind.sinusBradycardia) {
+      return '${l10n.hrEcgRhythmTitle(inferred!)}. ${l10n.hrEcgRhythmFeatures(inferred)}';
     }
     if (a.hrvMs != null && a.hrvMs! < 40) return l10n.hrExplainLowHrv;
     if (a.zone == HeartZone.normal) return l10n.hrExplainNormal;

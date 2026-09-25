@@ -5,9 +5,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'health_telemetry.dart';
 import 'daily_notifications.dart';
+import 'heart_rate_service.dart';
 import 'physical_activity.dart';
 import 'services.dart';
 import 'treatment_notifications.dart';
+import 'trial_notifications.dart';
 
 /// Background telemetry sync: permission after sign-up, on app open, and live polling.
 class TelemetrySyncService {
@@ -31,14 +33,15 @@ class TelemetrySyncService {
 
   /// Runs on app open / resume. Returns true if dashboard data should refresh.
   static Future<bool> onAppOpen(String userId) async {
-    if (!HealthTelemetryService.isSupported) return false;
-
     final prefs = await SharedPreferences.getInstance();
     final needsPrompt = prefs.getBool(_needsPromptKey(userId)) ?? false;
     final attempted = prefs.getBool(_promptAttemptedKey(userId)) ?? false;
 
-    if (needsPrompt && !attempted) {
+    if (HealthTelemetryService.isSupported && needsPrompt && !attempted) {
       await HealthTelemetryService.requestPermission();
+      // Ask for heart types in the same first-run flow so History / Health
+      // Index can fill without opening Heart Rate & Rhythm.
+      await HeartRateService.requestPermission();
       await DailyNotificationService.requestPermission();
       await prefs.setBool(_promptAttemptedKey(userId), true);
       await prefs.setBool(_needsPromptKey(userId), false);
@@ -49,7 +52,8 @@ class TelemetrySyncService {
     }
 
     var synced = false;
-    if (await HealthTelemetryService.hasPermission()) {
+    if (HealthTelemetryService.isSupported &&
+        await HealthTelemetryService.hasPermission()) {
       try {
         synced = await HealthConnectService.syncFromDevice(userId);
       } catch (_) {
@@ -57,12 +61,23 @@ class TelemetrySyncService {
       }
     }
 
-    if (await DailyNotificationService.hasPermission()) {
-      // Always (re)schedule after sync so evening copy uses real steps.
-      unawaited(DailyNotificationService.scheduleForUser(userId));
-      unawaited(TreatmentNotificationService.rescheduleForUser(userId));
-      unawaited(PhysicalActivityService.scheduleEveningReminder(userId));
+    // Heart metrics: pull whenever the app is open, even if the user never
+    // opened Heart Rate & Rhythm. No auth sheet here.
+    if (HeartRateService.isSupported) {
+      // Existing installs may have activity auth but never HR auth — ask once.
+      if (!await HeartRateService.hasPermission() &&
+          await HealthTelemetryService.hasPermission()) {
+        await HeartRateService.requestPermission();
+      }
+      final hrSynced = await HeartRateService.syncQuietly(userId);
+      if (hrSynced) synced = true;
     }
+
+    // OS pushes must schedule even when HealthKit is unavailable / denied.
+    unawaited(DailyNotificationService.scheduleForUser(userId));
+    unawaited(TreatmentNotificationService.rescheduleForUser(userId));
+    unawaited(PhysicalActivityService.scheduleEveningReminder(userId));
+    unawaited(TrialNotificationService.scheduleForUser(userId));
 
     return synced;
   }
@@ -92,6 +107,10 @@ class TelemetrySyncService {
     try {
       if (!await HealthTelemetryService.hasPermission()) return;
       final changed = await HealthConnectService.syncFromDevice(userId);
+      // Throttled HR pull (every ~10 min) — do not block 1 Hz activity sync.
+      unawaited(HeartRateService.syncQuietly(userId).then((hrChanged) {
+        if (hrChanged) notify();
+      }));
       if (changed) {
         unawaited(
           DailyNotificationService.refreshEveningAfterActivitySync(userId),

@@ -11,13 +11,14 @@ import 'api.dart';
 import 'core/app_logger.dart';
 import 'db.dart';
 import 'daily_notifications.dart';
-import 'onboarding_prefs.dart';
 import 'physical_activity.dart';
 import 'profile_basics.dart';
+import 'purchases_config.dart';
 import 'modals/psycho_test_modal.dart';
 import 'modals/treatment_schedule_modal.dart';
 import 'modals/quick_action_modals.dart';
 import 'modals/heart_rate_modal.dart';
+import 'modals/ecg_modal.dart';
 import 'services.dart';
 import 'pages/dashboard.dart';
 import 'pages/history.dart';
@@ -140,7 +141,8 @@ class _PhaRootState extends State<PhaRoot> {
       AppLogger.d('Loading API config…', category: LogCategory.bootstrap);
       await ApiConfig.ensureLoaded().timeout(const Duration(seconds: 3));
       AppLogger.i(
-        'API config OK (key ${ApiConfig.apiKey.isEmpty ? "missing" : "set"})',
+        'API config OK base=${ApiConfig.baseUrl} '
+        '(key ${ApiConfig.apiKey.isEmpty ? "missing" : "set"})',
         category: LogCategory.bootstrap,
       );
     } catch (e, st) {
@@ -192,6 +194,22 @@ class _PhaRootState extends State<PhaRoot> {
         error: e,
         stackTrace: st,
         category: LogCategory.auth,
+      );
+    }
+
+    // RevenueCat after auth so we can attach the app user id.
+    // Do not cancel mid-configure: a timed-out Future left the SDK half-ready
+    // and the next purchase then failed with INVALID_CREDENTIALS.
+    try {
+      AppLogger.d('Configuring RevenueCat…', category: LogCategory.bootstrap);
+      await PurchasesConfig.configure(appUserId: _auth.user?.id);
+      AppLogger.i('RevenueCat OK', category: LogCategory.bootstrap);
+    } catch (e, st) {
+      AppLogger.w(
+        'RevenueCat configure failed (non-fatal)',
+        error: e,
+        stackTrace: st,
+        category: LogCategory.bootstrap,
       );
     }
 
@@ -292,7 +310,6 @@ class AppContent extends StatefulWidget {
 
 class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
   String currentPage = 'home';
-  bool? preOnboardingDone;
   bool? onboardingDone;
   String? checkedForUserId;
   int dashboardKey = 0;
@@ -304,7 +321,6 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    WidgetsBinding.instance.addPostFrameCallback((_) => unawaited(_loadPreOnboarding()));
     DailyNotificationService.addTapListener(_onOsNotificationTap);
   }
 
@@ -336,6 +352,12 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
 
     try {
       final payload = response.payload ?? '';
+      if (payload == 'trial_reminder' || payload == 'trial_ending_soon') {
+        if (!mounted) return;
+        setState(() => currentPage = 'home');
+        _openModal(UpgradeModal(trialExpired: auth.isTrialExpired));
+        return;
+      }
       if (payload == 'physical_activity_checkin') {
         final program =
             await PhysicalActivityService.activeProgram(auth.user!.id);
@@ -381,21 +403,6 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
         unawaited(_syncPatientHistorySafely(auth));
       }
       if (mounted) setState(() => dashboardKey++);
-    }
-  }
-
-  Future<void> _loadPreOnboarding() async {
-    try {
-      if (!Db.instance.isReady) {
-        if (mounted) setState(() => preOnboardingDone = false);
-        return;
-      }
-      final done = await OnboardingPrefs.isComplete();
-      if (mounted) setState(() => preOnboardingDone = done);
-    } catch (e, st) {
-      debugPrint('_loadPreOnboarding failed: $e');
-      debugPrintStack(stackTrace: st);
-      if (mounted) setState(() => preOnboardingDone = false);
     }
   }
 
@@ -501,17 +508,11 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
     try {
       final auth = context.watch<AuthProvider>();
 
-      if (auth.loading || preOnboardingDone == null) {
+      if (auth.loading) {
         return const _Splash();
       }
 
-      if (preOnboardingDone == false) {
-        return OnboardingPage(
-          beforeSignUp: true,
-          onComplete: () => setState(() => preOnboardingDone = true),
-        );
-      }
-
+      // First screen: Sign in / Sign up. Onboarding only after account exists.
       if (auth.user == null) {
         TelemetrySyncService.stopLiveSync();
         _trialExpiredPopupShown = false;
@@ -534,6 +535,7 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
       }
       if (onboardingDone == null) return const _Splash();
 
+      // New Sign up accounts land here until quests are finished.
       if (onboardingDone == false) {
         return OnboardingPage(
           beforeSignUp: false,
@@ -553,7 +555,14 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
         body: _buildPage(),
         bottomNavigationBar: AppBottomNav(
           current: currentPage,
-          onChange: (p) => setState(() => currentPage = p),
+          onChange: (p) {
+            final auth = context.read<AuthProvider>();
+            if (!auth.hasFreeAccess && p != 'home' && p != 'profile') {
+              _openModal(const UpgradeModal(trialExpired: true));
+              return;
+            }
+            setState(() => currentPage = p);
+          },
         ),
       );
     } catch (e, st) {
@@ -619,8 +628,11 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
           onOpenHeartRate: () => auth.isPlus
               ? _openModal(const HeartRateModal())
               : _openModal(const UpgradeModal()),
-          onOpenLogMetric: () => _openModal(
-              LogMetricModal(onSaved: () => setState(() => dashboardKey++))),
+          onOpenEcg: () => auth.isPlus
+              ? _openModal(const EcgModal())
+              : _openModal(const UpgradeModal()),
+          onOpenLogMetric: () => _guardFreeFeature(() => _openModal(
+              LogMetricModal(onSaved: () => setState(() => dashboardKey++)))),
           onOpenPsychoTest: () => auth.isPlus
               ? _openModal(const PsychoTestModal())
               : _openModal(const UpgradeModal()),

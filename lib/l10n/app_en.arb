@@ -65,8 +65,8 @@
   "signUp": "Sign up",
   "createAccount": "Create account",
   "signUpForFree": "Sign up for free",
-  "alreadyHaveAccount": "Already have an account? Sign in",
-  "dontHaveAccount": "Don't have an account? Sign up",
+  "alreadyHaveAccount": "Already have an account?",
+  "dontHaveAccount": "Don't have an account?",
   "email": "Email",
   "password": "Password",
   "displayName": "Display Name",
@@ -79,6 +79,25 @@
   "acceptPrivacy": "I accept the Privacy Policy",
   "pleaseAcceptLegal": "Please read and accept the Agreement and Privacy Policy to continue.",
   "passwordTooShort": "Password must be at least 8 characters.",
+  "emailAlreadyRegistered": "This email is already in use. Please sign in instead.",
+  "invalidEmailOrPassword": "Invalid email or password. Please check and try again.",
+  "authNetworkError": "Cannot reach the server. Check your internet connection and try again.",
+  "authServerSyncFailed": "Could not register this email on the server. Check your connection and try again.",
+  "authAccountNotOnServer": "No cloud backup for this email yet. Open the app once on the original device with internet, then try again.",
+  "authCodeSent": "We sent a 6-digit code to your email. It is valid for 10 minutes.",
+  "authEnterCode": "Confirmation code",
+  "authVerifyAndCreate": "Confirm and create account",
+  "authResendCode": "Resend code",
+  "authInvalidCode": "Invalid or expired code.",
+  "authResendTooSoon": "Please wait a moment before requesting another code.",
+  "authEmailDeliveryFailed": "Could not send the email. Try again later.",
+  "forgotPassword": "Forgot password?",
+  "forgotPasswordSend": "Send reset code",
+  "forgotPasswordTitle": "Reset password",
+  "forgotPasswordNew": "New password",
+  "forgotPasswordConfirm": "Set new password",
+  "forgotPasswordDone": "Password updated. Sign in with the new password.",
+  "authAccountNotFound": "No cloud account found for this email.",
   "featureTrackVitals": "Track vitals & glucose",
   "featureAiInsights": "AI health insights",
   "featureSmartAnalysis": "Smart analysis",
@@ -357,7 +376,7 @@
   "phaPlusUnlockedTitle": "You're on PHA Plus+!",
   "phaPlusUnlockedBody": "All features are now unlocked. Enjoy unlimited uploads, PsychoTest, and Treatment Schedule.",
   "onboardingQuest2BuildAvatar": "Quest 2: Build your avatar",
-  "onboardingQuest2FillFields": "Fill all 3 fields — earn +{hp} HP on complete.",
+  "onboardingQuest2FillFields": "Fill all 3 fields to continue.",
   "@onboardingQuest2FillFields": {
     "placeholders": {
       "hp": {
@@ -370,7 +389,7 @@
   "male": "Male",
   "female": "Female",
   "unitYearsLong": "years",
-  "completeQuest2": "Complete Quest 2 (+{hp} HP)",
+  "completeQuest2": "Complete Quest 2",
   "@completeQuest2": {
     "placeholders": {
       "hp": {
@@ -381,7 +400,7 @@
   "backToQuest2": "Back to Quest 2",
   "onboardingQuest3PowerUp": "Quest 3: Power-up (bonus)",
   "onboardingQuest3BpDone": "You already logged BP and glucose today. Come back tomorrow for your next reading.",
-  "onboardingQuest3Optional": "Optional vitals — +{bpHp} HP for BP, +{glucoseHp} HP for glucose. Once per day.",
+  "onboardingQuest3Optional": "Optional vitals — log blood pressure and glucose (once per day).",
   "@onboardingQuest3Optional": {
     "placeholders": {
       "bpHp": {
@@ -393,7 +412,7 @@
     }
   },
   "onboardingAllQuestsComplete": "All quests complete!",
-  "onboardingEarnedHp": "You earned {hp} HP · Level {level} {title}",
+  "onboardingEarnedHp": "Level {level} · {title}",
   "@onboardingEarnedHp": {
     "placeholders": {
       "hp": {
@@ -421,9 +440,9 @@
   "levelVitalsPro": "Vitals Pro",
   "picked": "PICKED",
   "saving": "Saving…",
-  "claimBonusFinish": "Claim bonus & finish 🏆",
-  "skipBonusQuest": "Skip bonus quest",
-  "calculatingRewards": "Calculating rewards…",
+  "claimBonusFinish": "Save & finish 🏆",
+  "skipBonusQuest": "Skip",
+  "calculatingRewards": "Saving…",
   "categoryBloodPressure": "Blood Pressure",
   "categoryBloodGlucose": "Blood Glucose",
   "categoryWeight": "Weight",
@@ -655,6 +674,11 @@
   "aiDocUpgradeChat": "Upgrade to continue chatting…",
   "aiDocNoProblem": "No problem! Whenever you're ready, describe your symptoms or health concerns in detail — or share a photo.",
   "aiDocPhoto": "Photo",
+  "aiDocHoldToSpeak": "Hold to speak",
+  "aiDocListening": "Listening… release to send",
+  "aiDocSpeechUnavailable": "Voice input is not available on this device.",
+  "aiDocSpeechPermissionDenied": "Microphone or speech recognition permission is required for voice messages.",
+  "aiDocSpeechEmpty": "No speech detected. Hold the mic and try again.",
   "wellnessResults": "Wellness Results",
   "wellnessQuestion": "Question {current} of {total}",
   "@wellnessQuestion": {
@@ -744,7 +768,7 @@
     }
   },
   "onboardingBackToQuest2": "Back to Quest 3",
-  "onboardingBpGlucose": "BP / +{hp} HP",
+  "onboardingBpGlucose": "Blood pressure",
   "@onboardingBpGlucose": {
     "placeholders": {
       "hp": {
@@ -752,7 +776,7 @@
       }
     }
   },
-  "onboardingGlucoseHp": "Glucose / +{hp} HP",
+  "onboardingGlucoseHp": "Glucose",
   "@onboardingGlucoseHp": {
     "placeholders": {
       "hp": {
@@ -770,7 +794,7 @@
       }
     }
   },
-  "onboardingRedeemHp": "Redeem your {hp} HP for {percent}% off your first 6-month or annual PHA Plus+ subscription.",
+  "onboardingRedeemHp": "Get {percent}% off your first 6-month or annual PHA Plus+ subscription.",
   "@onboardingRedeemHp": {
     "placeholders": {
       "hp": {
@@ -846,7 +870,7 @@
   "loginHeroLine3": "tracked.",
   "loginHeroBody": "Monitor your metrics, get AI-powered insights, and take control of your wellness journey.",
   "loginTrustedBy": "Trusted by health-conscious individuals worldwide.",
-  "loginSignUpSubtitle": "Start tracking your health today — free forever.",
+  "loginSignUpSubtitle": "Start tracking your health today.",
   "loginSignInSubtitle": "Sign in to access your health dashboard.",
   "loginFullName": "Full name",
   "loginNamePlaceholder": "Jane Smith",
@@ -879,6 +903,12 @@
   "vitalsPromptTurnOffHint": "Skip daily BP/glucose prompts.",
   "vitalsPromptEvery5Days": "Ask once in 5 days",
   "vitalsPromptEvery5DaysHint": "Remind every 5 days, not daily.",
+  "vitalsPromptSectionTitle": "Blood pressure & glucose",
+  "vitalsPromptSectionSubtitle": "How often should PHA ask you to log BP and blood sugar?",
+  "vitalsPromptDaily": "Once a day",
+  "vitalsPromptDailyHint": "Remind every day until you log today’s values.",
+  "vitalsPromptNever": "Don't ask",
+  "vitalsPromptNeverHint": "No automatic BP or glucose prompts.",
   "vitalsBpLabel": "Blood pressure (mmHg)",
   "vitalsGlucoseLabel": "Blood glucose ({unit})",
   "@vitalsGlucoseLabel": {
@@ -915,12 +945,17 @@
   "logMetricHintWeightMetric": "e.g. 72.5",
   "logMetricHintWater": "e.g. 2000",
   "upgradeTrialTitle": "Unlock All Features of PHA Plus+",
+  "purchaseErrorInvalidCredentials": "Purchase setup error: invalid billing credentials. In RevenueCat → Project settings → API keys, copy the Apple public SDK key (appl_…) into dart_define.json as REVENUECAT_IOS_API_KEY, and confirm App Store Connect is linked under Apps & providers.",
+  "purchaseErrorNetwork": "Network error while contacting the App Store. Check your connection and try again.",
+  "purchaseErrorStore": "The App Store could not complete the purchase. Try again later.",
+  "purchaseErrorNoOfferings": "Subscription plans are not available yet. Check RevenueCat offerings and App Store Connect products.",
+  "purchaseErrorNoPackage": "This plan is not available in the store right now. Try another plan or try again later.",
   "upgradeTrialBody1": "Take full control of your health! Unlock all premium options in PHA Plus+ and gain the ability to monitor your health, physical activity, nutrition, and medical indicators in real time.",
   "upgradeTrialBody2": "Stay informed about potential risks and easily adjust your lifestyle. Count calories without any limits, correlate them with your daily activity levels, and receive personalized recommendations based on your medical data.",
   "upgradeTagline": "Your health. Your control. Always.",
   "upgradeTitle": "Unlock All Features",
   "upgradeSubtitle": "Get the full power of your Personal Health Assistant",
-  "upgradeHpBanner": "You have {hp} HP! Redeem for {percent}% off 6-month or annual plans.",
+  "upgradeHpBanner": "{percent}% off 6-month and annual plans.",
   "@upgradeHpBanner": {
     "placeholders": {
       "hp": {
@@ -954,7 +989,7 @@
   "planBilledMonthly": "Billed monthly.",
   "planSemiannual": "6 Months",
   "planAnnual": "Annual",
-  "planHpDiscountNote": "20% HP discount applied.",
+  "planHpDiscountNote": "20% discount applied.",
   "planSave17": "Save ~17%.",
   "planSave42": "Save ~42%.",
   "planPerMonth": "/mo",
@@ -962,6 +997,11 @@
   "planPerYear": "/yr",
   "planBestBadge": "BEST",
   "psychoTestPromoBody": "In-depth self-assessment for stress levels, psychosomatic patterns, and mental wellness indicators.",
+  "promoCodeLabel": "Promo code",
+  "promoCodeHint": "Enter promo code",
+  "promoCodeApply": "Apply",
+  "promoCodeInvalid": "Invalid promo code.",
+  "promoCodeAlreadyUsed": "This promo code has already been used on this profile.",
   "psychoQuestionOfBlock": "Q{current} of {total}",
   "@psychoQuestionOfBlock": {
     "placeholders": {
@@ -989,6 +1029,12 @@
   "aiDocNoOnboardingData": "I could not find your onboarding health data yet. Please complete onboarding first.",
   "activityYourProgramFallback": "your program",
   "trialSevenDayFree": "7-day free trial",
+  "trialNotifChannelName": "Trial reminders",
+  "trialNotifChannelDesc": "Alerts before your free trial ends",
+  "trialNotifThreeDaysTitle": "Trial ends in 3 days",
+  "trialNotifThreeDaysBody": "Your 7-day free trial ends in 3 days. Subscribe to PHA Plus+ to keep all features.",
+  "trialNotifTwentyFourHoursTitle": "Trial ends in 24 hours",
+  "trialNotifTwentyFourHoursBody": "Less than a day left in your free trial. Subscribe now to keep full access to PHA.",
   "uploadImageFormats": "JPG, PNG, GIF",
   "mealSaveFailed": "Could not save meal: {error}",
   "@mealSaveFailed": {
@@ -1513,6 +1559,24 @@
 
   "actionHeartRate": "Heart Rate & Rhythm",
   "actionHeartRateDesc": "Heart check with Smart Watch",
+  "actionEcg": "ECG",
+  "actionEcgDesc": "Read electrode ECG from Apple Watch and compatible sensors",
+  "hrEcgEmpty": "No electrode ECG recordings found. Take an ECG on Apple Watch (Series 4+), then tap Read sensors.",
+  "hrEcgConnectSensors": "Allow ECG sensor access",
+  "hrEcgReadSensors": "Read ECG from sensors",
+  "hrEcgNeedPermissionTitle": "ECG sensor access needed",
+  "hrEcgNeedPermissionBody": "PHA reads Electrocardiogram data written by Apple Watch electrodes into Apple Health. Enable ECG in the Health permission sheet.",
+  "hrEcgSensorHow": "ECG is captured by electrodes on Apple Watch (Digital Crown + crystal). PHA reads those HealthKit recordings — it does not replace a clinical ECG.",
+  "hrEcgSensorAndroid": "Electrode ECG via Health Connect is not available on this Android build yet. On iPhone, use Apple Watch Series 4+ ECG.",
+  "hrEcgLatestFromSensor": "Latest electrode reading",
+  "hrEcgSensorMeta": "{source} · {samples} electrode samples · {hz} Hz",
+  "@hrEcgSensorMeta": {
+    "placeholders": {
+      "source": {"type": "String"},
+      "samples": {"type": "int"},
+      "hz": {"type": "int"}
+    }
+  },
   "unitBpm": "bpm",
   "unitMs": "ms",
   "hrEvents": "events",
@@ -1570,12 +1634,32 @@
   "hrNoChartData": "No chart data for this period",
   "hrWhatItMeans": "What this means",
   "hrWhatItMeansBody": "Resting heart rate and HRV reflect stress, recovery, and fitness. Sudden jumps or several high days in a row deserve attention.",
-  "hrEcgTitle": "Recent ECG (Apple Watch)",
+  "hrEcgTitle": "Electrode ECG recordings",
   "hrEcgSinusRhythm": "Sinus rhythm",
   "hrEcgAtrialFibrillation": "Atrial fibrillation",
   "hrEcgLowOrHighHr": "Low or high heart rate",
   "hrEcgInconclusive": "Inconclusive",
   "hrEcgNotSet": "Not classified",
+  "hrEcgSinusTachycardia": "Sinus tachycardia",
+  "hrEcgSinusBradycardia": "Sinus bradycardia",
+  "hrEcgVentricularTachycardia": "Ventricular tachycardia",
+  "hrEcgVentricularFibrillation": "Ventricular fibrillation",
+  "hrEcgAvBlock1": "First-degree AV block",
+  "hrEcgAvBlock2MobitzI": "Second-degree AV block (Mobitz I)",
+  "hrEcgAvBlock3": "Third-degree AV block",
+  "hrEcgReferenceTitle": "ECG rhythms at a glance",
+  "hrEcgReferenceSubtitle": "Key teaching features — educational only, not a diagnosis.",
+  "hrEcgFeatNormalSinus": "Rate 60–100 bpm · regular · each P before QRS · PR 0.12–0.20 s · QRS < 0.12 s",
+  "hrEcgFeatSinusTachy": "Rate > 100 bpm · regular · each P before QRS · PR 0.12–0.20 s · QRS < 0.12 s",
+  "hrEcgFeatSinusBrady": "Rate < 60 bpm · regular · each P before QRS · PR 0.12–0.20 s · QRS < 0.12 s",
+  "hrEcgFeatAfib": "Rate often 100–250 bpm · irregular · no P waves · QRS usually ≤ 0.12 s",
+  "hrEcgFeatVt": "Rate 100–250 bpm · regular · wide QRS (≥ 0.12 s) · P waves usually absent",
+  "hrEcgFeatVf": "Chaotic baseline · no organized QRS · no P waves — emergency teaching pattern",
+  "hrEcgFeatAv1": "PR > 0.20 s · every P followed by QRS · QRS < 0.12 s",
+  "hrEcgFeatAv2": "Progressive PR lengthening · dropped QRS · cyclic dropout pattern",
+  "hrEcgFeatAv3": "No P–QRS relationship · independent atrial/ventricular rates · escape rhythm",
+  "hrEcgFeatInconclusive": "Apple Watch could not classify this tracing confidently.",
+  "hrEcgFeatUnknown": "Classification not available.",
   "hrIrregularRhythm": "Irregular rhythm alerts",
   "hrTrendImproving": "Improving",
   "hrTrendWorsening": "Worsening",
@@ -1597,20 +1681,41 @@
     }
   },
   "hrExplainLowHrv": "Heart-rate variability looks low. That can mean higher stress or incomplete recovery — prioritize sleep and rest.",
-  "hrExplainElevatedStreak": "Resting heart rate has stayed in the 80–95 bpm range for several days. Watch for stress, overtraining, or early illness.",
+  "hrExplainElevatedStreak": "Resting heart rate has stayed at or above 105 bpm for several days. Watch for stress, overtraining, or early illness.",
   "hrExplainSpike": "Resting heart rate rose sharply day to day. Note how you feel and recheck tomorrow.",
   "hrExplainIrregular": "Apple Watch reported irregular rhythm notifications. This is not a diagnosis — discuss with a clinician if alerts continue or you feel unwell.",
   "hrAlertRiskTitle": "Heart rate alarm",
   "hrAlertAttentionTitle": "Elevated resting heart rate",
-  "hrAlertGenericBody": "Your resting heart rate is stably high (80–95 bpm) or rising day to day. Open Heart Rate & Rhythm for details.",
-  "hrRestingChartTitle": "Resting heart rate",
+  "hrAlertGenericBody": "Your resting heart rate is stably high (≥105 bpm) or rising day to day. Open Heart Rate & Rhythm for details.",
+  "hrRestingChartTitle": "Heart Rate",
   "hrAvgResting": "Avg {bpm} bpm",
   "@hrAvgResting": {
     "placeholders": {
       "bpm": { "type": "int" }
     }
   },
-  "hrZoneNormal": "Green — {low}–{high} bpm (normal)",
+  "historyGlucoseAvg": "Avg {value} {unit}",
+  "@historyGlucoseAvg": {
+    "placeholders": {
+      "value": {"type": "String"},
+      "unit": {"type": "String"}
+    }
+  },
+  "historyBpAvg": "Avg {sys}/{dia} mmHg",
+  "@historyBpAvg": {
+    "placeholders": {
+      "sys": {"type": "int"},
+      "dia": {"type": "int"}
+    }
+  },
+  "historyGlucoseZoneNormalImperial": "Normal fasting ≤99 mg/dL",
+  "historyGlucoseZoneNormalMetric": "Normal fasting ≤5.5 mmol/L",
+  "historyGlucoseZoneAttention": "Above normal or prediabetes range",
+  "historyGlucoseZoneHigh": "High / diabetes range",
+  "historyBpZoneNormal": "Systolic ≤120 mmHg",
+  "historyBpZoneElevated": "Elevated 121–139 mmHg",
+  "historyBpZoneHigh": "High ≥140 mmHg",
+  "hrZoneNormal": "Green — {low}–{high} bpm at rest (normal)",
   "@hrZoneNormal": {
     "placeholders": {
       "low": { "type": "int" },

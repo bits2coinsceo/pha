@@ -15,6 +15,7 @@ import 'units.dart';
 
 export 'blood_pressure.dart';
 export 'clinical_correlations.dart';
+export 'ecg_rhythms.dart';
 
 /// Shared finding tone used by Insights and mirrored in questionnaire UIs.
 typedef MedStatus = String; // good | info | warning | critical
@@ -80,17 +81,18 @@ abstract final class MedicalGuidelines {
   static const mealIntakeDeficitMaxKcal = 1700;
   static const mealIntakeModerateMaxKcal = 2000;
 
-  /// Resting heart-rate wellness bands (bpm). Tunable; not a diagnosis.
+  /// Resting heart-rate wellness bands (bpm) — at rest only, not during exercise.
+  /// Tunable; not a diagnosis. Activity / walking / workout HR use separate bands.
   static const restingHrMin = 60;
-  static const restingHrMax = 95;
-  static const restingHrMaxYoung = 95;
-  static const restingHrMaxSenior = 95;
+  static const restingHrMax = 105;
+  static const restingHrMaxYoung = 105;
+  static const restingHrMaxSenior = 105;
   static const restingHrAthleteMin = 40;
-  /// Soft elevated cut-off: flag if resting HR stays in/above 80–95.
-  static const restingHrElevatedCutOff = 80;
-  /// Upper of the elevated band — at/above this is a risk signal.
-  static const restingHrElevatedHigh = 95;
-  /// Day-to-day rise that counts as a sharp change.
+  /// Soft elevated cut-off for *resting* HR (at/above normal max).
+  static const restingHrElevatedCutOff = 105;
+  /// Risk signal for *resting* HR — at/above this while at rest.
+  static const restingHrElevatedHigh = 105;
+  /// Day-to-day rise in resting HR that counts as a sharp change.
   static const restingHrSharpChangeBpm = 10;
 
   /// Soft daily energy target (Mifflin–St Jeor × light activity 1.4).

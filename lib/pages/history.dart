@@ -4,48 +4,12 @@ import 'package:provider/provider.dart';
 
 import '../auth.dart';
 import '../daily_metric_store.dart';
-import '../db.dart';
 import '../l10n/l10n_ext.dart';
 import '../meal_calories.dart';
 import '../medical_guidelines.dart';
-import '../models.dart';
 import '../theme.dart';
 import '../units.dart';
 import '../widgets.dart';
-
-class _MetricConfig {
-  final String Function(AppLocalizations l10n) labelOf;
-  final IconData icon;
-  final Color color;
-  final Color bg;
-  const _MetricConfig(this.labelOf, this.icon, this.color, this.bg);
-}
-
-Map<String, _MetricConfig> get _configs => {
-  'steps': _MetricConfig((l) => l.steps, Icons.directions_walk, C.green600, C.green100),
-  'calories': _MetricConfig((l) => l.calories, Icons.local_fire_department, C.orange600, C.orange100),
-  'distance': _MetricConfig((l) => l.distance, Icons.place, C.blue600, C.blue100),
-  'active_time': _MetricConfig((l) => l.activeTime, Icons.access_time, C.teal600, C.teal100),
-  'weight': _MetricConfig((l) => l.weight, Icons.favorite, C.rose600, C.rose100),
-  'water': _MetricConfig((l) => l.water, Icons.water_drop, C.sky600, C.sky100),
-  'glucose': _MetricConfig((l) => l.bloodGlucose, Icons.water_drop, C.red600, C.red100),
-  'blood_pressure_systolic':
-      _MetricConfig((l) => l.bpSystolic, Icons.monitor_heart, C.purple600, C.purple100),
-  'blood_pressure_diastolic':
-      _MetricConfig((l) => l.bpDiastolic, Icons.monitor_heart, C.pink600, C.pink100),
-  'heart_rate':
-      _MetricConfig((l) => l.hrCurrent, Icons.favorite, C.rose600, C.rose50),
-  'resting_heart_rate':
-      _MetricConfig((l) => l.hrResting, Icons.favorite, C.rose600, C.rose50),
-  'walking_heart_rate':
-      _MetricConfig((l) => l.hrWalking, Icons.directions_walk, C.rose600, C.rose50),
-  'heart_rate_avg':
-      _MetricConfig((l) => l.hrAvg, Icons.favorite_border, C.rose600, C.rose50),
-  'hrv_sdnn':
-      _MetricConfig((l) => l.hrHrv, Icons.graphic_eq, C.teal600, C.teal50),
-  'irregular_rhythm':
-      _MetricConfig((l) => l.hrIrregularRhythm, Icons.warning_amber_rounded, C.red600, C.red100),
-};
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -57,16 +21,17 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
   static const _chartRanges = [7, 30, 90];
 
-  List<HealthMetric> metrics = [];
   List<({DateTime day, double value})> stepSeries = const [];
   List<({DateTime day, double value})> healthIndexSeries = const [];
   List<({DateTime day, double value})> calorieSeries = const [];
   List<({DateTime day, double value})> mealIntakeSeries = const [];
-  List<({DateTime day, double value})> restingHrSeries = const [];
+  List<({DateTime day, double value})> heartRateSeries = const [];
+  List<({DateTime day, double value})> glucoseSeries = const [];
+  List<({DateTime day, double value})> bpSystolicSeries = const [];
+  List<({DateTime day, double value})> bpDiastolicSeries = const [];
   int chartRangeDays = 7;
   bool loading = true;
   bool loadingCharts = false;
-  String filter = 'all';
 
   @override
   void initState() {
@@ -93,9 +58,20 @@ class _HistoryPageState extends State<HistoryPage> {
       userId: userId,
       days: days,
     );
-    final restingHr = await DailyMetricStore.lastNCalendarDays(
+    final heartRate = await _loadHeartRateSeries(userId, days);
+    final glucose = await DailyMetricStore.lastNCalendarDays(
       userId: userId,
-      metricType: 'resting_heart_rate',
+      metricType: 'glucose',
+      days: days,
+    );
+    final bpSys = await DailyMetricStore.lastNCalendarDays(
+      userId: userId,
+      metricType: 'blood_pressure_systolic',
+      days: days,
+    );
+    final bpDia = await DailyMetricStore.lastNCalendarDays(
+      userId: userId,
+      metricType: 'blood_pressure_diastolic',
       days: days,
     );
     if (!mounted) return;
@@ -104,30 +80,39 @@ class _HistoryPageState extends State<HistoryPage> {
       healthIndexSeries = index;
       calorieSeries = calories;
       mealIntakeSeries = mealIntake;
-      restingHrSeries = restingHr;
+      heartRateSeries = heartRate;
+      glucoseSeries = glucose;
+      bpSystolicSeries = bpSys;
+      bpDiastolicSeries = bpDia;
       chartRangeDays = days;
       loadingCharts = false;
     });
   }
 
+  /// Prefer daily avg heart rate from the device; fall back to resting HR.
+  Future<List<({DateTime day, double value})>> _loadHeartRateSeries(
+    String userId,
+    int days,
+  ) async {
+    final avg = await DailyMetricStore.lastNCalendarDays(
+      userId: userId,
+      metricType: 'heart_rate_avg',
+      days: days,
+    );
+    final resting = await DailyMetricStore.lastNCalendarDays(
+      userId: userId,
+      metricType: 'resting_heart_rate',
+      days: days,
+    );
+    return List.generate(days, (i) {
+      final a = avg[i].value;
+      final r = resting[i].value;
+      return (day: avg[i].day, value: a > 0 ? a : r);
+    });
+  }
+
   Future<void> _load() async {
     final userId = context.read<AuthProvider>().user!.id;
-    final rows = await Db.instance.raw.query('health_metrics',
-        where: 'user_id = ?', whereArgs: [userId], orderBy: 'recorded_at DESC', limit: 200);
-    // Keep one steps/distance/calories/active_time row per local day.
-    final seenDaily = <String>{};
-    final filtered = <HealthMetric>[];
-    for (final r in rows) {
-      final m = HealthMetric.fromRow(r);
-      if (DailyMetricStore.isDailyLiveMetric(m.metricType)) {
-        final key =
-            '${m.metricType}|${DailyMetricStore.localDateKey(m.recordedAt)}';
-        if (seenDaily.contains(key)) continue;
-        seenDaily.add(key);
-      }
-      filtered.add(m);
-      if (filtered.length >= 100) break;
-    }
     final steps = await DailyMetricStore.lastNCalendarDays(
       userId: userId,
       metricType: 'steps',
@@ -146,19 +131,32 @@ class _HistoryPageState extends State<HistoryPage> {
       userId: userId,
       days: chartRangeDays,
     );
-    final restingHr = await DailyMetricStore.lastNCalendarDays(
+    final heartRate = await _loadHeartRateSeries(userId, chartRangeDays);
+    final glucose = await DailyMetricStore.lastNCalendarDays(
       userId: userId,
-      metricType: 'resting_heart_rate',
+      metricType: 'glucose',
+      days: chartRangeDays,
+    );
+    final bpSys = await DailyMetricStore.lastNCalendarDays(
+      userId: userId,
+      metricType: 'blood_pressure_systolic',
+      days: chartRangeDays,
+    );
+    final bpDia = await DailyMetricStore.lastNCalendarDays(
+      userId: userId,
+      metricType: 'blood_pressure_diastolic',
       days: chartRangeDays,
     );
     if (!mounted) return;
     setState(() {
-      metrics = filtered;
       stepSeries = steps;
       healthIndexSeries = index;
       calorieSeries = calories;
       mealIntakeSeries = mealIntake;
-      restingHrSeries = restingHr;
+      heartRateSeries = heartRate;
+      glucoseSeries = glucose;
+      bpSystolicSeries = bpSys;
+      bpDiastolicSeries = bpDia;
       loading = false;
     });
   }
@@ -173,57 +171,10 @@ class _HistoryPageState extends State<HistoryPage> {
     await _loadChartSeries(userId, days);
   }
 
-  String _unit(String type, String sys, AppLocalizations l10n) {
-    switch (type) {
-      case 'steps':
-        return l10n.unitSteps;
-      case 'calories':
-        return l10n.unitKcal;
-      case 'active_time':
-        return l10n.unitMin;
-      case 'water':
-        return l10n.unitMl;
-      case 'blood_pressure_systolic':
-      case 'blood_pressure_diastolic':
-        return l10n.unitMmhg;
-      case 'heart_rate':
-      case 'resting_heart_rate':
-      case 'walking_heart_rate':
-      case 'heart_rate_avg':
-        return l10n.unitBpm;
-      case 'hrv_sdnn':
-        return l10n.unitMs;
-      case 'irregular_rhythm':
-        return l10n.hrEvents;
-      default:
-        return getMetricUnit(type, sys);
-    }
-  }
-
-  String _value(HealthMetric m, String sys) {
-    if (m.metricType == 'steps') return fmtThousands(m.value);
-    if (m.metricType == 'glucose') return formatGlucose(m.value, sys).value;
-    final disp = toDisplayValue(m.metricType, m.value, sys);
-    if (m.metricType == 'distance') return disp.toStringAsFixed(2);
-    if (m.metricType == 'weight') return disp.toStringAsFixed(1);
-    return m.value.toStringAsFixed(m.value == m.value.roundToDouble() ? 0 : 1);
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final locale = Localizations.localeOf(context).toString();
     final sys = context.watch<AuthProvider>().unitSystem;
-    final filtered =
-        filter == 'all' ? metrics : metrics.where((m) => m.metricType == filter).toList();
-    final types = metrics.map((m) => m.metricType).toSet().toList();
-
-    final grouped = <String, List<HealthMetric>>{};
-    for (final m in filtered) {
-      final key = DateFormat('EEEE, MMMM d, y', locale)
-          .format(m.recordedAt.toLocal());
-      grouped.putIfAbsent(key, () => []).add(m);
-    }
 
     return Column(
         children: [
@@ -237,36 +188,7 @@ class _HistoryPageState extends State<HistoryPage> {
                         constraints: const BoxConstraints(maxWidth: 1152),
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(24, 24, 24, 120),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _stepTrendChart(l10n),
-                              SizedBox(height: 24),
-                              if (metrics.isEmpty)
-                                _empty(l10n)
-                              else ...[
-                                Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
-                                  children: [
-                                    _chip(l10n.allFilter, 'all'),
-                                    ...types.map((t) => _chip(
-                                        _configs[t]?.labelOf(l10n) ?? t, t)),
-                                  ],
-                                ),
-                                SizedBox(height: 16),
-                                Text(
-                                    filtered.length == 1
-                                        ? l10n.recordCountOne
-                                        : l10n.recordsCount(filtered.length),
-                                    style: TextStyle(
-                                        fontSize: 14, color: C.gray400)),
-                                SizedBox(height: 16),
-                                ...grouped.entries.map(
-                                    (e) => _dateGroup(e.key, e.value, sys, l10n)),
-                              ],
-                            ],
-                          ),
+                          child: _stepTrendChart(l10n, sys),
                         ),
                       ),
                     ),
@@ -276,7 +198,7 @@ class _HistoryPageState extends State<HistoryPage> {
     );
   }
 
-  Widget _stepTrendChart(AppLocalizations l10n) {
+  Widget _stepTrendChart(AppLocalizations l10n, String sys) {
     final localeTag = l10n.localeName;
     final stepAvg = stepSeries.isEmpty
         ? 0.0
@@ -299,10 +221,35 @@ class _HistoryPageState extends State<HistoryPage> {
                 .fold<double>(0, (a, b) => a + b) /
             mealIntakeSeries.length;
     final restingVals =
-        restingHrSeries.where((e) => e.value > 0).map((e) => e.value).toList();
-    final restingHrAvg = restingVals.isEmpty
+        heartRateSeries.where((e) => e.value > 0).map((e) => e.value).toList();
+    final heartRateAvg = restingVals.isEmpty
         ? 0.0
         : restingVals.fold<double>(0, (a, b) => a + b) / restingVals.length;
+
+    final glucoseDisplay = glucoseSeries
+        .map((e) => (
+              day: e.day,
+              value: e.value <= 0 ? 0.0 : toDisplayValue('glucose', e.value, sys),
+            ))
+        .toList();
+    final glucoseVals =
+        glucoseDisplay.where((e) => e.value > 0).map((e) => e.value).toList();
+    final glucoseAvg = glucoseVals.isEmpty
+        ? 0.0
+        : glucoseVals.fold<double>(0, (a, b) => a + b) / glucoseVals.length;
+
+    final bpSysVals =
+        bpSystolicSeries.where((e) => e.value > 0).map((e) => e.value).toList();
+    final bpDiaVals =
+        bpDiastolicSeries.where((e) => e.value > 0).map((e) => e.value).toList();
+    final bpSysAvg = bpSysVals.isEmpty
+        ? 0.0
+        : bpSysVals.fold<double>(0, (a, b) => a + b) / bpSysVals.length;
+    final bpDiaAvg = bpDiaVals.isEmpty
+        ? 0.0
+        : bpDiaVals.fold<double>(0, (a, b) => a + b) / bpDiaVals.length;
+
+    final glucoseUnit = getMetricUnit('glucose', sys);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -384,14 +331,65 @@ class _HistoryPageState extends State<HistoryPage> {
           barColor: C.green500,
           todayBarColor: C.green500,
           accentColor: C.rose600,
-          series: restingHrSeries,
-          subtitleRight: restingHrAvg > 0
-              ? l10n.hrAvgResting(restingHrAvg.round())
+          series: heartRateSeries,
+          subtitleRight: heartRateAvg > 0
+              ? l10n.hrAvgResting(heartRateAvg.round())
               : l10n.hrNoChartData,
           formatValue: (v) => v <= 0 ? '—' : v.round().toString(),
-          valueCeiling: _restingHrCeiling(restingHrSeries),
+          valueCeiling: _restingHrCeiling(heartRateSeries),
           colorForValue: _restingHrBarColor,
           legend: _restingHrLegend(l10n),
+        ),
+        SizedBox(height: 16),
+        _dailyBarChartCard(
+          title: l10n.bloodGlucose,
+          localeTag: localeTag,
+          icon: Icons.water_drop,
+          iconBg: C.red100,
+          iconColor: C.red600,
+          barColor: C.red400,
+          todayBarColor: C.red500,
+          accentColor: C.red600,
+          series: glucoseDisplay,
+          subtitleRight: glucoseAvg > 0
+              ? l10n.historyGlucoseAvg(
+                  sys == 'imperial'
+                      ? glucoseAvg.round().toString()
+                      : glucoseAvg.toStringAsFixed(1),
+                  glucoseUnit,
+                )
+              : l10n.hrNoChartData,
+          formatValue: (v) {
+            if (v <= 0) return '—';
+            return sys == 'imperial'
+                ? v.round().toString()
+                : v.toStringAsFixed(1);
+          },
+          valueCeiling: _glucoseCeiling(glucoseDisplay, sys),
+          colorForValue: (v) => _glucoseBarColor(v, sys),
+          legend: _glucoseLegend(l10n, sys),
+        ),
+        SizedBox(height: 16),
+        _dailyBarChartCard(
+          title: l10n.bloodPressure,
+          localeTag: localeTag,
+          icon: Icons.monitor_heart,
+          iconBg: C.purple100,
+          iconColor: C.purple600,
+          barColor: C.purple600.withValues(alpha: 0.55),
+          todayBarColor: C.purple600,
+          accentColor: C.purple600,
+          series: bpSystolicSeries,
+          subtitleRight: bpSysAvg > 0
+              ? l10n.historyBpAvg(
+                  bpSysAvg.round(),
+                  bpDiaAvg > 0 ? bpDiaAvg.round() : 0,
+                )
+              : l10n.hrNoChartData,
+          formatValue: (v) => v <= 0 ? '—' : v.round().toString(),
+          valueCeiling: _bpCeiling(bpSystolicSeries),
+          colorForValue: _bpBarColor,
+          legend: _bpLegend(l10n),
         ),
         SizedBox(height: 16),
         Row(
@@ -707,6 +705,74 @@ class _HistoryPageState extends State<HistoryPage> {
       (C.amber500, l10n.hrZoneAttention),
       (C.red500, l10n.hrZoneRisk),
     ];
+    return _chartLegend(items);
+  }
+
+  double _glucoseCeiling(
+    List<({DateTime day, double value})> series,
+    String sys,
+  ) {
+    final fallback = sys == 'imperial' ? 180.0 : 10.0;
+    var maxRaw = fallback;
+    for (final e in series) {
+      if (e.value > maxRaw) maxRaw = e.value;
+    }
+    return sys == 'imperial'
+        ? ((maxRaw / 10).ceil() * 10).toDouble()
+        : ((maxRaw * 2).ceil() / 2).toDouble();
+  }
+
+  Color _glucoseBarColor(double displayValue, String sys) {
+    if (displayValue <= 0) return C.gray300;
+    final mgdl = sys == 'imperial'
+        ? displayValue
+        : mmolToMgdl(displayValue);
+    if (mgdl < MedicalGuidelines.glucoseHypoMax) return C.amber500;
+    if (mgdl <= MedicalGuidelines.glucoseNormalMax) return C.green500;
+    if (mgdl <= MedicalGuidelines.glucosePrediabetesMax) return C.amber500;
+    return C.red500;
+  }
+
+  Widget _glucoseLegend(AppLocalizations l10n, String sys) {
+    if (sys == 'imperial') {
+      return _chartLegend([
+        (C.green500, l10n.historyGlucoseZoneNormalImperial),
+        (C.amber500, l10n.historyGlucoseZoneAttention),
+        (C.red500, l10n.historyGlucoseZoneHigh),
+      ]);
+    }
+    return _chartLegend([
+      (C.green500, l10n.historyGlucoseZoneNormalMetric),
+      (C.amber500, l10n.historyGlucoseZoneAttention),
+      (C.red500, l10n.historyGlucoseZoneHigh),
+    ]);
+  }
+
+  double _bpCeiling(List<({DateTime day, double value})> series) {
+    var maxRaw = 160.0;
+    for (final e in series) {
+      if (e.value > maxRaw) maxRaw = e.value;
+    }
+    return ((maxRaw / 10).ceil() * 10).toDouble();
+  }
+
+  Color _bpBarColor(double sys) {
+    if (sys <= 0) return C.gray300;
+    if (sys < 90) return C.amber500;
+    if (sys <= 120) return C.green500;
+    if (sys <= 139) return C.amber500;
+    return C.red500;
+  }
+
+  Widget _bpLegend(AppLocalizations l10n) {
+    return _chartLegend([
+      (C.green500, l10n.historyBpZoneNormal),
+      (C.amber500, l10n.historyBpZoneElevated),
+      (C.red500, l10n.historyBpZoneHigh),
+    ]);
+  }
+
+  Widget _chartLegend(List<(Color, String)> items) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -769,115 +835,6 @@ class _HistoryPageState extends State<HistoryPage> {
             color: selected ? C.green600 : C.gray600,
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _chip(String label, String value) {
-    final selected = filter == value;
-    return GestureDetector(
-      onTap: () => setState(() => filter = value),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: selected ? C.navActiveBg : C.card,
-          borderRadius: BorderRadius.circular(99),
-          border: Border.all(color: selected ? C.navActiveBorder : C.gray200),
-        ),
-        child: Text(label,
-            style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: selected ? C.navActiveFg : C.gray600)),
-      ),
-    );
-  }
-
-  Widget _dateGroup(
-      String date, List<HealthMetric> items, String sys, AppLocalizations l10n) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(height: 12),
-        Text(date.toUpperCase(),
-            style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: C.gray500,
-                letterSpacing: 0.5)),
-        SizedBox(height: 12),
-        ...items.map((m) {
-          final cfg = _configs[m.metricType];
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: cardDecoration(radius: 12),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        color: cfg?.bg ?? C.gray100,
-                        borderRadius: BorderRadius.circular(8)),
-                    child: Icon(cfg?.icon ?? Icons.monitor_heart,
-                        size: 20, color: cfg?.color ?? C.gray500),
-                  ),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(cfg?.labelOf(l10n) ?? m.metricType,
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500, color: C.gray900)),
-                        if (m.notes != null && m.notes!.isNotEmpty)
-                          Text(m.notes!,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: 12, color: C.gray400)),
-                      ],
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(_value(m, sys),
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold, color: C.gray900)),
-                      Text(_unit(m.metricType, sys, l10n),
-                          style: TextStyle(fontSize: 12, color: C.gray400)),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          );
-        }),
-      ],
-    );
-  }
-
-  Widget _empty(AppLocalizations l10n) {
-    return Container(
-      padding: const EdgeInsets.all(64),
-      decoration: cardDecoration(),
-      child: Column(
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(color: C.gray100, shape: BoxShape.circle),
-            child: Icon(Icons.calendar_today, color: C.gray400, size: 32),
-          ),
-          SizedBox(height: 16),
-          Text(l10n.noMetricsYet,
-              style: TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.w600, color: C.gray900)),
-          SizedBox(height: 8),
-          Text(l10n.noMetricsHint,
-              textAlign: TextAlign.center, style: TextStyle(fontSize: 14, color: C.gray500)),
-        ],
       ),
     );
   }

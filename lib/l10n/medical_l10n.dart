@@ -168,18 +168,56 @@ extension MedicalL10n on AppLocalizations {
     return englishCategory;
   }
 
-  /// Localize Apple HealthKit ECG classification strings.
+  /// Localize Apple HealthKit ECG classification strings using the rhythm KB.
   String hrEcgClassification(String raw) {
-    final c = raw.toLowerCase().replaceAll(' ', '').replaceAll('_', '');
-    if (c.contains('sinusrhythm') || c == 'sinus') return hrEcgSinusRhythm;
-    if (c.contains('atrialfibrillation') || c.contains('afib') || c == 'af') {
-      return hrEcgAtrialFibrillation;
-    }
-    if (c.contains('loworhigh') || c.contains('highorlow')) return hrEcgLowOrHighHr;
-    if (c.contains('inconclusive')) return hrEcgInconclusive;
-    if (c.contains('notset') || c.isEmpty || c == 'unknown') return hrEcgNotSet;
-    return raw;
+    final kind = EcgRhythmKnowledge.fromAppleClassification(raw);
+    return switch (kind) {
+      EcgRhythmKind.normalSinus => hrEcgSinusRhythm,
+      EcgRhythmKind.atrialFibrillation => hrEcgAtrialFibrillation,
+      EcgRhythmKind.sinusTachycardia => hrEcgSinusTachycardia,
+      EcgRhythmKind.sinusBradycardia => hrEcgSinusBradycardia,
+      EcgRhythmKind.ventricularTachycardia => hrEcgVentricularTachycardia,
+      EcgRhythmKind.ventricularFibrillation => hrEcgVentricularFibrillation,
+      EcgRhythmKind.avBlockFirstDegree => hrEcgAvBlock1,
+      EcgRhythmKind.avBlockSecondMobitzI => hrEcgAvBlock2MobitzI,
+      EcgRhythmKind.avBlockThirdDegree => hrEcgAvBlock3,
+      EcgRhythmKind.inconclusive =>
+        raw.toLowerCase().contains('low') || raw.toLowerCase().contains('high')
+            ? hrEcgLowOrHighHr
+            : hrEcgInconclusive,
+      EcgRhythmKind.unknown =>
+        (raw.trim().isEmpty ? hrEcgNotSet : raw),
+    };
   }
+
+  /// Short key-feature blurb for a rhythm kind (educational).
+  String hrEcgRhythmFeatures(EcgRhythmKind kind) => switch (kind) {
+        EcgRhythmKind.normalSinus => hrEcgFeatNormalSinus,
+        EcgRhythmKind.sinusTachycardia => hrEcgFeatSinusTachy,
+        EcgRhythmKind.sinusBradycardia => hrEcgFeatSinusBrady,
+        EcgRhythmKind.atrialFibrillation => hrEcgFeatAfib,
+        EcgRhythmKind.ventricularTachycardia => hrEcgFeatVt,
+        EcgRhythmKind.ventricularFibrillation => hrEcgFeatVf,
+        EcgRhythmKind.avBlockFirstDegree => hrEcgFeatAv1,
+        EcgRhythmKind.avBlockSecondMobitzI => hrEcgFeatAv2,
+        EcgRhythmKind.avBlockThirdDegree => hrEcgFeatAv3,
+        EcgRhythmKind.inconclusive => hrEcgFeatInconclusive,
+        EcgRhythmKind.unknown => hrEcgFeatUnknown,
+      };
+
+  String hrEcgRhythmTitle(EcgRhythmKind kind) => switch (kind) {
+        EcgRhythmKind.normalSinus => hrEcgSinusRhythm,
+        EcgRhythmKind.sinusTachycardia => hrEcgSinusTachycardia,
+        EcgRhythmKind.sinusBradycardia => hrEcgSinusBradycardia,
+        EcgRhythmKind.atrialFibrillation => hrEcgAtrialFibrillation,
+        EcgRhythmKind.ventricularTachycardia => hrEcgVentricularTachycardia,
+        EcgRhythmKind.ventricularFibrillation => hrEcgVentricularFibrillation,
+        EcgRhythmKind.avBlockFirstDegree => hrEcgAvBlock1,
+        EcgRhythmKind.avBlockSecondMobitzI => hrEcgAvBlock2MobitzI,
+        EcgRhythmKind.avBlockThirdDegree => hrEcgAvBlock3,
+        EcgRhythmKind.inconclusive => hrEcgInconclusive,
+        EcgRhythmKind.unknown => hrEcgNotSet,
+      };
 
   String analysisSummary(String uiStatus, int score, List<({String category, String status})> findings, List<String> gapKeys) {
     final opener = switch (uiStatus) {
