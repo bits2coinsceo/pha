@@ -2,46 +2,48 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart' as p;
 
 import 'core/app_logger.dart';
+import 'session_secret.dart';
+
+/// HTTPS-only API base. Localhost is allowed for a dev server on the machine.
+String _httpsApiBase(String raw) {
+  final trimmed = raw.trim().replaceAll(RegExp(r'/+$'), '');
+  final uri = Uri.tryParse(trimmed);
+  final host = uri?.host.toLowerCase() ?? '';
+  final isLocal = host == 'localhost' || host == '127.0.0.1';
+  if (uri == null ||
+      uri.host.isEmpty ||
+      (uri.scheme != 'https' && !(isLocal && uri.scheme == 'http'))) {
+    throw StateError('PHA_API_BASE must use https');
+  }
+  return trimmed;
+}
 
 /// Configuration for the PHA backend (FastAPI + Vertex AI Gemini).
 ///
 /// Compile-time values come from `--dart-define-from-file=dart_define.json`.
-/// If those are missing (e.g. hot restart without defines), [ensureLoaded]
-/// falls back to the bundled `dart_define.json` asset when present.
+/// The JSON file is not bundled into the app, so the API key is not shipped
+/// as a loose asset.
 class ApiConfig {
   static const _baseUrlEnv = String.fromEnvironment(
     'PHA_API_BASE',
-    defaultValue: 'http://49.13.66.150:8080',
+    defaultValue: 'https://api.pha-app.net',
   );
   static const _apiKeyEnv = String.fromEnvironment('PHA_API_KEY', defaultValue: '');
 
-  static String baseUrl = _baseUrlEnv;
+  static String baseUrl = _httpsApiBase(_baseUrlEnv);
   static String apiKey = _apiKeyEnv;
 
   static bool _loaded = false;
 
-  /// Load API settings from the bundled dart_define.json when compile-time
-  /// defines were not applied to the running isolate.
   static Future<void> ensureLoaded() async {
     if (_loaded) return;
     _loaded = true;
-    if (apiKey.isNotEmpty) return;
-    try {
-      final raw = await rootBundle.loadString('dart_define.json');
-      final json = jsonDecode(raw) as Map<String, dynamic>;
-      final key = json['PHA_API_KEY'] as String?;
-      final base = json['PHA_API_BASE'] as String?;
-      if (key != null && key.isNotEmpty) apiKey = key;
-      if (base != null && base.isNotEmpty) baseUrl = base;
-    } catch (_) {
-      // Asset absent or invalid — rely on compile-time defines only.
-    }
+    baseUrl = _httpsApiBase(baseUrl);
   }
 }
 
@@ -190,6 +192,14 @@ class ApiClient {
             complexity: complexity,
           ));
 
+  static Future<Map<String, String>> _sessionHeaders() async {
+    final session = await SessionSecret.current();
+    if (session == null) {
+      throw ApiException(401, 'auth_required');
+    }
+    return _patientHeaders(email: session.email, syncToken: session.token);
+  }
+
   static Future<String> _chatOnce({
     required String userId,
     required String message,
@@ -198,7 +208,10 @@ class ApiClient {
     final res = await http
         .post(
           Uri.parse('${ApiConfig.baseUrl}/chat'),
-          headers: {..._authHeaders, 'Content-Type': 'application/json'},
+          headers: {
+            ...await _sessionHeaders(),
+            'Content-Type': 'application/json',
+          },
           body: jsonEncode({
             'user_id': userId,
             'message': message,
@@ -238,8 +251,7 @@ class ApiClient {
       'POST',
       Uri.parse('${ApiConfig.baseUrl}/analyze'),
     )
-      ..headers.addAll(_authHeaders)
-      ..fields['user_id'] = userId
+      ..headers.addAll(await _sessionHeaders())
       ..fields['text_logs'] = textLogs
       ..fields['complexity'] = complexity
       ..files.add(await http.MultipartFile.fromPath(
@@ -288,21 +300,6 @@ class ApiClient {
   static String _detail(Map<String, dynamic> body) =>
       body['detail']?.toString() ?? 'Request failed';
 
-  /// GET /patient/exists — whether a history file exists for this email.
-  static Future<bool> patientExists(String email) async {
-    final res = await http
-        .get(
-          Uri.parse(
-            '${ApiConfig.baseUrl}/patient/exists?email=${Uri.encodeQueryComponent(email.trim().toLowerCase())}',
-          ),
-          headers: _authHeaders,
-        )
-        .timeout(const Duration(seconds: 30));
-    final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
-    if (res.statusCode == 200) return body['exists'] as bool? ?? false;
-    throw ApiException(res.statusCode, _detail(body));
-  }
-
   /// GET /patient/history — download encrypted health history. Returns null if 404.
   static Future<Map<String, dynamic>?> getPatientHistory({
     required String email,
@@ -343,7 +340,11 @@ class ApiClient {
     throw ApiException(res.statusCode, _detail(body));
   }
 
-  static Future<void> _postAuth(String path, Map<String, dynamic> body) async {
+  static Future<Map<String, dynamic>> _postAuth(
+    String path,
+    Map<String, dynamic> body, {
+    Map<String, String>? extraHeaders,
+  }) async {
     final uri = Uri.parse('${ApiConfig.baseUrl}$path');
     AppLogger.i('POST $uri', category: LogCategory.auth);
     late http.Response res;
@@ -351,7 +352,11 @@ class ApiClient {
       res = await http
           .post(
             uri,
-            headers: {..._authHeaders, 'Content-Type': 'application/json'},
+            headers: {
+            ..._authHeaders,
+            ...?extraHeaders,
+            'Content-Type': 'application/json',
+          },
             body: jsonEncode(body),
           )
           .timeout(const Duration(seconds: 30));
@@ -367,10 +372,14 @@ class ApiClient {
     final raw = utf8.decode(res.bodyBytes);
     if (res.statusCode == 200) {
       AppLogger.i('POST $uri -> ${res.statusCode}', category: LogCategory.auth);
-      return;
+      try {
+        final parsed = jsonDecode(raw);
+        if (parsed is Map<String, dynamic>) return parsed;
+      } catch (_) {}
+      return const {};
     }
-    AppLogger.e(
-      'POST $uri -> HTTP ${res.statusCode} body=$raw',
+      AppLogger.e(
+      'POST $uri -> HTTP ${res.statusCode}',
       category: LogCategory.auth,
     );
     Map<String, dynamic> decoded = const {};
@@ -381,36 +390,103 @@ class ApiClient {
     throw ApiException(res.statusCode, _detail(decoded));
   }
 
-  static Future<void> sendRegistrationCode(String email) => _postAuth(
-        '/api/auth/register-send-code',
-        {'email': email.trim().toLowerCase()},
-      );
+  static Future<void> sendRegistrationCode(String email) async {
+    await _postAuth(
+      '/api/auth/register-send-code',
+      {'email': email.trim().toLowerCase()},
+    );
+  }
 
-  static Future<void> verifyRegistrationCode({
+  static Future<String> verifyRegistrationCode({
     required String email,
     required String code,
-  }) =>
-      _postAuth(
-        '/api/auth/register-verify',
-        {'email': email.trim().toLowerCase(), 'code': code.trim()},
-      );
+  }) async {
+    final body = await _postAuth(
+      '/api/auth/register-verify',
+      {'email': email.trim().toLowerCase(), 'code': code.trim()},
+    );
+    final ticket = body['registration_ticket'] as String? ?? '';
+    if (ticket.isEmpty) {
+      throw ApiException(400, 'invalid_code');
+    }
+    return ticket;
+  }
 
-  static Future<void> sendPasswordResetCode(String email) => _postAuth(
-        '/api/auth/forgot-password-send-code',
-        {'email': email.trim().toLowerCase()},
-      );
+  static Future<({String syncToken, String userId})> registerAccount({
+    required String email,
+    required String password,
+    required String userId,
+    required String registrationTicket,
+  }) async {
+    final body = await _postAuth(
+      '/api/auth/register-account',
+      {
+        'email': email.trim().toLowerCase(),
+        'password': password,
+        'user_id': userId,
+        'registration_ticket': registrationTicket,
+      },
+    );
+    return _sessionFrom(body);
+  }
+
+  static Future<({String syncToken, String userId})> openSession({
+    required String email,
+    required String password,
+  }) async {
+    final body = await _postAuth(
+      '/api/auth/session',
+      {
+        'email': email.trim().toLowerCase(),
+        'password': password,
+      },
+    );
+    return _sessionFrom(body);
+  }
+
+  static ({String syncToken, String userId}) _sessionFrom(Map<String, dynamic> body) {
+    final token = body['sync_token'] as String? ?? '';
+    if (token.isEmpty) {
+      throw ApiException(401, 'invalid_credentials');
+    }
+    return (syncToken: token, userId: body['user_id'] as String? ?? '');
+  }
+
+  static Future<({String plan, String expiresAt, String codeId})> redeemPromo({
+    required String code,
+    required String deviceId,
+  }) async {
+    final body = await _postAuth(
+      '/patient/promo',
+      {'code': code.trim(), 'device_id': deviceId},
+      extraHeaders: await _sessionHeaders(),
+    );
+    return (
+      plan: body['plan'] as String? ?? '',
+      expiresAt: body['expires_at'] as String? ?? '',
+      codeId: body['code_id'] as String? ?? '',
+    );
+  }
+
+  static Future<void> sendPasswordResetCode(String email) async {
+    await _postAuth(
+      '/api/auth/forgot-password-send-code',
+      {'email': email.trim().toLowerCase()},
+    );
+  }
 
   static Future<void> verifyPasswordReset({
     required String email,
     required String code,
-    required String newSyncToken,
-  }) =>
-      _postAuth(
-        '/api/auth/forgot-password-verify',
-        {
-          'email': email.trim().toLowerCase(),
-          'code': code.trim(),
-          'new_sync_token': newSyncToken,
-        },
-      );
+    required String newPassword,
+  }) async {
+    await _postAuth(
+      '/api/auth/forgot-password-verify',
+      {
+        'email': email.trim().toLowerCase(),
+        'code': code.trim(),
+        'new_password': newPassword,
+      },
+    );
+  }
 }

@@ -128,8 +128,6 @@ class _EcgModalState extends State<EcgModal> {
                   _statusBanner(l10n),
                   const SizedBox(height: 14),
                   _recordings(l10n),
-                  const SizedBox(height: 14),
-                  _rhythmGuide(l10n),
                 ],
                 const SizedBox(height: 16),
                 Text(
@@ -198,25 +196,9 @@ class _EcgModalState extends State<EcgModal> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: cardDecoration(radius: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.hrEcgReferenceTitle,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: C.gray900,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.hrEcgSensorAndroid,
-            style: TextStyle(fontSize: 13, color: C.gray600, height: 1.4),
-          ),
-          const SizedBox(height: 14),
-          _rhythmGuide(l10n),
-        ],
+      child: Text(
+        l10n.hrEcgSensorAndroid,
+        style: TextStyle(fontSize: 13, color: C.gray600, height: 1.4),
       ),
     );
   }
@@ -249,67 +231,128 @@ class _EcgModalState extends State<EcgModal> {
   Widget _statusBanner(AppLocalizations l10n) {
     final latest = ecgs.isNotEmpty ? ecgs.first : null;
     if (latest != null) {
-      final kind =
-          EcgRhythmKnowledge.fromAppleClassification(latest.classification);
-      final risk = EcgRhythmKnowledge.profile(kind)?.severity ==
-          EcgRhythmSeverity.risk;
+      final kind = EcgRhythmKnowledge.resolveProcessedKind(
+        classification: latest.classification,
+        averageBpm: latest.averageBpm,
+      );
+      final severity =
+          EcgRhythmKnowledge.profile(kind)?.severity ?? EcgRhythmSeverity.attention;
+      final risk = severity == EcgRhythmSeverity.risk;
+      final attention = severity == EcgRhythmSeverity.attention;
+      final bg = risk ? C.red50 : attention ? C.amber50 : C.emerald50;
+      final fg = risk ? C.red700 : attention ? C.amber700 : C.emerald600;
       return Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: risk ? C.red50 : C.emerald50,
+          color: bg,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              l10n.hrEcgLatestFromSensor,
+              l10n.hrEcgResultTitle,
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: risk ? C.red700 : C.emerald600,
+                color: fg,
               ),
             ),
             const SizedBox(height: 4),
             Text(
               l10n.hrEcgRhythmTitle(kind),
               style: TextStyle(
-                fontSize: 15,
+                fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: risk ? C.red700 : C.emerald600,
+                color: fg,
               ),
             ),
             const SizedBox(height: 4),
             Text(
-              l10n.hrEcgRhythmFeatures(kind),
+              l10n.hrEcgDistortionLabel(kind),
               style: TextStyle(
-                fontSize: 12,
-                color: risk ? C.red700 : C.emerald600,
-                height: 1.35,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: fg,
               ),
             ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.hrEcgRhythmAdvice(kind),
+              style: TextStyle(fontSize: 13, color: fg, height: 1.4),
+            ),
+            if (latest.averageBpm != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                '${l10n.hrEcgLatestFromSensor}: ${latest.averageBpm!.round()} ${l10n.unitBpm}',
+                style: TextStyle(fontSize: 11, color: fg.withValues(alpha: 0.85)),
+              ),
+            ],
           ],
         ),
       );
     }
     final irregular = snap?.irregularRhythm == true;
-    final inferred = EcgRhythmKnowledge.inferFromRestingRate(snap?.restingBpm);
     final irregularKind = EcgRhythmKnowledge.inferFromIrregularEvents(
       irregularRhythm: irregular,
       restingBpm: snap?.restingBpm,
     );
-    final kind = irregularKind ?? inferred;
+    final kind =
+        irregularKind ?? EcgRhythmKnowledge.inferFromRestingRate(snap?.restingBpm);
+    if (kind == null) {
+      return Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: C.blue50,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          l10n.hrEcgEmpty,
+          style: TextStyle(fontSize: 12, color: C.blue700, height: 1.4),
+        ),
+      );
+    }
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: C.blue50,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Text(
-        kind == null
-            ? l10n.hrEcgEmpty
-            : '${l10n.hrEcgRhythmTitle(kind)}. ${l10n.hrEcgRhythmFeatures(kind)}',
-        style: TextStyle(fontSize: 12, color: C.blue700, height: 1.4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.hrEcgResultTitle,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: C.blue700,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            l10n.hrEcgRhythmTitle(kind),
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: C.blue700,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            l10n.hrEcgDistortionLabel(kind),
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: C.blue700,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            l10n.hrEcgRhythmAdvice(kind),
+            style: TextStyle(fontSize: 13, color: C.blue700, height: 1.4),
+          ),
+        ],
       ),
     );
   }
@@ -340,115 +383,69 @@ class _EcgModalState extends State<EcgModal> {
             for (final e in ecgs)
               Padding(
                 padding: const EdgeInsets.only(bottom: 14),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+                child: Builder(
+                  builder: (context) {
+                    final kind = EcgRhythmKnowledge.resolveProcessedKind(
+                      classification: e.classification,
+                      averageBpm: e.averageBpm,
+                    );
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.monitor_heart_outlined,
-                            size: 16, color: C.purple600),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            '${fmt.format(e.at.toLocal())}'
-                            '${e.averageBpm != null ? ' · ${e.averageBpm!.round()} ${l10n.unitBpm}' : ''}'
-                            ' · ${l10n.hrEcgClassification(e.classification)}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: C.gray800,
+                        Row(
+                          children: [
+                            Icon(Icons.monitor_heart_outlined,
+                                size: 16, color: C.purple600),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                '${fmt.format(e.at.toLocal())}'
+                                '${e.averageBpm != null ? ' · ${e.averageBpm!.round()} ${l10n.unitBpm}' : ''}'
+                                ' · ${l10n.hrEcgRhythmTitle(kind)}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: C.gray800,
+                                ),
+                              ),
                             ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          l10n.hrEcgDistortionLabel(kind),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: EcgRhythmKnowledge.hasRhythmDistortion(kind)
+                                ? C.amber700
+                                : C.emerald600,
+                          ),
+                        ),
+                        if (e.waveformPreview.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            height: 56,
+                            width: double.infinity,
+                            child: CustomPaint(
+                              painter: _EcgWavePainter(e.waveformPreview),
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 6),
+                        Text(
+                          l10n.hrEcgRhythmAdvice(kind),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: C.gray600,
+                            height: 1.35,
                           ),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      l10n.hrEcgSensorMeta(
-                        e.sourceName.isEmpty ? 'Apple Watch' : e.sourceName,
-                        e.voltageSampleCount,
-                        e.samplingFrequencyHz?.round() ?? 0,
-                      ),
-                      style: TextStyle(fontSize: 11, color: C.gray500),
-                    ),
-                    if (e.waveformPreview.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      SizedBox(
-                        height: 56,
-                        width: double.infinity,
-                        child: CustomPaint(
-                          painter: _EcgWavePainter(e.waveformPreview),
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 4),
-                    Text(
-                      l10n.hrEcgRhythmFeatures(
-                        EcgRhythmKnowledge.fromAppleClassification(
-                          e.classification,
-                        ),
-                      ),
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: C.gray500,
-                        height: 1.35,
-                      ),
-                    ),
-                  ],
+                    );
+                  },
                 ),
               ),
-        ],
-      ),
-    );
-  }
-
-  Widget _rhythmGuide(AppLocalizations l10n) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: cardDecoration(radius: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.hrEcgReferenceTitle,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: C.gray900,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            l10n.hrEcgReferenceSubtitle,
-            style: TextStyle(fontSize: 11, color: C.gray500, height: 1.35),
-          ),
-          const SizedBox(height: 12),
-          for (final p in EcgRhythmKnowledge.catalog)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.hrEcgRhythmTitle(p.kind),
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: C.gray800,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    l10n.hrEcgRhythmFeatures(p.kind),
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: C.gray500,
-                      height: 1.35,
-                    ),
-                  ),
-                ],
-              ),
-            ),
         ],
       ),
     );

@@ -35,6 +35,7 @@ class Dashboard extends StatefulWidget {
   final VoidCallback onOpenTreatmentSchedule;
   final VoidCallback onUpgrade;
   final VoidCallback onOpenInsights;
+  final VoidCallback onOpenHistory;
   /// Bumped when telemetry/metrics change — reloads data without remounting.
   final int refreshToken;
 
@@ -53,6 +54,7 @@ class Dashboard extends StatefulWidget {
     required this.onOpenTreatmentSchedule,
     required this.onUpgrade,
     required this.onOpenInsights,
+    required this.onOpenHistory,
     this.refreshToken = 0,
   });
 
@@ -76,11 +78,29 @@ class _DashboardState extends State<Dashboard> {
   int mealChecks24h = 0;
   int unreadNotifications = 0;
   bool _didInitialPrompt = false;
+  Timer? _trialTicker;
 
   @override
   void initState() {
     super.initState();
     _loadAll(promptVitals: true);
+    _trialTicker = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      final auth = context.read<AuthProvider>();
+      if (auth.isTrialActive) {
+        setState(() {});
+      } else if (_trialTicker != null && auth.isTrialExpired) {
+        setState(() {});
+        _trialTicker?.cancel();
+        _trialTicker = null;
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _trialTicker?.cancel();
+    super.dispose();
   }
 
   @override
@@ -197,39 +217,47 @@ class _DashboardState extends State<Dashboard> {
     aiConsultCount = (a.first['c'] as num).toInt();
   }
 
+  Future<double?> _latestMetric(String metricType) async {
+    final rows = await Db.instance.raw.query(
+      'health_metrics',
+      columns: ['value'],
+      where: 'user_id = ? AND metric_type = ?',
+      whereArgs: [_userId, metricType],
+      orderBy: 'recorded_at DESC',
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return (rows.first['value'] as num).toDouble();
+  }
+
+  Future<double?> _todayMetric(String metricType) =>
+      DailyMetricStore.valueOnLocalDay(
+        userId: _userId,
+        metricType: metricType,
+      );
+
   Future<void> _loadHealthData() async {
+    // Live daily totals must be today-scoped. A global "latest row" can show
+    // yesterday after a failed HealthKit sync, or 0 after a fake empty write.
+    final latestSteps = await _todayMetric('steps');
+    final latestCalories = await _todayMetric('calories');
+    final latestDistance = await _todayMetric('distance');
+    final latestActive = await _todayMetric('active_time');
+    final latestSys = await _latestMetric('blood_pressure_systolic');
+    final latestDia = await _latestMetric('blood_pressure_diastolic');
+    final latestGlucose = await _latestMetric('glucose');
+    final latestWeight = await _latestMetric('weight');
+
+    steps = latestSteps?.toInt() ?? 0;
+    if (latestCalories != null) calories = latestCalories;
+    if (latestDistance != null) distance = latestDistance;
+    if (latestActive != null) activeTime = latestActive.toInt();
+    if (latestSys != null) systolic = latestSys;
+    if (latestDia != null) diastolic = latestDia;
+    if (latestGlucose != null) glucose = latestGlucose;
+    if (latestWeight != null) weight = latestWeight;
+
     final db = Db.instance.raw;
-    final metrics = await db.query('health_metrics',
-        columns: ['metric_type', 'value'],
-        where: 'user_id = ?',
-        whereArgs: [_userId],
-        orderBy: 'recorded_at DESC',
-        limit: 20);
-    final seen = <String>{};
-    for (final m in metrics) {
-      final t = m['metric_type'] as String;
-      if (seen.contains(t)) continue;
-      seen.add(t);
-      final v = (m['value'] as num).toDouble();
-      switch (t) {
-        case 'steps':
-          steps = v.toInt();
-        case 'calories':
-          calories = v;
-        case 'distance':
-          distance = v;
-        case 'active_time':
-          activeTime = v.toInt();
-        case 'blood_pressure_systolic':
-          systolic = v;
-        case 'blood_pressure_diastolic':
-          diastolic = v;
-        case 'glucose':
-          glucose = v;
-        case 'weight':
-          weight = v;
-      }
-    }
     stepHistory = await DailyMetricStore.dailySeries(
       userId: _userId,
       metricType: 'steps',
@@ -283,7 +311,7 @@ class _DashboardState extends State<Dashboard> {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final auth = context.watch<AuthProvider>();
-    final isPlus = auth.isPlus;
+    final isPlus = auth.hasPlusAccess;
     final trialLocked = !isPlus && auth.isTrialExpired;
     final unit = auth.unitSystem;
     // Display name is stored verbatim (any script) and never localized.
@@ -491,6 +519,7 @@ class _DashboardState extends State<Dashboard> {
                         steps: steps,
                         stepsGoal: MedicalGuidelines.stepsGoal,
                         onHealthIndexTap: widget.onOpenInsights,
+                        onStepsTap: widget.onOpenHistory,
                       ),
                       SizedBox(height: 20),
                       QuickActions(actions: actions, onUpgrade: widget.onUpgrade),
@@ -518,9 +547,8 @@ class _DashboardState extends State<Dashboard> {
 
   Widget _header() {
     final auth = context.watch<AuthProvider>();
-    final showTrialPill = !auth.isPlus &&
-        auth.trialDaysRemaining != null &&
-        auth.trialDaysRemaining! > 0;
+    final countdown = auth.trialCountdownLabel;
+    final showTrialPill = !auth.isPlus && countdown != null;
 
     return Container(
       decoration: BoxDecoration(
@@ -563,19 +591,33 @@ class _DashboardState extends State<Dashboard> {
                     ),
                   ),
                   if (showTrialPill) ...[
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: C.blue50,
-                        borderRadius: BorderRadius.circular(99),
-                        border: Border.all(color: C.blue100),
-                      ),
-                      child: Text(
-                        context.l10n.trialSevenDayFree,
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: C.blue700,
+                    GestureDetector(
+                      onTap: widget.onUpgrade,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: C.blue50,
+                          borderRadius: BorderRadius.circular(99),
+                          border: Border.all(color: C.blue100),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.timer_outlined, size: 13, color: C.blue700),
+                            const SizedBox(width: 4),
+                            Text(
+                              context.l10n.trialCountdown(countdown),
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: C.blue700,
+                                fontFeatures: const [FontFeature.tabularFigures()],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),

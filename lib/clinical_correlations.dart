@@ -359,7 +359,7 @@ abstract final class ClinicalCorrelationEngine {
         final localized = _localizedPathologyFlag(flag, l10n);
         out.add(Finding(
           category: l10n.clinicalCategoryWhatMeans,
-          status: 'warning',
+          status: flag == 'fatty_liver_obesity' ? 'critical' : 'warning',
           value: localized.$1,
           message: localized.$2,
         ));
@@ -425,6 +425,10 @@ abstract final class ClinicalCorrelationEngine {
             l10n.clinicalFlagExtraWeightTitle,
             l10n.clinicalFlagExtraWeightBody,
           ),
+        'fatty_liver_obesity' => (
+            l10n.clinicalFlagFattyLiverTitle,
+            l10n.clinicalFlagFattyLiverBody,
+          ),
         'weight_bp_sugar' => (
             l10n.clinicalFlagTripleTitle,
             l10n.clinicalFlagTripleBody,
@@ -446,6 +450,14 @@ abstract final class ClinicalCorrelationEngine {
             return (parts.first, parts.length > 1 ? parts[1] : key);
           }(),
       };
+
+  /// WHO obesity (BMI ≥ 30) or marked excess vs ideal weight (distortion).
+  static bool _hasObesityWeightDistortion(BmiAnalysis bmi) {
+    if (bmi.bmi >= MedicalGuidelines.bmiOver) return true;
+    // Overweight with large upward deviation from ideal ≈ obesity-range load.
+    return bmi.bmi >= MedicalGuidelines.bmiNormal &&
+        bmi.pctDeviationFromIdeal >= 25;
+  }
 
   static String _localizedAgeInsight(String key, AppLocalizations l10n) =>
       switch (key) {
@@ -797,6 +809,10 @@ abstract final class ClinicalCorrelationEngine {
       mult *= bmi.riskMultiplier;
       if (bmi.bmi >= MedicalGuidelines.bmiOver) {
         flags.add('extra_weight');
+      }
+      // Obesity / large excess weight → higher NAFLD (fatty liver) probability.
+      if (_hasObesityWeightDistortion(bmi)) {
+        flags.add('fatty_liver_obesity');
       }
     }
 

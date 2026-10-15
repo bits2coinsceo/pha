@@ -194,6 +194,48 @@ class EcgRhythmKnowledge {
     return null;
   }
 
+  /// Resolve the teaching rhythm for a recording: Apple class + rate models.
+  ///
+  /// Apple Watch only emits sinus / AFib / inconclusive. When the class is
+  /// sinus (or rate-only inconclusive), classic 60–100 bpm bands refine
+  /// bradycardia / tachycardia. Technical PR/QRS criteria stay internal.
+  static EcgRhythmKind resolveProcessedKind({
+    required String? classification,
+    double? averageBpm,
+  }) {
+    final apple = fromAppleClassification(classification);
+    if (apple == EcgRhythmKind.atrialFibrillation ||
+        apple == EcgRhythmKind.ventricularTachycardia ||
+        apple == EcgRhythmKind.ventricularFibrillation ||
+        apple == EcgRhythmKind.avBlockFirstDegree ||
+        apple == EcgRhythmKind.avBlockSecondMobitzI ||
+        apple == EcgRhythmKind.avBlockThirdDegree) {
+      return apple;
+    }
+    if (apple == EcgRhythmKind.normalSinus ||
+        apple == EcgRhythmKind.sinusTachycardia ||
+        apple == EcgRhythmKind.sinusBradycardia) {
+      return inferFromRestingRate(averageBpm) ?? apple;
+    }
+    // Inconclusive / unknown: still offer a rate-only teaching label when possible.
+    final fromRate = inferFromRestingRate(averageBpm);
+    if (fromRate != null &&
+        (apple == EcgRhythmKind.inconclusive || apple == EcgRhythmKind.unknown)) {
+      final c = (classification ?? '').toLowerCase();
+      if (c.contains('low') || c.contains('high') || c.contains('heart')) {
+        return fromRate;
+      }
+    }
+    return apple;
+  }
+
+  /// True when the processed rhythm is not a normal sinus pattern.
+  static bool hasRhythmDistortion(EcgRhythmKind kind) {
+    return kind != EcgRhythmKind.normalSinus &&
+        kind != EcgRhythmKind.unknown &&
+        kind != EcgRhythmKind.inconclusive;
+  }
+
   /// Map Apple HealthKit / health plugin classification strings.
   static EcgRhythmKind fromAppleClassification(String? raw) {
     if (raw == null || raw.trim().isEmpty) return EcgRhythmKind.unknown;

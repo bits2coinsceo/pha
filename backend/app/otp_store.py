@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
 import secrets
 import sqlite3
 import threading
@@ -49,11 +50,30 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
         )
         """
     )
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS registration_tickets (
+          email TEXT PRIMARY KEY,
+          ticket_hash TEXT NOT NULL,
+          expires_at INTEGER NOT NULL
+        )
+        """
+    )
+    columns = {row[1] for row in conn.execute("PRAGMA table_info(otp_codes)")}
+    if "attempts" not in columns:
+        conn.execute(
+            "ALTER TABLE otp_codes ADD COLUMN attempts INTEGER NOT NULL DEFAULT 0"
+        )
     conn.commit()
 
 
 def _hash_code(code: str) -> str:
-    return hashlib.sha256(code.encode()).hexdigest()
+    pepper = (settings.api_key or "").encode()
+    return hmac.new(pepper, code.encode(), hashlib.sha256).hexdigest()
+
+
+def _codes_match(stored: str, candidate: str) -> bool:
+    return hmac.compare_digest(stored, _hash_code(candidate))
 
 
 def issue_code(email: str, purpose: str) -> str:
@@ -65,20 +85,24 @@ def issue_code(email: str, purpose: str) -> str:
         conn = _connect()
         try:
             row = conn.execute(
-                "SELECT created_at FROM otp_codes WHERE email = ? AND purpose = ?",
+                "SELECT created_at, attempts FROM otp_codes WHERE email = ? AND purpose = ?",
                 (email, purpose),
             ).fetchone()
             if row and now - int(row[0]) < _MIN_RESEND_SECONDS:
                 raise ValueError("resend_too_soon")
+            if row and int(row[1]) >= _MAX_ATTEMPTS:
+                raise ValueError("too_many")
+            # A new code does not reset the attempt counter.
+            attempts = int(row[1]) if row else 0
             conn.execute(
                 """
                 INSERT INTO otp_codes (email, purpose, code_hash, expires_at, created_at, attempts)
-                VALUES (?, ?, ?, ?, ?, 0)
+                VALUES (?, ?, ?, ?, ?, ?)
                 ON CONFLICT(email, purpose) DO UPDATE SET
                   code_hash = excluded.code_hash,
                   expires_at = excluded.expires_at,
                   created_at = excluded.created_at,
-                  attempts = 0
+                  attempts = otp_codes.attempts
                 """,
                 (
                     email,
@@ -86,6 +110,7 @@ def issue_code(email: str, purpose: str) -> str:
                     _hash_code(code),
                     now + settings.otp_ttl_seconds,
                     now,
+                    attempts,
                 ),
             )
             conn.commit()
@@ -135,7 +160,7 @@ def _verify_locked(
         )
         conn.commit()
         return "expired"
-    if code_hash != _hash_code(cleaned):
+    if not _codes_match(code_hash, cleaned):
         conn.execute(
             "UPDATE otp_codes SET attempts = attempts + 1 WHERE email = ? AND purpose = ?",
             (email, purpose),
@@ -159,15 +184,48 @@ def _verify_locked(
     return None
 
 
-def is_email_verified(email: str) -> bool:
+def issue_registration_ticket(email: str) -> str:
+    """Single-use ticket, 15 minutes. Required to create the account."""
     email = email.strip().lower()
+    ticket = secrets.token_urlsafe(32)
+    expires = int(time.time()) + 15 * 60
+    with _lock:
+        conn = _connect()
+        try:
+            conn.execute(
+                """
+                INSERT INTO registration_tickets (email, ticket_hash, expires_at)
+                VALUES (?, ?, ?)
+                ON CONFLICT(email) DO UPDATE SET
+                  ticket_hash = excluded.ticket_hash,
+                  expires_at = excluded.expires_at
+                """,
+                (email, _hash_code(ticket), expires),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+    return ticket
+
+
+def consume_registration_ticket(email: str, ticket: str) -> bool:
+    email = email.strip().lower()
+    now = int(time.time())
     with _lock:
         conn = _connect()
         try:
             row = conn.execute(
-                "SELECT 1 FROM verified_emails WHERE email = ?",
+                "SELECT ticket_hash, expires_at FROM registration_tickets WHERE email = ?",
                 (email,),
             ).fetchone()
+            if row is None or now > int(row[1]) or not _codes_match(row[0], ticket):
+                return False
+            conn.execute(
+                "DELETE FROM registration_tickets WHERE email = ?",
+                (email,),
+            )
+            conn.execute("DELETE FROM verified_emails WHERE email = ?", (email,))
+            conn.commit()
         finally:
             conn.close()
-    return row is not None
+    return True

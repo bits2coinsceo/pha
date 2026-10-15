@@ -97,11 +97,16 @@ class _LoginPageState extends State<LoginPage> {
           if (_code.text.trim().length != 6) {
             throw Exception(context.l10n.authInvalidCode);
           }
-          await ApiClient.verifyRegistrationCode(
+          final ticket = await ApiClient.verifyRegistrationCode(
             email: _email.text,
             code: _code.text,
           );
-          await auth.signUp(_email.text, _password.text, _name.text);
+          await auth.signUp(
+            _email.text,
+            _password.text,
+            _name.text,
+            registrationTicket: ticket,
+          );
         case _AuthStep.forgotEmail:
           await ApiClient.sendPasswordResetCode(_email.text);
           if (!mounted) return;
@@ -120,7 +125,7 @@ class _LoginPageState extends State<LoginPage> {
           await ApiClient.verifyPasswordReset(
             email: _email.text,
             code: _code.text,
-            newSyncToken: AuthProvider.passwordHash(_newPassword.text),
+            newPassword: _newPassword.text,
           );
           if (!mounted) return;
           setState(() {

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 import 'auth.dart';
@@ -7,14 +8,14 @@ import 'daily_notifications.dart';
 import 'db.dart';
 import 'locale_controller.dart';
 
-/// One-shot reminders before the 7-day free trial ends.
+/// One-shot reminders before the 24h install trial ends.
 class TrialNotificationService {
   TrialNotificationService._();
 
-  static const _threeDaysId = 4001;
-  static const _twentyFourHoursId = 4002;
+  static const _sixHoursId = 4001;
+  static const _oneHourId = 4002;
 
-  /// Schedules −3 day and −24 hour trial-ending pushes, or cancels if Plus+.
+  /// Schedules −6h and −1h trial-ending pushes, or cancels if Plus+.
   static Future<void> scheduleForUser(String userId) async {
     if (kIsWeb) return;
     if (!DailyNotificationService.isInitialized) {
@@ -40,12 +41,13 @@ class TrialNotificationService {
       return;
     }
 
-    final createdAt =
-        DateTime.tryParse(rows.first['created_at'] as String? ?? '');
-    if (createdAt == null) return;
+    final prefs = await SharedPreferences.getInstance();
+    final installRaw = prefs.getString('pha_install_trial_started_at');
+    final start = DateTime.tryParse(installRaw ?? '')?.toUtc() ??
+        DateTime.tryParse(rows.first['created_at'] as String? ?? '')?.toUtc();
+    if (start == null) return;
 
-    final trialEnd =
-        createdAt.toUtc().add(const Duration(days: freeTrialDays));
+    final trialEnd = start.add(freeTrialDuration);
     if (!DateTime.now().toUtc().isBefore(trialEnd)) {
       await cancelAll();
       return;
@@ -73,27 +75,23 @@ class TrialNotificationService {
       ),
     );
 
-    await plugin.cancel(_threeDaysId);
-    await plugin.cancel(_twentyFourHoursId);
-
-    final threeDaysBefore = trialEnd.subtract(const Duration(days: 3));
-    final twentyFourHoursBefore =
-        trialEnd.subtract(const Duration(hours: 24));
+    await plugin.cancel(_sixHoursId);
+    await plugin.cancel(_oneHourId);
 
     await _scheduleOneShot(
       plugin: plugin,
-      id: _threeDaysId,
-      title: l10n.trialNotifThreeDaysTitle,
-      body: l10n.trialNotifThreeDaysBody,
-      fireAtUtc: threeDaysBefore,
+      id: _sixHoursId,
+      title: l10n.trialNotifSixHoursTitle,
+      body: l10n.trialNotifSixHoursBody,
+      fireAtUtc: trialEnd.subtract(const Duration(hours: 6)),
       details: details,
     );
     await _scheduleOneShot(
       plugin: plugin,
-      id: _twentyFourHoursId,
-      title: l10n.trialNotifTwentyFourHoursTitle,
-      body: l10n.trialNotifTwentyFourHoursBody,
-      fireAtUtc: twentyFourHoursBefore,
+      id: _oneHourId,
+      title: l10n.trialNotifOneHourTitle,
+      body: l10n.trialNotifOneHourBody,
+      fireAtUtc: trialEnd.subtract(const Duration(hours: 1)),
       details: details,
     );
   }
@@ -105,8 +103,11 @@ class TrialNotificationService {
         await DailyNotificationService.init();
       }
       final plugin = DailyNotificationService.plugin;
-      await plugin.cancel(_threeDaysId);
-      await plugin.cancel(_twentyFourHoursId);
+      await plugin.cancel(_sixHoursId);
+      await plugin.cancel(_oneHourId);
+      // Legacy 7-day trial ids.
+      await plugin.cancel(4001);
+      await plugin.cancel(4002);
     } catch (e, st) {
       debugPrint('TrialNotificationService.cancelAll failed: $e\n$st');
     }

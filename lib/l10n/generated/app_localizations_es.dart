@@ -331,6 +331,70 @@ class AppLocalizationsEs extends AppLocalizations {
   String get profileSubtitle => 'Administra la configuración de tu cuenta';
 
   @override
+  String get profileHealthAccessTitle => 'Acceso al dispositivo y Health';
+
+  @override
+  String get profileHealthAccessSubtitle =>
+      'Comprueba o solicita aquí el acceso a pasos, distancia y datos cardíacos. PHA se queda en la app: sin saltar al menú Health del teléfono.';
+
+  @override
+  String get profileHealthAccessActivity => 'Pasos y distancia';
+
+  @override
+  String get profileHealthAccessActivityHint =>
+      'Permite a PHA leer los pasos y la distancia de caminata del dispositivo.';
+
+  @override
+  String get profileHealthAccessHeart => 'Pulso y datos de Health';
+
+  @override
+  String get profileHealthAccessHeartHint =>
+      'Frecuencia cardíaca, FC en reposo, VFC, ritmo irregular y ECG de Apple Health.';
+
+  @override
+  String get profileHealthAccessAll => 'Comprobar / permitir todo el acceso';
+
+  @override
+  String get profileHealthAccessOpenSettings => 'Abrir ajustes de Health';
+
+  @override
+  String get profileHealthAccessOpenSettingsHint =>
+      'Activa el uso compartido para PHA en Health (Pasos, Distancia, Pulso, etc.).';
+
+  @override
+  String get profileHealthAccessStatusOn => 'Conectado';
+
+  @override
+  String get profileHealthAccessStatusOff => 'Sin conectar';
+
+  @override
+  String get profileHealthAccessRequesting => 'Comprobando acceso…';
+
+  @override
+  String get profileHealthAccessPrompted =>
+      'Se mostró el permiso: activa los tipos que quieras compartir.';
+
+  @override
+  String get profileHealthAccessAlreadyGranted =>
+      'El acceso a estos tipos de datos ya está concedido.';
+
+  @override
+  String get profileHealthAccessOpenedSettings =>
+      'Se abrieron los ajustes de Health. Activa los datos para PHA y vuelve a la app.';
+
+  @override
+  String get profileHealthAccessSynced =>
+      'Acceso actualizado: sincronizando tus datos.';
+
+  @override
+  String get profileHealthAccessUnsupported =>
+      'La sincronización de salud no está disponible en esta plataforma.';
+
+  @override
+  String get profileHealthAccessFailed =>
+      'No se pudo solicitar el acceso. Inténtalo de nuevo.';
+
+  @override
   String get age => 'Edad';
 
   @override
@@ -1325,10 +1389,23 @@ class AppLocalizationsEs extends AppLocalizations {
       'Tras el análisis, toca ✓ solo si comiste este plato — se suma a las calorías de hoy.';
 
   @override
-  String get mealCamera => 'Camera';
+  String get mealCamera => 'Cámara';
 
   @override
-  String get mealGallery => 'Gallery';
+  String get mealGallery => 'Galería';
+
+  @override
+  String get mealPhotoReady =>
+      'Foto lista — toca Analizar comida cuando quieras.';
+
+  @override
+  String get mealPhotoSelected => 'Foto de la comida seleccionada';
+
+  @override
+  String get mealChangePhoto => 'Cambiar foto';
+
+  @override
+  String get mealRemovePhoto => 'Quitar';
 
   @override
   String get mealAnalyze => 'Analizar comida';
@@ -2146,7 +2223,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get promoCodeInvalid => 'Código promocional no válido.';
 
   @override
-  String get promoCodeAlreadyUsed => 'Este código ya se usó en este perfil.';
+  String get promoCodeAlreadyUsed =>
+      'Este código ya se usó en este perfil o en este dispositivo.';
 
   @override
   String psychoQuestionOfBlock(int current, int total) {
@@ -2185,28 +2263,46 @@ class AppLocalizationsEs extends AppLocalizations {
   String get activityYourProgramFallback => 'tu programa';
 
   @override
-  String get trialSevenDayFree => 'Prueba gratis 7 días';
+  String get trialSevenDayFree => 'Prueba gratis 24 horas';
+
+  @override
+  String trialCountdown(String time) {
+    return 'Prueba $time';
+  }
+
+  @override
+  String get trialNotifSixHoursTitle => 'La prueba termina en 6 horas';
+
+  @override
+  String get trialNotifSixHoursBody =>
+      'Tu prueba gratuita de 24 horas termina en 6 horas. Suscríbete a PHA Plus+ para mantener el acceso completo.';
+
+  @override
+  String get trialNotifOneHourTitle => 'La prueba termina en 1 hora';
+
+  @override
+  String get trialNotifOneHourBody =>
+      'Queda menos de una hora de prueba. Suscríbete ahora para conservar todas las funciones de PHA.';
 
   @override
   String get trialNotifChannelName => 'Recordatorios de prueba';
 
   @override
-  String get trialNotifChannelDesc =>
-      'Avisos antes de que termine la prueba gratuita';
+  String get trialNotifChannelDesc => 'Avisos antes de que termine la prueba';
 
   @override
-  String get trialNotifThreeDaysTitle => 'La prueba termina en 3 días';
+  String get trialNotifThreeDaysTitle => 'La prueba termina en 6 horas';
 
   @override
   String get trialNotifThreeDaysBody =>
-      'Tu prueba gratuita de 7 días termina en 3 días. Suscríbete a PHA Plus+ para conservar todas las funciones.';
+      'Tu prueba gratuita de 24 horas termina en 6 horas. Suscríbete a PHA Plus+ para mantener el acceso completo.';
 
   @override
-  String get trialNotifTwentyFourHoursTitle => 'La prueba termina en 24 horas';
+  String get trialNotifTwentyFourHoursTitle => 'La prueba termina en 1 hora';
 
   @override
   String get trialNotifTwentyFourHoursBody =>
-      'Queda menos de un día de prueba. Suscríbete ahora para mantener el acceso completo a PHA.';
+      'Queda menos de una hora de prueba. Suscríbete ahora para conservar todas las funciones de PHA.';
 
   @override
   String get uploadImageFormats => 'JPG, PNG, GIF';
@@ -2862,6 +2958,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'El peso extra eleva la chance de azúcar alto y problemas cardíacos. Porciones más pequeñas, más verduras y caminatas diarias ayudan.';
 
   @override
+  String get clinicalFlagFattyLiverTitle => 'Riesgo de hígado graso';
+
+  @override
+  String get clinicalFlagFattyLiverBody =>
+      'Con obesidad o un gran exceso de peso, la probabilidad de hígado graso es mayor. Conviene hacerse una ecografía del hígado y el páncreas y comentar el resultado con el médico.';
+
+  @override
   String get clinicalFlagTripleTitle => 'Peso + PA + azúcar';
 
   @override
@@ -2970,7 +3073,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get actionHeartRate => 'Frecuencia y ritmo';
 
   @override
-  String get actionHeartRateDesc => 'Chequeo cardíaco con smartwatch';
+  String get actionHeartRateDesc => 'Ritmo cardíaco con reloj/pulsera o cámara';
 
   @override
   String get actionEcg => 'ECG';
@@ -3127,6 +3230,196 @@ class AppLocalizationsEs extends AppLocalizations {
       'Esto no es un dispositivo médico. Los datos del reloj no sustituyen al médico. Busca atención si te sientes mal.';
 
   @override
+  String get ppgTitle => 'Pulso con cámara';
+
+  @override
+  String get ppgSourceWatch => 'Reloj / pulsera';
+
+  @override
+  String get ppgSourceCamera => 'Cámara + flash';
+
+  @override
+  String get ppgSourceHint =>
+      'Lee el pulso desde un wearable o midelo con la cámara y el flash del teléfono.';
+
+  @override
+  String get ppgMeasureCamera => 'Medir con cámara';
+
+  @override
+  String get ppgStart => 'Empezar medición';
+
+  @override
+  String get ppgStop => 'Detener';
+
+  @override
+  String get ppgRetry => 'Medir de nuevo';
+
+  @override
+  String get ppgSave => 'Guardar resultado';
+
+  @override
+  String get ppgSaving => 'Guardando…';
+
+  @override
+  String get ppgSaved => 'Pulso guardado en tu historial';
+
+  @override
+  String get ppgSaveFailed => 'No se pudo guardar la lectura';
+
+  @override
+  String get ppgPreparing => 'Preparando la cámara…';
+
+  @override
+  String get ppgPlaceFinger =>
+      'Coloca el dedo sobre la cámara y el flash hasta que el círculo se ponga rojo';
+
+  @override
+  String get ppgCoverBothHint =>
+      'Cubre a la vez el objetivo y el flash. El círculo solo se pone rojo entonces y la medición empieza sola.';
+
+  @override
+  String get ppgExitAndAnalyze => 'Salir y analizar';
+
+  @override
+  String get ppgAnalyzed => 'Lectura de cámara guardada y analizada';
+
+  @override
+  String get ppgAnalysisTitle => 'Análisis de la medición con cámara';
+
+  @override
+  String get ppgAnalysisStatusNormal => 'El pulso en reposo parece cómodo';
+
+  @override
+  String get ppgAnalysisStatusElevated => 'El pulso en reposo está elevado';
+
+  @override
+  String get ppgAnalysisStatusLow => 'El pulso en reposo es bajo';
+
+  @override
+  String get ppgAnalysisStatusHigh => 'El pulso en reposo es marcadamente alto';
+
+  @override
+  String ppgAnalysisBodyNormal(int bpm, int low, int high) {
+    return 'Lectura con cámara: $bpm lpm. Tu banda cómoda en reposo es $low–$high lpm. Parece un pulso en reposo tranquilo — útil como control de bienestar. Si quieres, vuelve a medir en unos minutos sentado.';
+  }
+
+  @override
+  String ppgAnalysisBodyElevated(int bpm, int low, int high) {
+    return 'Lectura con cámara: $bpm lpm — por encima de tu banda habitual $low–$high lpm. Actividad reciente, estrés, cafeína, calor o mala recuperación pueden subir el pulso. Descansa 2–3 minutos y mide de nuevo sentado.';
+  }
+
+  @override
+  String ppgAnalysisBodyLow(int bpm, int low, int high) {
+    return 'Lectura con cámara: $bpm lpm — por debajo de tu banda habitual $low–$high lpm. Los deportistas suelen tener el pulso más bajo en reposo. Si te mareas, sientes debilidad o malestar, busca atención; si no, sigue cómo te sientes día a día.';
+  }
+
+  @override
+  String ppgAnalysisBodyHigh(int bpm, int low, int high) {
+    return 'Lectura con cámara: $bpm lpm — claramente por encima de $low–$high lpm. Si tienes dolor torácico, falta de aire intensa o te mareas, busca atención urgente. Si no, descansa y vuelve a comprobar en unos minutos.';
+  }
+
+  @override
+  String ppgAnalysisRangeLabel(int low, int high) {
+    return 'Tu banda cómoda en reposo: $low–$high lpm';
+  }
+
+  @override
+  String ppgAnalysisQualityGood(int percent) {
+    return 'Calidad de señal $percent% — señal fuerte en la yema';
+  }
+
+  @override
+  String ppgAnalysisQualityFair(int percent) {
+    return 'Calidad de señal $percent% — usable; mantén el dedo quieto para muestras más limpias';
+  }
+
+  @override
+  String ppgAnalysisQualityPoor(int percent) {
+    return 'Calidad de señal $percent% — débil; cubre bien el objetivo y el flash y reintenta';
+  }
+
+  @override
+  String get ppgAnalysisMethodNote =>
+      'Medido con la cámara y el flash (PPG por la yema). No es un ECG ni un diagnóstico médico.';
+
+  @override
+  String get ppgHoldFinger => 'Mantén el dedo quieto, no lo retires';
+
+  @override
+  String get ppgHoldStill => 'Quédate quieto hasta que termine la medición';
+
+  @override
+  String get ppgTipsHeader => 'CONSEJOS Y DATOS SOBRE SALUD Y VIDA';
+
+  @override
+  String get ppgFact1 =>
+      'Medimos la variabilidad del ritmo cardíaco (HRV), no solo el pulso.';
+
+  @override
+  String get ppgFact2 =>
+      'El pulso es cuántas veces late el corazón; la variabilidad es cómo cambia el tiempo entre latidos.';
+
+  @override
+  String get ppgFact3 =>
+      '¿Cómo medimos la variabilidad con la cámara? Este método se llama fotopletismografía.';
+
+  @override
+  String get ppgFact4 =>
+      'Cuando el corazón late, el volumen de sangre en los vasos cambia y también su color.';
+
+  @override
+  String get ppgFact5 =>
+      'La cámara registra esos cambios y así vemos el tiempo entre latidos.';
+
+  @override
+  String get ppgFact6 =>
+      'A partir del ritmo calculamos métricas estándar de HRV como SDNN y rMSSD.';
+
+  @override
+  String get ppgFact7 =>
+      'Empresas como Apple y Garmin también usan el análisis de variabilidad en relojes inteligentes.';
+
+  @override
+  String get ppgFact8 =>
+      'Haz mediciones, recoge tus datos y siéntete mejor con el tiempo.';
+
+  @override
+  String get ppgResultTitle => 'Medición completa';
+
+  @override
+  String ppgQuality(int percent) {
+    return 'Calidad de señal $percent%';
+  }
+
+  @override
+  String get ppgExportRaw => 'Copiar señal bruta';
+
+  @override
+  String get ppgExportTitle => 'Exportación PPG PHA';
+
+  @override
+  String get ppgExportCopied => 'Señal bruta copiada';
+
+  @override
+  String get ppgNeedPermission =>
+      'Se necesita acceso a la cámara para medir el pulso con el flash.';
+
+  @override
+  String get ppgNoCamera => 'No hay cámara en este dispositivo.';
+
+  @override
+  String get ppgNoTorch =>
+      'El flash no está disponible. La medición puede ser menos precisa.';
+
+  @override
+  String get ppgCameraError =>
+      'No se pudo abrir la cámara. Inténtalo de nuevo.';
+
+  @override
+  String get ppgDisclaimer =>
+      'Esto no es un dispositivo médico. Las lecturas con cámara son solo informativas y no sustituyen el consejo médico.';
+
+  @override
   String get hrChartTitle => 'Tendencia de la frecuencia';
 
   @override
@@ -3234,6 +3527,63 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get hrEcgFeatUnknown => 'Clasificación no disponible.';
+
+  @override
+  String get hrEcgResultTitle => 'Resultado del análisis';
+
+  @override
+  String get hrEcgNoDistortion => 'No se detectó distorsión del ritmo';
+
+  @override
+  String get hrEcgHasDistortion => 'Posible irregularidad del ritmo';
+
+  @override
+  String get hrEcgUnclearDistortion =>
+      'No se pudo clasificar el ritmo con claridad';
+
+  @override
+  String get hrEcgAdviceNormalSinus =>
+      'Tu último ECG parece un ritmo sinusal regular. Sigue cómo te sientes; esto no es un diagnóstico médico.';
+
+  @override
+  String get hrEcgAdviceSinusTachy =>
+      'Tu frecuencia parece más alta que un ritmo sinusal en reposo. Descansa, evita estimulantes y consulta si continúa o te sientes mal.';
+
+  @override
+  String get hrEcgAdviceSinusBrady =>
+      'Tu frecuencia parece más baja que un ritmo sinusal en reposo. Si tienes mareo, debilidad o falta de aire, contacta a un médico.';
+
+  @override
+  String get hrEcgAdviceAfib =>
+      'El registro sugiere un ritmo irregular compatible con fibrilación auricular. Consulta pronto a un médico; no confíes solo en el reloj.';
+
+  @override
+  String get hrEcgAdviceVt =>
+      'Se señaló un patrón rápido de aspecto peligroso. Busca atención de urgencia si hay desmayo, dolor de pecho o debilidad intensa.';
+
+  @override
+  String get hrEcgAdviceVf =>
+      'Se señaló un patrón caótico de emergencia. Llama a emergencias de inmediato si así te sientes.';
+
+  @override
+  String get hrEcgAdviceAv1 =>
+      'Puede haber un leve retraso de conducción. Menciónalo a tu médico en la próxima visita, sobre todo si hay síntomas nuevos.';
+
+  @override
+  String get hrEcgAdviceAv2 =>
+      'Puede haber un patrón con latidos perdidos. Contacta pronto a un médico para un ECG clínico.';
+
+  @override
+  String get hrEcgAdviceAv3 =>
+      'Puede haber un bloqueo de conducción grave. Busca atención médica urgente.';
+
+  @override
+  String get hrEcgAdviceInconclusive =>
+      'El sensor no pudo clasificar este trazado con confianza. Inténtalo de nuevo en reposo o pide un ECG clínico.';
+
+  @override
+  String get hrEcgAdviceUnknown =>
+      'Aún no hay un resultado claro. Haz un ECG en Apple Watch, sincroniza y toca Leer sensores.';
 
   @override
   String get hrIrregularRhythm => 'Alertas de ritmo irregular';

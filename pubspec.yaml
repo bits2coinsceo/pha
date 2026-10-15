@@ -41,6 +41,7 @@ dependencies:
   provider: ^6.1.5+1
   crypto: ^3.0.7
   shared_preferences: ^2.5.5
+  flutter_secure_storage: ^9.2.4
   uuid: ^4.5.3
   intl: ^0.20.2
   file_picker: ^11.0.2
@@ -58,6 +59,7 @@ dependencies:
   logging_on_oslog: ^1.1.0
   purchases_flutter: ^10.9.1
   speech_to_text: ^7.4.0
+  camera: ^0.12.1
 
 dev_dependencies:
   flutter_test:
@@ -89,7 +91,7 @@ flutter:
     - assets/logo.jpg
     - assets/logo-dashboard.png
     - assets/ai_doc_avatar.png
-    - dart_define.json
+    - assets/ppg/finger_instruction.png
     - assets/legal/terms_of_service.txt
     - assets/legal/privacy_policy.txt
     - assets/legal/terms_of_service.pdf

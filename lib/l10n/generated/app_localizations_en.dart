@@ -329,6 +329,70 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileSubtitle => 'Manage your account settings';
 
   @override
+  String get profileHealthAccessTitle => 'Device & Health access';
+
+  @override
+  String get profileHealthAccessSubtitle =>
+      'Check or request access to steps, distance, and heart data here. PHA stays in the app — no jump to phone Health menus.';
+
+  @override
+  String get profileHealthAccessActivity => 'Steps & distance';
+
+  @override
+  String get profileHealthAccessActivityHint =>
+      'Allow PHA to read today’s steps and walking distance from your device.';
+
+  @override
+  String get profileHealthAccessHeart => 'Heart & Health data';
+
+  @override
+  String get profileHealthAccessHeartHint =>
+      'Heart rate, resting HR, HRV, irregular rhythm alerts, and ECG from Apple Health.';
+
+  @override
+  String get profileHealthAccessAll => 'Check / allow all access';
+
+  @override
+  String get profileHealthAccessOpenSettings => 'Open Health settings';
+
+  @override
+  String get profileHealthAccessOpenSettingsHint =>
+      'Turn on sharing for PHA in the Health app (Steps, Distance, Heart Rate, and more).';
+
+  @override
+  String get profileHealthAccessStatusOn => 'Connected';
+
+  @override
+  String get profileHealthAccessStatusOff => 'Not connected';
+
+  @override
+  String get profileHealthAccessRequesting => 'Checking access…';
+
+  @override
+  String get profileHealthAccessPrompted =>
+      'Permission dialog shown — enable the types you want to share.';
+
+  @override
+  String get profileHealthAccessAlreadyGranted =>
+      'Access is already granted for these data types.';
+
+  @override
+  String get profileHealthAccessOpenedSettings =>
+      'Opened Health settings. Enable the data types for PHA, then return to the app.';
+
+  @override
+  String get profileHealthAccessSynced =>
+      'Access updated — syncing your latest data.';
+
+  @override
+  String get profileHealthAccessUnsupported =>
+      'Device health sync is not available on this platform.';
+
+  @override
+  String get profileHealthAccessFailed =>
+      'Could not request access. Try again.';
+
+  @override
   String get age => 'Age';
 
   @override
@@ -1322,6 +1386,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mealGallery => 'Gallery';
 
   @override
+  String get mealPhotoReady =>
+      'Photo ready — tap Analyze Meal when you are set.';
+
+  @override
+  String get mealPhotoSelected => 'Selected meal photo';
+
+  @override
+  String get mealChangePhoto => 'Change photo';
+
+  @override
+  String get mealRemovePhoto => 'Remove';
+
+  @override
   String get mealAnalyze => 'Analyze Meal';
 
   @override
@@ -2132,7 +2209,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get promoCodeAlreadyUsed =>
-      'This promo code has already been used on this profile.';
+      'This promo code was already used on this profile or this device.';
 
   @override
   String psychoQuestionOfBlock(int current, int total) {
@@ -2171,7 +2248,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get activityYourProgramFallback => 'your program';
 
   @override
-  String get trialSevenDayFree => '7-day free trial';
+  String get trialSevenDayFree => '24-hour free trial';
+
+  @override
+  String trialCountdown(String time) {
+    return 'Trial $time';
+  }
+
+  @override
+  String get trialNotifSixHoursTitle => 'Trial ends in 6 hours';
+
+  @override
+  String get trialNotifSixHoursBody =>
+      'Your 24-hour free trial ends in 6 hours. Subscribe to PHA Plus+ to keep full access.';
+
+  @override
+  String get trialNotifOneHourTitle => 'Trial ends in 1 hour';
+
+  @override
+  String get trialNotifOneHourBody =>
+      'Less than an hour left in your free trial. Subscribe now to keep all PHA features.';
 
   @override
   String get trialNotifChannelName => 'Trial reminders';
@@ -2180,18 +2276,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trialNotifChannelDesc => 'Alerts before your free trial ends';
 
   @override
-  String get trialNotifThreeDaysTitle => 'Trial ends in 3 days';
+  String get trialNotifThreeDaysTitle => 'Trial ends in 6 hours';
 
   @override
   String get trialNotifThreeDaysBody =>
-      'Your 7-day free trial ends in 3 days. Subscribe to PHA Plus+ to keep all features.';
+      'Your 24-hour free trial ends in 6 hours. Subscribe to PHA Plus+ to keep full access.';
 
   @override
-  String get trialNotifTwentyFourHoursTitle => 'Trial ends in 24 hours';
+  String get trialNotifTwentyFourHoursTitle => 'Trial ends in 1 hour';
 
   @override
   String get trialNotifTwentyFourHoursBody =>
-      'Less than a day left in your free trial. Subscribe now to keep full access to PHA.';
+      'Less than an hour left in your free trial. Subscribe now to keep all PHA features.';
 
   @override
   String get uploadImageFormats => 'JPG, PNG, GIF';
@@ -2841,6 +2937,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Carrying extra weight raises the chance of high blood sugar and heart problems. Smaller portions, more vegetables, and daily walks help.';
 
   @override
+  String get clinicalFlagFattyLiverTitle => 'Fatty liver risk';
+
+  @override
+  String get clinicalFlagFattyLiverBody =>
+      'With obesity or a large excess of weight, the chance of fatty liver disease is higher. Consider an ultrasound of the liver and pancreas and discuss the result with your doctor.';
+
+  @override
   String get clinicalFlagTripleTitle => 'Weight + BP + sugar';
 
   @override
@@ -2948,7 +3051,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionHeartRate => 'Heart Rate & Rhythm';
 
   @override
-  String get actionHeartRateDesc => 'Heart check with Smart Watch';
+  String get actionHeartRateDesc => 'Heart check via watch/band or camera';
 
   @override
   String get actionEcg => 'ECG';
@@ -3105,6 +3208,195 @@ class AppLocalizationsEn extends AppLocalizations {
       'This is not a medical device. Smart-watch data does not replace a doctor’s advice. Seek care if you feel unwell.';
 
   @override
+  String get ppgTitle => 'Camera heart rate';
+
+  @override
+  String get ppgSourceWatch => 'Watch / band';
+
+  @override
+  String get ppgSourceCamera => 'Camera + flash';
+
+  @override
+  String get ppgSourceHint =>
+      'Read heart rate from a wearable, or measure with the phone camera and flash.';
+
+  @override
+  String get ppgMeasureCamera => 'Measure with camera';
+
+  @override
+  String get ppgStart => 'Start measurement';
+
+  @override
+  String get ppgStop => 'Stop';
+
+  @override
+  String get ppgRetry => 'Measure again';
+
+  @override
+  String get ppgSave => 'Save result';
+
+  @override
+  String get ppgSaving => 'Saving…';
+
+  @override
+  String get ppgSaved => 'Heart rate saved to your history';
+
+  @override
+  String get ppgSaveFailed => 'Could not save the reading';
+
+  @override
+  String get ppgPreparing => 'Preparing camera…';
+
+  @override
+  String get ppgPlaceFinger =>
+      'Place your finger over the camera and flash so the circle turns red';
+
+  @override
+  String get ppgCoverBothHint =>
+      'Cover both the lens and the flashlight at once. The circle turns red only then, and measurement starts automatically.';
+
+  @override
+  String get ppgExitAndAnalyze => 'Exit and analyze';
+
+  @override
+  String get ppgAnalyzed => 'Camera reading saved and analyzed';
+
+  @override
+  String get ppgAnalysisTitle => 'Camera measurement analysis';
+
+  @override
+  String get ppgAnalysisStatusNormal => 'Resting pulse looks comfortable';
+
+  @override
+  String get ppgAnalysisStatusElevated => 'Resting pulse is elevated';
+
+  @override
+  String get ppgAnalysisStatusLow => 'Resting pulse is low';
+
+  @override
+  String get ppgAnalysisStatusHigh => 'Resting pulse is markedly high';
+
+  @override
+  String ppgAnalysisBodyNormal(int bpm, int low, int high) {
+    return 'Camera reading: $bpm bpm. Your resting comfort band is $low–$high bpm. This looks like a calm resting pulse — useful as a wellness check-in. Sit quietly and remeasure later if you want a second sample.';
+  }
+
+  @override
+  String ppgAnalysisBodyElevated(int bpm, int low, int high) {
+    return 'Camera reading: $bpm bpm — above your usual $low–$high bpm resting comfort band. Recent activity, stress, caffeine, heat, or incomplete recovery can raise pulse. Rest 2–3 minutes and measure again while still seated.';
+  }
+
+  @override
+  String ppgAnalysisBodyLow(int bpm, int low, int high) {
+    return 'Camera reading: $bpm bpm — below your usual $low–$high bpm band. Trained athletes often run lower at rest. If you feel dizzy, weak, or unwell, seek care; otherwise keep tracking how you feel day to day.';
+  }
+
+  @override
+  String ppgAnalysisBodyHigh(int bpm, int low, int high) {
+    return 'Camera reading: $bpm bpm — well above your $low–$high bpm comfort band. If you have chest pain, severe shortness of breath, or feel faint, seek urgent care. Otherwise rest and recheck in a few minutes.';
+  }
+
+  @override
+  String ppgAnalysisRangeLabel(int low, int high) {
+    return 'Your resting comfort band: $low–$high bpm';
+  }
+
+  @override
+  String ppgAnalysisQualityGood(int percent) {
+    return 'Signal quality $percent% — strong fingertip signal';
+  }
+
+  @override
+  String ppgAnalysisQualityFair(int percent) {
+    return 'Signal quality $percent% — usable; keep the finger still for cleaner samples';
+  }
+
+  @override
+  String ppgAnalysisQualityPoor(int percent) {
+    return 'Signal quality $percent% — weak; cover the lens and flash fully and retry';
+  }
+
+  @override
+  String get ppgAnalysisMethodNote =>
+      'Measured with the camera and flash (PPG light through the fingertip). This is not an ECG and not a medical diagnosis.';
+
+  @override
+  String get ppgHoldFinger => 'Keep your finger still — do not move it';
+
+  @override
+  String get ppgHoldStill => 'Stay still until the measurement finishes';
+
+  @override
+  String get ppgTipsHeader => 'TIPS AND FACTS ABOUT HEALTH AND LIFE';
+
+  @override
+  String get ppgFact1 =>
+      'We measure heart rate variability (HRV), not only pulse.';
+
+  @override
+  String get ppgFact2 =>
+      'Pulse is how often the heart beats; variability is how the time between beats changes.';
+
+  @override
+  String get ppgFact3 =>
+      'How do we measure variability with a camera? This method is called photoplethysmography.';
+
+  @override
+  String get ppgFact4 =>
+      'When the heart beats, blood volume in the vessels changes — and so does their color.';
+
+  @override
+  String get ppgFact5 =>
+      'The camera records these changes so we can see the time between heartbeats.';
+
+  @override
+  String get ppgFact6 =>
+      'From the rhythm we compute standard HRV metrics such as SDNN and rMSSD.';
+
+  @override
+  String get ppgFact7 =>
+      'Companies like Apple and Garmin also use variability analysis in smartwatches.';
+
+  @override
+  String get ppgFact8 =>
+      'Take measurements, collect your own data, and feel better over time.';
+
+  @override
+  String get ppgResultTitle => 'Measurement complete';
+
+  @override
+  String ppgQuality(int percent) {
+    return 'Signal quality $percent%';
+  }
+
+  @override
+  String get ppgExportRaw => 'Copy raw signal';
+
+  @override
+  String get ppgExportTitle => 'PHA camera PPG export';
+
+  @override
+  String get ppgExportCopied => 'Raw signal copied to clipboard';
+
+  @override
+  String get ppgNeedPermission =>
+      'Camera access is required to measure heart rate with the flash.';
+
+  @override
+  String get ppgNoCamera => 'No camera is available on this device.';
+
+  @override
+  String get ppgNoTorch =>
+      'Flashlight is not available. Measurement may be less accurate.';
+
+  @override
+  String get ppgCameraError => 'Could not open the camera. Try again.';
+
+  @override
+  String get ppgDisclaimer =>
+      'This is not a medical device. Camera readings are for informational use only and do not replace a doctor’s advice.';
+
+  @override
   String get hrChartTitle => 'Heart rate trend';
 
   @override
@@ -3170,7 +3462,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hrEcgReferenceSubtitle =>
-      'Key teaching features — educational only, not a diagnosis.';
+      'Educational summary only — not a diagnosis.';
 
   @override
   String get hrEcgFeatNormalSinus =>
@@ -3214,6 +3506,62 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hrEcgFeatUnknown => 'Classification not available.';
+
+  @override
+  String get hrEcgResultTitle => 'Processing result';
+
+  @override
+  String get hrEcgNoDistortion => 'No rhythm distortion detected';
+
+  @override
+  String get hrEcgHasDistortion => 'Possible rhythm irregularity';
+
+  @override
+  String get hrEcgUnclearDistortion => 'Rhythm could not be classified clearly';
+
+  @override
+  String get hrEcgAdviceNormalSinus =>
+      'Your latest ECG looks like a regular sinus rhythm. Keep tracking how you feel; this is not a medical diagnosis.';
+
+  @override
+  String get hrEcgAdviceSinusTachy =>
+      'Your heart rate looks faster than a typical resting sinus rhythm. Rest, avoid stimulants, and see a doctor if it continues or you feel unwell.';
+
+  @override
+  String get hrEcgAdviceSinusBrady =>
+      'Your heart rate looks slower than a typical resting sinus rhythm. If you feel dizzy, weak, or short of breath, contact a doctor.';
+
+  @override
+  String get hrEcgAdviceAfib =>
+      'The recording suggests an irregular rhythm compatible with atrial fibrillation. Contact a doctor soon — do not rely on the watch alone.';
+
+  @override
+  String get hrEcgAdviceVt =>
+      'A dangerous-looking fast rhythm pattern was flagged. Seek emergency care if you feel faint, chest pain, or severe weakness.';
+
+  @override
+  String get hrEcgAdviceVf =>
+      'A chaotic emergency teaching pattern was flagged. Call emergency services immediately if this matches how you feel.';
+
+  @override
+  String get hrEcgAdviceAv1 =>
+      'A mild conduction delay pattern may be present. Mention it to your doctor at the next visit, especially if you have new symptoms.';
+
+  @override
+  String get hrEcgAdviceAv2 =>
+      'A dropped-beat conduction pattern may be present. Contact a doctor promptly for clinical ECG evaluation.';
+
+  @override
+  String get hrEcgAdviceAv3 =>
+      'A severe conduction-block pattern may be present. Seek urgent medical care.';
+
+  @override
+  String get hrEcgAdviceInconclusive =>
+      'The sensor could not classify this tracing confidently. Try again while still, or ask a clinician for a standard ECG.';
+
+  @override
+  String get hrEcgAdviceUnknown =>
+      'No clear rhythm result yet. Take an ECG on Apple Watch and sync, then tap Read sensors.';
 
   @override
   String get hrIrregularRhythm => 'Irregular rhythm alerts';

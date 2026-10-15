@@ -66,7 +66,7 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
   void initState() {
     super.initState();
     final auth = context.read<AuthProvider>();
-    if (!auth.isPlus) {
+    if (!auth.hasPlusAccess) {
       _count('analysis_uploads', auth.user!.id).then((c) => setState(() => uploadCount = c));
     }
   }
@@ -101,7 +101,7 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
   String? _filePickerHint(AppLocalizations l10n, AuthProvider auth) {
     if (atLimit) return l10n.uploadUpgradeMore;
     return switch (fileType) {
-      'pdf' => auth.isPlus ? null : l10n.fileTypePdf,
+      'pdf' => auth.hasPlusAccess ? null : l10n.fileTypePdf,
       'dicom' => l10n.fileTypeDicom,
       _ => l10n.uploadImageFormats,
     };
@@ -166,7 +166,7 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
       );
       // Don't block opening Ai Doc chat on network sync.
       unawaited(auth.syncPatientHistory());
-      if (!auth.isPlus && uploadCount != null) {
+      if (!auth.hasPlusAccess && uploadCount != null) {
         uploadCount = uploadCount! + 1;
       }
       if (!mounted) return;
@@ -190,7 +190,7 @@ class _UploadAnalysisModalState extends State<UploadAnalysisModal> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (!auth.isPlus && uploadCount != null) ...[
+          if (!auth.hasPlusAccess && uploadCount != null) ...[
             AppBanner(
               text: atLimit
                   ? l10n.uploadLimitMessage
@@ -324,7 +324,7 @@ class _CheckMealCaloriesModalState extends State<CheckMealCaloriesModal> {
 
   Future<void> _refreshCount() async {
     final auth = context.read<AuthProvider>();
-    if (auth.isPlus) return;
+    if (auth.hasPlusAccess) return;
     final count = await MealCalorieService.countLast24Hours(auth.user!.id);
     if (mounted) setState(() => checksLast24h = count);
   }
@@ -337,7 +337,7 @@ class _CheckMealCaloriesModalState extends State<CheckMealCaloriesModal> {
   }
 
   bool _isAtLimit(AuthProvider auth) =>
-      !auth.isPlus &&
+      !auth.hasPlusAccess &&
       checksLast24h != null &&
       checksLast24h! >= MealCalorieService.freeDailyLimit;
 
@@ -464,7 +464,7 @@ class _CheckMealCaloriesModalState extends State<CheckMealCaloriesModal> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (!auth.isPlus && checksLast24h != null) ...[
+          if (!auth.hasPlusAccess && checksLast24h != null) ...[
             AppBanner(
               text: atLimit
                   ? l10n.mealFreeLimit
@@ -534,36 +534,58 @@ class _CheckMealCaloriesModalState extends State<CheckMealCaloriesModal> {
               style: TextStyle(fontSize: 12, color: C.gray500, height: 1.4),
             ),
             const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed:
-                        analyzing || atLimit ? null : () => _pickImage(ImageSource.camera),
-                    icon: Icon(Icons.camera_alt_outlined, color: C.gray600),
-                    label: Text(l10n.mealCamera, style: TextStyle(color: C.gray700)),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed:
-                        analyzing || atLimit ? null : () => _pickImage(ImageSource.gallery),
-                    icon: Icon(Icons.photo_library_outlined, color: C.gray600),
-                    label: Text(l10n.mealGallery, style: TextStyle(color: C.gray700)),
-                  ),
-                ),
-              ],
-            ),
-            if (fileName != null) ...[
-              const SizedBox(height: 12),
-              Text(
-                fileName!,
-                style: TextStyle(fontSize: 13, color: C.gray600),
-                textAlign: TextAlign.center,
+            if (filePath != null) ...[
+              AppBanner(
+                text: l10n.mealPhotoReady,
+                bg: C.green50,
+                border: C.green200,
+                fg: C.teal700,
+                icon: Icons.check_circle_outline,
               ),
-            ],
-            const SizedBox(height: 16),
+              const SizedBox(height: 12),
+              _MealPhotoPreview(
+                imagePath: filePath!,
+                fileName: fileName,
+                onChange: analyzing || atLimit
+                    ? null
+                    : () => _pickImage(ImageSource.gallery),
+                onRemove: analyzing
+                    ? null
+                    : () => setState(() {
+                          filePath = null;
+                          fileName = null;
+                          error = '';
+                        }),
+              ),
+              const SizedBox(height: 16),
+            ] else
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: analyzing || atLimit
+                          ? null
+                          : () => _pickImage(ImageSource.camera),
+                      icon: Icon(Icons.camera_alt_outlined, color: C.gray600),
+                      label: Text(l10n.mealCamera,
+                          style: TextStyle(color: C.gray700)),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: analyzing || atLimit
+                          ? null
+                          : () => _pickImage(ImageSource.gallery),
+                      icon:
+                          Icon(Icons.photo_library_outlined, color: C.gray600),
+                      label: Text(l10n.mealGallery,
+                          style: TextStyle(color: C.gray700)),
+                    ),
+                  ),
+                ],
+              ),
+            if (filePath == null) const SizedBox(height: 16),
             atLimit
                 ? PrimaryButton(
                     label: l10n.upgradeToPhaPlus,
@@ -575,6 +597,35 @@ class _CheckMealCaloriesModalState extends State<CheckMealCaloriesModal> {
                     label: analyzing ? l10n.mealAnalyzing : l10n.mealAnalyze,
                     onPressed: (filePath == null || analyzing) ? null : _analyze,
                   ),
+            if (filePath != null) ...[
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton.icon(
+                      onPressed: analyzing || atLimit
+                          ? null
+                          : () => _pickImage(ImageSource.camera),
+                      icon: Icon(Icons.camera_alt_outlined,
+                          size: 18, color: C.gray600),
+                      label: Text(l10n.mealCamera,
+                          style: TextStyle(color: C.gray600)),
+                    ),
+                  ),
+                  Expanded(
+                    child: TextButton.icon(
+                      onPressed: analyzing || atLimit
+                          ? null
+                          : () => _pickImage(ImageSource.gallery),
+                      icon: Icon(Icons.photo_library_outlined,
+                          size: 18, color: C.gray600),
+                      label: Text(l10n.mealChangePhoto,
+                          style: TextStyle(color: C.gray600)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
             const SizedBox(height: 24),
           ],
 
@@ -582,6 +633,141 @@ class _CheckMealCaloriesModalState extends State<CheckMealCaloriesModal> {
           if (todaySummary != null) ...[
             _TodayIntakeSection(summary: todaySummary!),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+class _MealPhotoPreview extends StatelessWidget {
+  final String imagePath;
+  final String? fileName;
+  final VoidCallback? onChange;
+  final VoidCallback? onRemove;
+
+  const _MealPhotoPreview({
+    required this.imagePath,
+    required this.fileName,
+    required this.onChange,
+    required this.onRemove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return Container(
+      decoration: BoxDecoration(
+        color: C.card,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: C.green200),
+        boxShadow: C.glowShadow(alphaLight: 0.06, alphaDark: 0.12),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AspectRatio(
+            aspectRatio: 4 / 3,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.file(
+                  File(imagePath),
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: C.gray100,
+                    alignment: Alignment.center,
+                    child: Icon(Icons.broken_image_outlined,
+                        color: C.gray400, size: 40),
+                  ),
+                ),
+                Positioned(
+                  top: 10,
+                  left: 10,
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: C.teal700.withValues(alpha: 0.92),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.check, color: Colors.white, size: 14),
+                        const SizedBox(width: 4),
+                        Text(
+                          l10n.mealPhotoSelected,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                if (onRemove != null)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Material(
+                      color: Colors.black54,
+                      shape: const CircleBorder(),
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: onRemove,
+                        child: const Padding(
+                          padding: EdgeInsets.all(6),
+                          child: Icon(Icons.close, color: Colors.white, size: 18),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
+            child: Row(
+              children: [
+                Icon(Icons.image_outlined, size: 18, color: C.teal700),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    fileName?.isNotEmpty == true
+                        ? fileName!
+                        : l10n.mealPhotoSelected,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: C.gray800,
+                    ),
+                  ),
+                ),
+                if (onChange != null)
+                  TextButton(
+                    onPressed: onChange,
+                    style: TextButton.styleFrom(
+                      foregroundColor: C.accentPrimary,
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(
+                      l10n.mealChangePhoto,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -994,7 +1180,7 @@ class _AIChatModalState extends State<AIChatModal> {
     super.initState();
     _loadConsultationHistory();
     final auth = context.read<AuthProvider>();
-    if (!auth.isPlus) {
+    if (!auth.hasPlusAccess) {
       _count('ai_consultations', auth.user!.id).then((c) => setState(() => consultCount = c));
     }
   }
@@ -1243,7 +1429,7 @@ class _AIChatModalState extends State<AIChatModal> {
       _messages.add(_Msg(false, reply));
       loading = false;
       _analyzingOnboarding = false;
-      if (!auth.isPlus && consultCount != null) consultCount = consultCount! + 1;
+      if (!auth.hasPlusAccess && consultCount != null) consultCount = consultCount! + 1;
     });
     _scrollDown();
   }
@@ -1304,7 +1490,7 @@ class _AIChatModalState extends State<AIChatModal> {
                 ),
                 SizedBox(height: 12),
               ],
-              if (!auth.isPlus && consultCount != null) ...[
+              if (!auth.hasPlusAccess && consultCount != null) ...[
                 AppBanner(
                   text: atLimit
                       ? l10n.aiDocFreeLimit

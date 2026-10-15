@@ -124,14 +124,6 @@ class PatientSync {
     await push(email: email, syncToken: token, userId: userId);
   }
 
-  static Future<bool> existsOnServer(String email) async {
-    try {
-      return await ApiClient.patientExists(email);
-    } catch (_) {
-      return false;
-    }
-  }
-
   static Future<Map<String, dynamic>> _export(String userId, String email) async {
     final db = Db.instance.raw;
     final profiles =

@@ -328,6 +328,69 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profileSubtitle => 'إدارة إعدادات حسابك';
 
   @override
+  String get profileHealthAccessTitle => 'الوصول إلى بيانات الجهاز والصحة';
+
+  @override
+  String get profileHealthAccessSubtitle =>
+      'تحقق من الوصول إلى الخطوات والمسافة وبيانات القلب أو اطلبه هنا. يبقى PHA داخل التطبيق دون الانتقال إلى قائمة Health.';
+
+  @override
+  String get profileHealthAccessActivity => 'الخطوات والمسافة';
+
+  @override
+  String get profileHealthAccessActivityHint =>
+      'اسمح لـ PHA بقراءة الخطوات ومسافة المشي من جهازك.';
+
+  @override
+  String get profileHealthAccessHeart => 'نبض القلب وبيانات Health';
+
+  @override
+  String get profileHealthAccessHeartHint =>
+      'معدل القلب، معدل الراحة، تقلب القلب، إيقاع غير منتظم وتخطيط القلب من Apple Health.';
+
+  @override
+  String get profileHealthAccessAll => 'تحقق / اسمح بكل الوصول';
+
+  @override
+  String get profileHealthAccessOpenSettings => 'فتح إعدادات Health';
+
+  @override
+  String get profileHealthAccessOpenSettingsHint =>
+      'فعّل المشاركة لـ PHA في تطبيق Health (الخطوات، المسافة، معدل القلب وغيرها).';
+
+  @override
+  String get profileHealthAccessStatusOn => 'متصل';
+
+  @override
+  String get profileHealthAccessStatusOff => 'غير متصل';
+
+  @override
+  String get profileHealthAccessRequesting => 'جارٍ التحقق من الوصول…';
+
+  @override
+  String get profileHealthAccessPrompted =>
+      'ظهر طلب الإذن — فعّل أنواع البيانات التي تريد مشاركتها.';
+
+  @override
+  String get profileHealthAccessAlreadyGranted =>
+      'تم منح الوصول إلى أنواع البيانات هذه بالفعل.';
+
+  @override
+  String get profileHealthAccessOpenedSettings =>
+      'فُتحت إعدادات Health. فعّل أنواع البيانات لـ PHA ثم عد إلى التطبيق.';
+
+  @override
+  String get profileHealthAccessSynced =>
+      'تم تحديث الوصول — جارٍ مزامنة أحدث بياناتك.';
+
+  @override
+  String get profileHealthAccessUnsupported =>
+      'مزامنة الصحة غير متاحة على هذه المنصة.';
+
+  @override
+  String get profileHealthAccessFailed => 'تعذّر طلب الوصول. حاول مجددًا.';
+
+  @override
   String get age => 'العمر';
 
   @override
@@ -1302,10 +1365,23 @@ class AppLocalizationsAr extends AppLocalizations {
       'بعد التحليل، اضغط ✓ فقط إذا أكلت هذا الطبق — يُضاف إلى سعرات اليوم.';
 
   @override
-  String get mealCamera => 'Camera';
+  String get mealCamera => 'الكاميرا';
 
   @override
-  String get mealGallery => 'Gallery';
+  String get mealGallery => 'المعرض';
+
+  @override
+  String get mealPhotoReady =>
+      'الصورة جاهزة — اضغط «حلّل الوجبة» عندما تكون مستعدًا.';
+
+  @override
+  String get mealPhotoSelected => 'صورة الوجبة المحددة';
+
+  @override
+  String get mealChangePhoto => 'تغيير الصورة';
+
+  @override
+  String get mealRemovePhoto => 'إزالة';
 
   @override
   String get mealAnalyze => 'حلّل الوجبة';
@@ -2100,7 +2176,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get promoCodeAlreadyUsed =>
-      'تم استخدام هذا الرمز مسبقاً لهذا الملف الشخصي.';
+      'تم استخدام هذا الرمز مسبقاً لهذا الملف الشخصي أو لهذا الجهاز.';
 
   @override
   String psychoQuestionOfBlock(int current, int total) {
@@ -2138,28 +2214,46 @@ class AppLocalizationsAr extends AppLocalizations {
   String get activityYourProgramFallback => 'برنامجك';
 
   @override
-  String get trialSevenDayFree => 'تجربة مجانية 7 أيام';
+  String get trialSevenDayFree => 'تجربة مجانية 24 ساعة';
+
+  @override
+  String trialCountdown(String time) {
+    return 'التجربة $time';
+  }
+
+  @override
+  String get trialNotifSixHoursTitle => 'تنتهي التجربة خلال 6 ساعات';
+
+  @override
+  String get trialNotifSixHoursBody =>
+      'تنتهي تجربتك المجانية لمدة 24 ساعة خلال 6 ساعات. اشترك في PHA Plus+ للاحتفاظ بالوصول الكامل.';
+
+  @override
+  String get trialNotifOneHourTitle => 'تنتهي التجربة خلال ساعة';
+
+  @override
+  String get trialNotifOneHourBody =>
+      'تبقّى أقل من ساعة على نهاية التجربة. اشترك الآن للاحتفاظ بجميع ميزات PHA.';
 
   @override
   String get trialNotifChannelName => 'تذكيرات الفترة التجريبية';
 
   @override
-  String get trialNotifChannelDesc =>
-      'تنبيهات قبل انتهاء الفترة التجريبية المجانية';
+  String get trialNotifChannelDesc => 'تنبيهات قبل انتهاء الفترة التجريبية';
 
   @override
-  String get trialNotifThreeDaysTitle => 'تنتهي التجربة خلال 3 أيام';
+  String get trialNotifThreeDaysTitle => 'تنتهي التجربة خلال 6 ساعات';
 
   @override
   String get trialNotifThreeDaysBody =>
-      'تنتهي تجربتك المجانية لمدة 7 أيام خلال 3 أيام. اشترك في PHA Plus+ للاحتفاظ بجميع الميزات.';
+      'تنتهي تجربتك المجانية لمدة 24 ساعة خلال 6 ساعات. اشترك في PHA Plus+ للاحتفاظ بالوصول الكامل.';
 
   @override
-  String get trialNotifTwentyFourHoursTitle => 'تنتهي التجربة خلال 24 ساعة';
+  String get trialNotifTwentyFourHoursTitle => 'تنتهي التجربة خلال ساعة';
 
   @override
   String get trialNotifTwentyFourHoursBody =>
-      'بقي أقل من يوم على انتهاء التجربة المجانية. اشترك الآن للاحتفاظ بالوصول الكامل إلى PHA.';
+      'تبقّى أقل من ساعة على نهاية التجربة. اشترك الآن للاحتفاظ بجميع ميزات PHA.';
 
   @override
   String get uploadImageFormats => 'JPG, PNG, GIF';
@@ -2801,6 +2895,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'الوزن الزائد يرفع فرصة ارتفاع السكر ومشاكل القلب. حصص أصغر وخضار أكثر ومشي يومي يساعد.';
 
   @override
+  String get clinicalFlagFattyLiverTitle => 'خطر الكبد الدهني';
+
+  @override
+  String get clinicalFlagFattyLiverBody =>
+      'مع السمنة أو الزيادة الكبيرة في الوزن ترتفع احتمالية الكبد الدهني. يُفضّل إجراء موجات فوق صوتية للكبد والبنكرياس ومناقشة النتيجة مع الطبيب.';
+
+  @override
   String get clinicalFlagTripleTitle => 'وزن + ضغط + سكر';
 
   @override
@@ -2909,7 +3010,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get actionHeartRate => 'معدل وإيقاع القلب';
 
   @override
-  String get actionHeartRateDesc => 'فحص القلب عبر الساعة الذكية';
+  String get actionHeartRateDesc => 'فحص النبض عبر الساعة/السوار أو الكاميرا';
 
   @override
   String get actionEcg => 'تخطيط القلب';
@@ -3066,6 +3167,190 @@ class AppLocalizationsAr extends AppLocalizations {
       'هذا ليس جهازًا طبيًا. بيانات الساعة لا تغني عن استشارة الطبيب. راجع مختصًا عند الشعور بتوعك.';
 
   @override
+  String get ppgTitle => 'نبض عبر الكاميرا';
+
+  @override
+  String get ppgSourceWatch => 'ساعة / سوار';
+
+  @override
+  String get ppgSourceCamera => 'كاميرا + فلاش';
+
+  @override
+  String get ppgSourceHint =>
+      'اقرأ النبض من الجهاز القابل للارتداء أو قِسه بكاميرا الهاتف والفلاش.';
+
+  @override
+  String get ppgMeasureCamera => 'القياس بالكاميرا';
+
+  @override
+  String get ppgStart => 'بدء القياس';
+
+  @override
+  String get ppgStop => 'إيقاف';
+
+  @override
+  String get ppgRetry => 'قياس مرة أخرى';
+
+  @override
+  String get ppgSave => 'حفظ النتيجة';
+
+  @override
+  String get ppgSaving => 'جارٍ الحفظ…';
+
+  @override
+  String get ppgSaved => 'تم حفظ النبض في السجل';
+
+  @override
+  String get ppgSaveFailed => 'تعذّر حفظ القراءة';
+
+  @override
+  String get ppgPreparing => 'جارٍ تجهيز الكاميرا…';
+
+  @override
+  String get ppgPlaceFinger =>
+      'ضع إصبعك على الكاميرا والفلاش حتى يصبح الدائرة حمراء';
+
+  @override
+  String get ppgCoverBothHint =>
+      'غطِّ العدسة والفلاش معًا. يتحول الدائرة إلى الأحمر عندها فقط ويبدأ القياس تلقائيًا.';
+
+  @override
+  String get ppgExitAndAnalyze => 'خروج وتحليل';
+
+  @override
+  String get ppgAnalyzed => 'تم حفظ قراءة الكاميرا وتحليلها';
+
+  @override
+  String get ppgAnalysisTitle => 'تحليل قياس الكاميرا';
+
+  @override
+  String get ppgAnalysisStatusNormal => 'نبض الراحة يبدو مريحًا';
+
+  @override
+  String get ppgAnalysisStatusElevated => 'نبض الراحة مرتفع';
+
+  @override
+  String get ppgAnalysisStatusLow => 'نبض الراحة منخفض';
+
+  @override
+  String get ppgAnalysisStatusHigh => 'نبض الراحة مرتفع بشكل ملحوظ';
+
+  @override
+  String ppgAnalysisBodyNormal(int bpm, int low, int high) {
+    return 'قراءة الكاميرا: $bpm نبضة/د. نطاق راحتك في الراحة $low–$high. يبدو نبض راحة هادئًا — مفيد كمتابعة عامة. يمكنك إعادة القياس بعد دقائق وأنت جالس.';
+  }
+
+  @override
+  String ppgAnalysisBodyElevated(int bpm, int low, int high) {
+    return 'قراءة الكاميرا: $bpm — أعلى من نطاقك المعتاد $low–$high. النشاط الأخير أو التوتر أو الكافيين أو الحرارة أو ضعف التعافي قد يرفع النبض. ارتاح دقيقتين إلى ثلاث وأعد القياس جالسًا.';
+  }
+
+  @override
+  String ppgAnalysisBodyLow(int bpm, int low, int high) {
+    return 'قراءة الكاميرا: $bpm — أقل من نطاقك المعتاد $low–$high. الرياضيون غالبًا لديهم نبض أهدأ في الراحة. إن شعرت بدوخة أو ضعف أو سوء حال فاستشر؛ وإلا راقب شعورك يوميًا.';
+  }
+
+  @override
+  String ppgAnalysisBodyHigh(int bpm, int low, int high) {
+    return 'قراءة الكاميرا: $bpm — أعلى بكثير من $low–$high. إن كان هناك ألم صدري أو ضيق تنفس شديد أو إغماء فاطلب رعاية عاجلة. وإلا ارتاح وأعد الفحص بعد دقائق.';
+  }
+
+  @override
+  String ppgAnalysisRangeLabel(int low, int high) {
+    return 'نطاق راحتك في الراحة: $low–$high نبضة/د';
+  }
+
+  @override
+  String ppgAnalysisQualityGood(int percent) {
+    return 'جودة الإشارة $percent% — إشارة قوية من الإصبع';
+  }
+
+  @override
+  String ppgAnalysisQualityFair(int percent) {
+    return 'جودة الإشارة $percent% — مقبولة؛ أبقِ الإصبع ثابتًا لقراءة أوضح';
+  }
+
+  @override
+  String ppgAnalysisQualityPoor(int percent) {
+    return 'جودة الإشارة $percent% — ضعيفة؛ غطِّ العدسة والفلاش تمامًا وأعد المحاولة';
+  }
+
+  @override
+  String get ppgAnalysisMethodNote =>
+      'قِيس بالكاميرا والفلاش (PPG عبر طرف الإصبع). هذا ليس تخطيط قلب وليس تشخيصًا طبيًا.';
+
+  @override
+  String get ppgHoldFinger => 'أبقِ إصبعك ثابتًا ولا تحرّكه';
+
+  @override
+  String get ppgHoldStill => 'ابقَ ثابتًا حتى ينتهي القياس';
+
+  @override
+  String get ppgTipsHeader => 'نصائح وحقائق عن الصحة والحياة';
+
+  @override
+  String get ppgFact1 => 'نقيس تغيّر معدل ضربات القلب (HRV) وليس النبض فقط.';
+
+  @override
+  String get ppgFact2 =>
+      'النبض هو عدد ضربات القلب؛ والتغيّر هو كيف يتغير الزمن بين الضربات.';
+
+  @override
+  String get ppgFact3 =>
+      'كيف نقيس التغيّر بالكاميرا؟ تُسمّى هذه الطريقة تخطيط التحجم الضوئي.';
+
+  @override
+  String get ppgFact4 =>
+      'عندما ينبض القلب يتغير حجم الدم في الأوعية ويتغير لونها.';
+
+  @override
+  String get ppgFact5 => 'تسجّل الكاميرا هذه التغيرات لنعرف الزمن بين الضربات.';
+
+  @override
+  String get ppgFact6 =>
+      'من إيقاع القلب نحسب مؤشرات HRV القياسية مثل SDNN و rMSSD.';
+
+  @override
+  String get ppgFact7 =>
+      'شركات مثل Apple و Garmin تستخدم أيضًا تحليل التغيّر في الساعات الذكية.';
+
+  @override
+  String get ppgFact8 => 'قم بالقياسات واجمع بياناتك وشعُر بتحسّن مع الوقت.';
+
+  @override
+  String get ppgResultTitle => 'اكتمل القياس';
+
+  @override
+  String ppgQuality(int percent) {
+    return 'جودة الإشارة $percent%';
+  }
+
+  @override
+  String get ppgExportRaw => 'نسخ الإشارة الخام';
+
+  @override
+  String get ppgExportTitle => 'تصدير PPG من PHA';
+
+  @override
+  String get ppgExportCopied => 'تم نسخ الإشارة الخام';
+
+  @override
+  String get ppgNeedPermission => 'يلزم إذن الكاميرا لقياس النبض بالفلاش.';
+
+  @override
+  String get ppgNoCamera => 'لا توجد كاميرا على هذا الجهاز.';
+
+  @override
+  String get ppgNoTorch => 'الفلاش غير متاح. قد يكون القياس أقل دقة.';
+
+  @override
+  String get ppgCameraError => 'تعذّر فتح الكاميرا. حاول مرة أخرى.';
+
+  @override
+  String get ppgDisclaimer =>
+      'هذا ليس جهازًا طبيًا. قراءات الكاميرا للاطلاع فقط ولا تغني عن استشارة الطبيب.';
+
+  @override
   String get hrChartTitle => 'اتجاه معدل القلب';
 
   @override
@@ -3174,6 +3459,62 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get hrEcgFeatUnknown => 'التصنيف غير متاح.';
+
+  @override
+  String get hrEcgResultTitle => 'نتيجة المعالجة';
+
+  @override
+  String get hrEcgNoDistortion => 'لم يُكتشف تشوّه في الإيقاع';
+
+  @override
+  String get hrEcgHasDistortion => 'احتمال اضطراب في الإيقاع';
+
+  @override
+  String get hrEcgUnclearDistortion => 'تعذّر تصنيف الإيقاع بوضوح';
+
+  @override
+  String get hrEcgAdviceNormalSinus =>
+      'آخر تخطيط يبدو كإيقاع جيبي منتظم. راقب شعورك؛ هذا ليس تشخيصًا طبيًا.';
+
+  @override
+  String get hrEcgAdviceSinusTachy =>
+      'معدل القلب أعلى من الإيقاع الجيبي المعتاد في الراحة. استرح وتجنّب المنشطات وراجع الطبيب إن استمر أو شعرت بتوعك.';
+
+  @override
+  String get hrEcgAdviceSinusBrady =>
+      'معدل القلب أقل من الإيقاع الجيبي المعتاد في الراحة. إن شعرت بدوخة أو ضعف أو ضيق تنفس فاتصل بالطبيب.';
+
+  @override
+  String get hrEcgAdviceAfib =>
+      'التسجيل يوحي بإيقاع غير منتظم متوافق مع الرجفان الأذيني. راجع طبيبًا قريبًا ولا تعتمد على الساعة وحدها.';
+
+  @override
+  String get hrEcgAdviceVt =>
+      'أُشير إلى نمط سريع يبدو خطيرًا. اطلب رعاية طارئة عند الإغماء أو ألم الصدر أو ضعف شديد.';
+
+  @override
+  String get hrEcgAdviceVf =>
+      'أُشير إلى نمط فوضوي طارئ. اتصل بالطوارئ فورًا إن كان هذا شعورك.';
+
+  @override
+  String get hrEcgAdviceAv1 =>
+      'قد يكون هناك تأخّر خفيف في التوصيل. أخبر طبيبك في الزيارة التالية خاصة مع أعراض جديدة.';
+
+  @override
+  String get hrEcgAdviceAv2 =>
+      'قد يكون هناك نمط مع نبضات ساقطة. اتصل بالطبيب قريبًا لتقييم تخطيط سريري.';
+
+  @override
+  String get hrEcgAdviceAv3 =>
+      'قد يكون هناك انسداد توصيل شديد. اطلب رعاية طبية عاجلة.';
+
+  @override
+  String get hrEcgAdviceInconclusive =>
+      'تعذّر على المستشعر تصنيف هذا التخطيط بثقة. أعد المحاولة وأنت ثابت أو اطلب تخطيطًا سريريًا.';
+
+  @override
+  String get hrEcgAdviceUnknown =>
+      'لا توجد نتيجة واضحة بعد. خذ تخطيطًا على Apple Watch وزامِن ثم اضغط قراءة المستشعرات.';
 
   @override
   String get hrIrregularRhythm => 'تنبيهات إيقاع غير منتظم';

@@ -40,7 +40,7 @@ class Settings:
     gemini_model_complex: str = os.environ.get("GEMINI_MODEL_COMPLEX", "gemini-1.5-flash")
 
     # --- Доступ к API ---
-    # Если задан — клиент обязан присылать заголовок X-API-Key с этим значением.
+    # Обязателен. Пустое значение больше не отключает проверку — процесс не стартует.
     api_key: str | None = os.environ.get("API_KEY") or None
 
     # --- Лимит кредитов на пользователя ---
@@ -51,7 +51,7 @@ class Settings:
 
     # --- Хранение истории пациента (зашифрованные файлы по email) ---
     patient_data_dir: str = os.environ.get("PATIENT_DATA_DIR", "patient_data")
-    # Fernet key (urlsafe base64, 32 bytes). Generate: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+    # Fernet key (urlsafe base64, 32 bytes). Обязателен. Без него процесс не стартует.
     patient_encryption_key: str | None = os.environ.get("PATIENT_ENCRYPTION_KEY") or None
 
     # --- Twilio Email (transactional OTP) ---
@@ -70,6 +70,25 @@ class Settings:
     price_simple_out: float = float(os.environ.get("PRICE_SIMPLE_OUT", "2.50"))
     price_complex_in: float = float(os.environ.get("PRICE_COMPLEX_IN", "1.50"))
     price_complex_out: float = float(os.environ.get("PRICE_COMPLEX_OUT", "9.00"))
+
+    def require_production_secrets(self) -> None:
+        """Отказывает в старте, если API или шифрование пациентов не заданы."""
+        key = self.api_key or ""
+        if len(key) < 32:
+            raise RuntimeError(
+                "API_KEY must be set to a random string of at least 32 characters. "
+                "An empty API_KEY no longer disables authentication."
+            )
+        enc = self.patient_encryption_key or ""
+        try:
+            from cryptography.fernet import Fernet
+
+            Fernet(enc.encode("utf-8"))
+        except Exception as exc:
+            raise RuntimeError(
+                "PATIENT_ENCRYPTION_KEY must be a Fernet key. Generate one with: "
+                'python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"'
+            ) from exc
 
     def model_for(self, complexity: str) -> str:
         """Имя модели по уровню сложности запроса."""

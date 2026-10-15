@@ -318,7 +318,8 @@ class DailyNotificationService {
   ///
   /// Step sync checkpoints (iOS BG + HealthKit rewrite of pending banners):
   /// - **00:00** on the morning delivery day (yesterday's steps for 10:30)
-  /// - **30 minutes before** the evening 20:00 push (today's steps)
+  /// - Evening 20:00 body is rewritten from HealthKit whenever new steps
+  ///   arrive, and again a few minutes before the push.
   static Future<void> scheduleForUser(String userId) async {
     if (!_initialized) await init();
     // Always (re)prompt once if OS permission is missing — otherwise TestFlight
@@ -463,9 +464,10 @@ class DailyNotificationService {
       final deliveryDay = DateTime(morningAt.year, morningAt.month, morningAt.day);
       final yesterday = deliveryDay.subtract(const Duration(days: 1));
 
-      // Finalize yesterday from the device before baking the banner.
+      // Try HealthKit, but never let it wipe SQLite history (downgrade-guarded).
       await _syncDayForMorningPush(userId, yesterday);
 
+      // Morning banner source of truth = app history for yesterday.
       final knownSteps = await _stepsOnDay(userId, yesterday);
       // Always include a numeric step count in the morning OS push.
       final osMorningBody = _clip(
@@ -474,6 +476,7 @@ class DailyNotificationService {
           l10n,
           forDeliveryDay: deliveryDay,
           avoidZeroBanner: false,
+          stepsOverride: knownSteps,
         ),
         _osPushBodyMax,
       );
@@ -603,9 +606,11 @@ class DailyNotificationService {
         'midnightMs': midnight.millisecondsSinceEpoch,
         'prePushMs': prePush.millisecondsSinceEpoch,
         'title': title,
-        // Native fills __STEPS__ from HealthKit for the day before fireAt.
+        // Native fills __STEPS__: prefer app history, then HealthKit if higher.
         'bodyTemplate': _clip(template, _osPushBodyMax),
         'bodyFallback': fallback,
+        // SQLite history for yesterday — never let a HealthKit 0 wipe this.
+        'historySteps': knownSteps,
       });
     } catch (e, st) {
       debugPrint('Morning push prep schedule failed: $e\n$st');
@@ -615,7 +620,7 @@ class DailyNotificationService {
   static const _todayTemplateSentinel = 812837465;
   static const _yesterdayTemplateSentinel = 712837465;
 
-  /// iOS: rewrite evening OS banner 30 minutes before 20:00 with live steps.
+  /// iOS: keep the 20:00 banner on live HealthKit steps (not the last app open).
   static Future<void> _scheduleNativeEveningPrep({
     required tz.TZDateTime fireAt,
     required String title,
@@ -637,7 +642,7 @@ class DailyNotificationService {
       final template = withSentinel
           .replaceAll('$_todayTemplateSentinel', '__TODAY__')
           .replaceAll('$_yesterdayTemplateSentinel', '__YESTERDAY__');
-      final prePush = fireAt.subtract(const Duration(minutes: 30));
+      final prePush = fireAt.subtract(const Duration(minutes: 5));
       const channel = MethodChannel('pha.evening_push_prep/methods');
       await channel.invokeMethod<void>('schedule', {
         'fireAtMs': fireAt.millisecondsSinceEpoch,
@@ -750,16 +755,20 @@ class DailyNotificationService {
   /// When [avoidZeroBanner] is true (OS push), a zero/empty yesterday falls
   /// back to a short “open PHA” tip so the lock-screen banner is not frozen
   /// with “0 steps” before HealthKit has synced.
+  ///
+  /// Pass [stepsOverride] to force the history value already loaded for the
+  /// OS banner (avoids a second query drifting from the prep payload).
   static Future<String> _localizedMorningBody(
     String userId,
     AppLocalizations l10n, {
     DateTime? forDeliveryDay,
     bool avoidZeroBanner = false,
+    int? stepsOverride,
   }) async {
     final delivery = forDeliveryDay ?? DateTime.now();
     final day = DateTime(delivery.year, delivery.month, delivery.day);
     final yesterday = day.subtract(const Duration(days: 1));
-    final steps = await _stepsOnDay(userId, yesterday);
+    final steps = stepsOverride ?? await _stepsOnDay(userId, yesterday);
     final kcal = await _mealKcalOnDay(userId, yesterday);
     final index = await _indexSnapshot(userId, l10n);
     if (avoidZeroBanner && steps <= 0) {

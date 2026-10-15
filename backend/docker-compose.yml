@@ -3,14 +3,15 @@ services:
     build: .
     image: pha-backend:latest
     container_name: pha-backend
+    # Только localhost. Снаружи — HTTPS-прокси (Caddy), не открытый :8080.
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     environment:
       - GCP_PROJECT=${GCP_PROJECT:-pha-personal-health-assistant}
       - GCP_LOCATION=${GCP_LOCATION:-global}
       - GEMINI_MODEL_SIMPLE=${GEMINI_MODEL_SIMPLE:-gemini-1.5-flash}
       - GEMINI_MODEL_COMPLEX=${GEMINI_MODEL_COMPLEX:-gemini-1.5-flash}
-      - API_KEY=${API_KEY:-}
+      - API_KEY=${API_KEY:?Set API_KEY in .env}
       - USER_BUDGET_USD=${USER_BUDGET_USD:-5}
       - PRICE_SIMPLE_IN=${PRICE_SIMPLE_IN:-0.30}
       - PRICE_SIMPLE_OUT=${PRICE_SIMPLE_OUT:-2.50}
@@ -18,12 +19,13 @@ services:
       - PRICE_COMPLEX_OUT=${PRICE_COMPLEX_OUT:-9.00}
       - USAGE_DB=/data/usage.db
       - PATIENT_DATA_DIR=/data/patients
-      - PATIENT_ENCRYPTION_KEY=${PATIENT_ENCRYPTION_KEY:-}
+      - PATIENT_ENCRYPTION_KEY=${PATIENT_ENCRYPTION_KEY:?Set PATIENT_ENCRYPTION_KEY in .env}
       - TWILIO_EMAIL_API_KEY_SID=${TWILIO_EMAIL_API_KEY_SID:-}
       - TWILIO_EMAIL_API_SECRET=${TWILIO_EMAIL_API_SECRET:-}
       - TWILIO_EMAIL_FROM=${TWILIO_EMAIL_FROM:-support@pha-app.net}
       - TWILIO_EMAIL_FROM_NAME=${TWILIO_EMAIL_FROM_NAME:-PHA - Personal Health Assistant}
       - OTP_DB=/data/otp.db
+      - REVENUECAT_SECRET_API_KEY=${REVENUECAT_SECRET_API_KEY:-}
       - GOOGLE_APPLICATION_CREDENTIALS=/secrets/sa.json
     volumes:
       # Ключ сервис-аккаунта монтируется внутрь контейнера только для чтения.
@@ -39,5 +41,21 @@ services:
       retries: 3
       start_period: 10s
 
+  caddy:
+    image: caddy:2
+    container_name: pha-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - api
+
 volumes:
   pha-usage:
+  caddy-data:
+  caddy-config:

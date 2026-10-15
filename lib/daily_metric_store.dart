@@ -132,6 +132,27 @@ class DailyMetricStore {
     });
   }
 
+  /// Value for [metricType] on the local calendar day of [day] (default: today).
+  static Future<double?> valueOnLocalDay({
+    required String userId,
+    required String metricType,
+    DateTime? day,
+  }) async {
+    if (!Db.instance.isReady) return null;
+    final bounds = localDayBounds(day);
+    final rows = await Db.instance.raw.query(
+      'health_metrics',
+      columns: ['value'],
+      where:
+          'user_id = ? AND metric_type = ? AND recorded_at >= ? AND recorded_at < ?',
+      whereArgs: [userId, metricType, bounds.startIso, bounds.endIso],
+      orderBy: 'recorded_at DESC',
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+    return (rows.first['value'] as num).toDouble();
+  }
+
   /// Latest value per local day, oldest → newest, capped at [limit] days.
   static Future<List<double>> dailySeries({
     required String userId,

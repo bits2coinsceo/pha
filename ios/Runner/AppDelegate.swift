@@ -13,6 +13,9 @@ import flutter_local_notifications
     // Must register BG tasks before launch returns (Apple requirement).
     MorningPushPrep.registerBackgroundTask()
     EveningPushPrep.registerBackgroundTask()
+    // HealthKit must be able to wake the app and rewrite the 20:00 banner
+    // even when Flutter has not started.
+    EveningPushPrep.startHealthKitDelivery()
     // Do NOT register plugins or set UNUserNotificationCenter.delegate here.
     // With FlutterImplicitEngine / UIScene, the engine may not be ready yet when
     // iOS delivers a cold-start notification tap — doing that too early can crash.
@@ -32,6 +35,9 @@ import flutter_local_notifications
       with: engineBridge.applicationRegistrar.messenger()
     )
     EveningPushPrep.register(
+      with: engineBridge.applicationRegistrar.messenger()
+    )
+    HealthSettingsBridge.register(
       with: engineBridge.applicationRegistrar.messenger()
     )
     if #available(iOS 10.0, *) {

@@ -11,8 +11,9 @@ import UserNotifications
 /// 2. At 00:00 on the delivery calendar day (yesterday's steps are finalized)
 /// 3. 1 minute before the push fires (late Watch / HealthKit sync)
 ///
-/// Flutter stores a `__STEPS__` body template (+ fallback). Native fills steps
-/// from HealthKit for the calendar day *before* [fireAt].
+/// Flutter stores a `__STEPS__` body template (+ fallback) and
+/// [historySteps] from PHA SQLite. Native prefers history; HealthKit may only
+/// raise the count (late Watch sync), never replace history with 0.
 enum MorningPushPrep {
   static let midnightTaskId = "com.pha.phaFlutter.morningPrep.midnight"
   static let prePushTaskId = "com.pha.phaFlutter.morningPrep.prePush"
@@ -28,6 +29,9 @@ enum MorningPushPrep {
   private static let fireAtKey = "pha_morning_os_fire_at_ms"
   private static let midnightKey = "pha_morning_os_midnight_ms"
   private static let prePushKey = "pha_morning_os_prepush_ms"
+  /// Steps from PHA SQLite history for the day before fireAt.
+  /// HealthKit must not replace this with a lower / zero glitch.
+  private static let historyStepsKey = "pha_morning_os_history_steps"
 
   static func register(with messenger: FlutterBinaryMessenger) {
     let channel = FlutterMethodChannel(
@@ -56,6 +60,7 @@ enum MorningPushPrep {
           ?? Self.defaultMidnightMs(fireAtMs: fireAtMs.doubleValue)
         let prePushMs = (args["prePushMs"] as? NSNumber)?.doubleValue
           ?? (fireAtMs.doubleValue - 60_000)
+        let historySteps = (args["historySteps"] as? NSNumber)?.intValue ?? 0
 
         defaults.set(title, forKey: titleKey)
         defaults.set(template, forKey: templateKey)
@@ -63,9 +68,10 @@ enum MorningPushPrep {
         defaults.set(fireAtMs.doubleValue, forKey: fireAtKey)
         defaults.set(midnightMs, forKey: midnightKey)
         defaults.set(prePushMs, forKey: prePushKey)
+        defaults.set(historySteps, forKey: historyStepsKey)
 
         cancelAllBackgroundTasks()
-        // 1) Immediate HealthKit fill for the correct "yesterday".
+        // 1) Immediate fill: app history first, HealthKit only if higher.
         refreshPendingNotification(fireAtMs: fireAtMs.doubleValue) { _ in
           // 2) 00:00 on delivery day  3) 1 minute before push
           scheduleBackgroundRefresh(
@@ -228,6 +234,25 @@ enum MorningPushPrep {
     store.execute(query)
   }
 
+  /// Prefer PHA history; allow HealthKit only when it reports a higher total
+  /// (late Watch sync). Never replace a known history count with HK zero.
+  private static func resolveSteps(healthKit: Int?) -> Int {
+    let history = defaults.integer(forKey: historyStepsKey)
+    let hk = healthKit ?? 0
+    if history > 0 && hk < history {
+      NSLog(
+        "MorningPushPrep: keep history steps=\(history) (HealthKit=\(hk))"
+      )
+      return history
+    }
+    let resolved = max(hk, history)
+    if history > 0, hk > history {
+      // Promote stored history so later BG refreshes keep the better total.
+      defaults.set(resolved, forKey: historyStepsKey)
+    }
+    return resolved
+  }
+
   private static func refreshPendingNotification(
     fireAtMs: Double,
     completion: @escaping (Bool) -> Void
@@ -242,9 +267,17 @@ enum MorningPushPrep {
       return
     }
 
-    fetchSteps(from: bounds.start, to: bounds.end) { steps in
-      applyBody(steps: steps)
-      completion(steps != nil)
+    let history = defaults.integer(forKey: historyStepsKey)
+    // Apply history immediately so the banner is never briefly stuck at 0
+    // while HealthKit is still querying.
+    if history > 0 {
+      applyBody(steps: history)
+    }
+
+    fetchSteps(from: bounds.start, to: bounds.end) { hkSteps in
+      let resolved = resolveSteps(healthKit: hkSteps)
+      applyBody(steps: resolved)
+      completion(true)
     }
   }
 
@@ -253,13 +286,14 @@ enum MorningPushPrep {
     let template = defaults.string(forKey: templateKey) ?? ""
     let fallback = defaults.string(forKey: fallbackKey) ?? template
     let fireAtMs = defaults.double(forKey: fireAtKey)
+    let resolved = steps ?? defaults.integer(forKey: historyStepsKey)
 
     let body: String
     if !template.isEmpty {
-      // Always include a step count in the morning OS push (0 is valid).
+      // Always include a step count in the morning OS push.
       body = template.replacingOccurrences(
         of: "__STEPS__",
-        with: "\(steps ?? 0)"
+        with: "\(resolved)"
       )
     } else {
       body = fallback
@@ -308,7 +342,7 @@ enum MorningPushPrep {
         if let error {
           NSLog("MorningPushPrep: failed to update notification: \(error)")
         } else {
-          NSLog("MorningPushPrep: updated morning body (steps=\(steps ?? -1))")
+          NSLog("MorningPushPrep: updated morning body (steps=\(resolved))")
         }
       }
     }

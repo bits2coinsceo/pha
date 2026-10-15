@@ -41,6 +41,17 @@ def send_registration_code(to_email: str, code: str) -> None:
     )
 
 
+def send_already_registered(to_email: str) -> None:
+    _send(
+        to_email,
+        "Вход в PHA",
+        """<div style="font-family: Arial, sans-serif; padding: 20px;">
+  <p>Этот email уже зарегистрирован в PHA. Войдите с паролем или запросите сброс пароля.</p>
+</div>""",
+        "Этот email уже зарегистрирован в PHA. Войдите с паролем или запросите сброс пароля.",
+    )
+
+
 def send_password_reset_code(to_email: str, code: str) -> None:
     _send(
         to_email,

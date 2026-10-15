@@ -619,28 +619,29 @@ class _AppContentState extends State<AppContent> with WidgetsBindingObserver {
               AIChatModal(onNeedUpgrade: _needUpgrade))),
           onOpenStressTest: () => _guardFreeFeature(
               () => _openModal(const StressTestModal())),
-          onOpenBadHabits: () => auth.isPlus
+          onOpenBadHabits: () => auth.hasPlusAccess
               ? _openModal(const BadHabitsModal())
               : _openModal(const UpgradeModal()),
-          onOpenPhysicalActivity: () => auth.isPlus
+          onOpenPhysicalActivity: () => auth.hasPlusAccess
               ? _openModal(const PhysicalActivityModal())
               : _openModal(const UpgradeModal()),
-          onOpenHeartRate: () => auth.isPlus
+          onOpenHeartRate: () => auth.hasPlusAccess
               ? _openModal(const HeartRateModal())
               : _openModal(const UpgradeModal()),
-          onOpenEcg: () => auth.isPlus
+          onOpenEcg: () => auth.hasPlusAccess
               ? _openModal(const EcgModal())
               : _openModal(const UpgradeModal()),
           onOpenLogMetric: () => _guardFreeFeature(() => _openModal(
               LogMetricModal(onSaved: () => setState(() => dashboardKey++)))),
-          onOpenPsychoTest: () => auth.isPlus
+          onOpenPsychoTest: () => auth.hasPlusAccess
               ? _openModal(const PsychoTestModal())
               : _openModal(const UpgradeModal()),
-          onOpenTreatmentSchedule: () => auth.isPlus
+          onOpenTreatmentSchedule: () => auth.hasPlusAccess
               ? _openModal(const TreatmentScheduleModal())
               : _openModal(const UpgradeModal()),
           onUpgrade: () => _openModal(const UpgradeModal()),
           onOpenInsights: () => setState(() => currentPage = 'insights'),
+          onOpenHistory: () => setState(() => currentPage = 'history'),
         );
     }
   }

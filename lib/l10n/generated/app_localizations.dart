@@ -722,6 +722,114 @@ abstract class AppLocalizations {
   /// **'Manage your account settings'**
   String get profileSubtitle;
 
+  /// No description provided for @profileHealthAccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Device & Health access'**
+  String get profileHealthAccessTitle;
+
+  /// No description provided for @profileHealthAccessSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check or request access to steps, distance, and heart data here. PHA stays in the app — no jump to phone Health menus.'**
+  String get profileHealthAccessSubtitle;
+
+  /// No description provided for @profileHealthAccessActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Steps & distance'**
+  String get profileHealthAccessActivity;
+
+  /// No description provided for @profileHealthAccessActivityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow PHA to read today’s steps and walking distance from your device.'**
+  String get profileHealthAccessActivityHint;
+
+  /// No description provided for @profileHealthAccessHeart.
+  ///
+  /// In en, this message translates to:
+  /// **'Heart & Health data'**
+  String get profileHealthAccessHeart;
+
+  /// No description provided for @profileHealthAccessHeartHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Heart rate, resting HR, HRV, irregular rhythm alerts, and ECG from Apple Health.'**
+  String get profileHealthAccessHeartHint;
+
+  /// No description provided for @profileHealthAccessAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Check / allow all access'**
+  String get profileHealthAccessAll;
+
+  /// No description provided for @profileHealthAccessOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Health settings'**
+  String get profileHealthAccessOpenSettings;
+
+  /// No description provided for @profileHealthAccessOpenSettingsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on sharing for PHA in the Health app (Steps, Distance, Heart Rate, and more).'**
+  String get profileHealthAccessOpenSettingsHint;
+
+  /// No description provided for @profileHealthAccessStatusOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get profileHealthAccessStatusOn;
+
+  /// No description provided for @profileHealthAccessStatusOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Not connected'**
+  String get profileHealthAccessStatusOff;
+
+  /// No description provided for @profileHealthAccessRequesting.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking access…'**
+  String get profileHealthAccessRequesting;
+
+  /// No description provided for @profileHealthAccessPrompted.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission dialog shown — enable the types you want to share.'**
+  String get profileHealthAccessPrompted;
+
+  /// No description provided for @profileHealthAccessAlreadyGranted.
+  ///
+  /// In en, this message translates to:
+  /// **'Access is already granted for these data types.'**
+  String get profileHealthAccessAlreadyGranted;
+
+  /// No description provided for @profileHealthAccessOpenedSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Opened Health settings. Enable the data types for PHA, then return to the app.'**
+  String get profileHealthAccessOpenedSettings;
+
+  /// No description provided for @profileHealthAccessSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Access updated — syncing your latest data.'**
+  String get profileHealthAccessSynced;
+
+  /// No description provided for @profileHealthAccessUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Device health sync is not available on this platform.'**
+  String get profileHealthAccessUnsupported;
+
+  /// No description provided for @profileHealthAccessFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not request access. Try again.'**
+  String get profileHealthAccessFailed;
+
   /// No description provided for @age.
   ///
   /// In en, this message translates to:
@@ -2462,6 +2570,30 @@ abstract class AppLocalizations {
   /// **'Gallery'**
   String get mealGallery;
 
+  /// No description provided for @mealPhotoReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo ready — tap Analyze Meal when you are set.'**
+  String get mealPhotoReady;
+
+  /// No description provided for @mealPhotoSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected meal photo'**
+  String get mealPhotoSelected;
+
+  /// No description provided for @mealChangePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Change photo'**
+  String get mealChangePhoto;
+
+  /// No description provided for @mealRemovePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get mealRemovePhoto;
+
   /// No description provided for @mealAnalyze.
   ///
   /// In en, this message translates to:
@@ -3923,7 +4055,7 @@ abstract class AppLocalizations {
   /// No description provided for @promoCodeAlreadyUsed.
   ///
   /// In en, this message translates to:
-  /// **'This promo code has already been used on this profile.'**
+  /// **'This promo code was already used on this profile or this device.'**
   String get promoCodeAlreadyUsed;
 
   /// No description provided for @psychoQuestionOfBlock.
@@ -3983,8 +4115,38 @@ abstract class AppLocalizations {
   /// No description provided for @trialSevenDayFree.
   ///
   /// In en, this message translates to:
-  /// **'7-day free trial'**
+  /// **'24-hour free trial'**
   String get trialSevenDayFree;
+
+  /// No description provided for @trialCountdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Trial {time}'**
+  String trialCountdown(String time);
+
+  /// No description provided for @trialNotifSixHoursTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trial ends in 6 hours'**
+  String get trialNotifSixHoursTitle;
+
+  /// No description provided for @trialNotifSixHoursBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your 24-hour free trial ends in 6 hours. Subscribe to PHA Plus+ to keep full access.'**
+  String get trialNotifSixHoursBody;
+
+  /// No description provided for @trialNotifOneHourTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trial ends in 1 hour'**
+  String get trialNotifOneHourTitle;
+
+  /// No description provided for @trialNotifOneHourBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Less than an hour left in your free trial. Subscribe now to keep all PHA features.'**
+  String get trialNotifOneHourBody;
 
   /// No description provided for @trialNotifChannelName.
   ///
@@ -4001,25 +4163,25 @@ abstract class AppLocalizations {
   /// No description provided for @trialNotifThreeDaysTitle.
   ///
   /// In en, this message translates to:
-  /// **'Trial ends in 3 days'**
+  /// **'Trial ends in 6 hours'**
   String get trialNotifThreeDaysTitle;
 
   /// No description provided for @trialNotifThreeDaysBody.
   ///
   /// In en, this message translates to:
-  /// **'Your 7-day free trial ends in 3 days. Subscribe to PHA Plus+ to keep all features.'**
+  /// **'Your 24-hour free trial ends in 6 hours. Subscribe to PHA Plus+ to keep full access.'**
   String get trialNotifThreeDaysBody;
 
   /// No description provided for @trialNotifTwentyFourHoursTitle.
   ///
   /// In en, this message translates to:
-  /// **'Trial ends in 24 hours'**
+  /// **'Trial ends in 1 hour'**
   String get trialNotifTwentyFourHoursTitle;
 
   /// No description provided for @trialNotifTwentyFourHoursBody.
   ///
   /// In en, this message translates to:
-  /// **'Less than a day left in your free trial. Subscribe now to keep full access to PHA.'**
+  /// **'Less than an hour left in your free trial. Subscribe now to keep all PHA features.'**
   String get trialNotifTwentyFourHoursBody;
 
   /// No description provided for @uploadImageFormats.
@@ -5078,6 +5240,18 @@ abstract class AppLocalizations {
   /// **'Carrying extra weight raises the chance of high blood sugar and heart problems. Smaller portions, more vegetables, and daily walks help.'**
   String get clinicalFlagExtraWeightBody;
 
+  /// No description provided for @clinicalFlagFattyLiverTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fatty liver risk'**
+  String get clinicalFlagFattyLiverTitle;
+
+  /// No description provided for @clinicalFlagFattyLiverBody.
+  ///
+  /// In en, this message translates to:
+  /// **'With obesity or a large excess of weight, the chance of fatty liver disease is higher. Consider an ultrasound of the liver and pancreas and discuss the result with your doctor.'**
+  String get clinicalFlagFattyLiverBody;
+
   /// No description provided for @clinicalFlagTripleTitle.
   ///
   /// In en, this message translates to:
@@ -5243,7 +5417,7 @@ abstract class AppLocalizations {
   /// No description provided for @actionHeartRateDesc.
   ///
   /// In en, this message translates to:
-  /// **'Heart check with Smart Watch'**
+  /// **'Heart check via watch/band or camera'**
   String get actionHeartRateDesc;
 
   /// No description provided for @actionEcg.
@@ -5516,6 +5690,318 @@ abstract class AppLocalizations {
   /// **'This is not a medical device. Smart-watch data does not replace a doctor’s advice. Seek care if you feel unwell.'**
   String get hrDisclaimer;
 
+  /// No description provided for @ppgTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera heart rate'**
+  String get ppgTitle;
+
+  /// No description provided for @ppgSourceWatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch / band'**
+  String get ppgSourceWatch;
+
+  /// No description provided for @ppgSourceCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera + flash'**
+  String get ppgSourceCamera;
+
+  /// No description provided for @ppgSourceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Read heart rate from a wearable, or measure with the phone camera and flash.'**
+  String get ppgSourceHint;
+
+  /// No description provided for @ppgMeasureCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Measure with camera'**
+  String get ppgMeasureCamera;
+
+  /// No description provided for @ppgStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start measurement'**
+  String get ppgStart;
+
+  /// No description provided for @ppgStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get ppgStop;
+
+  /// No description provided for @ppgRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Measure again'**
+  String get ppgRetry;
+
+  /// No description provided for @ppgSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save result'**
+  String get ppgSave;
+
+  /// No description provided for @ppgSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving…'**
+  String get ppgSaving;
+
+  /// No description provided for @ppgSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Heart rate saved to your history'**
+  String get ppgSaved;
+
+  /// No description provided for @ppgSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save the reading'**
+  String get ppgSaveFailed;
+
+  /// No description provided for @ppgPreparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing camera…'**
+  String get ppgPreparing;
+
+  /// No description provided for @ppgPlaceFinger.
+  ///
+  /// In en, this message translates to:
+  /// **'Place your finger over the camera and flash so the circle turns red'**
+  String get ppgPlaceFinger;
+
+  /// No description provided for @ppgCoverBothHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Cover both the lens and the flashlight at once. The circle turns red only then, and measurement starts automatically.'**
+  String get ppgCoverBothHint;
+
+  /// No description provided for @ppgExitAndAnalyze.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit and analyze'**
+  String get ppgExitAndAnalyze;
+
+  /// No description provided for @ppgAnalyzed.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera reading saved and analyzed'**
+  String get ppgAnalyzed;
+
+  /// No description provided for @ppgAnalysisTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera measurement analysis'**
+  String get ppgAnalysisTitle;
+
+  /// No description provided for @ppgAnalysisStatusNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Resting pulse looks comfortable'**
+  String get ppgAnalysisStatusNormal;
+
+  /// No description provided for @ppgAnalysisStatusElevated.
+  ///
+  /// In en, this message translates to:
+  /// **'Resting pulse is elevated'**
+  String get ppgAnalysisStatusElevated;
+
+  /// No description provided for @ppgAnalysisStatusLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Resting pulse is low'**
+  String get ppgAnalysisStatusLow;
+
+  /// No description provided for @ppgAnalysisStatusHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'Resting pulse is markedly high'**
+  String get ppgAnalysisStatusHigh;
+
+  /// No description provided for @ppgAnalysisBodyNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera reading: {bpm} bpm. Your resting comfort band is {low}–{high} bpm. This looks like a calm resting pulse — useful as a wellness check-in. Sit quietly and remeasure later if you want a second sample.'**
+  String ppgAnalysisBodyNormal(int bpm, int low, int high);
+
+  /// No description provided for @ppgAnalysisBodyElevated.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera reading: {bpm} bpm — above your usual {low}–{high} bpm resting comfort band. Recent activity, stress, caffeine, heat, or incomplete recovery can raise pulse. Rest 2–3 minutes and measure again while still seated.'**
+  String ppgAnalysisBodyElevated(int bpm, int low, int high);
+
+  /// No description provided for @ppgAnalysisBodyLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera reading: {bpm} bpm — below your usual {low}–{high} bpm band. Trained athletes often run lower at rest. If you feel dizzy, weak, or unwell, seek care; otherwise keep tracking how you feel day to day.'**
+  String ppgAnalysisBodyLow(int bpm, int low, int high);
+
+  /// No description provided for @ppgAnalysisBodyHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera reading: {bpm} bpm — well above your {low}–{high} bpm comfort band. If you have chest pain, severe shortness of breath, or feel faint, seek urgent care. Otherwise rest and recheck in a few minutes.'**
+  String ppgAnalysisBodyHigh(int bpm, int low, int high);
+
+  /// No description provided for @ppgAnalysisRangeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Your resting comfort band: {low}–{high} bpm'**
+  String ppgAnalysisRangeLabel(int low, int high);
+
+  /// No description provided for @ppgAnalysisQualityGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Signal quality {percent}% — strong fingertip signal'**
+  String ppgAnalysisQualityGood(int percent);
+
+  /// No description provided for @ppgAnalysisQualityFair.
+  ///
+  /// In en, this message translates to:
+  /// **'Signal quality {percent}% — usable; keep the finger still for cleaner samples'**
+  String ppgAnalysisQualityFair(int percent);
+
+  /// No description provided for @ppgAnalysisQualityPoor.
+  ///
+  /// In en, this message translates to:
+  /// **'Signal quality {percent}% — weak; cover the lens and flash fully and retry'**
+  String ppgAnalysisQualityPoor(int percent);
+
+  /// No description provided for @ppgAnalysisMethodNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Measured with the camera and flash (PPG light through the fingertip). This is not an ECG and not a medical diagnosis.'**
+  String get ppgAnalysisMethodNote;
+
+  /// No description provided for @ppgHoldFinger.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep your finger still — do not move it'**
+  String get ppgHoldFinger;
+
+  /// No description provided for @ppgHoldStill.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay still until the measurement finishes'**
+  String get ppgHoldStill;
+
+  /// No description provided for @ppgTipsHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'TIPS AND FACTS ABOUT HEALTH AND LIFE'**
+  String get ppgTipsHeader;
+
+  /// No description provided for @ppgFact1.
+  ///
+  /// In en, this message translates to:
+  /// **'We measure heart rate variability (HRV), not only pulse.'**
+  String get ppgFact1;
+
+  /// No description provided for @ppgFact2.
+  ///
+  /// In en, this message translates to:
+  /// **'Pulse is how often the heart beats; variability is how the time between beats changes.'**
+  String get ppgFact2;
+
+  /// No description provided for @ppgFact3.
+  ///
+  /// In en, this message translates to:
+  /// **'How do we measure variability with a camera? This method is called photoplethysmography.'**
+  String get ppgFact3;
+
+  /// No description provided for @ppgFact4.
+  ///
+  /// In en, this message translates to:
+  /// **'When the heart beats, blood volume in the vessels changes — and so does their color.'**
+  String get ppgFact4;
+
+  /// No description provided for @ppgFact5.
+  ///
+  /// In en, this message translates to:
+  /// **'The camera records these changes so we can see the time between heartbeats.'**
+  String get ppgFact5;
+
+  /// No description provided for @ppgFact6.
+  ///
+  /// In en, this message translates to:
+  /// **'From the rhythm we compute standard HRV metrics such as SDNN and rMSSD.'**
+  String get ppgFact6;
+
+  /// No description provided for @ppgFact7.
+  ///
+  /// In en, this message translates to:
+  /// **'Companies like Apple and Garmin also use variability analysis in smartwatches.'**
+  String get ppgFact7;
+
+  /// No description provided for @ppgFact8.
+  ///
+  /// In en, this message translates to:
+  /// **'Take measurements, collect your own data, and feel better over time.'**
+  String get ppgFact8;
+
+  /// No description provided for @ppgResultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurement complete'**
+  String get ppgResultTitle;
+
+  /// No description provided for @ppgQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Signal quality {percent}%'**
+  String ppgQuality(int percent);
+
+  /// No description provided for @ppgExportRaw.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy raw signal'**
+  String get ppgExportRaw;
+
+  /// No description provided for @ppgExportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PHA camera PPG export'**
+  String get ppgExportTitle;
+
+  /// No description provided for @ppgExportCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Raw signal copied to clipboard'**
+  String get ppgExportCopied;
+
+  /// No description provided for @ppgNeedPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera access is required to measure heart rate with the flash.'**
+  String get ppgNeedPermission;
+
+  /// No description provided for @ppgNoCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'No camera is available on this device.'**
+  String get ppgNoCamera;
+
+  /// No description provided for @ppgNoTorch.
+  ///
+  /// In en, this message translates to:
+  /// **'Flashlight is not available. Measurement may be less accurate.'**
+  String get ppgNoTorch;
+
+  /// No description provided for @ppgCameraError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the camera. Try again.'**
+  String get ppgCameraError;
+
+  /// No description provided for @ppgDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'This is not a medical device. Camera readings are for informational use only and do not replace a doctor’s advice.'**
+  String get ppgDisclaimer;
+
   /// No description provided for @hrChartTitle.
   ///
   /// In en, this message translates to:
@@ -5645,7 +6131,7 @@ abstract class AppLocalizations {
   /// No description provided for @hrEcgReferenceSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Key teaching features — educational only, not a diagnosis.'**
+  /// **'Educational summary only — not a diagnosis.'**
   String get hrEcgReferenceSubtitle;
 
   /// No description provided for @hrEcgFeatNormalSinus.
@@ -5713,6 +6199,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Classification not available.'**
   String get hrEcgFeatUnknown;
+
+  /// No description provided for @hrEcgResultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing result'**
+  String get hrEcgResultTitle;
+
+  /// No description provided for @hrEcgNoDistortion.
+  ///
+  /// In en, this message translates to:
+  /// **'No rhythm distortion detected'**
+  String get hrEcgNoDistortion;
+
+  /// No description provided for @hrEcgHasDistortion.
+  ///
+  /// In en, this message translates to:
+  /// **'Possible rhythm irregularity'**
+  String get hrEcgHasDistortion;
+
+  /// No description provided for @hrEcgUnclearDistortion.
+  ///
+  /// In en, this message translates to:
+  /// **'Rhythm could not be classified clearly'**
+  String get hrEcgUnclearDistortion;
+
+  /// No description provided for @hrEcgAdviceNormalSinus.
+  ///
+  /// In en, this message translates to:
+  /// **'Your latest ECG looks like a regular sinus rhythm. Keep tracking how you feel; this is not a medical diagnosis.'**
+  String get hrEcgAdviceNormalSinus;
+
+  /// No description provided for @hrEcgAdviceSinusTachy.
+  ///
+  /// In en, this message translates to:
+  /// **'Your heart rate looks faster than a typical resting sinus rhythm. Rest, avoid stimulants, and see a doctor if it continues or you feel unwell.'**
+  String get hrEcgAdviceSinusTachy;
+
+  /// No description provided for @hrEcgAdviceSinusBrady.
+  ///
+  /// In en, this message translates to:
+  /// **'Your heart rate looks slower than a typical resting sinus rhythm. If you feel dizzy, weak, or short of breath, contact a doctor.'**
+  String get hrEcgAdviceSinusBrady;
+
+  /// No description provided for @hrEcgAdviceAfib.
+  ///
+  /// In en, this message translates to:
+  /// **'The recording suggests an irregular rhythm compatible with atrial fibrillation. Contact a doctor soon — do not rely on the watch alone.'**
+  String get hrEcgAdviceAfib;
+
+  /// No description provided for @hrEcgAdviceVt.
+  ///
+  /// In en, this message translates to:
+  /// **'A dangerous-looking fast rhythm pattern was flagged. Seek emergency care if you feel faint, chest pain, or severe weakness.'**
+  String get hrEcgAdviceVt;
+
+  /// No description provided for @hrEcgAdviceVf.
+  ///
+  /// In en, this message translates to:
+  /// **'A chaotic emergency teaching pattern was flagged. Call emergency services immediately if this matches how you feel.'**
+  String get hrEcgAdviceVf;
+
+  /// No description provided for @hrEcgAdviceAv1.
+  ///
+  /// In en, this message translates to:
+  /// **'A mild conduction delay pattern may be present. Mention it to your doctor at the next visit, especially if you have new symptoms.'**
+  String get hrEcgAdviceAv1;
+
+  /// No description provided for @hrEcgAdviceAv2.
+  ///
+  /// In en, this message translates to:
+  /// **'A dropped-beat conduction pattern may be present. Contact a doctor promptly for clinical ECG evaluation.'**
+  String get hrEcgAdviceAv2;
+
+  /// No description provided for @hrEcgAdviceAv3.
+  ///
+  /// In en, this message translates to:
+  /// **'A severe conduction-block pattern may be present. Seek urgent medical care.'**
+  String get hrEcgAdviceAv3;
+
+  /// No description provided for @hrEcgAdviceInconclusive.
+  ///
+  /// In en, this message translates to:
+  /// **'The sensor could not classify this tracing confidently. Try again while still, or ask a clinician for a standard ECG.'**
+  String get hrEcgAdviceInconclusive;
+
+  /// No description provided for @hrEcgAdviceUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'No clear rhythm result yet. Take an ECG on Apple Watch and sync, then tap Read sensors.'**
+  String get hrEcgAdviceUnknown;
 
   /// No description provided for @hrIrregularRhythm.
   ///

@@ -1334,11 +1334,15 @@ class HealthConnectService {
     return rows.isEmpty ? null : LastSync.fromRow(rows.first);
   }
 
+  static DateTime? _lastHeavySideEffectsAt;
+
   static Future<void> sync(
     String userId, {
     required int steps,
     required double distanceMeters,
     DateTime? day,
+    /// Skip index recalc + remote push (live ticks / post-login fast path).
+    bool light = false,
   }) async {
     final db = Db.instance.raw;
     final weightRows = await db.query('health_metrics',
@@ -1379,13 +1383,28 @@ class HealthConnectService {
         'day': DailyMetricStore.localDateKey(targetDay),
       }),
     });
+    if (light) {
+      // Debounce expensive work so 15s live sync stays snappy.
+      final last = _lastHeavySideEffectsAt;
+      final due = last == null ||
+          DateTime.now().difference(last) > const Duration(minutes: 2);
+      if (due) {
+        _lastHeavySideEffectsAt = DateTime.now();
+        unawaited(HealthIndexService.recalculate(userId));
+        unawaited(PatientSync.pushForUser(userId));
+      }
+      return;
+    }
     await HealthIndexService.recalculate(userId);
     unawaited(PatientSync.pushForUser(userId));
   }
 
   /// Reads today's steps and distance from the device, then stores them locally.
   /// Returns true when new data was written.
-  static Future<bool> syncFromDevice(String userId) async {
+  static Future<bool> syncFromDevice(
+    String userId, {
+    bool light = false,
+  }) async {
     if (!HealthTelemetryService.isSupported) {
       throw Exception('Device activity sync is only available on iOS and Android.');
     }
@@ -1399,6 +1418,23 @@ class HealthConnectService {
         'in the Health permission sheet.',
       );
     }
+
+    // Compare against today's SQLite steps (not only last sync log) so a real
+    // HealthKit total can replace a stale zero after permission is granted.
+    final todaySteps = await DailyMetricStore.valueOnLocalDay(
+      userId: userId,
+      metricType: 'steps',
+    );
+    final storedSteps = todaySteps?.round() ?? 0;
+
+    // Do not persist a fake zero when HealthKit likely denied READ access —
+    // that made the dashboard stuck at 0 and looked like "steps don't work".
+    if (!snapshot.hasActivity &&
+        storedSteps == 0 &&
+        !await HealthTelemetryService.hasReadEvidence()) {
+      return false;
+    }
+
     final previous = await last(userId);
     if (previous != null) {
       final prevDay = previous.syncedAt.toLocal();
@@ -1411,11 +1447,25 @@ class HealthConnectService {
           (previous.distanceMeters - snapshot.distanceMeters).abs() < 0.5) {
         return false;
       }
+      // HealthKit sometimes returns a transient 0 / lower total before Watch
+      // syncs — never downgrade today's already-known step count.
+      final baseline = storedSteps > previous.steps ? storedSteps : previous.steps;
+      if (sameDay && snapshot.steps < baseline && baseline > 0) {
+        if (snapshot.steps == 0 || snapshot.steps < (baseline * 0.85)) {
+          return false;
+        }
+      }
+    } else if (storedSteps > 0 &&
+        snapshot.steps < storedSteps &&
+        (snapshot.steps == 0 || snapshot.steps < storedSteps * 0.85)) {
+      return false;
     }
+
     await sync(
       userId,
       steps: snapshot.steps,
       distanceMeters: snapshot.distanceMeters,
+      light: light,
     );
     return true;
   }
@@ -1442,10 +1492,16 @@ class HealthConnectService {
       orderBy: 'recorded_at DESC',
       limit: 1,
     );
-    if (existing.isNotEmpty) {
-      final prev = (existing.first['value'] as num).toInt();
-      if (prev == snapshot.steps) return false;
+    final prevSteps =
+        existing.isEmpty ? 0 : (existing.first['value'] as num).toInt();
+    if (prevSteps == snapshot.steps) return false;
+    // Never wipe a finalized history total with a HealthKit zero / glitch.
+    if (prevSteps > 0 &&
+        (snapshot.steps == 0 || snapshot.steps < (prevSteps * 0.85))) {
+      return false;
     }
+    // No real activity and nothing stored — skip polluting history with 0.
+    if (!snapshot.hasActivity && prevSteps == 0) return false;
 
     await sync(
       userId,

@@ -12,7 +12,7 @@ import 'onboarding_hp.dart';
 import 'onboarding_prefs.dart';
 import 'patient_sync.dart';
 import 'pha_purchases.dart';
-import 'promo_codes.dart';
+import 'session_secret.dart';
 import 'telemetry_sync.dart';
 import 'trial_notifications.dart';
 
@@ -47,8 +47,13 @@ class PromoException implements Exception {
   String toString() => code;
 }
 
-/// Free-tier features are available for this many days after account creation.
-const freeTrialDays = 7;
+/// Full Plus+ access for this long after first app install.
+const freeTrialDuration = Duration(hours: 24);
+
+/// Kept for call sites that still speak in whole days (≈1 during the 24h trial).
+const freeTrialDays = 1;
+
+const _installTrialStartedKey = 'pha_install_trial_started_at';
 
 /// Local replacement for Supabase Auth + the AuthContext from the web app.
 class AuthProvider extends ChangeNotifier {
@@ -57,6 +62,8 @@ class AuthProvider extends ChangeNotifier {
   bool isPlus = false;
   DateTime? accountCreatedAt;
   DateTime? subscriptionExpiresAt;
+  /// First launch / install timestamp that starts the 24h full-access trial.
+  DateTime? installTrialStartedAt;
   String unitSystem = 'metric'; // 'metric' | 'imperial'
   int healthPoints = 0;
   bool hpDiscountUsed = false;
@@ -64,37 +71,81 @@ class AuthProvider extends ChangeNotifier {
 
   bool get hpDiscountEligible => !hpDiscountUsed;
 
-  /// UTC end of the 7-day free trial, or null when Plus / unknown start.
+  /// UTC end of the 24h install trial, or null when Plus / unknown start.
   DateTime? get trialEndsAt {
-    if (isPlus || accountCreatedAt == null) return null;
-    return accountCreatedAt!.toUtc().add(const Duration(days: freeTrialDays));
+    if (isPlus) return null;
+    final start = installTrialStartedAt ?? accountCreatedAt?.toUtc();
+    if (start == null) return null;
+    return start.toUtc().add(freeTrialDuration);
   }
 
-  /// True when the 7-day free trial has ended and the user is not on Plus+.
+  /// True while the 24h install trial is still running (and user is not Plus+).
+  bool get isTrialActive {
+    final end = trialEndsAt;
+    if (end == null) return false;
+    return DateTime.now().toUtc().isBefore(end);
+  }
+
+  /// True when the 24h free trial has ended and the user is not on Plus+.
   bool get isTrialExpired {
     final end = trialEndsAt;
     if (end == null) return false;
-    return DateTime.now().toUtc().isAfter(end);
+    return !DateTime.now().toUtc().isBefore(end);
   }
 
-  /// Free-tier quick actions (uploads, AI chat, wellness, meals, log metric)
-  /// while the trial is active; Plus+ unlocks the rest.
-  bool get hasFreeAccess => isPlus || !isTrialExpired;
+  /// Paid Plus+ **or** active 24h install trial — unlocks every feature.
+  bool get hasPlusAccess => isPlus || isTrialActive;
 
-  /// Days left in the free trial, or null for Plus+ / unknown.
-  int? get trialDaysRemaining {
+  /// Same as [hasPlusAccess]: during the trial nothing is paywalled.
+  bool get hasFreeAccess => hasPlusAccess;
+
+  /// Remaining trial time, or null for Plus+ / unknown / already ended.
+  Duration? get trialRemaining {
     final end = trialEndsAt;
-    if (end == null) return null;
-    final days = end.difference(DateTime.now().toUtc()).inDays;
-    return days < 0 ? 0 : days + 1;
+    if (end == null || isTrialExpired) return null;
+    final left = end.difference(DateTime.now().toUtc());
+    return left.isNegative ? Duration.zero : left;
   }
 
-  /// Same hash stored in `profiles.password_hash` — used as the server sync token.
-  static String passwordHash(String password) => _hash(password);
+  /// `HH:MM:SS` countdown, or null when not in an active trial.
+  String? get trialCountdownLabel {
+    final left = trialRemaining;
+    if (left == null) return null;
+    final h = left.inHours;
+    final m = left.inMinutes.remainder(60);
+    final s = left.inSeconds.remainder(60);
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${two(h)}:${two(m)}:${two(s)}';
+  }
+
+  /// Whole hours left (rounded up), or null for Plus+ / unknown.
+  int? get trialDaysRemaining {
+    final left = trialRemaining;
+    if (left == null) return null;
+    if (left.inSeconds <= 0) return 0;
+    return (left.inSeconds / 3600).ceil().clamp(1, 24);
+  }
+
+  Future<void> _storeSession({
+    required String userId,
+    required String email,
+    required String token,
+    required String password,
+  }) async {
+    await SessionSecret.saveToken(email: email, token: token);
+    await SessionSecret.savePasswordCheck(email, password);
+    await Db.instance.raw.update(
+      'profiles',
+      {'password_hash': token},
+      where: 'id = ?',
+      whereArgs: [userId],
+    );
+  }
 
   Future<void> bootstrap() async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      await _ensureInstallTrialStart(prefs);
       final id = prefs.getString('session_user_id');
       if (id != null && Db.instance.isReady) {
         final rows =
@@ -102,6 +153,10 @@ class AuthProvider extends ChangeNotifier {
         if (rows.isNotEmpty) {
           final r = rows.first;
           user = AppUser(id: r['id'] as String, email: r['email'] as String);
+          final storedToken = r['password_hash'] as String?;
+          if (storedToken != null && storedToken.isNotEmpty) {
+            await SessionSecret.saveToken(email: user!.email, token: storedToken);
+          }
           await _loadPlanStatus(id);
           // Defer network sync — must not block first frame / cold start.
           unawaited(_syncWithServer(id, user!.email));
@@ -114,6 +169,20 @@ class AuthProvider extends ChangeNotifier {
       loading = false;
       notifyListeners();
     }
+  }
+
+  /// Starts the 24h full-access clock on first launch; persists across sessions.
+  Future<void> _ensureInstallTrialStart(SharedPreferences prefs) async {
+    final raw = prefs.getString(_installTrialStartedKey);
+    if (raw != null && raw.isNotEmpty) {
+      installTrialStartedAt = DateTime.tryParse(raw)?.toUtc();
+      if (installTrialStartedAt != null) return;
+    }
+    installTrialStartedAt = DateTime.now().toUtc();
+    await prefs.setString(
+      _installTrialStartedKey,
+      installTrialStartedAt!.toIso8601String(),
+    );
   }
 
   Future<void> _loadPlanStatus(String userId) async {
@@ -168,7 +237,12 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> signUp(String email, String password, String displayName) async {
+  Future<void> signUp(
+    String email,
+    String password,
+    String displayName, {
+    required String registrationTicket,
+  }) async {
     email = email.trim().toLowerCase();
     final existing = await Db.instance.raw.query(
       'profiles',
@@ -178,20 +252,23 @@ class AuthProvider extends ChangeNotifier {
     if (existing.isNotEmpty) {
       throw AuthException(AuthException.emailAlreadyRegistered);
     }
-    // Server history is keyed by email — block re-registration of an existing account.
-    try {
-      if (await ApiClient.patientExists(email)) {
-        throw AuthException(AuthException.emailAlreadyRegistered);
-      }
-    } on AuthException {
-      rethrow;
-    } catch (_) {
-      throw AuthException(AuthException.networkError);
-    }
 
     final now = DateTime.now().toUtc().toIso8601String();
     final id = _uuid.v4();
-    final token = _hash(password);
+    final ({String syncToken, String userId}) session;
+    try {
+      session = await ApiClient.registerAccount(
+        email: email,
+        password: password,
+        userId: id,
+        registrationTicket: registrationTicket,
+      );
+    } on ApiException {
+      throw AuthException(AuthException.serverSyncFailed);
+    } catch (_) {
+      throw AuthException(AuthException.networkError);
+    }
+    final token = session.syncToken;
     final nameAsEntered = displayName.trim();
     await Db.instance.raw.insert('profiles', {
       'id': id,
@@ -204,6 +281,8 @@ class AuthProvider extends ChangeNotifier {
       'created_at': now,
       'updated_at': now,
     });
+    await SessionSecret.saveToken(email: email, token: token);
+    await SessionSecret.savePasswordCheck(email, password);
 
     // Registration must land on the server so other devices can restore by email.
     try {
@@ -214,7 +293,8 @@ class AuthProvider extends ChangeNotifier {
     }
 
     await _setSession(id, email);
-    await TelemetrySyncService.markNeedsPromptAfterSignUp(id);
+    // Combined Health sheet + fast sync immediately — do not wait for onboarding.
+    await TelemetrySyncService.promptAndSyncAfterAuth(id);
     await _loadPlanStatus(id);
     unawaited(PhaPurchases.configure(appUserId: id));
     notifyListeners();
@@ -222,68 +302,125 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> signIn(String email, String password) async {
     email = email.trim().toLowerCase();
-    final token = _hash(password);
 
-    // Cross-device: prefer restoring the email-keyed server backup first.
+    var sawNetworkFailure = false;
     try {
+      final session = await ApiClient.openSession(email: email, password: password);
       final remote = await ApiClient.getPatientHistory(
         email: email,
-        syncToken: token,
+        syncToken: session.syncToken,
       );
       if (remote != null) {
         final userId = await PatientSync.applyRemoteSnapshot(
           email: email,
-          syncToken: token,
+          syncToken: session.syncToken,
           remote: remote,
         );
+        await _storeSession(
+          userId: userId,
+          email: email,
+          token: session.syncToken,
+          password: password,
+        );
         await _setSession(userId, email);
+        await TelemetrySyncService.promptAndSyncAfterAuth(userId);
         await _loadPlanStatus(userId);
         await _markPreOnboardingDoneIfProfileComplete(userId);
         unawaited(PhaPurchases.configure(appUserId: userId));
-        // Keep server backup fresh after restore.
         unawaited(_syncWithServer(userId, email));
         notifyListeners();
         return;
       }
-      // 404 — no history on server for this email.
+      final userId = session.userId.isNotEmpty ? session.userId : _uuid.v4();
+      await _ensureLocalProfile(userId, email, session.syncToken);
+      await _storeSession(
+        userId: userId,
+        email: email,
+        token: session.syncToken,
+        password: password,
+      );
+      await _setSession(userId, email);
+      await _loadPlanStatus(userId);
+      unawaited(PhaPurchases.configure(appUserId: userId));
+      notifyListeners();
+      return;
     } on ApiException catch (e) {
-      if (e.status == 403) {
+      if (e.status == 401 || e.status == 403) {
         throw AuthException(AuthException.invalidCredentials);
       }
-      // Network / other — fall through to local profile if present.
+      if (e.status == 429) {
+        throw AuthException(AuthException.networkError);
+      }
     } catch (_) {
-      // Offline — fall through to local.
+      sawNetworkFailure = true;
     }
 
+    if (await SessionSecret.passwordMatches(email, password)) {
+      final rows = await Db.instance.raw.query(
+        'profiles',
+        where: 'email = ?',
+        whereArgs: [email],
+      );
+      if (rows.isNotEmpty) {
+        final id = rows.first['id'] as String;
+        final token = rows.first['password_hash'] as String? ?? '';
+        if (token.isNotEmpty) {
+          await SessionSecret.saveToken(email: email, token: token);
+        }
+        await _setSession(id, email);
+        await _loadPlanStatus(id);
+        notifyListeners();
+        return;
+      }
+    }
+
+    final legacy = _hash(password);
     final rows =
         await Db.instance.raw.query('profiles', where: 'email = ?', whereArgs: [email]);
-    if (rows.isNotEmpty) {
-      if (rows.first['password_hash'] != token) {
-        throw AuthException(AuthException.invalidCredentials);
-      }
+    if (rows.isNotEmpty && rows.first['password_hash'] == legacy) {
       final id = rows.first['id'] as String;
+      await SessionSecret.saveToken(email: email, token: legacy);
       await _setSession(id, email);
-      await _syncWithServer(id, email);
+      await TelemetrySyncService.promptAndSyncAfterAuth(id);
+      unawaited(_syncWithServer(id, email));
       await _loadPlanStatus(id);
-      await _markPreOnboardingDoneIfProfileComplete(id);
-      unawaited(PhaPurchases.configure(appUserId: id));
       notifyListeners();
       return;
     }
 
-    // No server backup and no local profile.
-    try {
-      final exists = await ApiClient.patientExists(email);
-      if (exists) {
-        // Meta exists but history missing or token mismatch already handled → wrong password
-        throw AuthException(AuthException.invalidCredentials);
-      }
-      throw AuthException(AuthException.accountNotOnServer);
-    } on AuthException {
-      rethrow;
-    } catch (_) {
+    if (sawNetworkFailure) {
       throw AuthException(AuthException.networkError);
     }
+    throw AuthException(AuthException.invalidCredentials);
+  }
+
+  Future<void> _ensureLocalProfile(String userId, String email, String token) async {
+    final rows = await Db.instance.raw.query(
+      'profiles',
+      where: 'email = ?',
+      whereArgs: [email],
+      limit: 1,
+    );
+    final now = DateTime.now().toUtc().toIso8601String();
+    if (rows.isEmpty) {
+      await Db.instance.raw.insert('profiles', {
+        'id': userId,
+        'email': email,
+        'password_hash': token,
+        'onboarding_completed': 0,
+        'is_plus': 0,
+        'unit_system': 'metric',
+        'created_at': now,
+        'updated_at': now,
+      });
+      return;
+    }
+    await Db.instance.raw.update(
+      'profiles',
+      {'password_hash': token},
+      where: 'email = ?',
+      whereArgs: [email],
+    );
   }
 
   Future<void> _markPreOnboardingDoneIfProfileComplete(String userId) async {
@@ -351,38 +488,42 @@ class AuthProvider extends ChangeNotifier {
     await _syncWithServer(user!.id, user!.email);
   }
 
-  /// Redeems a built-in test promo code and unlocks Plus+ locally.
+  /// Redeems a server-side promo. Each code works once per profile and device.
   Future<void> redeemPromoCode(String raw) async {
     if (user == null) return;
-    final match = PhaPromoCodes.match(raw);
-    if (match == null) {
+    final code = raw.trim();
+    if (code.isEmpty) {
       throw PromoException(PromoException.invalid);
     }
-    if (match.oncePerProfile && _promoCodesUsed.contains(match.id)) {
-      throw PromoException(PromoException.alreadyUsed);
+    final ({String plan, String expiresAt, String codeId}) grant;
+    try {
+      grant = await ApiClient.redeemPromo(
+        code: code,
+        deviceId: await SessionSecret.deviceId(),
+      );
+    } on ApiException catch (e) {
+      if (e.status == 409) throw PromoException(PromoException.alreadyUsed);
+      throw PromoException(PromoException.invalid);
     }
-
-    final now = DateTime.now().toUtc();
-    final expires = match.duration == null ? null : now.add(match.duration!);
+    final expires = DateTime.tryParse(grant.expiresAt);
     final used = [..._promoCodesUsed];
-    if (!used.contains(match.id)) {
-      used.add(match.id);
+    if (grant.codeId.isNotEmpty && !used.contains(grant.codeId)) {
+      used.add(grant.codeId);
     }
-
     await Db.instance.raw.update(
       'profiles',
       {
         'is_plus': 1,
-        'subscription_plan': 'promo_${match.id}',
-        'subscription_expires_at': expires?.toIso8601String(),
+        'subscription_plan': grant.plan,
+        'subscription_expires_at': expires?.toUtc().toIso8601String(),
         'promo_codes_used': jsonEncode(used),
-        'updated_at': now.toIso8601String(),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
       },
       where: 'id = ?',
       whereArgs: [user!.id],
     );
     isPlus = true;
-    subscriptionExpiresAt = expires;
+    subscriptionExpiresAt = expires?.toUtc();
     _promoCodesUsed = List.unmodifiable(used);
     notifyListeners();
     unawaited(TrialNotificationService.cancelAll());

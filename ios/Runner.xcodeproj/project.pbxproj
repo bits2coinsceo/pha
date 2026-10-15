@@ -22,6 +22,7 @@
 		A1B2C3D4E5F60718293A4B5C /* LiveHeartRatePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5B /* LiveHeartRatePlugin.swift */; };
 		A1B2C3D4E5F60718293A4B5E /* MorningPushPrep.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5D /* MorningPushPrep.swift */; };
 		A1B2C3D4E5F60718293A4B60 /* EveningPushPrep.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B5F /* EveningPushPrep.swift */; };
+		A1B2C3D4E5F60718293A4B62 /* HealthSettingsBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F60718293A4B61 /* HealthSettingsBridge.swift */; };
 		B7A11C0DE5F60718293A4B70 /* Alarm.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = B7A11C0DE5F60718293A4B71 /* Alarm.mp3 */; };
 		B7A11C0DE5F60718293A4B72 /* Medication.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = B7A11C0DE5F60718293A4B73 /* Medication.mp3 */; };
 /* End PBXBuildFile section */
@@ -76,6 +77,7 @@
 		A1B2C3D4E5F60718293A4B5B /* LiveHeartRatePlugin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LiveHeartRatePlugin.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A4B5D /* MorningPushPrep.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MorningPushPrep.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F60718293A4B5F /* EveningPushPrep.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EveningPushPrep.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F60718293A4B61 /* HealthSettingsBridge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HealthSettingsBridge.swift; sourceTree = "<group>"; };
 		ABEE568C2D6B9E4300551983 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		B7A11C0DE5F60718293A4B71 /* Alarm.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Alarm.mp3; sourceTree = "<group>"; };
 		B7A11C0DE5F60718293A4B73 /* Medication.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Medication.mp3; sourceTree = "<group>"; };
@@ -171,6 +173,7 @@
 				A1B2C3D4E5F60718293A4B5B /* LiveHeartRatePlugin.swift */,
 				A1B2C3D4E5F60718293A4B5D /* MorningPushPrep.swift */,
 				A1B2C3D4E5F60718293A4B5F /* EveningPushPrep.swift */,
+				A1B2C3D4E5F60718293A4B61 /* HealthSettingsBridge.swift */,
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
 				B7A11C0DE5F60718293A4B71 /* Alarm.mp3 */,
 				B7A11C0DE5F60718293A4B73 /* Medication.mp3 */,
@@ -416,6 +419,7 @@
 				A1B2C3D4E5F60718293A4B5C /* LiveHeartRatePlugin.swift in Sources */,
 				A1B2C3D4E5F60718293A4B5E /* MorningPushPrep.swift in Sources */,
 				A1B2C3D4E5F60718293A4B60 /* EveningPushPrep.swift in Sources */,
+				A1B2C3D4E5F60718293A4B62 /* HealthSettingsBridge.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
 			);
@@ -514,10 +518,11 @@
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = XDDB5RU7VM;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -705,10 +710,11 @@
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = XDDB5RU7VM;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -732,10 +738,11 @@
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 13;
 				DEVELOPMENT_TEAM = XDDB5RU7VM;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

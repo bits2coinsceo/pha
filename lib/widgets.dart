@@ -250,6 +250,7 @@ class HealthIndexCard extends StatelessWidget {
   final int steps;
   final int stepsGoal;
   final VoidCallback? onHealthIndexTap;
+  final VoidCallback? onStepsTap;
 
   const HealthIndexCard({
     super.key,
@@ -258,6 +259,7 @@ class HealthIndexCard extends StatelessWidget {
     required this.steps,
     this.stepsGoal = MedicalGuidelines.stepsGoal,
     this.onHealthIndexTap,
+    this.onStepsTap,
   });
 
   Color get _statusColor {
@@ -334,33 +336,52 @@ class HealthIndexCard extends StatelessWidget {
           ),
           Container(width: 1, margin: const EdgeInsets.symmetric(horizontal: 6), color: C.gray200),
           Expanded(
-            child: _roundMetricColumn(
-              title: l10n.steps,
-              trailing: Icon(Icons.directions_walk, size: 14, color: C.statusGood),
-              fraction: stepPct,
-              progressColor: C.progressGreen,
-              centerMain: _fmt(steps),
-              centerSub: '/${_fmt(stepsGoal)}',
-              centerMainSize: _fmt(steps).length > 5 ? 18 : 24,
-              belowGauge: Column(
-                children: [
-                  Text(stepFeedback.range,
-                      textAlign: TextAlign.center,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: onStepsTap,
+                borderRadius: BorderRadius.circular(12),
+                child: _roundMetricColumn(
+                  title: l10n.steps,
+                  trailing: Icon(
+                    Icons.directions_walk,
+                    size: 14,
+                    color: C.statusGood,
+                  ),
+                  fraction: stepPct,
+                  progressColor: C.progressGreen,
+                  centerMain: _fmt(steps),
+                  centerSub: '/${_fmt(stepsGoal)}',
+                  centerMainSize: _fmt(steps).length > 5 ? 18 : 24,
+                  belowGauge: Column(
+                    children: [
+                      Text(
+                        stepFeedback.range,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 11,
                           color: C.statusGood,
-                          height: 1.2)),
-                  const SizedBox(height: 4),
-                  Text(stepFeedback.message,
-                      textAlign: TextAlign.center,
-                      maxLines: 4,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          color: C.gray500, fontSize: 10, height: 1.3)),
-                ],
+                          height: 1.2,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        stepFeedback.message,
+                        textAlign: TextAlign.center,
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: C.gray500,
+                          fontSize: 10,
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),

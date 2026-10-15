@@ -6,7 +6,6 @@ import 'package:sqflite/sqflite.dart' as sqflite;
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'daily_metric_store.dart';
-import 'test_profile.dart';
 
 /// Local SQLite database — replaces Supabase Postgres for the Flutter port.
 /// Stores all health data on-device.
@@ -44,7 +43,6 @@ class Db {
         options: OpenDatabaseOptions(version: 13, onCreate: _create, onUpgrade: _upgrade),
       );
     }
-    await TestProfile.ensureSeeded();
   }
 
   Future<void> _upgrade(Database db, int oldVersion, int newVersion) async {

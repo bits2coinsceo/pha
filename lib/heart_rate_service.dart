@@ -206,6 +206,16 @@ class HeartRateService {
     return permitted ?? false;
   }
 
+  /// Called after a combined Health sheet that included heart / ECG types.
+  static Future<void> markPromptShown({bool includeEcg = true}) async {
+    if (!isSupported) return;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_hrAuthKey, true);
+    if (includeEcg && Platform.isIOS) {
+      await prefs.setBool(_ecgAuthKey, true);
+    }
+  }
+
   static Future<bool> requestPermission() async {
     if (!isSupported) return false;
     try {
@@ -222,8 +232,7 @@ class HeartRateService {
           .requestAuthorization(_types, permissions: _permissions)
           .timeout(const Duration(seconds: 45));
       if (Platform.isIOS) {
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool(_hrAuthKey, true);
+        await markPromptShown(includeEcg: false);
       }
       return granted || Platform.isIOS;
     } catch (e) {
@@ -276,6 +285,8 @@ class HeartRateService {
     String userId, {
     bool force = false,
     bool notifyOnRisk = false,
+    /// Skip ECG pull for faster post-login / live sync.
+    bool includeEcg = true,
   }) async {
     if (!isSupported || !Db.instance.isReady) return false;
     try {
@@ -295,6 +306,7 @@ class HeartRateService {
       final snap = await syncAndLoad(
         userId,
         notifyOnRisk: notifyOnRisk,
+        includeEcg: includeEcg,
       );
       await prefs.setInt(key, DateTime.now().toUtc().millisecondsSinceEpoch);
       return snap.hasData && snap.error == null;
@@ -327,6 +339,7 @@ class HeartRateService {
     int? age,
     bool athlete = false,
     bool notifyOnRisk = true,
+    bool includeEcg = true,
   }) async {
     if (!isSupported) {
       return _empty(
@@ -353,32 +366,56 @@ class HeartRateService {
       final start7 = now.subtract(const Duration(days: 7));
       final start24 = now.subtract(const Duration(hours: 24));
 
-      final results = await Future.wait([
+      final futures = <Future<List<HealthDataPoint>>>[
         _safeQuery(
           [HealthDataType.HEART_RATE],
           now.subtract(const Duration(hours: 6)),
           now,
+          timeout: const Duration(seconds: 4),
         ),
-        _safeQuery([HealthDataType.HEART_RATE], start24, now),
-        _safeQuery([HealthDataType.RESTING_HEART_RATE], start7, now),
-        _safeQuery([HealthDataType.WALKING_HEART_RATE], start7, now),
+        _safeQuery(
+          [HealthDataType.HEART_RATE],
+          start24,
+          now,
+          timeout: const Duration(seconds: 6),
+        ),
+        _safeQuery(
+          [HealthDataType.RESTING_HEART_RATE],
+          start7,
+          now,
+          timeout: const Duration(seconds: 4),
+        ),
+        _safeQuery(
+          [HealthDataType.WALKING_HEART_RATE],
+          start7,
+          now,
+          timeout: const Duration(seconds: 4),
+        ),
         _safeQuery(
           [HealthDataType.HEART_RATE_VARIABILITY_SDNN],
           start7,
           now,
+          timeout: const Duration(seconds: 4),
         ),
         _safeQuery(
           [HealthDataType.IRREGULAR_HEART_RATE_EVENT],
           start7,
           now,
+          timeout: const Duration(seconds: 4),
         ),
-        _safeQuery(
-          [HealthDataType.ELECTROCARDIOGRAM],
-          now.subtract(const Duration(days: 90)),
-          now,
-          timeout: const Duration(seconds: 20),
-        ),
-      ]);
+      ];
+      if (includeEcg && Platform.isIOS) {
+        futures.add(
+          _safeQuery(
+            [HealthDataType.ELECTROCARDIOGRAM],
+            now.subtract(const Duration(days: 90)),
+            now,
+            timeout: const Duration(seconds: 8),
+          ),
+        );
+      }
+
+      final results = await Future.wait(futures);
 
       final latestPoints = results[0];
       final hrPoints = results[1];
@@ -386,7 +423,8 @@ class HeartRateService {
       final walkingPoints = results[3];
       final hrvPoints = results[4];
       final irregularPoints = results[5];
-      final ecgPoints = results[6];
+      final ecgPoints =
+          includeEcg && results.length > 6 ? results[6] : const <HealthDataPoint>[];
       final recentEcgs = _parseEcgs(ecgPoints);
 
       final newest = _newestSample(latestPoints);
@@ -677,8 +715,9 @@ class HeartRateService {
     }
     final appleKind = snap.recentEcgs.isEmpty
         ? null
-        : EcgRhythmKnowledge.fromAppleClassification(
-            snap.recentEcgs.first.classification,
+        : EcgRhythmKnowledge.resolveProcessedKind(
+            classification: snap.recentEcgs.first.classification,
+            averageBpm: snap.recentEcgs.first.averageBpm,
           );
     buf.writeln();
     buf.writeln(

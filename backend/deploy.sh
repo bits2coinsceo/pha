@@ -33,5 +33,5 @@ rsync -avz --delete \
 echo ">> Сборка и запуск контейнера на ${HOST}"
 ssh "${HOST}" "cd ${REMOTE_DIR} && docker compose up -d --build && docker compose ps"
 
-echo ">> Готово. Проверка здоровья:"
-ssh "${HOST}" "curl -fsS http://localhost:8080/health || echo 'health-check не прошёл'"
+echo ">> Готово. Проверка здоровья внутри контейнера:"
+ssh "${HOST}" "cd ${REMOTE_DIR} && docker compose exec -T api python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health')\" || echo 'health-check не прошёл'"

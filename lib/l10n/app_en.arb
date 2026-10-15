@@ -103,6 +103,24 @@
   "featureSmartAnalysis": "Smart analysis",
   "profileTitle": "Profile",
   "profileSubtitle": "Manage your account settings",
+  "profileHealthAccessTitle": "Device & Health access",
+  "profileHealthAccessSubtitle": "Check or request access to steps, distance, and heart data here. PHA stays in the app — no jump to phone Health menus.",
+  "profileHealthAccessActivity": "Steps & distance",
+  "profileHealthAccessActivityHint": "Allow PHA to read today’s steps and walking distance from your device.",
+  "profileHealthAccessHeart": "Heart & Health data",
+  "profileHealthAccessHeartHint": "Heart rate, resting HR, HRV, irregular rhythm alerts, and ECG from Apple Health.",
+  "profileHealthAccessAll": "Check / allow all access",
+  "profileHealthAccessOpenSettings": "Open Health settings",
+  "profileHealthAccessOpenSettingsHint": "Turn on sharing for PHA in the Health app (Steps, Distance, Heart Rate, and more).",
+  "profileHealthAccessStatusOn": "Connected",
+  "profileHealthAccessStatusOff": "Not connected",
+  "profileHealthAccessRequesting": "Checking access…",
+  "profileHealthAccessPrompted": "Permission dialog shown — enable the types you want to share.",
+  "profileHealthAccessAlreadyGranted": "Access is already granted for these data types.",
+  "profileHealthAccessOpenedSettings": "Opened Health settings. Enable the data types for PHA, then return to the app.",
+  "profileHealthAccessSynced": "Access updated — syncing your latest data.",
+  "profileHealthAccessUnsupported": "Device health sync is not available on this platform.",
+  "profileHealthAccessFailed": "Could not request access. Try again.",
   "age": "Age",
   "heightCm": "Height (cm)",
   "weightKg": "Weight (kg)",
@@ -624,6 +642,10 @@
   "mealAfterAnalysis": "After analysis, tap ✓ only if you ate this dish — it adds to today's calories.",
   "mealCamera": "Camera",
   "mealGallery": "Gallery",
+  "mealPhotoReady": "Photo ready — tap Analyze Meal when you are set.",
+  "mealPhotoSelected": "Selected meal photo",
+  "mealChangePhoto": "Change photo",
+  "mealRemovePhoto": "Remove",
   "mealAnalyze": "Analyze Meal",
   "mealAnalyzing": "Analyzing…",
   "mealFailed": "Analysis failed. Please try again.",
@@ -1001,7 +1023,7 @@
   "promoCodeHint": "Enter promo code",
   "promoCodeApply": "Apply",
   "promoCodeInvalid": "Invalid promo code.",
-  "promoCodeAlreadyUsed": "This promo code has already been used on this profile.",
+  "promoCodeAlreadyUsed": "This promo code was already used on this profile or this device.",
   "psychoQuestionOfBlock": "Q{current} of {total}",
   "@psychoQuestionOfBlock": {
     "placeholders": {
@@ -1028,13 +1050,23 @@
   "syncReadFailed": "Could not read activity data. Enable Steps and Walking + Running Distance in Health settings.",
   "aiDocNoOnboardingData": "I could not find your onboarding health data yet. Please complete onboarding first.",
   "activityYourProgramFallback": "your program",
-  "trialSevenDayFree": "7-day free trial",
+  "trialSevenDayFree": "24-hour free trial",
+  "trialCountdown": "Trial {time}",
+  "@trialCountdown": {
+    "placeholders": {
+      "time": { "type": "String" }
+    }
+  },
+  "trialNotifSixHoursTitle": "Trial ends in 6 hours",
+  "trialNotifSixHoursBody": "Your 24-hour free trial ends in 6 hours. Subscribe to PHA Plus+ to keep full access.",
+  "trialNotifOneHourTitle": "Trial ends in 1 hour",
+  "trialNotifOneHourBody": "Less than an hour left in your free trial. Subscribe now to keep all PHA features.",
   "trialNotifChannelName": "Trial reminders",
   "trialNotifChannelDesc": "Alerts before your free trial ends",
-  "trialNotifThreeDaysTitle": "Trial ends in 3 days",
-  "trialNotifThreeDaysBody": "Your 7-day free trial ends in 3 days. Subscribe to PHA Plus+ to keep all features.",
-  "trialNotifTwentyFourHoursTitle": "Trial ends in 24 hours",
-  "trialNotifTwentyFourHoursBody": "Less than a day left in your free trial. Subscribe now to keep full access to PHA.",
+  "trialNotifThreeDaysTitle": "Trial ends in 6 hours",
+  "trialNotifThreeDaysBody": "Your 24-hour free trial ends in 6 hours. Subscribe to PHA Plus+ to keep full access.",
+  "trialNotifTwentyFourHoursTitle": "Trial ends in 1 hour",
+  "trialNotifTwentyFourHoursBody": "Less than an hour left in your free trial. Subscribe now to keep all PHA features.",
   "uploadImageFormats": "JPG, PNG, GIF",
   "mealSaveFailed": "Could not save meal: {error}",
   "@mealSaveFailed": {
@@ -1465,6 +1497,8 @@
   "clinicalRiskMsgLow": "Your overall heart and sugar risk looks relatively low based on weight, blood pressure, and blood sugar.",
   "clinicalFlagExtraWeightTitle": "Extra weight",
   "clinicalFlagExtraWeightBody": "Carrying extra weight raises the chance of high blood sugar and heart problems. Smaller portions, more vegetables, and daily walks help.",
+  "clinicalFlagFattyLiverTitle": "Fatty liver risk",
+  "clinicalFlagFattyLiverBody": "With obesity or a large excess of weight, the chance of fatty liver disease is higher. Consider an ultrasound of the liver and pancreas and discuss the result with your doctor.",
   "clinicalFlagTripleTitle": "Weight + BP + sugar",
   "clinicalFlagTripleBody": "Extra weight, higher blood pressure, and higher blood sugar together greatly raise diabetes and heart risk. Focus on food, walks, and a doctor visit.",
   "clinicalFlagLowWeightBpTitle": "Low weight + low BP",
@@ -1558,7 +1592,7 @@
   "uploadAnalyzingDicom": "Analyzing DICOM with Ai Doc — thorough pathology review…",
 
   "actionHeartRate": "Heart Rate & Rhythm",
-  "actionHeartRateDesc": "Heart check with Smart Watch",
+  "actionHeartRateDesc": "Heart check via watch/band or camera",
   "actionEcg": "ECG",
   "actionEcgDesc": "Read electrode ECG from Apple Watch and compatible sensors",
   "hrEcgEmpty": "No electrode ECG recordings found. Take an ECG on Apple Watch (Series 4+), then tap Read sensors.",
@@ -1627,6 +1661,112 @@
   "hrExportTitle": "PHA Heart Rate & Rhythm summary",
   "hrExportCopied": "Summary copied to clipboard",
   "hrDisclaimer": "This is not a medical device. Smart-watch data does not replace a doctor’s advice. Seek care if you feel unwell.",
+  "ppgTitle": "Camera heart rate",
+  "ppgSourceWatch": "Watch / band",
+  "ppgSourceCamera": "Camera + flash",
+  "ppgSourceHint": "Read heart rate from a wearable, or measure with the phone camera and flash.",
+  "ppgMeasureCamera": "Measure with camera",
+  "ppgStart": "Start measurement",
+  "ppgStop": "Stop",
+  "ppgRetry": "Measure again",
+  "ppgSave": "Save result",
+  "ppgSaving": "Saving…",
+  "ppgSaved": "Heart rate saved to your history",
+  "ppgSaveFailed": "Could not save the reading",
+  "ppgPreparing": "Preparing camera…",
+  "ppgPlaceFinger": "Place your finger over the camera and flash so the circle turns red",
+  "ppgCoverBothHint": "Cover both the lens and the flashlight at once. The circle turns red only then, and measurement starts automatically.",
+  "ppgExitAndAnalyze": "Exit and analyze",
+  "ppgAnalyzed": "Camera reading saved and analyzed",
+  "ppgAnalysisTitle": "Camera measurement analysis",
+  "ppgAnalysisStatusNormal": "Resting pulse looks comfortable",
+  "ppgAnalysisStatusElevated": "Resting pulse is elevated",
+  "ppgAnalysisStatusLow": "Resting pulse is low",
+  "ppgAnalysisStatusHigh": "Resting pulse is markedly high",
+  "ppgAnalysisBodyNormal": "Camera reading: {bpm} bpm. Your resting comfort band is {low}–{high} bpm. This looks like a calm resting pulse — useful as a wellness check-in. Sit quietly and remeasure later if you want a second sample.",
+  "@ppgAnalysisBodyNormal": {
+    "placeholders": {
+      "bpm": { "type": "int" },
+      "low": { "type": "int" },
+      "high": { "type": "int" }
+    }
+  },
+  "ppgAnalysisBodyElevated": "Camera reading: {bpm} bpm — above your usual {low}–{high} bpm resting comfort band. Recent activity, stress, caffeine, heat, or incomplete recovery can raise pulse. Rest 2–3 minutes and measure again while still seated.",
+  "@ppgAnalysisBodyElevated": {
+    "placeholders": {
+      "bpm": { "type": "int" },
+      "low": { "type": "int" },
+      "high": { "type": "int" }
+    }
+  },
+  "ppgAnalysisBodyLow": "Camera reading: {bpm} bpm — below your usual {low}–{high} bpm band. Trained athletes often run lower at rest. If you feel dizzy, weak, or unwell, seek care; otherwise keep tracking how you feel day to day.",
+  "@ppgAnalysisBodyLow": {
+    "placeholders": {
+      "bpm": { "type": "int" },
+      "low": { "type": "int" },
+      "high": { "type": "int" }
+    }
+  },
+  "ppgAnalysisBodyHigh": "Camera reading: {bpm} bpm — well above your {low}–{high} bpm comfort band. If you have chest pain, severe shortness of breath, or feel faint, seek urgent care. Otherwise rest and recheck in a few minutes.",
+  "@ppgAnalysisBodyHigh": {
+    "placeholders": {
+      "bpm": { "type": "int" },
+      "low": { "type": "int" },
+      "high": { "type": "int" }
+    }
+  },
+  "ppgAnalysisRangeLabel": "Your resting comfort band: {low}–{high} bpm",
+  "@ppgAnalysisRangeLabel": {
+    "placeholders": {
+      "low": { "type": "int" },
+      "high": { "type": "int" }
+    }
+  },
+  "ppgAnalysisQualityGood": "Signal quality {percent}% — strong fingertip signal",
+  "@ppgAnalysisQualityGood": {
+    "placeholders": {
+      "percent": { "type": "int" }
+    }
+  },
+  "ppgAnalysisQualityFair": "Signal quality {percent}% — usable; keep the finger still for cleaner samples",
+  "@ppgAnalysisQualityFair": {
+    "placeholders": {
+      "percent": { "type": "int" }
+    }
+  },
+  "ppgAnalysisQualityPoor": "Signal quality {percent}% — weak; cover the lens and flash fully and retry",
+  "@ppgAnalysisQualityPoor": {
+    "placeholders": {
+      "percent": { "type": "int" }
+    }
+  },
+  "ppgAnalysisMethodNote": "Measured with the camera and flash (PPG light through the fingertip). This is not an ECG and not a medical diagnosis.",
+  "ppgHoldFinger": "Keep your finger still — do not move it",
+  "ppgHoldStill": "Stay still until the measurement finishes",
+  "ppgTipsHeader": "TIPS AND FACTS ABOUT HEALTH AND LIFE",
+  "ppgFact1": "We measure heart rate variability (HRV), not only pulse.",
+  "ppgFact2": "Pulse is how often the heart beats; variability is how the time between beats changes.",
+  "ppgFact3": "How do we measure variability with a camera? This method is called photoplethysmography.",
+  "ppgFact4": "When the heart beats, blood volume in the vessels changes — and so does their color.",
+  "ppgFact5": "The camera records these changes so we can see the time between heartbeats.",
+  "ppgFact6": "From the rhythm we compute standard HRV metrics such as SDNN and rMSSD.",
+  "ppgFact7": "Companies like Apple and Garmin also use variability analysis in smartwatches.",
+  "ppgFact8": "Take measurements, collect your own data, and feel better over time.",
+  "ppgResultTitle": "Measurement complete",
+  "ppgQuality": "Signal quality {percent}%",
+  "@ppgQuality": {
+    "placeholders": {
+      "percent": { "type": "int" }
+    }
+  },
+  "ppgExportRaw": "Copy raw signal",
+  "ppgExportTitle": "PHA camera PPG export",
+  "ppgExportCopied": "Raw signal copied to clipboard",
+  "ppgNeedPermission": "Camera access is required to measure heart rate with the flash.",
+  "ppgNoCamera": "No camera is available on this device.",
+  "ppgNoTorch": "Flashlight is not available. Measurement may be less accurate.",
+  "ppgCameraError": "Could not open the camera. Try again.",
+  "ppgDisclaimer": "This is not a medical device. Camera readings are for informational use only and do not replace a doctor’s advice.",
   "hrChartTitle": "Heart rate trend",
   "hrRange24h": "24h",
   "hrRange7d": "7d",
@@ -1648,7 +1788,7 @@
   "hrEcgAvBlock2MobitzI": "Second-degree AV block (Mobitz I)",
   "hrEcgAvBlock3": "Third-degree AV block",
   "hrEcgReferenceTitle": "ECG rhythms at a glance",
-  "hrEcgReferenceSubtitle": "Key teaching features — educational only, not a diagnosis.",
+  "hrEcgReferenceSubtitle": "Educational summary only — not a diagnosis.",
   "hrEcgFeatNormalSinus": "Rate 60–100 bpm · regular · each P before QRS · PR 0.12–0.20 s · QRS < 0.12 s",
   "hrEcgFeatSinusTachy": "Rate > 100 bpm · regular · each P before QRS · PR 0.12–0.20 s · QRS < 0.12 s",
   "hrEcgFeatSinusBrady": "Rate < 60 bpm · regular · each P before QRS · PR 0.12–0.20 s · QRS < 0.12 s",
@@ -1660,6 +1800,21 @@
   "hrEcgFeatAv3": "No P–QRS relationship · independent atrial/ventricular rates · escape rhythm",
   "hrEcgFeatInconclusive": "Apple Watch could not classify this tracing confidently.",
   "hrEcgFeatUnknown": "Classification not available.",
+  "hrEcgResultTitle": "Processing result",
+  "hrEcgNoDistortion": "No rhythm distortion detected",
+  "hrEcgHasDistortion": "Possible rhythm irregularity",
+  "hrEcgUnclearDistortion": "Rhythm could not be classified clearly",
+  "hrEcgAdviceNormalSinus": "Your latest ECG looks like a regular sinus rhythm. Keep tracking how you feel; this is not a medical diagnosis.",
+  "hrEcgAdviceSinusTachy": "Your heart rate looks faster than a typical resting sinus rhythm. Rest, avoid stimulants, and see a doctor if it continues or you feel unwell.",
+  "hrEcgAdviceSinusBrady": "Your heart rate looks slower than a typical resting sinus rhythm. If you feel dizzy, weak, or short of breath, contact a doctor.",
+  "hrEcgAdviceAfib": "The recording suggests an irregular rhythm compatible with atrial fibrillation. Contact a doctor soon — do not rely on the watch alone.",
+  "hrEcgAdviceVt": "A dangerous-looking fast rhythm pattern was flagged. Seek emergency care if you feel faint, chest pain, or severe weakness.",
+  "hrEcgAdviceVf": "A chaotic emergency teaching pattern was flagged. Call emergency services immediately if this matches how you feel.",
+  "hrEcgAdviceAv1": "A mild conduction delay pattern may be present. Mention it to your doctor at the next visit, especially if you have new symptoms.",
+  "hrEcgAdviceAv2": "A dropped-beat conduction pattern may be present. Contact a doctor promptly for clinical ECG evaluation.",
+  "hrEcgAdviceAv3": "A severe conduction-block pattern may be present. Seek urgent medical care.",
+  "hrEcgAdviceInconclusive": "The sensor could not classify this tracing confidently. Try again while still, or ask a clinician for a standard ECG.",
+  "hrEcgAdviceUnknown": "No clear rhythm result yet. Take an ECG on Apple Watch and sync, then tap Read sensors.",
   "hrIrregularRhythm": "Irregular rhythm alerts",
   "hrTrendImproving": "Improving",
   "hrTrendWorsening": "Worsening",

@@ -1,0 +1,5 @@
+# HTTPS for the PHA API. Caddy obtains and renews the certificate.
+# DNS: api.pha-app.net must point at this server before the first start.
+api.pha-app.net {
+	reverse_proxy api:8080
+}

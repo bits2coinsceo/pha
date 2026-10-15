@@ -328,6 +328,70 @@ class AppLocalizationsRu extends AppLocalizations {
   String get profileSubtitle => 'Управление настройками аккаунта';
 
   @override
+  String get profileHealthAccessTitle => 'Доступ к данным устройства';
+
+  @override
+  String get profileHealthAccessSubtitle =>
+      'Проверьте или запросите доступ к шагам, дистанции и данным сердца здесь. PHA остаётся в приложении — без перехода в меню Health на iPhone.';
+
+  @override
+  String get profileHealthAccessActivity => 'Шаги и дистанция';
+
+  @override
+  String get profileHealthAccessActivityHint =>
+      'Разрешите PHA читать шаги и дистанцию ходьбы с устройства.';
+
+  @override
+  String get profileHealthAccessHeart => 'Пульс и данные Health';
+
+  @override
+  String get profileHealthAccessHeartHint =>
+      'Пульс, ЧСС в покое, ВСР, уведомления о нерегулярном ритме и ЭКГ из Apple Health.';
+
+  @override
+  String get profileHealthAccessAll => 'Проверить / разрешить весь доступ';
+
+  @override
+  String get profileHealthAccessOpenSettings => 'Открыть настройки Health';
+
+  @override
+  String get profileHealthAccessOpenSettingsHint =>
+      'Включите обмен данными для PHA в приложении «Здоровье» (шаги, дистанция, пульс и др.).';
+
+  @override
+  String get profileHealthAccessStatusOn => 'Подключено';
+
+  @override
+  String get profileHealthAccessStatusOff => 'Не подключено';
+
+  @override
+  String get profileHealthAccessRequesting => 'Проверка доступа…';
+
+  @override
+  String get profileHealthAccessPrompted =>
+      'Показан запрос разрешения — включите нужные типы данных.';
+
+  @override
+  String get profileHealthAccessAlreadyGranted =>
+      'Доступ к этим типам данных уже предоставлен.';
+
+  @override
+  String get profileHealthAccessOpenedSettings =>
+      'Открыты настройки Health. Включите типы данных для PHA и вернитесь в приложение.';
+
+  @override
+  String get profileHealthAccessSynced =>
+      'Доступ обновлён — синхронизируем актуальные данные.';
+
+  @override
+  String get profileHealthAccessUnsupported =>
+      'Синхронизация здоровья недоступна на этой платформе.';
+
+  @override
+  String get profileHealthAccessFailed =>
+      'Не удалось запросить доступ. Попробуйте снова.';
+
+  @override
   String get age => 'Возраст';
 
   @override
@@ -1325,6 +1389,19 @@ class AppLocalizationsRu extends AppLocalizations {
   String get mealGallery => 'Галерея';
 
   @override
+  String get mealPhotoReady =>
+      'Фото загружено — нажмите «Анализировать еду», когда будете готовы.';
+
+  @override
+  String get mealPhotoSelected => 'Выбранное фото еды';
+
+  @override
+  String get mealChangePhoto => 'Заменить фото';
+
+  @override
+  String get mealRemovePhoto => 'Убрать';
+
+  @override
   String get mealAnalyze => 'Анализировать еду';
 
   @override
@@ -2137,7 +2214,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get promoCodeAlreadyUsed =>
-      'Этот промокод уже использован для данного профиля.';
+      'Этот промокод уже использован на этом профиле или на этом устройстве.';
 
   @override
   String psychoQuestionOfBlock(int current, int total) {
@@ -2177,29 +2254,48 @@ class AppLocalizationsRu extends AppLocalizations {
   String get activityYourProgramFallback => 'ваша программа';
 
   @override
-  String get trialSevenDayFree => '7 дней бесплатно';
+  String get trialSevenDayFree => '24 часа бесплатно';
+
+  @override
+  String trialCountdown(String time) {
+    return 'Триал $time';
+  }
+
+  @override
+  String get trialNotifSixHoursTitle => 'Триал заканчивается через 6 часов';
+
+  @override
+  String get trialNotifSixHoursBody =>
+      'Ваш бесплатный доступ на 24 часа закончится через 6 часов. Оформите PHA Plus+, чтобы сохранить все функции.';
+
+  @override
+  String get trialNotifOneHourTitle => 'Триал заканчивается через 1 час';
+
+  @override
+  String get trialNotifOneHourBody =>
+      'До конца бесплатного периода меньше часа. Подпишитесь, чтобы сохранить полный доступ к PHA.';
 
   @override
   String get trialNotifChannelName => 'Напоминания о триале';
 
   @override
   String get trialNotifChannelDesc =>
-      'Уведомления до окончания бесплатного периода';
+      'Напоминания до конца бесплатного периода';
 
   @override
-  String get trialNotifThreeDaysTitle => 'Триал заканчивается через 3 дня';
+  String get trialNotifThreeDaysTitle => 'Триал заканчивается через 6 часов';
 
   @override
   String get trialNotifThreeDaysBody =>
-      'Бесплатный период 7 дней закончится через 3 дня. Оформите PHA Plus+, чтобы сохранить все функции.';
+      'Ваш бесплатный доступ на 24 часа закончится через 6 часов. Оформите PHA Plus+, чтобы сохранить все функции.';
 
   @override
   String get trialNotifTwentyFourHoursTitle =>
-      'Триал заканчивается через 24 часа';
+      'Триал заканчивается через 1 час';
 
   @override
   String get trialNotifTwentyFourHoursBody =>
-      'До конца бесплатного периода остались сутки. Подпишитесь, чтобы сохранить полный доступ к PHA.';
+      'До конца бесплатного периода меньше часа. Подпишитесь, чтобы сохранить полный доступ к PHA.';
 
   @override
   String get uploadImageFormats => 'JPG, PNG, GIF';
@@ -2854,6 +2950,13 @@ class AppLocalizationsRu extends AppLocalizations {
       'Лишний вес повышает риск высокого сахара и проблем с сердцем. Меньше порции, больше овощей и ежедневные прогулки помогают.';
 
   @override
+  String get clinicalFlagFattyLiverTitle => 'Риск жирной печени';
+
+  @override
+  String get clinicalFlagFattyLiverBody =>
+      'При ожирении или сильном искажении веса выше вероятность жировой болезни печени. Рекомендуется пройти УЗИ печени и поджелудочной железы и обсудить результат с врачом.';
+
+  @override
   String get clinicalFlagTripleTitle => 'Вес + АД + сахар';
 
   @override
@@ -2962,7 +3065,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get actionHeartRate => 'ЧСС и ритм';
 
   @override
-  String get actionHeartRateDesc => 'Проверка сердца с умных часов';
+  String get actionHeartRateDesc => 'Пульс с часов/браслета или через камеру';
 
   @override
   String get actionEcg => 'ЭКГ';
@@ -3119,6 +3222,195 @@ class AppLocalizationsRu extends AppLocalizations {
       'Это не медицинское изделие. Данные с умных часов не заменяют консультацию врача. При ухудшении самочувствия обратитесь к специалисту.';
 
   @override
+  String get ppgTitle => 'Пульс через камеру';
+
+  @override
+  String get ppgSourceWatch => 'Часы / браслет';
+
+  @override
+  String get ppgSourceCamera => 'Камера + вспышка';
+
+  @override
+  String get ppgSourceHint =>
+      'Считайте пульс с часов или фитнес-браслета либо измерьте через камеру и вспышку телефона.';
+
+  @override
+  String get ppgMeasureCamera => 'Измерить камерой';
+
+  @override
+  String get ppgStart => 'Начать измерение';
+
+  @override
+  String get ppgStop => 'Стоп';
+
+  @override
+  String get ppgRetry => 'Измерить ещё раз';
+
+  @override
+  String get ppgSave => 'Сохранить результат';
+
+  @override
+  String get ppgSaving => 'Сохранение…';
+
+  @override
+  String get ppgSaved => 'Пульс сохранён в историю';
+
+  @override
+  String get ppgSaveFailed => 'Не удалось сохранить измерение';
+
+  @override
+  String get ppgPreparing => 'Подготовка камеры…';
+
+  @override
+  String get ppgPlaceFinger =>
+      'Приложите палец к камере и вспышке так, чтобы круг стал красным';
+
+  @override
+  String get ppgCoverBothHint =>
+      'Перекройте и объектив, и вспышку одновременно. Круг станет красным только тогда — и измерение начнётся автоматически.';
+
+  @override
+  String get ppgExitAndAnalyze => 'Выйти и проанализировать';
+
+  @override
+  String get ppgAnalyzed => 'Измерение с камеры сохранено и проанализировано';
+
+  @override
+  String get ppgAnalysisTitle => 'Анализ измерения с камеры';
+
+  @override
+  String get ppgAnalysisStatusNormal => 'Пульс в покое в комфортном диапазоне';
+
+  @override
+  String get ppgAnalysisStatusElevated => 'Пульс в покое повышен';
+
+  @override
+  String get ppgAnalysisStatusLow => 'Пульс в покое понижен';
+
+  @override
+  String get ppgAnalysisStatusHigh => 'Пульс в покое заметно высокий';
+
+  @override
+  String ppgAnalysisBodyNormal(int bpm, int low, int high) {
+    return 'Показание камеры: $bpm уд/мин. Ваш комфортный диапазон в покое — $low–$high уд/мин. Это похоже на спокойный пульс в покое — удобная проверка самочувствия. При желании повторите замер через несколько минут сидя.';
+  }
+
+  @override
+  String ppgAnalysisBodyElevated(int bpm, int low, int high) {
+    return 'Показание камеры: $bpm уд/мин — выше вашего обычного диапазона $low–$high уд/мин. Недавняя активность, стресс, кофеин, жара или недовосстановление могут поднимать пульс. Отдохните 2–3 минуты и измерьте снова сидя.';
+  }
+
+  @override
+  String ppgAnalysisBodyLow(int bpm, int low, int high) {
+    return 'Показание камеры: $bpm уд/мин — ниже вашего обычного диапазона $low–$high уд/мин. У тренированных людей пульс в покое часто ниже. Если есть головокружение, слабость или плохое самочувствие — обратитесь за помощью; иначе просто отслеживайте, как вы себя чувствуете.';
+  }
+
+  @override
+  String ppgAnalysisBodyHigh(int bpm, int low, int high) {
+    return 'Показание камеры: $bpm уд/мин — заметно выше диапазона $low–$high уд/мин. При боли в груди, сильной одышке или предобмороке срочно обратитесь за помощью. Иначе отдохните и перепроверьте через несколько минут.';
+  }
+
+  @override
+  String ppgAnalysisRangeLabel(int low, int high) {
+    return 'Ваш комфортный диапазон в покое: $low–$high уд/мин';
+  }
+
+  @override
+  String ppgAnalysisQualityGood(int percent) {
+    return 'Качество сигнала $percent% — устойчивый сигнал с пальца';
+  }
+
+  @override
+  String ppgAnalysisQualityFair(int percent) {
+    return 'Качество сигнала $percent% — приемлемо; держите палец неподвижно для более чистого замера';
+  }
+
+  @override
+  String ppgAnalysisQualityPoor(int percent) {
+    return 'Качество сигнала $percent% — слабо; полностью закройте объектив и вспышку и повторите';
+  }
+
+  @override
+  String get ppgAnalysisMethodNote =>
+      'Измерено камерой и вспышкой (ППГ — свет через палец). Это не ЭКГ и не медицинский диагноз.';
+
+  @override
+  String get ppgHoldFinger => 'Держите палец, не убирайте его';
+
+  @override
+  String get ppgHoldStill => 'Не двигайтесь до конца измерения';
+
+  @override
+  String get ppgTipsHeader => 'СОВЕТЫ И ФАКТЫ О ЗДОРОВЬЕ И ЖИЗНИ';
+
+  @override
+  String get ppgFact1 =>
+      'Мы измеряем не только пульс, а вариабельность ритма сердца — ВСР.';
+
+  @override
+  String get ppgFact2 =>
+      'Пульс — это сколько раз сердце бьётся, а вариабельность — как меняется время между ударами.';
+
+  @override
+  String get ppgFact3 =>
+      'Как мы измеряем вариабельность с помощью камеры? Этот метод называется фотоплетизмография.';
+
+  @override
+  String get ppgFact4 =>
+      'Когда сердце бьётся — объём крови в сосудах меняется. Из-за этого меняется и их цвет.';
+
+  @override
+  String get ppgFact5 =>
+      'Камера фиксирует эти изменения, и так мы понимаем, сколько времени проходит между ударами сердца.';
+
+  @override
+  String get ppgFact6 =>
+      'На основе данных о ритме мы считаем стандартные показатели вариабельности: SDNN, rMSSD и другие.';
+
+  @override
+  String get ppgFact7 =>
+      'Такие гиганты как Apple и Garmin в своих умных часах также используют анализ вариабельности.';
+
+  @override
+  String get ppgFact8 =>
+      'Делайте замеры, собирайте данные о себе и чувствуйте себя лучше.';
+
+  @override
+  String get ppgResultTitle => 'Измерение завершено';
+
+  @override
+  String ppgQuality(int percent) {
+    return 'Качество сигнала $percent%';
+  }
+
+  @override
+  String get ppgExportRaw => 'Скопировать сырой сигнал';
+
+  @override
+  String get ppgExportTitle => 'Экспорт PPG PHA';
+
+  @override
+  String get ppgExportCopied => 'Сырой сигнал скопирован';
+
+  @override
+  String get ppgNeedPermission =>
+      'Нужен доступ к камере, чтобы измерить пульс со вспышкой.';
+
+  @override
+  String get ppgNoCamera => 'На этом устройстве нет камеры.';
+
+  @override
+  String get ppgNoTorch =>
+      'Вспышка недоступна. Измерение может быть менее точным.';
+
+  @override
+  String get ppgCameraError => 'Не удалось открыть камеру. Попробуйте ещё раз.';
+
+  @override
+  String get ppgDisclaimer =>
+      'Это не медицинское устройство. Результаты носят ознакомительный характер и не заменяют консультацию врача.';
+
+  @override
   String get hrChartTitle => 'Динамика пульса';
 
   @override
@@ -3227,6 +3519,63 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get hrEcgFeatUnknown => 'Классификация недоступна.';
+
+  @override
+  String get hrEcgResultTitle => 'Результат обработки';
+
+  @override
+  String get hrEcgNoDistortion => 'Искажений ритма не обнаружено';
+
+  @override
+  String get hrEcgHasDistortion => 'Возможны нарушения ритма';
+
+  @override
+  String get hrEcgUnclearDistortion =>
+      'Ритм не удалось классифицировать уверенно';
+
+  @override
+  String get hrEcgAdviceNormalSinus =>
+      'Последняя ЭКГ похожа на регулярный синусовый ритм. Следите за самочувствием; это не медицинский диагноз.';
+
+  @override
+  String get hrEcgAdviceSinusTachy =>
+      'Пульс выше обычного синусового ритма в покое. Отдохните, избегайте стимуляторов и обратитесь к врачу, если это сохраняется или вам плохо.';
+
+  @override
+  String get hrEcgAdviceSinusBrady =>
+      'Пульс ниже обычного синусового ритма в покое. При головокружении, слабости или одышке обратитесь к врачу.';
+
+  @override
+  String get hrEcgAdviceAfib =>
+      'Запись похожа на нерегулярный ритм, совместимый с фибрилляцией предсердий. Скоро обратитесь к врачу — не полагайтесь только на часы.';
+
+  @override
+  String get hrEcgAdviceVt =>
+      'Отмечен опасный быстрый паттерн ритма. При обмороке, боли в груди или сильной слабости срочно обратитесь за помощью.';
+
+  @override
+  String get hrEcgAdviceVf =>
+      'Отмечен хаотичный аварийный паттерн. Если так же себя чувствуете — немедленно вызывайте скорую.';
+
+  @override
+  String get hrEcgAdviceAv1 =>
+      'Возможна лёгкая задержка проведения. Упомяните это врачу на ближайшем приёме, особенно при новых симптомах.';
+
+  @override
+  String get hrEcgAdviceAv2 =>
+      'Возможен паттерн с выпадением сокращений. Скоро обратитесь к врачу за клинической ЭКГ.';
+
+  @override
+  String get hrEcgAdviceAv3 =>
+      'Возможен тяжёлый блок проведения. Срочно обратитесь за медицинской помощью.';
+
+  @override
+  String get hrEcgAdviceInconclusive =>
+      'Датчик не смог уверенно классифицировать запись. Повторите измерение неподвижно или сделайте обычную ЭКГ у врача.';
+
+  @override
+  String get hrEcgAdviceUnknown =>
+      'Пока нет ясного результата по ритму. Снимите ЭКГ на Apple Watch, синхронизируйте и нажмите «Считать с датчиков».';
 
   @override
   String get hrIrregularRhythm => 'Оповещения о нерегулярном ритме';

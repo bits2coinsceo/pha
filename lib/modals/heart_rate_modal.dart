@@ -14,8 +14,9 @@ import '../l10n/medical_l10n.dart';
 import '../live_heart_rate.dart';
 import '../theme.dart';
 import '../widgets.dart';
+import 'ppg_camera_modal.dart';
 
-/// Quick Action: Heart Rate & Rhythm — reads Apple Watch / HealthKit data.
+/// Quick Action: Heart Rate & Rhythm — watch/band HealthKit data or camera PPG.
 class HeartRateModal extends StatefulWidget {
   const HeartRateModal({super.key});
 
@@ -44,6 +45,9 @@ class _HeartRateModalState extends State<HeartRateModal>
   bool _athlete = false;
 
   late final AnimationController _beat;
+
+  /// Latest camera PPG reading returned via "Exit and analyze".
+  PpgMeasureResult? _ppgResult;
 
   /// Current BPM is hidden (and the heart stops) after this age.
   static const _freshWindow = Duration(minutes: 15);
@@ -372,7 +376,13 @@ class _HeartRateModalState extends State<HeartRateModal>
                     l10n.actionHeartRateDesc,
                     style: TextStyle(fontSize: 13, color: C.gray500, height: 1.35),
                   ),
+                  const SizedBox(height: 12),
+                  _sourcePicker(l10n),
                   const SizedBox(height: 16),
+                  if (_ppgResult != null) ...[
+                    _ppgAnalysisCard(l10n, _ppgResult!),
+                    const SizedBox(height: 14),
+                  ],
                   if (snap?.error == 'permission' ||
                       snap?.permissionGranted == false)
                     _permissionCard(l10n)
@@ -482,6 +492,254 @@ class _HeartRateModalState extends State<HeartRateModal>
             style: TextStyle(fontSize: 13, color: C.gray500, height: 1.35),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _openPpg() async {
+    final result = await Navigator.of(context).push<PpgMeasureResult?>(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => const PpgCameraModal(),
+      ),
+    );
+    if (!mounted || result == null) return;
+    setState(() {
+      _ppgResult = result;
+      _liveBpm = result.bpm;
+      _liveAt = DateTime.now();
+      toast = context.l10n.ppgAnalyzed;
+    });
+    _syncBeatToBpm(result.bpm);
+    await _load(preserveLive: true);
+  }
+
+  /// Camera PPG analysis — heart-rate wellness wording only (never ECG copy).
+  ({String status, String body, Color color}) _ppgAnalysis(
+    AppLocalizations l10n,
+    double bpm,
+  ) {
+    final band = HeartRateGuidelines.restingRange(age: _age, athlete: _athlete);
+    final zone = HeartRateGuidelines.zoneForResting(
+      bpm,
+      age: _age,
+      athlete: _athlete,
+    );
+    final b = bpm.round();
+    return switch (zone) {
+      HeartZone.risk when bpm > band.high => (
+          status: l10n.ppgAnalysisStatusHigh,
+          body: l10n.ppgAnalysisBodyHigh(b, band.low, band.high),
+          color: C.red600,
+        ),
+      HeartZone.risk => (
+          status: l10n.ppgAnalysisStatusLow,
+          body: l10n.ppgAnalysisBodyLow(b, band.low, band.high),
+          color: C.amber600,
+        ),
+      HeartZone.attention when bpm > band.high => (
+          status: l10n.ppgAnalysisStatusElevated,
+          body: l10n.ppgAnalysisBodyElevated(b, band.low, band.high),
+          color: C.amber600,
+        ),
+      HeartZone.attention => (
+          status: l10n.ppgAnalysisStatusLow,
+          body: l10n.ppgAnalysisBodyLow(b, band.low, band.high),
+          color: C.amber600,
+        ),
+      HeartZone.normal => (
+          status: l10n.ppgAnalysisStatusNormal,
+          body: l10n.ppgAnalysisBodyNormal(b, band.low, band.high),
+          color: C.green600,
+        ),
+    };
+  }
+
+  String _ppgQualityLine(AppLocalizations l10n, double quality) {
+    final pct = (quality * 100).round();
+    if (quality >= 0.7) return l10n.ppgAnalysisQualityGood(pct);
+    if (quality >= 0.45) return l10n.ppgAnalysisQualityFair(pct);
+    return l10n.ppgAnalysisQualityPoor(pct);
+  }
+
+  Widget _ppgAnalysisCard(AppLocalizations l10n, PpgMeasureResult result) {
+    final analysis = _ppgAnalysis(l10n, result.bpm);
+    final band = HeartRateGuidelines.restingRange(age: _age, athlete: _athlete);
+    final color = analysis.color;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.camera_alt_outlined, size: 18, color: color),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n.ppgAnalysisTitle,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    color: color,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+              Text(
+                '${result.bpm.round()} ${l10n.unitBpm}',
+                style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: C.gray900,
+                  fontSize: 18,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text(
+              analysis.status,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: color,
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            analysis.body,
+            style: TextStyle(fontSize: 13, color: C.gray700, height: 1.45),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            l10n.ppgAnalysisRangeLabel(band.low, band.high),
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: C.gray600,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            _ppgQualityLine(l10n, result.quality),
+            style: TextStyle(fontSize: 12, color: C.gray500, height: 1.35),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            l10n.ppgAnalysisMethodNote,
+            style: TextStyle(
+              fontSize: 11,
+              color: C.gray400,
+              height: 1.35,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _sourcePicker(AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: C.card,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: C.cardBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            l10n.ppgSourceHint,
+            style: TextStyle(fontSize: 12, color: C.gray500, height: 1.35),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _sourceChip(
+                  icon: Icons.watch_outlined,
+                  label: l10n.ppgSourceWatch,
+                  selected: true,
+                  onTap: null,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _sourceChip(
+                  icon: Icons.photo_camera_outlined,
+                  label: l10n.ppgSourceCamera,
+                  selected: false,
+                  onTap: _openPpg,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ElevatedButton.icon(
+            onPressed: _openPpg,
+            icon: const Icon(Icons.flash_on_outlined, size: 18),
+            label: Text(l10n.ppgMeasureCamera),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: C.rose600,
+              foregroundColor: C.white,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _sourceChip({
+    required IconData icon,
+    required String label,
+    required bool selected,
+    required VoidCallback? onTap,
+  }) {
+    return Material(
+      color: selected ? C.blue600.withValues(alpha: 0.12) : C.gray50,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: selected ? C.blue600 : C.gray200,
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, size: 18, color: selected ? C.blue600 : C.gray600),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: selected ? C.blue700 : C.gray700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -1153,9 +1411,10 @@ class _HeartRateModalState extends State<HeartRateModal>
     }
     // Classic ECG teaching labels for resting rate (60–100 sinus band).
     final inferred = EcgRhythmKnowledge.inferFromRestingRate(a.restingBpm);
-    if (inferred == EcgRhythmKind.sinusTachycardia ||
-        inferred == EcgRhythmKind.sinusBradycardia) {
-      return '${l10n.hrEcgRhythmTitle(inferred!)}. ${l10n.hrEcgRhythmFeatures(inferred)}';
+    if (inferred != null &&
+        (inferred == EcgRhythmKind.sinusTachycardia ||
+            inferred == EcgRhythmKind.sinusBradycardia)) {
+      return '${l10n.hrEcgRhythmTitle(inferred)}. ${l10n.hrEcgRhythmAdvice(inferred)}';
     }
     if (a.hrvMs != null && a.hrvMs! < 40) return l10n.hrExplainLowHrv;
     if (a.zone == HeartZone.normal) return l10n.hrExplainNormal;

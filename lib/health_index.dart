@@ -112,19 +112,48 @@ class HealthIndexService {
     final profile = profiles.isEmpty ? null : profiles.first;
     final age = (profile?['age'] as num?)?.toInt();
 
-    final metrics = await db.query(
-      'health_metrics',
-      where: 'user_id = ?',
-      whereArgs: [userId],
-      orderBy: 'recorded_at DESC',
-      limit: 80,
-    );
+    // Load daily live metrics by type for *today* so dense heart_rate samples
+    // cannot push steps out of a global LIMIT window.
     final latest = <String, double>{};
-    for (final m in metrics) {
-      latest.putIfAbsent(
-        m['metric_type'] as String,
-        () => (m['value'] as num).toDouble(),
+    for (final type in const [
+      'steps',
+      'distance',
+      'calories',
+      'active_time',
+      'resting_heart_rate',
+      'walking_heart_rate',
+      'hrv_sdnn',
+      'heart_rate_avg',
+      'weight',
+      'blood_pressure_systolic',
+      'blood_pressure_diastolic',
+      'glucose',
+    ]) {
+      final v = await DailyMetricStore.valueOnLocalDay(
+        userId: userId,
+        metricType: type,
       );
+      if (v != null) latest[type] = v;
+    }
+    // Fallbacks for non-daily vitals / body metrics (latest ever).
+    for (final type in const [
+      'weight',
+      'blood_pressure_systolic',
+      'blood_pressure_diastolic',
+      'glucose',
+    ]) {
+      if (latest.containsKey(type)) continue;
+      final rows = await db.query(
+        'health_metrics',
+        columns: ['value'],
+        where: 'user_id = ? AND metric_type = ?',
+        whereArgs: [userId, type],
+        orderBy: 'recorded_at DESC',
+        limit: 1,
+      );
+      if (rows.isNotEmpty) {
+        latest[type] = (rows.first['value'] as num).toDouble();
+      }
     }
 
     final foundation = <String, double>{};

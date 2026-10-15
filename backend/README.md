@@ -14,8 +14,8 @@ Python API (FastAPI) поверх **Vertex AI Gemini**. Отвечает на з
 | GET/PUT | `/patient/history` | Headers `X-Patient-Email`, `X-Sync-Token` — encrypted health history per email |
 | —     | `/docs`    | Авто-документация Swagger                            |
 
-Если в окружении задан `API_KEY`, все эндпоинты (кроме `/health`) требуют
-заголовок `X-API-Key`.
+Все эндпоинты кроме `/health` требуют заголовок `X-API-Key`.
+`API_KEY` и `PATIENT_ENCRYPTION_KEY` обязательны: без них процесс не стартует.
 
 ## Локальный запуск (без Docker)
 
@@ -56,7 +56,7 @@ curl localhost:8080/usage/user-42
    cp "/Users/deveus/Downloads/Telegram Desktop/pha-personal-health-assistant-50d0e32300d8.json" secrets/sa.json
    ```
 
-2. (Опционально) `cp .env.example .env` и задай `API_KEY` / `GEMINI_MODEL`.
+2. `cp .env.example .env` и задай `API_KEY` (минимум 32 символа) и `PATIENT_ENCRYPTION_KEY` (Fernet).
 
 3. Старт:
 
@@ -83,8 +83,9 @@ scp .env            user@host:~/pha-backend/.env   # если используе
 
 - **Ключ сервис-аккаунта НЕ коммитится** — он монтируется как volume только для
   чтения через `GOOGLE_APPLICATION_CREDENTIALS`.
-- Для прода задай `API_KEY` и проксируй сервис за HTTPS (nginx/Caddy/Cloudflare),
-  не выставляй порт 8080 в интернет напрямую.
+- Порт `8080` слушает только `127.0.0.1`. Снаружи API доступен через Caddy
+  (`deploy/Caddyfile`) на `https://api.pha-app.net`.
+- Не оставляй `API_KEY` пустым и не используй запасной ключ шифрования.
 
 ## Свитчер моделей
 

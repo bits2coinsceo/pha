@@ -6,23 +6,22 @@ Flutter app talks to it. Keep it up to date when the API changes.
 ## TL;DR
 
 - **Backend lives in** [`backend/`](backend/) — Python **FastAPI** wrapping **Vertex AI Gemini**.
-- **Deployed on** SSH host `fest` → `http://49.13.66.150:8080` (Docker, `restart: unless-stopped`).
+- **Deployed on** SSH host `fest`. Public URL is `https://api.pha-app.net` (Caddy → `127.0.0.1:8080`).
 - **App talks to it** via [`lib/api.dart`](lib/api.dart) (`ApiClient.chat` / `ApiClient.analyze`).
-- **Auth:** header `X-API-Key: <key>` on every call except `/health`.
+- **Auth:** header `X-API-Key` on every call except `/health`. The server refuses to start if `API_KEY` or `PATIENT_ENCRYPTION_KEY` is missing.
 - Full backend docs: [`backend/README.md`](backend/README.md).
 
 ## Where the API is
 
 | | Value |
 |---|---|
-| Base URL (prod) | `http://49.13.66.150:8080` |
+| Base URL (prod) | `https://api.pha-app.net` |
 | Host alias | `fest` (`ssh fest`, root@49.13.66.150) |
 | Remote dir | `/root/pha-backend` |
 | Runtime | Docker Compose, port `8080`, container `pha-backend` |
 | Source | `backend/` in this repo |
 
-> ⚠️ Plain HTTP, no TLS yet. iOS reaches it via an ATS exception in
-> `ios/Runner/Info.plist` (`NSAllowsArbitraryLoads`) — **remove once HTTPS is set up**.
+> The app rejects non-HTTPS API bases (localhost excepted). iOS ATS exception `NSAllowsArbitraryLoads` has been removed.
 
 ## What's in the backend
 

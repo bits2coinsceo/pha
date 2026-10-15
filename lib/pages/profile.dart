@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../auth.dart';
 import '../daily_vitals.dart';
 import '../db.dart';
+import '../device_health_access.dart';
 import '../l10n/l10n_ext.dart';
 import '../legal.dart';
 import '../medical_guidelines.dart';
@@ -23,9 +26,12 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
   bool loading = true;
   bool saving = false;
+  bool _healthBusy = false;
+  bool _activityConnected = false;
+  bool _heartConnected = false;
   String error = '';
   String success = '';
   VitalsPromptMode _vitalsPromptMode = VitalsPromptMode.daily;
@@ -39,11 +45,20 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _load();
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(_refreshHealthAccessStatus());
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _name.dispose();
     _age.dispose();
     _height.dispose();
@@ -51,6 +66,54 @@ class _ProfilePageState extends State<ProfilePage> {
     _heightIn.dispose();
     _weight.dispose();
     super.dispose();
+  }
+
+  Future<void> _refreshHealthAccessStatus() async {
+    if (!DeviceHealthAccess.isSupported) return;
+    final activity = await DeviceHealthAccess.activityAccessLikely();
+    final heart = await DeviceHealthAccess.heartAccessLikely();
+    if (!mounted) return;
+    setState(() {
+      _activityConnected = activity;
+      _heartConnected = heart;
+    });
+  }
+
+  String _healthOutcomeMessage(
+    AppLocalizations l10n,
+    HealthAccessOutcome outcome,
+  ) {
+    return switch (outcome) {
+      HealthAccessOutcome.prompted => l10n.profileHealthAccessPrompted,
+      HealthAccessOutcome.alreadyGranted =>
+        l10n.profileHealthAccessAlreadyGranted,
+      HealthAccessOutcome.synced => l10n.profileHealthAccessSynced,
+      HealthAccessOutcome.unsupported => l10n.profileHealthAccessUnsupported,
+      HealthAccessOutcome.failed => l10n.profileHealthAccessFailed,
+    };
+  }
+
+  Future<void> _runHealthAccess(
+    Future<HealthAccessOutcome> Function() action,
+  ) async {
+    final l10n = context.l10n;
+    setState(() {
+      _healthBusy = true;
+      error = '';
+      success = l10n.profileHealthAccessRequesting;
+    });
+    final outcome = await action();
+    await _refreshHealthAccessStatus();
+    if (!mounted) return;
+    setState(() {
+      _healthBusy = false;
+      success = _healthOutcomeMessage(l10n, outcome);
+      if (outcome == HealthAccessOutcome.failed ||
+          outcome == HealthAccessOutcome.unsupported) {
+        error = success;
+        success = '';
+      }
+    });
   }
 
   bool get _isImperial =>
@@ -83,9 +146,17 @@ class _ProfilePageState extends State<ProfilePage> {
       }
     }
     final mode = await DailyVitalsService.getPromptMode(userId);
+    final activity = DeviceHealthAccess.isSupported
+        ? await DeviceHealthAccess.activityAccessLikely()
+        : false;
+    final heart = DeviceHealthAccess.isSupported
+        ? await DeviceHealthAccess.heartAccessLikely()
+        : false;
     if (!mounted) return;
     setState(() {
       _vitalsPromptMode = mode;
+      _activityConnected = activity;
+      _heartConnected = heart;
       loading = false;
     });
   }
@@ -371,6 +442,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                               ),
                               SizedBox(height: 24),
+                              if (DeviceHealthAccess.isSupported) ...[
+                                _healthAccessCard(l10n, auth.user!.id),
+                                SizedBox(height: 24),
+                              ],
                               _vitalsPromptCard(l10n),
                               SizedBox(height: 24),
                               // Not const — must rebuild with ThemeModeController / C.* colors.
@@ -523,6 +598,178 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
       );
+
+  Widget _healthAccessCard(AppLocalizations l10n, String userId) {
+    return Container(
+      width: double.infinity,
+      decoration: cardDecoration(border: C.gray200),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: C.sky50,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(Icons.health_and_safety_outlined,
+                    color: C.sky600, size: 22),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.profileHealthAccessTitle,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: C.gray900,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      l10n.profileHealthAccessSubtitle,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: C.gray500,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _healthAccessTile(
+            icon: Icons.directions_walk,
+            title: l10n.profileHealthAccessActivity,
+            subtitle: l10n.profileHealthAccessActivityHint,
+            connected: _activityConnected,
+            onTap: _healthBusy
+                ? null
+                : () => _runHealthAccess(
+                      () => DeviceHealthAccess.requestActivityAccess(
+                        userId: userId,
+                      ),
+                    ),
+            l10n: l10n,
+          ),
+          const SizedBox(height: 8),
+          _healthAccessTile(
+            icon: Icons.favorite_outline,
+            title: l10n.profileHealthAccessHeart,
+            subtitle: l10n.profileHealthAccessHeartHint,
+            connected: _heartConnected,
+            onTap: _healthBusy
+                ? null
+                : () => _runHealthAccess(
+                      () => DeviceHealthAccess.requestHeartAccess(
+                        userId: userId,
+                      ),
+                    ),
+            l10n: l10n,
+          ),
+          const SizedBox(height: 14),
+          PrimaryButton(
+            label: l10n.profileHealthAccessAll,
+            onPressed: _healthBusy
+                ? null
+                : () => _runHealthAccess(
+                      () => DeviceHealthAccess.requestMissingAccess(
+                        userId: userId,
+                      ),
+                    ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _healthAccessTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required bool connected,
+    required VoidCallback? onTap,
+    required AppLocalizations l10n,
+  }) {
+    final statusColor = connected ? C.teal700 : C.amber600;
+    final statusBg = connected ? C.green50 : C.amber50;
+    return Material(
+      color: C.gray50,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(icon, color: C.accentPrimary, size: 22),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: C.gray900,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: statusBg,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            connected
+                                ? l10n.profileHealthAccessStatusOn
+                                : l10n.profileHealthAccessStatusOff,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: statusColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: C.gray500,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _vitalsPromptCard(AppLocalizations l10n) {
     return Container(

@@ -318,6 +318,64 @@ class AppLocalizationsZh extends AppLocalizations {
   String get profileSubtitle => '管理您的账户设置';
 
   @override
+  String get profileHealthAccessTitle => '设备与健康数据访问';
+
+  @override
+  String get profileHealthAccessSubtitle =>
+      '在此检查或申请步数、距离与心脏数据访问。PHA 留在应用内，不会跳转到手机健康菜单。';
+
+  @override
+  String get profileHealthAccessActivity => '步数与距离';
+
+  @override
+  String get profileHealthAccessActivityHint => '允许 PHA 读取设备上的步数与步行距离。';
+
+  @override
+  String get profileHealthAccessHeart => '心率与健康数据';
+
+  @override
+  String get profileHealthAccessHeartHint =>
+      '来自 Apple Health 的心率、静息心率、HRV、不规则心律与心电图。';
+
+  @override
+  String get profileHealthAccessAll => '检查 / 允许全部访问';
+
+  @override
+  String get profileHealthAccessOpenSettings => '打开健康设置';
+
+  @override
+  String get profileHealthAccessOpenSettingsHint =>
+      '在「健康」App 中为 PHA 开启共享（步数、距离、心率等）。';
+
+  @override
+  String get profileHealthAccessStatusOn => '已连接';
+
+  @override
+  String get profileHealthAccessStatusOff => '未连接';
+
+  @override
+  String get profileHealthAccessRequesting => '正在检查访问…';
+
+  @override
+  String get profileHealthAccessPrompted => '已显示权限对话框 — 请开启要共享的数据类型。';
+
+  @override
+  String get profileHealthAccessAlreadyGranted => '这些数据类型的访问权限已授予。';
+
+  @override
+  String get profileHealthAccessOpenedSettings =>
+      '已打开健康设置。请为 PHA 开启数据类型，然后返回应用。';
+
+  @override
+  String get profileHealthAccessSynced => '访问已更新 — 正在同步最新数据。';
+
+  @override
+  String get profileHealthAccessUnsupported => '此平台不支持健康数据同步。';
+
+  @override
+  String get profileHealthAccessFailed => '无法请求访问。请重试。';
+
+  @override
   String get age => '年龄';
 
   @override
@@ -1243,10 +1301,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get mealAfterAnalysis => '分析后，仅在你确实吃了这道菜时点 ✓ — 会计入今日热量。';
 
   @override
-  String get mealCamera => 'Camera';
+  String get mealCamera => '相机';
 
   @override
-  String get mealGallery => 'Gallery';
+  String get mealGallery => '相册';
+
+  @override
+  String get mealPhotoReady => '照片已就绪 — 准备好后点击「分析餐食」。';
+
+  @override
+  String get mealPhotoSelected => '已选择的餐食照片';
+
+  @override
+  String get mealChangePhoto => '更换照片';
+
+  @override
+  String get mealRemovePhoto => '移除';
 
   @override
   String get mealAnalyze => '分析餐食';
@@ -2015,7 +2085,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get promoCodeInvalid => '优惠码无效。';
 
   @override
-  String get promoCodeAlreadyUsed => '此优惠码已在此个人资料中使用过。';
+  String get promoCodeAlreadyUsed => '此优惠码已在此个人资料或此设备上使用过。';
 
   @override
   String psychoQuestionOfBlock(int current, int total) {
@@ -2049,7 +2119,25 @@ class AppLocalizationsZh extends AppLocalizations {
   String get activityYourProgramFallback => '您的计划';
 
   @override
-  String get trialSevenDayFree => '7 天免费试用';
+  String get trialSevenDayFree => '24 小时免费试用';
+
+  @override
+  String trialCountdown(String time) {
+    return '试用 $time';
+  }
+
+  @override
+  String get trialNotifSixHoursTitle => '试用还有 6 小时结束';
+
+  @override
+  String get trialNotifSixHoursBody =>
+      '你的 24 小时免费试用将在 6 小时后结束。订阅 PHA Plus+ 以保留完整功能。';
+
+  @override
+  String get trialNotifOneHourTitle => '试用还有 1 小时结束';
+
+  @override
+  String get trialNotifOneHourBody => '免费试用不足一小时。立即订阅以保留 PHA 的全部功能。';
 
   @override
   String get trialNotifChannelName => '试用提醒';
@@ -2058,17 +2146,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get trialNotifChannelDesc => '免费试用结束前提醒';
 
   @override
-  String get trialNotifThreeDaysTitle => '试用还有 3 天结束';
+  String get trialNotifThreeDaysTitle => '试用还有 6 小时结束';
 
   @override
   String get trialNotifThreeDaysBody =>
-      '您的 7 天免费试用将在 3 天后结束。订阅 PHA Plus+ 以保留全部功能。';
+      '你的 24 小时免费试用将在 6 小时后结束。订阅 PHA Plus+ 以保留完整功能。';
 
   @override
-  String get trialNotifTwentyFourHoursTitle => '试用还有 24 小时结束';
+  String get trialNotifTwentyFourHoursTitle => '试用还有 1 小时结束';
 
   @override
-  String get trialNotifTwentyFourHoursBody => '免费试用不足一天。立即订阅以保留 PHA 的完整访问权限。';
+  String get trialNotifTwentyFourHoursBody => '免费试用不足一小时。立即订阅以保留 PHA 的全部功能。';
 
   @override
   String get uploadImageFormats => 'JPG、PNG、GIF';
@@ -2664,6 +2752,13 @@ class AppLocalizationsZh extends AppLocalizations {
       '多余体重会升高高血糖和心脏问题的风险。减小份量、多吃蔬菜并每日步行有帮助。';
 
   @override
+  String get clinicalFlagFattyLiverTitle => '脂肪肝风险';
+
+  @override
+  String get clinicalFlagFattyLiverBody =>
+      '存在肥胖或明显超重时，脂肪肝的可能性更高。建议做肝脏和胰腺超声，并与医生讨论结果。';
+
+  @override
   String get clinicalFlagTripleTitle => '体重 + 血压 + 血糖';
 
   @override
@@ -2765,7 +2860,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get actionHeartRate => '心率与心律';
 
   @override
-  String get actionHeartRateDesc => '智能手表心脏检查';
+  String get actionHeartRateDesc => '通过手表/手环或摄像头检查心率';
 
   @override
   String get actionEcg => '心电图';
@@ -2916,6 +3011,180 @@ class AppLocalizationsZh extends AppLocalizations {
   String get hrDisclaimer => '这不是医疗器械。智能手表数据不能替代医生建议。如感不适请就医。';
 
   @override
+  String get ppgTitle => '摄像头测心率';
+
+  @override
+  String get ppgSourceWatch => '手表 / 手环';
+
+  @override
+  String get ppgSourceCamera => '摄像头 + 闪光灯';
+
+  @override
+  String get ppgSourceHint => '可从穿戴设备读取心率，或用手机摄像头和闪光灯测量。';
+
+  @override
+  String get ppgMeasureCamera => '用摄像头测量';
+
+  @override
+  String get ppgStart => '开始测量';
+
+  @override
+  String get ppgStop => '停止';
+
+  @override
+  String get ppgRetry => '再测一次';
+
+  @override
+  String get ppgSave => '保存结果';
+
+  @override
+  String get ppgSaving => '保存中…';
+
+  @override
+  String get ppgSaved => '心率已保存到历史记录';
+
+  @override
+  String get ppgSaveFailed => '无法保存读数';
+
+  @override
+  String get ppgPreparing => '正在准备摄像头…';
+
+  @override
+  String get ppgPlaceFinger => '将手指放在摄像头和闪光灯上，直到圆圈变红';
+
+  @override
+  String get ppgCoverBothHint => '同时遮住镜头和闪光灯。圆圈变红后会自动开始测量。';
+
+  @override
+  String get ppgExitAndAnalyze => '退出并分析';
+
+  @override
+  String get ppgAnalyzed => '摄像头读数已保存并分析';
+
+  @override
+  String get ppgAnalysisTitle => '摄像头测量分析';
+
+  @override
+  String get ppgAnalysisStatusNormal => '静息脉搏处于舒适范围';
+
+  @override
+  String get ppgAnalysisStatusElevated => '静息脉搏偏高';
+
+  @override
+  String get ppgAnalysisStatusLow => '静息脉搏偏低';
+
+  @override
+  String get ppgAnalysisStatusHigh => '静息脉搏明显偏高';
+
+  @override
+  String ppgAnalysisBodyNormal(int bpm, int low, int high) {
+    return '摄像头读数：$bpm 次/分。您的静息舒适区间为 $low–$high 次/分。这看起来像平静的静息脉搏，适合作为日常状态参考。如需复核，可静坐几分钟后再测一次。';
+  }
+
+  @override
+  String ppgAnalysisBodyElevated(int bpm, int low, int high) {
+    return '摄像头读数：$bpm 次/分——高于您通常的 $low–$high 次/分静息区间。近期活动、压力、咖啡因、高温或恢复不足都可能使脉搏升高。请休息 2–3 分钟后静坐再测。';
+  }
+
+  @override
+  String ppgAnalysisBodyLow(int bpm, int low, int high) {
+    return '摄像头读数：$bpm 次/分——低于您通常的 $low–$high 次/分区间。经常训练的人静息脉搏往往更低。若头晕、乏力或不适请就医；否则请继续观察日常感觉。';
+  }
+
+  @override
+  String ppgAnalysisBodyHigh(int bpm, int low, int high) {
+    return '摄像头读数：$bpm 次/分——明显高于 $low–$high 次/分舒适区间。若胸痛、严重气短或即将晕厥请紧急就医；否则请休息几分钟后复测。';
+  }
+
+  @override
+  String ppgAnalysisRangeLabel(int low, int high) {
+    return '您的静息舒适区间：$low–$high 次/分';
+  }
+
+  @override
+  String ppgAnalysisQualityGood(int percent) {
+    return '信号质量 $percent% — 指尖信号稳定';
+  }
+
+  @override
+  String ppgAnalysisQualityFair(int percent) {
+    return '信号质量 $percent% — 可用；请保持手指静止以获得更清晰读数';
+  }
+
+  @override
+  String ppgAnalysisQualityPoor(int percent) {
+    return '信号质量 $percent% — 偏弱；请完全遮住镜头与闪光灯后重试';
+  }
+
+  @override
+  String get ppgAnalysisMethodNote => '通过摄像头与闪光灯测量（指尖 PPG）。这不是心电图，也不是医学诊断。';
+
+  @override
+  String get ppgHoldFinger => '保持手指不动，不要移开';
+
+  @override
+  String get ppgHoldStill => '请保持静止直到测量结束';
+
+  @override
+  String get ppgTipsHeader => '健康与生活贴士';
+
+  @override
+  String get ppgFact1 => '我们测量的不只是脉搏，还有心率变异性（HRV）。';
+
+  @override
+  String get ppgFact2 => '脉搏是心跳次数；变异性是每次心跳间隔如何变化。';
+
+  @override
+  String get ppgFact3 => '如何用摄像头测量变异性？这种方法叫光电容积脉搏波描记法。';
+
+  @override
+  String get ppgFact4 => '心跳时血管中的血容量变化，颜色也会随之变化。';
+
+  @override
+  String get ppgFact5 => '摄像头记录这些变化，从而得到心跳间隔时间。';
+
+  @override
+  String get ppgFact6 => '根据节律我们计算 SDNN、rMSSD 等标准 HRV 指标。';
+
+  @override
+  String get ppgFact7 => 'Apple 和 Garmin 等品牌的智能手表也使用变异性分析。';
+
+  @override
+  String get ppgFact8 => '坚持测量、收集自己的数据，会感觉更好。';
+
+  @override
+  String get ppgResultTitle => '测量完成';
+
+  @override
+  String ppgQuality(int percent) {
+    return '信号质量 $percent%';
+  }
+
+  @override
+  String get ppgExportRaw => '复制原始信号';
+
+  @override
+  String get ppgExportTitle => 'PHA 摄像头 PPG 导出';
+
+  @override
+  String get ppgExportCopied => '原始信号已复制';
+
+  @override
+  String get ppgNeedPermission => '需要摄像头权限才能用闪光灯测量心率。';
+
+  @override
+  String get ppgNoCamera => '此设备没有可用摄像头。';
+
+  @override
+  String get ppgNoTorch => '闪光灯不可用，测量可能不够准确。';
+
+  @override
+  String get ppgCameraError => '无法打开摄像头，请重试。';
+
+  @override
+  String get ppgDisclaimer => '这不是医疗设备。摄像头读数仅供参考，不能替代医生建议。';
+
+  @override
   String get hrChartTitle => '心率趋势';
 
   @override
@@ -3016,6 +3285,52 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get hrEcgFeatUnknown => '暂无分类。';
+
+  @override
+  String get hrEcgResultTitle => '处理结果';
+
+  @override
+  String get hrEcgNoDistortion => '未发现心律异常';
+
+  @override
+  String get hrEcgHasDistortion => '可能存在心律不齐';
+
+  @override
+  String get hrEcgUnclearDistortion => '无法明确分类心律';
+
+  @override
+  String get hrEcgAdviceNormalSinus => '最近一次心电看起来像规则的窦性心律。请继续关注自我感觉；这不是医学诊断。';
+
+  @override
+  String get hrEcgAdviceSinusTachy => '心率高于典型静息窦性心律。请休息、避免刺激物；若持续或感觉不适请就医。';
+
+  @override
+  String get hrEcgAdviceSinusBrady => '心率低于典型静息窦性心律。若头晕、乏力或气短，请联系医生。';
+
+  @override
+  String get hrEcgAdviceAfib => '记录提示可能与房颤相符的不规则心律。请尽快就医，不要只依赖手表。';
+
+  @override
+  String get hrEcgAdviceVt => '标记了看似危险的快速心律模式。若昏厥、胸痛或严重乏力，请紧急就医。';
+
+  @override
+  String get hrEcgAdviceVf => '标记了混乱的紧急模式。若感觉如此，请立即呼叫急救。';
+
+  @override
+  String get hrEcgAdviceAv1 => '可能存在轻度传导延迟。下次就诊时告知医生，尤其有新症状时。';
+
+  @override
+  String get hrEcgAdviceAv2 => '可能存在漏搏传导模式。请尽快就医做临床心电图。';
+
+  @override
+  String get hrEcgAdviceAv3 => '可能存在严重传导阻滞。请紧急就医。';
+
+  @override
+  String get hrEcgAdviceInconclusive => '传感器无法自信地分类此次描记。请保持静止重试，或请医生做标准心电图。';
+
+  @override
+  String get hrEcgAdviceUnknown =>
+      '尚无明确心律结果。请在 Apple Watch 上做心电并同步，然后点“读取传感器”。';
 
   @override
   String get hrIrregularRhythm => '不规则心律提醒';

@@ -190,7 +190,7 @@ extension MedicalL10n on AppLocalizations {
     };
   }
 
-  /// Short key-feature blurb for a rhythm kind (educational).
+  /// Short key-feature blurb for a rhythm kind (internal / Ai Doc only).
   String hrEcgRhythmFeatures(EcgRhythmKind kind) => switch (kind) {
         EcgRhythmKind.normalSinus => hrEcgFeatNormalSinus,
         EcgRhythmKind.sinusTachycardia => hrEcgFeatSinusTachy,
@@ -218,6 +218,29 @@ extension MedicalL10n on AppLocalizations {
         EcgRhythmKind.inconclusive => hrEcgInconclusive,
         EcgRhythmKind.unknown => hrEcgNotSet,
       };
+
+  /// Plain-language advice after ECG processing (no PR/QRS teaching jargon).
+  String hrEcgRhythmAdvice(EcgRhythmKind kind) => switch (kind) {
+        EcgRhythmKind.normalSinus => hrEcgAdviceNormalSinus,
+        EcgRhythmKind.sinusTachycardia => hrEcgAdviceSinusTachy,
+        EcgRhythmKind.sinusBradycardia => hrEcgAdviceSinusBrady,
+        EcgRhythmKind.atrialFibrillation => hrEcgAdviceAfib,
+        EcgRhythmKind.ventricularTachycardia => hrEcgAdviceVt,
+        EcgRhythmKind.ventricularFibrillation => hrEcgAdviceVf,
+        EcgRhythmKind.avBlockFirstDegree => hrEcgAdviceAv1,
+        EcgRhythmKind.avBlockSecondMobitzI => hrEcgAdviceAv2,
+        EcgRhythmKind.avBlockThirdDegree => hrEcgAdviceAv3,
+        EcgRhythmKind.inconclusive => hrEcgAdviceInconclusive,
+        EcgRhythmKind.unknown => hrEcgAdviceUnknown,
+      };
+
+  String hrEcgDistortionLabel(EcgRhythmKind kind) {
+    if (kind == EcgRhythmKind.normalSinus) return hrEcgNoDistortion;
+    if (kind == EcgRhythmKind.inconclusive || kind == EcgRhythmKind.unknown) {
+      return hrEcgUnclearDistortion;
+    }
+    return hrEcgHasDistortion;
+  }
 
   String analysisSummary(String uiStatus, int score, List<({String category, String status})> findings, List<String> gapKeys) {
     final opener = switch (uiStatus) {
