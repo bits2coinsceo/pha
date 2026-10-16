@@ -83,8 +83,9 @@ scp .env            user@host:~/pha-backend/.env   # если используе
 
 - **Ключ сервис-аккаунта НЕ коммитится** — он монтируется как volume только для
   чтения через `GOOGLE_APPLICATION_CREDENTIALS`.
-- Порт `8080` слушает только `127.0.0.1`. Снаружи API доступен через Caddy
-  (`deploy/Caddyfile`) на `https://api.pha-app.net`.
+- Порт `8080` слушает только `127.0.0.1` и docker-мост `172.17.0.1`. Снаружи API
+  отдаёт общий `nginx-site` на fest (`deploy/nginx-api.conf` →
+  `/srv/nginx/conf.d/pha-api.conf`, сертификат certbot) на `https://api.pha-app.net`.
 - Не оставляй `API_KEY` пустым и не используй запасной ключ шифрования.
 
 ## Свитчер моделей

@@ -11,7 +11,7 @@ _hits: dict[str, list[float]] = {}
 
 
 def client_ip(request: Request) -> str:
-    # Caddy appends the real client. The first value can be spoofed by the caller.
+    # nginx ($proxy_add_x_forwarded_for) appends the real client. The first value can be spoofed by the caller.
     forwarded = request.headers.get("x-forwarded-for", "")
     if forwarded:
         parts = [part.strip() for part in forwarded.split(",") if part.strip()]

@@ -6,7 +6,7 @@ Flutter app talks to it. Keep it up to date when the API changes.
 ## TL;DR
 
 - **Backend lives in** [`backend/`](backend/) — Python **FastAPI** wrapping **Vertex AI Gemini**.
-- **Deployed on** SSH host `fest`. Public URL is `https://api.pha-app.net` (Caddy → `127.0.0.1:8080`).
+- **Deployed on** SSH host `fest`. Public URL is `https://api.pha-app.net` (nginx-site + certbot → `172.17.0.1:8080`).
 - **App talks to it** via [`lib/api.dart`](lib/api.dart) (`ApiClient.chat` / `ApiClient.analyze`).
 - **Auth:** header `X-API-Key` on every call except `/health`. The server refuses to start if `API_KEY` or `PATIENT_ENCRYPTION_KEY` is missing.
 - Full backend docs: [`backend/README.md`](backend/README.md).
@@ -134,8 +134,6 @@ ssh fest 'cd ~/pha-backend && docker compose ps && docker compose logs -f'
 
 ## Known follow-ups
 
-- **HTTPS** — backend is plain HTTP on an IP; add a reverse proxy (Caddy/nginx)
-  with TLS + domain, then drop the iOS ATS exception.
 - **Deprecated SDK** — `vertexai.generative_models` is deprecated (removal
   ~2026-06-24); migrate `backend/app/vertex.py` to `google-genai`.
 - **Single worker** — SQLite usage counter assumes one uvicorn worker; move to

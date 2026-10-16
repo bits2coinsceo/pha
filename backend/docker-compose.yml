@@ -3,9 +3,11 @@ services:
     build: .
     image: pha-backend:latest
     container_name: pha-backend
-    # Только localhost. Снаружи — HTTPS-прокси (Caddy), не открытый :8080.
+    # Не наружу: 127.0.0.1 для health-check по SSH, 172.17.0.1 для nginx-site
+    # (общий nginx на fest с certbot), который отдаёт api.pha-app.net по HTTPS.
     ports:
       - "127.0.0.1:8080:8080"
+      - "172.17.0.1:8080:8080"
     environment:
       - GCP_PROJECT=${GCP_PROJECT:-pha-personal-health-assistant}
       - GCP_LOCATION=${GCP_LOCATION:-global}
@@ -41,21 +43,5 @@ services:
       retries: 3
       start_period: 10s
 
-  caddy:
-    image: caddy:2
-    container_name: pha-caddy
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy-data:/data
-      - caddy-config:/config
-    depends_on:
-      - api
-
 volumes:
   pha-usage:
-  caddy-data:
-  caddy-config:
